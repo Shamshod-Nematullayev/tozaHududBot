@@ -18,7 +18,10 @@ composer.hears("👤Yangi abonent ochish", (ctx) => {
   ctx.scene.enter("NEW_ABONENT");
 });
 composer.hears("🔎Izlash", (ctx) => {
-  ctx.reply(messages.izlashUsuliTanlash, keyboards.searchType);
+  ctx.reply(
+    messages[ctx.session.til ? ctx.session.til : "lotin"].izlashUsuliTanlash,
+    keyboards.searchType
+  );
 });
 composer.action("searchByID", (ctx) => {
   ctx.scene.enter("searchByID");

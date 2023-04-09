@@ -11,16 +11,19 @@ const guvohnomaKiritishScene = new Scenes.WizardScene(
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text))
         return ctx.reply(
-          messages.enterOnlyNumber,
+          messages[ctx.session.til ? ctx.session.til : "lotin"].enterOnlyNumber,
           keyboards.cancelBtn.resize()
         );
       if (ctx.message.text.length != 12)
         return ctx.reply(
-          messages.enterFullNamber,
+          messages[ctx.session.til ? ctx.session.til : "lotin"].enterFullNamber,
           keyboards.cancelBtn.resize()
         );
       ctx.wizard.state.KOD = parseInt(ctx.message.text);
-      ctx.reply(messages.enterPicture, keyboards.cancelBtn.resize());
+      ctx.reply(
+        messages[ctx.session.til ? ctx.session.til : "lotin"].enterPicture,
+        keyboards.cancelBtn.resize()
+      );
       ctx.wizard.next();
     } catch (error) {
       console.log(error);
@@ -30,11 +33,16 @@ const guvohnomaKiritishScene = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (!ctx.message.photo || ctx.message.photo.length < 1) {
-        return ctx.reply(messages.enterPicture);
+        return ctx.reply(
+          messages[ctx.session.til ? ctx.session.til : "lotin"].enterPicture
+        );
       } else {
         ctx.wizard.state.PICTURE_ID =
           ctx.message.photo[ctx.message.photo.length - 1].file_id;
-        ctx.reply(messages.enterComment, keyboards.cancelBtn.resize());
+        ctx.reply(
+          messages[ctx.session.til ? ctx.session.til : "lotin"].enterComment,
+          keyboards.cancelBtn.resize()
+        );
         ctx.wizard.next();
       }
     } catch (error) {
@@ -45,7 +53,9 @@ const guvohnomaKiritishScene = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (ctx.message.text.length > 300)
-        return ctx.reply(messages.biggierMaxLength);
+        return ctx.reply(
+          messages[ctx.session.til ? ctx.session.til : "lotin"].biggierMaxLength
+        );
 
       const newGuvohonoma = new Guvohnoma({
         kod: ctx.wizard.state.KOD,
@@ -84,10 +94,16 @@ const guvohnomaKiritishScene = new Scenes.WizardScene(
   }
 );
 guvohnomaKiritishScene.enter((ctx) => {
-  ctx.reply(messages.enterAbonentKod, keyboards.cancelBtn.resize());
+  ctx.reply(
+    messages[ctx.session.til ? ctx.session.til : "lotin"].enterAbonentKod,
+    keyboards.cancelBtn.resize()
+  );
 });
 guvohnomaKiritishScene.leave((ctx) => {
-  ctx.reply(messages.startGreeting, keyboards.mainKeyboard.resize());
+  ctx.reply(
+    messages[ctx.session.til ? ctx.session.til : "lotin"].startGreeting,
+    keyboards.mainKeyboard.resize()
+  );
 });
 
 module.exports = { guvohnomaKiritishScene };

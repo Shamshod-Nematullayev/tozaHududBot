@@ -11,7 +11,8 @@ const sendAnswerScene = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) {
         ctx.reply(
-          messages.ogohlantirishKiriting,
+          messages[ctx.session.til ? ctx.session.til : "lotin"]
+            .ogohlantirishKiriting,
           keyboards.adminAnswerKeyboard.resize()
         );
         return ctx.wizard.next();
@@ -35,29 +36,36 @@ const sendAnswerScene = new Scenes.WizardScene(
               }
             )
             .then(() => {
-              ctx.reply(messages.sended).then(() => {
-                const state = res.data;
-                ctx.telegram.editMessageText(
-                  process.env.CHANNEL,
-                  res.messageIdChannel,
-                  0,
-                  `<a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n` +
-                    `status: |✅BAJARILDI✅|\n` +
-                    `<b>${state.FISH}</b>\n` +
-                    `mahalla: ${qaysiMahalla(state.MFY_ID)}\n` +
-                    `kod: <code>${ctx.message.text}</code> \npowered by <a href="https://t.me/oliy_ong">Oliy_Ong</a>`,
-                  {
-                    reply_markup: null,
-                    parse_mode: "HTML",
-                    disable_web_page_preview: true,
-                  }
-                );
-                ctx.scene.leave();
-              });
+              ctx
+                .reply(
+                  messages[ctx.session.til ? ctx.session.til : "lotin"].sended
+                )
+                .then(() => {
+                  const state = res.data;
+                  ctx.telegram.editMessageText(
+                    process.env.CHANNEL,
+                    res.messageIdChannel,
+                    0,
+                    `<a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n` +
+                      `status: |✅BAJARILDI✅|\n` +
+                      `<b>${state.FISH}</b>\n` +
+                      `mahalla: ${qaysiMahalla(state.MFY_ID)}\n` +
+                      `kod: <code>${ctx.message.text}</code> \npowered by <a href="https://t.me/oliy_ong">Oliy_Ong</a>`,
+                    {
+                      reply_markup: null,
+                      parse_mode: "HTML",
+                      disable_web_page_preview: true,
+                    }
+                  );
+                  ctx.scene.leave();
+                });
             });
         })
         .catch(() => {
-          ctx.reply(messages.kodOchilmadi, keyboards.cancelBtn.resize());
+          ctx.reply(
+            messages[ctx.session.til ? ctx.session.til : "lotin"].kodOchilmadi,
+            keyboards.cancelBtn.resize()
+          );
         });
     } catch (error) {
       console.log(error);
@@ -71,7 +79,7 @@ const sendAnswerScene = new Scenes.WizardScene(
       $set: { isCancel: true },
     })
       .then((res) => {
-        ctx.reply(messages.sended);
+        ctx.reply(messages[ctx.session.til ? ctx.session.til : "lotin"].sended);
         ctx.telegram
           .sendMessage(
             res.user.id,
@@ -108,17 +116,25 @@ const sendAnswerScene = new Scenes.WizardScene(
           });
       })
       .catch((err) => {
-        return ctx.reply(messages.errorOccured);
+        return ctx.reply(
+          messages[ctx.session.til ? ctx.session.til : "lotin"].errorOccured
+        );
       });
   }
 );
 
 sendAnswerScene.enter((ctx) => {
-  ctx.reply(messages.enterAbonentKod, keyboards.adminAnswerKeyboard.resize());
+  ctx.reply(
+    messages[ctx.session.til ? ctx.session.til : "lotin"].enterAbonentKod,
+    keyboards.adminAnswerKeyboard.resize()
+  );
 });
 
 sendAnswerScene.leave((ctx) => {
-  ctx.reply(messages.startGreeting, keyboards.mainKeyboard.resize());
+  ctx.reply(
+    messages[ctx.session.til ? ctx.session.til : "lotin"].startGreeting,
+    keyboards.mainKeyboard.resize()
+  );
 });
 
 module.exports = sendAnswerScene;

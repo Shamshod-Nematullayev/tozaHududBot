@@ -22,7 +22,13 @@
     {
       "id": "1317631144:1317631144",
       "data": {
-        "__scenes": {}
+        "__scenes": {
+          "current": "NEW_ABONENT",
+          "state": {
+            "FISH": "👤Yangi abonent ochish"
+          },
+          "cursor": 1
+        }
       }
     },
     {
@@ -91,7 +97,13 @@
     {
       "id": "870372096:870372096",
       "data": {
-        "__scenes": {}
+        "__scenes": {
+          "current": "NEW_ABONENT",
+          "state": {
+            "FISH": "👤Yangi abonent ochish"
+          },
+          "cursor": 1
+        }
       }
     },
     {
