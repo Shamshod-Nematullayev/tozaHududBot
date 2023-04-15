@@ -27,11 +27,17 @@ const newAdminScene = new Scenes.WizardScene(
 );
 
 newAdminScene.enter((ctx) => {
-  ctx.reply(messages.enterYourLogin, keyboards.cancelBtn.resize());
+  ctx.reply(
+    messages.enterYourLogin,
+    keyboards[ctx.session.til].cancelBtn.resize()
+  );
 });
 
 newAdminScene.leave((ctx) => {
-  ctx.reply(messages.adminDone, keyboards.mainKeyboard.resize());
+  ctx.reply(
+    messages.adminDone,
+    keyboards[ctx.session.til].mainKeyboard.resize()
+  );
 });
 
 module.exports = newAdminScene;

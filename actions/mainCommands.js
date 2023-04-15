@@ -14,13 +14,13 @@ function qaysiMahalla(id) {
   });
   return res;
 }
-composer.hears("👤Yangi abonent ochish", (ctx) => {
+composer.hears(["👤Yangi abonent ochish", "👤Янги абонент"], (ctx) => {
   ctx.scene.enter("NEW_ABONENT");
 });
-composer.hears("🔎Izlash", (ctx) => {
+composer.hears(["🔎Izlash", "🔎Излаш"], (ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].izlashUsuliTanlash,
-    keyboards.searchType
+    messages[ctx.session.til].izlashUsuliTanlash,
+    keyboards[ctx.session.til].searchType
   );
 });
 composer.action("searchByID", (ctx) => {
@@ -30,37 +30,40 @@ composer.action("searchByFISH", (ctx) => {
   ctx.reply("Bu funksiya hali to'liq ishlab chiqilmadi");
 });
 
-composer.hears("👥Mening abonentlarim", async (ctx) => {
-  const abonents = await Abonent.find({ ["user.id"]: ctx.from.id });
-  let str = "";
-  if (abonents.length > 0) {
-    abonents.forEach((elem, i) => {
-      str += `${i + 1}. ${qaysiMahalla(elem.data.MFY_ID)}  ${
-        elem.isCancel
-          ? "<strike>" + elem.data.FISH + "</strike>"
-          : "<b>" + elem.data.FISH + "</b>"
-      }: <code>${elem.kod}</code>\n`;
-    });
-    ctx.reply(str, { parse_mode: "HTML" });
-  } else {
-    ctx.reply(messages.noAbonent);
+composer.hears(
+  ["👥Mening abonentlarim", "👥Менинг абонентларим"],
+  async (ctx) => {
+    const abonents = await Abonent.find({ ["user.id"]: ctx.from.id });
+    let str = "";
+    if (abonents.length > 0) {
+      abonents.forEach((elem, i) => {
+        str += `${i + 1}. ${qaysiMahalla(elem.data.MFY_ID)}  ${
+          elem.isCancel
+            ? "<strike>" + elem.data.FISH + "</strike>"
+            : "<b>" + elem.data.FISH + "</b>"
+        }: <code>${elem.kod}</code>\n`;
+      });
+      ctx.reply(str, { parse_mode: "HTML" });
+    } else {
+      ctx.reply(messages.noAbonent);
+    }
   }
-});
+);
 
-composer.hears("📓Qo`llanma", (ctx) => {
+composer.hears(["📓Qo`llanma", "📓Қўлланма"], (ctx) => {
   ctx.reply("Hozircha video qo'llanma mavjud emas. 🧠 Ishlatish kifoya");
 });
-composer.hears("✏️Ma'lumotlarini o'zgartirish", (ctx) => {
+composer.hears(["✏️Ma'lumotlarini o'zgartirish", "✏️Тахрирлаш"], (ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].chooseEditType,
-    keyboards.editTypes.oneTime()
+    messages[ctx.session.til].chooseEditType,
+    keyboards[ctx.session.til].editTypes.oneTime()
   );
 });
 
-composer.hears("⚙Sozlamalar", (ctx) => {
+composer.hears(["⚙Sozlamalar", "⚙Созламалар"], (ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].chooseMenu,
-    keyboards.settings
+    messages[ctx.session.til].chooseMenu,
+    keyboards[ctx.session.til].settings
   );
 });
 // Ma'lumotlarni o'zgartirish funcsiyalariga yo'llash

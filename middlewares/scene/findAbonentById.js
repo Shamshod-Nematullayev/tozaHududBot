@@ -18,13 +18,13 @@ const findAbonentScene = new Scenes.WizardScene("searchByID", (ctx) => {
 
     if (isNaN(ctx.message.text)) {
       ctx.reply(
-        messages[ctx.session.til ? ctx.session.til : "lotin"].enterOnlyNumber,
-        messages[ctx.session.til ? ctx.session.til : "lotin"].cancelBtn.resize()
+        messages[ctx.session.til].enterOnlyNumber,
+        messages[ctx.session.til].cancelBtn.resize()
       );
     } else if (ctx.message.text.length !== 12) {
       ctx.reply(
-        messages[ctx.session.til ? ctx.session.til : "lotin"].enterFullNamber,
-        keyboards.cancelBtn.resize()
+        messages[ctx.session.til].enterFullNamber,
+        keyboards[ctx.session.til].cancelBtn.resize()
       );
     } else {
       const abonent = findById(ctx.message.text);
@@ -45,25 +45,25 @@ const findAbonentScene = new Scenes.WizardScene("searchByID", (ctx) => {
             }\nETK_raqam: ${
               abonent.ETK_raqam
             }\n\n<i>Oxirgi yangilanish ${lastUpdate}</i>`,
-            keyboards.cancelBtn.resize()
+            keyboards[ctx.session.til].cancelBtn.resize()
           )
         : ctx.reply(
-            messages[ctx.session.til ? ctx.session.til : "lotin"].notFoundData,
-            keyboards.cancelBtn.resize()
+            messages[ctx.session.til].notFoundData,
+            keyboards[ctx.session.til].cancelBtn.resize()
           );
     }
   } catch (error) {}
 });
 findAbonentScene.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].enterLitsavoy,
-    keyboards.cancelBtn.resize()
+    messages[ctx.session.til].enterLitsavoy,
+    keyboards[ctx.session.til].cancelBtn.resize()
   );
 });
 findAbonentScene.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].startGreeting,
-    keyboards.mainKeyboard.resize()
+    messages[ctx.session.til].startGreeting,
+    keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });
 

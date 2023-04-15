@@ -14,9 +14,8 @@ const newAbonentScene = new Scenes.WizardScene(
       if (isCancel(ctx.message.text)) return ctx.scene.leave();
       ctx.scene.state.FISH = kirillga(ctx.message.text);
       ctx.reply(
-        messages[ctx.session.til ? ctx.session.til : "lotin"]
-          .enterYashovchiSoni,
-        keyboards.cancelBtn.resize()
+        messages[ctx.session.til].enterYashovchiSoni,
+        keyboards[ctx.session.til].cancelBtn.resize()
       );
       ctx.wizard.next();
     } catch (error) {
@@ -28,15 +27,14 @@ const newAbonentScene = new Scenes.WizardScene(
       if (isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text)) {
         ctx.reply(
-          messages[ctx.session.til ? ctx.session.til : "lotin"]
-            .enterYashovchiSoni,
-          keyboards.cancelBtn.resize()
+          messages[ctx.session.til].enterYashovchiSoni,
+          keyboards[ctx.session.til].cancelBtn.resize()
         );
       } else {
         ctx.scene.state.YASHOVCHILAR = parseInt(ctx.message.text);
         ctx.reply(
-          messages[ctx.session.til ? ctx.session.til : "lotin"].enterMahalla,
-          keyboards.mahallalar.oneTime()
+          messages[ctx.session.til].enterMahalla,
+          keyboards[ctx.session.til].mahallalar.oneTime()
         );
         ctx.wizard.next();
       }
@@ -50,9 +48,7 @@ const newAbonentScene = new Scenes.WizardScene(
       const mfy_id = ctx.update.callback_query.data.split("_")[1];
       ctx.scene.state.MFY_ID = mfy_id;
       ctx.deleteMessage();
-      ctx.reply(
-        messages[ctx.session.til ? ctx.session.til : "lotin"].enterKocha
-      );
+      ctx.reply(messages[ctx.session.til].enterKocha);
       ctx.wizard.next();
     } catch (error) {
       console.log(error);
@@ -62,9 +58,7 @@ const newAbonentScene = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       ctx.scene.state.HUDUD = ctx.message.text;
-      ctx.reply(
-        messages[ctx.session.til ? ctx.session.til : "lotin"].enterPasport1
-      );
+      ctx.reply(messages[ctx.session.til].enterPasport1);
       ctx.wizard.next();
     } catch (error) {
       console.log(error);
@@ -74,9 +68,7 @@ const newAbonentScene = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       ctx.scene.state.PASSPORT = ctx.message.text;
-      ctx.reply(
-        messages[ctx.session.til ? ctx.session.til : "lotin"].enterPasport2
-      );
+      ctx.reply(messages[ctx.session.til].enterPasport2);
       ctx.wizard.next();
     } catch (error) {
       console.log(error);
@@ -126,18 +118,14 @@ const newAbonentScene = new Scenes.WizardScene(
               $set: { messageIdChannel: res.message_id },
             });
           });
-        ctx.reply(
-          messages[ctx.session.til ? ctx.session.til : "lotin"].accepted
-        );
+        ctx.reply(messages[ctx.session.til].accepted);
 
         ctx.scene.leave();
       } else {
         ctx.replyWithPhoto(
           "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DZjJS0SoXq6A&psig=AOvVaw1IOqLHD3CndpvLm1vqLwHJ&ust=1679216266118000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCPDp6ZqO5f0CFQAAAAAdAAAAABAE",
           {
-            caption:
-              messages[ctx.session.til ? ctx.session.til : "lotin"]
-                .enterReallyPinfl,
+            caption: messages[ctx.session.til].enterReallyPinfl,
           }
         );
       }
@@ -148,16 +136,16 @@ const newAbonentScene = new Scenes.WizardScene(
 );
 newAbonentScene.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].enterFISH,
+    messages[ctx.session.til].enterFISH,
 
-    keyboards.cancelBtn.resize()
+    keyboards[ctx.session.til].cancelBtn.resize()
   );
 });
 
 newAbonentScene.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].startGreeting,
-    keyboards.mainKeyboard.resize()
+    messages[ctx.session.til].startGreeting,
+    keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });
 module.exports = newAbonentScene;

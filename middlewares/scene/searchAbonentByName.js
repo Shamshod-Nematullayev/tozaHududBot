@@ -11,9 +11,7 @@ const searchAbonentbyName = new Scenes.WizardScene(
       const mfy_id = ctx.update.callback_query.data.split("_")[1];
       ctx.scene.state.MFY_ID = mfy_id;
       ctx.deleteMessage();
-      ctx.reply(
-        messages[ctx.session.til ? ctx.session.til : "lotin"].enterFISH
-      );
+      ctx.reply(messages[ctx.session.til].enterFISH);
       ctx.wizard.next();
     } catch (error) {
       console.log(error);
@@ -30,13 +28,13 @@ const searchAbonentbyName = new Scenes.WizardScene(
 );
 searchAbonentbyName.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].enterMahalla,
-    keyboards.mahallalar.oneTime()
+    messages[ctx.session.til].enterMahalla,
+    keyboards[ctx.session.til].mahallalar.oneTime()
   );
 });
 searchAbonentbyName.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].startGreeting,
-    keyboards.mainKeyboard
+    messages[ctx.session.til].startGreeting,
+    keyboards[ctx.session.til].mainKeyboard
   );
 });

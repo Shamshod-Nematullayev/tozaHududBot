@@ -12,7 +12,7 @@ const stage = new Scenes.Stage([
   newAdminScene,
   sendAnswerScene,
   findAbonentScene,
-  // guvohnomaKiritishScene,
+  // guvohnomaKirit ishScene,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

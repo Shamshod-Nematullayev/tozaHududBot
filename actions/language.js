@@ -6,22 +6,22 @@ const { messages } = require("../lib/messages");
 const composer = new Composer();
 composer.action("language", (ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].chooseLanguage,
-    keyboards.chooseLanguge
+    messages[ctx.session.til].chooseLanguage,
+    keyboards[ctx.session.til].chooseLanguge
   );
 });
 composer.action("lotin_tili_tanlash", (ctx) => {
   ctx.session.til = "lotin";
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].choosedLang,
-    keyboards.mainKeyboard.resize()
+    messages[ctx.session.til].choosedLang,
+    keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });
 composer.action("kiril_tili_tanlash", (ctx) => {
   ctx.session.til = "kiril";
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].choosedLang,
-    keyboards.mainKeyboard.resize()
+    messages[ctx.session.til].choosedLang,
+    keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });
 

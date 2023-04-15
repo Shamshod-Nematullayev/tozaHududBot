@@ -11,9 +11,8 @@ const sendAnswerScene = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) {
         ctx.reply(
-          messages[ctx.session.til ? ctx.session.til : "lotin"]
-            .ogohlantirishKiriting,
-          keyboards.adminAnswerKeyboard.resize()
+          messages[ctx.session.til].ogohlantirishKiriting,
+          keyboards[ctx.session.til].adminAnswerKeyboard.resize()
         );
         return ctx.wizard.next();
       } else if (ctx.message && ctx.message.text == "Chiqish") {
@@ -36,35 +35,31 @@ const sendAnswerScene = new Scenes.WizardScene(
               }
             )
             .then(() => {
-              ctx
-                .reply(
-                  messages[ctx.session.til ? ctx.session.til : "lotin"].sended
-                )
-                .then(() => {
-                  const state = res.data;
-                  ctx.telegram.editMessageText(
-                    process.env.CHANNEL,
-                    res.messageIdChannel,
-                    0,
-                    `<a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n` +
-                      `status: |✅BAJARILDI✅|\n` +
-                      `<b>${state.FISH}</b>\n` +
-                      `mahalla: ${qaysiMahalla(state.MFY_ID)}\n` +
-                      `kod: <code>${ctx.message.text}</code> \npowered by <a href="https://t.me/oliy_ong">Oliy_Ong</a>`,
-                    {
-                      reply_markup: null,
-                      parse_mode: "HTML",
-                      disable_web_page_preview: true,
-                    }
-                  );
-                  ctx.scene.leave();
-                });
+              ctx.reply(messages[ctx.session.til].sended).then(() => {
+                const state = res.data;
+                ctx.telegram.editMessageText(
+                  process.env.CHANNEL,
+                  res.messageIdChannel,
+                  0,
+                  `<a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n` +
+                    `status: |✅BAJARILDI✅|\n` +
+                    `<b>${state.FISH}</b>\n` +
+                    `mahalla: ${qaysiMahalla(state.MFY_ID)}\n` +
+                    `kod: <code>${ctx.message.text}</code> \npowered by <a href="https://t.me/oliy_ong">Oliy_Ong</a>`,
+                  {
+                    reply_markup: null,
+                    parse_mode: "HTML",
+                    disable_web_page_preview: true,
+                  }
+                );
+                ctx.scene.leave();
+              });
             });
         })
         .catch(() => {
           ctx.reply(
-            messages[ctx.session.til ? ctx.session.til : "lotin"].kodOchilmadi,
-            keyboards.cancelBtn.resize()
+            messages[ctx.session.til].kodOchilmadi,
+            keyboards[ctx.session.til].cancelBtn.resize()
           );
         });
     } catch (error) {
@@ -79,7 +74,7 @@ const sendAnswerScene = new Scenes.WizardScene(
       $set: { isCancel: true },
     })
       .then((res) => {
-        ctx.reply(messages[ctx.session.til ? ctx.session.til : "lotin"].sended);
+        ctx.reply(messages[ctx.session.til].sended);
         ctx.telegram
           .sendMessage(
             res.user.id,
@@ -116,24 +111,22 @@ const sendAnswerScene = new Scenes.WizardScene(
           });
       })
       .catch((err) => {
-        return ctx.reply(
-          messages[ctx.session.til ? ctx.session.til : "lotin"].errorOccured
-        );
+        return ctx.reply(messages[ctx.session.til].errorOccured);
       });
   }
 );
 
 sendAnswerScene.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].enterAbonentKod,
-    keyboards.adminAnswerKeyboard.resize()
+    messages[ctx.session.til].enterAbonentKod,
+    keyboards[ctx.session.til].adminAnswerKeyboard.resize()
   );
 });
 
 sendAnswerScene.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].startGreeting,
-    keyboards.mainKeyboard.resize()
+    messages[ctx.session.til].startGreeting,
+    keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });
 

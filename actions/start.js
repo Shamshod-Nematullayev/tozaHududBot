@@ -19,27 +19,24 @@ composer.start(async (ctx) => {
           ctx.scene.enter("answer_to_inspector");
         } else {
           ctx.reply(
-            messages[ctx.session.til ? ctx.session.til : "lotin"]
-              .youAreNotAdmin,
-            keyboards.mainKeyboard.resize()
+            messages[ctx.session.til].youAreNotAdmin,
+            keyboards[ctx.session.til].mainKeyboard.resize()
           );
         }
       })
       .catch((err) => {
         console.log(err);
-        ctx.reply(
-          messages[ctx.session.til ? ctx.session.til : "lotin"].notFoundData
-        );
+        ctx.reply(messages[ctx.session.til].notFoundData);
       });
   } else {
     const admin = await Admin.findOne({ user_id: ctx.from.id });
     if (admin) {
       // Admin dashboard
-      // ctx.reply(messages.startGreeting, keyboards.mainKeyboard.resize());
+      // ctx.reply(messages.startGreeting, keyboards[ctx.session.til].mainKeyboard.resize());
     } else {
       ctx.reply(
-        messages[ctx.session.til ? ctx.session.til : "lotin"].startGreeting,
-        keyboards.mainKeyboard.resize()
+        messages[ctx.session.til].startGreeting,
+        keyboards[ctx.session.til].mainKeyboard.resize()
       );
     }
   }
