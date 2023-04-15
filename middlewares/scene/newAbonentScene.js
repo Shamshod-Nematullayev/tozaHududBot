@@ -4,6 +4,7 @@ const { messages } = require("../../lib/messages");
 const { Abonent } = require("../../models/YangiAbonent");
 const isCancel = require("../smallFunctions/isCancel");
 const isPinfl = require("../smallFunctions/isPinfl");
+const { kirillga } = require("../smallFunctions/lotinKiril");
 const qaysiMahalla = require("../smallFunctions/qaysiMahalla");
 
 const newAbonentScene = new Scenes.WizardScene(
@@ -11,9 +12,11 @@ const newAbonentScene = new Scenes.WizardScene(
   (ctx) => {
     try {
       if (isCancel(ctx.message.text)) return ctx.scene.leave();
-      ctx.scene.state.FISH = ctx.message.text;
+      ctx.scene.state.FISH = kirillga(ctx.message.text);
       ctx.reply(
-        messages[ctx.session.til ? ctx.session.til : "lotin"].enterYashovchiSoni
+        messages[ctx.session.til ? ctx.session.til : "lotin"]
+          .enterYashovchiSoni,
+        keyboards.cancelBtn.resize()
       );
       ctx.wizard.next();
     } catch (error) {
@@ -144,7 +147,11 @@ const newAbonentScene = new Scenes.WizardScene(
   }
 );
 newAbonentScene.enter((ctx) => {
-  messages[ctx.session.til ? ctx.session.til : "lotin"];
+  ctx.reply(
+    messages[ctx.session.til ? ctx.session.til : "lotin"].enterFISH,
+
+    keyboards.cancelBtn.resize()
+  );
 });
 
 newAbonentScene.leave((ctx) => {

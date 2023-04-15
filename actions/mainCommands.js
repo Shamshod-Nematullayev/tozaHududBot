@@ -51,9 +51,18 @@ composer.hears("📓Qo`llanma", (ctx) => {
   ctx.reply("Hozircha video qo'llanma mavjud emas. 🧠 Ishlatish kifoya");
 });
 composer.hears("✏️Ma'lumotlarini o'zgartirish", (ctx) => {
-  ctx.reply(messages.chooseEditType, keyboards.editTypes.oneTime());
+  ctx.reply(
+    messages[ctx.session.til ? ctx.session.til : "lotin"].chooseEditType,
+    keyboards.editTypes.oneTime()
+  );
 });
 
+composer.hears("⚙Sozlamalar", (ctx) => {
+  ctx.reply(
+    messages[ctx.session.til ? ctx.session.til : "lotin"].chooseMenu,
+    keyboards.settings
+  );
+});
 // Ma'lumotlarni o'zgartirish funcsiyalariga yo'llash
 // composer.action("o'lim guvohnomasi", (ctx) => {
 //   ctx.scene.enter("GUVOHNOMA_KIRITISH");
