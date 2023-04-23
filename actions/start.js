@@ -32,7 +32,10 @@ composer.start(async (ctx) => {
     const admin = await Admin.findOne({ user_id: ctx.from.id });
     if (admin) {
       // Admin dashboard
-      // ctx.reply(messages.startGreeting, keyboards[ctx.session.til].mainKeyboard.resize());
+      ctx.reply(
+        messages[ctx.session.til].heyAdmin,
+        keyboards[ctx.session.til].adminKeyboard.resize()
+      );
     } else {
       ctx.reply(
         messages[ctx.session.til].startGreeting,

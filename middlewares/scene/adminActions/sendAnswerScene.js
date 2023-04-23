@@ -1,9 +1,9 @@
 const { Scenes } = require("telegraf");
-const { keyboards } = require("../../lib/keyboards");
-const { messages } = require("../../lib/messages");
-const { Abonent } = require("../../models/YangiAbonent");
-const isCancel = require("../smallFunctions/isCancel");
-const qaysiMahalla = require("../smallFunctions/qaysiMahalla");
+const { keyboards } = require("../../../lib/keyboards");
+const { messages } = require("../../../lib/messages");
+const { Abonent } = require("../../../models/YangiAbonent");
+const isCancel = require("../../smallFunctions/isCancel");
+const qaysiMahalla = require("../../smallFunctions/qaysiMahalla");
 
 const sendAnswerScene = new Scenes.WizardScene(
   "answer_to_inspector",
@@ -125,8 +125,8 @@ sendAnswerScene.enter((ctx) => {
 
 sendAnswerScene.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].startGreeting,
-    keyboards[ctx.session.til].mainKeyboard.resize()
+    messages[ctx.session.til ? ctx.session.til : "lotin"].startGreeting,
+    keyboards[ctx.session.til ? ctx.session.til : "lotin"].mainKeyboard.resize()
   );
 });
 

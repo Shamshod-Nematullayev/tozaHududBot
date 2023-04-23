@@ -4,14 +4,15 @@ const LocalSession = require("telegraf-session-local");
 const newAbonentScene = require("./scene/newAbonentScene");
 const newAdminScene = require("./scene/newAdminScene");
 const findAbonentScene = require("./scene/findAbonentById");
-const sendAnswerScene = require("./scene/sendAnswerScene");
-const { guvohnomaKiritishScene } = require("./scene/newGuvohnoma");
+const sendAnswerScene = require("./scene/adminActions/sendAnswerScene");
+const importIncomeScene = require("./scene/adminActions/importIncome");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
   newAdminScene,
   sendAnswerScene,
   findAbonentScene,
+  importIncomeScene,
   // guvohnomaKirit ishScene,
 ]);
 
