@@ -43,8 +43,12 @@ composer.action("add_notification_letter", (ctx) => {
   if (!confirm) {
     ctx.reply(messages.lotin.youAreNotAdmin);
   } else {
-    // Bildirishnoma kiritiladigan sahnaga yo'l
+    ctx.scene.enter("add_notification");
   }
+});
+
+composer.action("show_abonent_pic", (ctx) => {
+  ctx.scene.enter("show_abonent_pic");
 });
 
 bot.use(composer);

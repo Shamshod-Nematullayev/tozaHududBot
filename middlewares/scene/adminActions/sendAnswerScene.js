@@ -125,8 +125,10 @@ sendAnswerScene.enter((ctx) => {
 
 sendAnswerScene.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].startGreeting,
-    keyboards[ctx.session.til ? ctx.session.til : "lotin"].mainKeyboard.resize()
+    messages[ctx.session.til ? ctx.session.til : "lotin"].heyAdmin,
+    keyboards[
+      ctx.session.til ? ctx.session.til : "lotin"
+    ].adminKeyboard.resize()
   );
 });
 

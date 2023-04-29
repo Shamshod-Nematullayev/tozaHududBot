@@ -6,6 +6,9 @@ const newAdminScene = require("./scene/newAdminScene");
 const findAbonentScene = require("./scene/findAbonentById");
 const sendAnswerScene = require("./scene/adminActions/sendAnswerScene");
 const importIncomeScene = require("./scene/adminActions/importIncome");
+const { fuqoroRasmiScene } = require("./scene/fuqoroRasmiScene");
+const { showAbonentPic } = require("./scene/adminActions/showAbonentPic");
+const { addNotification } = require("./scene/adminActions/addNotification");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -13,6 +16,9 @@ const stage = new Scenes.Stage([
   sendAnswerScene,
   findAbonentScene,
   importIncomeScene,
+  fuqoroRasmiScene,
+  showAbonentPic,
+  addNotification,
   // guvohnomaKirit ishScene,
 ]);
 

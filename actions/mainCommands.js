@@ -71,4 +71,9 @@ composer.hears(["⚙Sozlamalar", "⚙Созламалар"], (ctx) => {
 //   ctx.scene.enter("GUVOHNOMA_KIRITISH");
 // });
 
+// Fuqoro rasmini tashlash
+composer.action("fuqoro_rasmi", (ctx) => {
+  ctx.scene.enter("fuqoro_rasmini_kiritish");
+});
+
 bot.use(composer);
