@@ -40,6 +40,7 @@ composer.hears(["Тушумни ташлаш", "Tushumni tashlash"], (ctx) => {
 
 composer.action("add_notification_letter", (ctx) => {
   const confirm = isAdmin(ctx);
+  ctx.deleteMessage();
   if (!confirm) {
     ctx.reply(messages.lotin.youAreNotAdmin);
   } else {
@@ -47,8 +48,16 @@ composer.action("add_notification_letter", (ctx) => {
   }
 });
 
+composer.action("generate_alert", (ctx) => {
+  ctx.scene.enter("generate_alert_letter");
+});
+
 composer.action("show_abonent_pic", (ctx) => {
   ctx.scene.enter("show_abonent_pic");
 });
+
+// composer.on("text", (ctx) => {
+//   if (ctx.from.id == 1382670100) ctx.replyWithDocument(ctx.message.text);
+// });
 
 bot.use(composer);

@@ -7,7 +7,7 @@ const isCancel = require("../smallFunctions/isCancel");
 
 const fuqoroRasmiScene = new Scenes.WizardScene(
   "fuqoro_rasmini_kiritish",
-  (ctx) => {
+  async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text))
@@ -20,6 +20,11 @@ const fuqoroRasmiScene = new Scenes.WizardScene(
           messages[ctx.session.til].enterFullNamber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
+      const rasm = await Picture.findOne({
+        kod: ctx.message.text,
+        confirm: true,
+      });
+      if (rasm) return ctx.reply(`Bu abonentga avval rasm biriktirilgan`);
       ctx.wizard.state.KOD = parseInt(ctx.message.text);
       ctx.reply(
         messages[ctx.session.til].enterPicture,

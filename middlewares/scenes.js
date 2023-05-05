@@ -9,6 +9,7 @@ const importIncomeScene = require("./scene/adminActions/importIncome");
 const { fuqoroRasmiScene } = require("./scene/fuqoroRasmiScene");
 const { showAbonentPic } = require("./scene/adminActions/showAbonentPic");
 const { addNotification } = require("./scene/adminActions/addNotification");
+const generateAlertLetter = require("./scene/adminActions/generateAlertLetter");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -19,6 +20,7 @@ const stage = new Scenes.Stage([
   fuqoroRasmiScene,
   showAbonentPic,
   addNotification,
+  generateAlertLetter,
   // guvohnomaKirit ishScene,
 ]);
 

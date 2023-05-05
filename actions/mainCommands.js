@@ -1,4 +1,4 @@
-const { Composer, Scenes } = require("telegraf");
+const { Composer, Scenes, Markup } = require("telegraf");
 const { bot } = require("../core/bot");
 const { Abonent } = require("../models/YangiAbonent");
 const composer = new Composer();
@@ -75,5 +75,33 @@ composer.hears(["⚙Sozlamalar", "⚙Созламалар"], (ctx) => {
 composer.action("fuqoro_rasmi", (ctx) => {
   ctx.scene.enter("fuqoro_rasmini_kiritish");
 });
+// Maxsus topshiriq bo'yicha open budjet
+// composer.hears("kichikming", (ctx) => {
+//   ctx.replyWithPhoto(
+//     { source: "./lib/kich.jpg" },
 
+//     {
+//       caption: `<a href="https://t.me/ochiqbudjetbot?start=00264921008" >Кичикминг </a>қишлоғи учун бефарқ бўлманг`,
+//       reply_markup: Markup.inlineKeyboard([
+//         [
+//           Markup.button.url(
+//             `🙏Овоз бериш🙏`,
+//             "https://t.me/ochiqbudjetbot?start=00264921008"
+//           ),
+//         ],
+//         [
+//           Markup.button.url(
+//             `🗒 Маълумот олиш`,
+//             "https://t.me/ochiqbudjetbot?start=00264921008"
+//           ),
+//         ],
+//       ]).reply_markup,
+//       parse_mode: "HTML",
+//     }
+//   );
+// });
+bot.catch((err, ctx) => {
+  ctx.telegram.sendMessage(1382670100, "Xatolik");
+  console.log({ err });
+});
 bot.use(composer);

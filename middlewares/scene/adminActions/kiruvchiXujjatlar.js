@@ -5,7 +5,7 @@ const { SudBildirishnoma } = require("../../../models/SudBildirishnoma");
 const isCancel = require("../../smallFunctions/isCancel");
 
 const addNotification = new Scenes.WizardScene(
-  "add_notification",
+  "income_document",
   async (ctx) => {
     if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
     if (!ctx.message.document) {
@@ -20,6 +20,8 @@ const addNotification = new Scenes.WizardScene(
     inspectors.forEach((ins) => {
       buttonsArray.push([Markup.button.callback(ins.name, ins.id)]);
     });
+    buttonsArray.push([Markup.button.callback("Boshqa", "boshqa")]);
+
     ctx.reply(
       messages[ctx.session.til].chooseInspektor,
       Markup.inlineKeyboard(buttonsArray).oneTime()
@@ -111,7 +113,7 @@ const addNotification = new Scenes.WizardScene(
 
 addNotification.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].enterNotificationFile,
+    messages[ctx.session.til].enterDocument,
     keyboards[ctx.session.til].cancelBtn.resize()
   );
 });

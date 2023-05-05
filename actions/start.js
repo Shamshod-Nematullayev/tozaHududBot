@@ -48,13 +48,13 @@ composer.start(async (ctx) => {
                     }
                   );
                 } else {
-                  return ctx.telegram.sendPhoto(
-                    pic.user_id,
-                    pic.photo_file_id,
-                    {
+                  return ctx.telegram
+                    .sendPhoto(pic.user_id, pic.photo_file_id, {
                       caption: messages.lotin.canceledPicture,
-                    }
-                  );
+                    })
+                    .then(() => {
+                      ctx.reply(messages.lotin.sended);
+                    });
                 }
               });
           });

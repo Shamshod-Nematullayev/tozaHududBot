@@ -5,6 +5,7 @@ const isCancel = require("../../smallFunctions/isCancel");
 const excelToJson = require("convert-excel-to-json");
 const https = require("https");
 const fs = require("fs");
+const qaysiMahalla = require("../../smallFunctions/qaysiMahalla");
 const nodeHtmlToImage = require("node-html-to-image");
 
 const importIncomeScene = new Scenes.WizardScene(
@@ -157,9 +158,176 @@ const importIncomeScene = new Scenes.WizardScene(
               ctx.scene.leave();
             });
           });
+        } else if (
+          ctx.message.document.mime_type == "application/vnd.ms-excel"
+        ) {
+          const xlsx = await ctx.telegram.getFileLink(
+            ctx.message.document.file_id
+          );
+          const excelFile = fs.createWriteStream("./incomeReportMFY.xls");
+          https.get(xlsx.href, (res) => {
+            res.pipe(excelFile);
+            excelFile.on("finish", async (cb) => {
+              const xls = excelToJson({
+                sourceFile: "./incomeReportMFY.xls",
+              });
+              const sheet = xls[Object.keys(xls)[0]];
+              const newJSON = {};
+              newJSON.sana = sheet[2].A;
+              newJSON.davr = sheet[3].A;
+              newJSON.mahallalar = [];
+              for (let i = 0; i < sheet.length - 9; i++) {
+                if (parseInt(sheet[i + 7].F) != 0)
+                  newJSON.mahallalar.push({
+                    id: sheet[i + 7].A,
+                    xisoblandi: parseInt(sheet[i + 7].F),
+                    tushum: parseInt(sheet[i + 7].G),
+                  });
+              }
+              let jamiXisoblandi = 0;
+              let jamiTushum = 0;
+              newJSON.mahallalar.sort(
+                (a, b) =>
+                  parseFloat(b.tushum / b.xisoblandi) -
+                  parseFloat(a.tushum / a.xisoblandi)
+              );
+              let tableItems = ``;
+              newJSON.mahallalar.forEach((mfy, index) => {
+                jamiXisoblandi += mfy.xisoblandi;
+                jamiTushum += mfy.tushum;
+                if (!qaysiMahalla(mfy.id)) {
+                  console.log(mfy);
+                }
+                tableItems += `<tr>
+            <td>${index + 1}</td>
+            <td align="left" class="left">${qaysiMahalla(mfy.id)}</td>
+            <td>${mfy.xisoblandi}</td>
+            <td>${mfy.tushum}</td>
+            <td align="center">${
+              Math.round((mfy.tushum / mfy.xisoblandi + Number.EPSILON) * 10) /
+              10
+            }%</td>
+            <td>${mfy.tushum - mfy.xisoblandi}</td>
+            </tr>`;
+              });
+              tableItems += `<tr>
+          <td></td>
+          <td></td>
+          <td>${jamiXisoblandi}</td>
+          <td>${jamiTushum}</td>
+          <td align="center">${
+            Math.round((jamiTushum / jamiXisoblandi + Number.EPSILON) * 10) / 10
+          }%</td>
+          <td>${jamiTushum - jamiXisoblandi}</td>
+          </tr>`;
+
+              nodeHtmlToImage({
+                output: "./income.png",
+                html: `<!DOCTYPE html>
+            <html lang="en">
+            <head>
+            <meta charset="UTF-8" />
+            <title>Document</title>
+            <style>
+            body{
+              font-family: sans-serif;
+              font-size: 20px;
+            }
+            table {
+                  overflow: hidden;
+                  border-collapse: collapse;
+                  padding: 10px;
+                }
+                h2 {
+                  text-align: center;
+                }
+                h3{
+                  margin: 5px;
+                  line-height: 15px
+                }
+                div {
+                  display: inline-block;
+                  position: relative
+                }
+                th,
+                td {
+                  border: 1px solid black;
+                  padding: 2px 5px;
+                  margin: 0;
+                  border-collapse: collapse;
+                }
+                td{
+                  text-align: right;
+                }
+                p {
+                  text-decoration: underline;
+                }
+                th {
+                  background-color: rgb(151, 218, 253);
+                }
+                td:last-child {
+                  text-align: right;
+                }
+                .left{
+                  text-align: left;
+                }
+                #oliy_ong{
+                  position: absolute;
+                  top:0;
+                  left:0;
+                }
+                </style>
+                </head>
+                <body>
+                <div>
+                <i style="color: blue" id="oliy_ong">Oliy Ong</i>
+                <h2>Тушумлар таҳлили</h2>
+                <h3>${newJSON.sana}</h3>
+                <!-- <h3>${newJSON.davr}</h3>-->
+                <h3>Каттақўрғон туман / "ANVARJON BIZNES INVEST" MCHJ</h3>
+                <table cellscasing="0">
+                <tr>
+                <th>№</th>
+                <th>Махалла</th>
+                <th>Хисобланди</th>
+                <th>Жами тушумлар</th>
+                <th>Фоизда</th>
+                <th>Фарқи</th>
+                </tr>
+                ${tableItems}
+                </table>
+                <footer><b>Бажарувчи: Шамшод Неъматуллаев</b></footer>
+                </div>
+                </body>
+                </html>
+                `,
+                type: "png",
+                encoding: "binary",
+                selector: "div",
+              }).then(() => {
+                ctx.telegram
+                  .sendPhoto(
+                    process.env.NAZORATCHILAR_GURUPPASI,
+                    // ctx.from.id,
+                    { source: "./income.png" },
+                    {
+                      caption: `${
+                        newJSON.sana
+                      } holatiga tushum.\n <a href="https://t.me/${
+                        ctx.from.username
+                      }">${ctx.from.first_name} ${
+                        ctx.from.last_name ? ctx.from.last_name : ""
+                      }</a> tizimga kiritdi\n powered by <i><a href="https://t.me/oliy_ong">Oliy Ong</a></i>`,
+                      parse_mode: "HTML",
+                    }
+                  )
+                  .then(() => {
+                    ctx.scene.leave();
+                  });
+              });
+            });
+          });
         }
-        ctx.wizard.state.file_id = ctx.message.document.file_id;
-        // ctx.wizard.next();
       } else {
         ctx.reply(
           messages.lotin.notExcelFile,
@@ -167,14 +335,14 @@ const importIncomeScene = new Scenes.WizardScene(
         );
       }
     } catch (error) {
-      console.log(err);
+      console.log(error);
     }
   }
 );
 
 importIncomeScene.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].enterExcelFile,
+    messages[ctx.session.til].enterIncomeReport,
     keyboards[ctx.session.til].cancelBtn.resize()
   );
 });
