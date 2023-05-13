@@ -45,7 +45,7 @@ composer.hears(
       });
       ctx.reply(str, { parse_mode: "HTML" });
     } else {
-      ctx.reply(messages.noAbonent);
+      ctx.reply(messages[ctx.session.til].noAbonent);
     }
   }
 );
@@ -73,33 +73,18 @@ composer.hears(["⚙Sozlamalar", "⚙Созламалар"], (ctx) => {
 
 // Fuqoro rasmini tashlash
 composer.action("fuqoro_rasmi", (ctx) => {
+  ctx.deleteMessage();
   ctx.scene.enter("fuqoro_rasmini_kiritish");
 });
-// Maxsus topshiriq bo'yicha open budjet
-// composer.hears("kichikming", (ctx) => {
-//   ctx.replyWithPhoto(
-//     { source: "./lib/kich.jpg" },
+bot.action("searchByFISH", (ctx) => {
+  ctx.deleteMessage();
+  ctx.scene.enter("SEARCH_BY_NAME");
+});
+bot.action("multply livings", (ctx) => {
+  ctx.deleteMessage();
+  ctx.scene.enter("multiply_livings");
+});
 
-//     {
-//       caption: `<a href="https://t.me/ochiqbudjetbot?start=00264921008" >Кичикминг </a>қишлоғи учун бефарқ бўлманг`,
-//       reply_markup: Markup.inlineKeyboard([
-//         [
-//           Markup.button.url(
-//             `🙏Овоз бериш🙏`,
-//             "https://t.me/ochiqbudjetbot?start=00264921008"
-//           ),
-//         ],
-//         [
-//           Markup.button.url(
-//             `🗒 Маълумот олиш`,
-//             "https://t.me/ochiqbudjetbot?start=00264921008"
-//           ),
-//         ],
-//       ]).reply_markup,
-//       parse_mode: "HTML",
-//     }
-//   );
-// });
 bot.catch((err, ctx) => {
   ctx.telegram.sendMessage(1382670100, "Xatolik");
   console.log({ err });

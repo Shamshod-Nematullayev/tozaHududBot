@@ -87,15 +87,19 @@ const generateAlertLetter = new Scenes.WizardScene(
 );
 
 generateAlertLetter.enter((ctx) => {
-  ctx.replyWithDocument(
-    { source: "./lib/generateAlertLetterInput.xlsx" },
-    {
-      caption:
-        `Ogohlantirish xati namuna \n` +
-        messages[ctx.session.til].enterExcelFile,
-      reply_markup: keyboards[ctx.session.til].cancelBtn.resize().reply_markup,
-    }
-  );
+  ctx
+    .replyWithDocument(
+      // Na'muna uchun ajtarilgan fayl id
+      `BQACAgIAAxkDAAIVUmRV4mAxBvQKyqIvbudNJUo7e1pDAAK6JgACvROxSorrbB2euUm-LwQ`,
+      {
+        caption:
+          `Ogohlantirish xati namuna \n` +
+          messages[ctx.session.til].enterExcelFile,
+        reply_markup:
+          keyboards[ctx.session.til].cancelBtn.resize().reply_markup,
+      }
+    )
+    .then((res) => console.log(res.document));
 });
 
 generateAlertLetter.leave((ctx) => {

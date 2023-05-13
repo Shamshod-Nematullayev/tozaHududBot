@@ -19,6 +19,7 @@ const importIncomeScene = new Scenes.WizardScene(
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
           ctx.message.document.mime_type == "application/vnd.ms-excel")
       ) {
+        ctx.reply(messages.lotin.pleaseWait);
         // Agar nazoratchilar kesimida xisobot bo'lsa
         if (
           ctx.message.document.mime_type ==
@@ -149,13 +150,23 @@ const importIncomeScene = new Scenes.WizardScene(
                 encoding: "binary",
                 selector: "div",
               }).then(() => {
-                ctx.telegram.sendPhoto(
-                  process.env.NAZORATCHILAR_GURUPPASI,
-                  { source: "./image.png" },
-                  { caption: `${newJSON.sana} holatiga tushum.` }
-                );
+                ctx.telegram
+                  .sendPhoto(
+                    process.env.NAZORATCHILAR_GURUPPASI,
+                    { source: "./image.png" },
+                    { caption: `${newJSON.sana} holatiga tushum.` }
+                  )
+
+                  .then(() => {
+                    fs.unlink("./image.png", (err) => {
+                      if (err) throw err;
+                    });
+                    fs.unlink("./incomeReport.xls", (err) => {
+                      if (err) throw err;
+                    });
+                    ctx.scene.leave();
+                  });
               });
-              ctx.scene.leave();
             });
           });
         } else if (
@@ -204,8 +215,9 @@ const importIncomeScene = new Scenes.WizardScene(
             <td>${mfy.xisoblandi}</td>
             <td>${mfy.tushum}</td>
             <td align="center">${
-              Math.round((mfy.tushum / mfy.xisoblandi + Number.EPSILON) * 10) /
-              10
+              Math.round(
+                (mfy.tushum / mfy.xisoblandi + Number.EPSILON) * 1000
+              ) / 10
             }%</td>
             <td>${mfy.tushum - mfy.xisoblandi}</td>
             </tr>`;
@@ -216,7 +228,8 @@ const importIncomeScene = new Scenes.WizardScene(
           <td>${jamiXisoblandi}</td>
           <td>${jamiTushum}</td>
           <td align="center">${
-            Math.round((jamiTushum / jamiXisoblandi + Number.EPSILON) * 10) / 10
+            Math.round((jamiTushum / jamiXisoblandi + Number.EPSILON) * 1000) /
+            10
           }%</td>
           <td>${jamiTushum - jamiXisoblandi}</td>
           </tr>`;
@@ -307,8 +320,8 @@ const importIncomeScene = new Scenes.WizardScene(
               }).then(() => {
                 ctx.telegram
                   .sendPhoto(
-                    process.env.NAZORATCHILAR_GURUPPASI,
-                    // ctx.from.id,
+                    // process.env.NAZORATCHILAR_GURUPPASI,
+                    ctx.from.id,
                     { source: "./income.png" },
                     {
                       caption: `${
@@ -322,6 +335,12 @@ const importIncomeScene = new Scenes.WizardScene(
                     }
                   )
                   .then(() => {
+                    fs.unlink("./income.png", (err) => {
+                      if (err) throw err;
+                    });
+                    fs.unlink("./incomeReportMFY.xls", (err) => {
+                      if (err) throw err;
+                    });
                     ctx.scene.leave();
                   });
               });

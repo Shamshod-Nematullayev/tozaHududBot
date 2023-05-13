@@ -1,7 +1,6 @@
 const { Scenes, Markup } = require("telegraf");
 const { keyboards } = require("../../lib/keyboards");
 const { messages } = require("../../lib/messages");
-const { Guvohnoma } = require("../../models/Guvohnoma");
 const { Picture } = require("../../models/Picture");
 const isCancel = require("../smallFunctions/isCancel");
 
