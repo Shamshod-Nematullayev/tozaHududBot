@@ -21,13 +21,11 @@ composer.start(async (ctx) => {
             : "BEKOR QILINDI";
         const id = ctx.startPayload.split("_")[2];
         const pic = await Picture.findById(id);
-        console.log(ctx.update);
         await pic
           .updateOne({
             $set: { confirm },
           })
           .then(() => {
-            console.log(pic.messageIdChannel);
             ctx.telegram
               .editMessageCaption(
                 process.env.CHANNEL,
@@ -40,20 +38,20 @@ composer.start(async (ctx) => {
               )
               .then(() => {
                 if (confirm == "TASDIQLANDI") {
-                  return ctx.telegram.sendPhoto(
-                    pic.user_id,
-                    pic.photo_file_id,
-                    {
+                  return ctx.telegram
+                    .sendPhoto(pic.user_id, pic.photo_file_id, {
                       caption: messages.lotin.acceptedPicture,
-                    }
-                  );
+                    })
+                    .then(() => {
+                      ctx.reply(messages[ctx.session.til].sended);
+                    });
                 } else {
                   return ctx.telegram
                     .sendPhoto(pic.user_id, pic.photo_file_id, {
                       caption: messages.lotin.canceledPicture,
                     })
                     .then(() => {
-                      ctx.reply(messages.lotin.sended);
+                      ctx.reply(messages[ctx.session.til].sended);
                     });
                 }
               });

@@ -11,5 +11,7 @@ const schema = mongoose.Schema({
     type: String,
     max: 300,
   },
+  holat: String,
+  document_number: Number,
 });
 module.exports.Guvohnoma = mongoose.model("guvohnoma", schema, "guvohnoma");

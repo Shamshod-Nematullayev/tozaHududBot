@@ -12,6 +12,7 @@ const { addNotification } = require("./scene/adminActions/addNotification");
 const generateAlertLetter = require("./scene/adminActions/generateAlertLetter");
 const { searchAbonentbyName } = require("./scene/searchAbonentByName");
 const { multiplyLivingsScene } = require("./scene/multiplyLivings");
+const { guvohnomaKiritishScene } = require("./scene/newGuvohnoma");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -25,7 +26,7 @@ const stage = new Scenes.Stage([
   generateAlertLetter,
   searchAbonentbyName,
   multiplyLivingsScene,
-  // guvohnomaKirit ishScene,
+  guvohnomaKiritishScene,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

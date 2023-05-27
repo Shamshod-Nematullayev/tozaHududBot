@@ -55,22 +55,19 @@ const multiplyLivingsScene = new Scenes.WizardScene(
               from: ctx.from,
             });
             await request.save();
-            ctx.reply(
-              messages[ctx.session.til].accepted,
-              Markup.keyboard(["Chiqish"])
-            );
+            ctx.reply(messages[ctx.session.til].accepted);
             ctx.telegram.sendMessage(
               process.env.CHANNEL,
               `#yashovchisoni by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n<code>${ctx.wizard.state.KOD}</code>\n${ctx.message.text} kishi`,
               {
                 parse_mode: "HTML",
                 reply_markup: Markup.inlineKeyboard([
-                  [Markup.button.callback("✅✅✅", "done_")],
+                  [Markup.button.callback("✅✅✅", "done_" + request._id)],
                 ]).reply_markup,
                 disable_web_page_preview: true,
               }
             );
-            ctx.wizard.next();
+            ctx.scene.leave();
           } else {
             ctx.reply(messages[ctx.session.til].enterHigherNumber);
           }

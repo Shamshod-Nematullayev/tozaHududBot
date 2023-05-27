@@ -320,8 +320,8 @@ const importIncomeScene = new Scenes.WizardScene(
               }).then(() => {
                 ctx.telegram
                   .sendPhoto(
-                    // process.env.NAZORATCHILAR_GURUPPASI,
-                    ctx.from.id,
+                    process.env.NAZORATCHILAR_GURUPPASI,
+                    // ctx.from.id,
                     { source: "./income.png" },
                     {
                       caption: `${

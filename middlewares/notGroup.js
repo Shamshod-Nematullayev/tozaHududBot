@@ -1,16 +1,115 @@
 const { bot } = require("../core/bot");
+const { messages } = require("../lib/messages");
+const { Admin } = require("../models/Admin");
+const { Guvohnoma } = require("../models/Guvohnoma");
 const { MultiplyRequest } = require("../models/MultiplyRequest");
+const { Counter } = require("../models/Counter");
 
 bot.use(async (ctx, next) => {
   if (ctx.chat.id < 0) {
     try {
+      if (ctx.update.callback_query.data == "ulim_guvohnomasini_qabul_qilish") {
+        const file_id =
+          ctx.callbackQuery.message.reply_markup.inline_keyboard[1][0].url
+            .split("=")[1]
+            .split("_")[1];
+        await Counter.findOne({ name: "ulim_guvohnoma_document_number" })
+          .then(async (counter) => {
+            await Guvohnoma.findByIdAndUpdate(file_id, {
+              $set: {
+                holat: "QABUL_QILINDI",
+                document_number: counter.value + 1,
+              },
+            }).then(async (guvohnoma) => {
+              await counter.updateOne({
+                $set: {
+                  value: counter.value + 1,
+                  last_update: Date.now(),
+                },
+              });
+              ctx
+                .editMessageCaption(
+                  `<b>№_${counter.value + 1}</b><a href="https://t.me/${
+                    guvohnoma.user.username
+                  }">${guvohnoma.user.fullname}</a>\n` +
+                    `status: |<b> 🟡QABUL_QILINDI🟡 </b>|        #game_over\n` +
+                    `<code>${guvohnoma.kod}</code>\n` +
+                    `<i>${guvohnoma.comment}</i>\n` +
+                    `✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+                  { parse_mode: "HTML", disable_web_page_preview: true }
+                )
+                .then(() => {
+                  ctx.telegram
+                    .sendPhoto(guvohnoma.user.id, guvohnoma.file_id, {
+                      caption: `Siz yuborga O'lim guvohnomasi operator tomonidan qabul qilindi. Tez orada sizga natijasini yetkazamiz\n\n№ <code>${
+                        counter.value + 1
+                      }</code>`,
+                    })
+                    .then(() => {
+                      return ctx.answerCbQuery(messages.lotin.sended);
+                    });
+                });
+            });
+          })
+          .catch(async (err) => {
+            //   const newCounter = new Counter({
+            //     name: "ulim_guvohnoma_document_number",
+            //     value: 0,
+            //     last_update: Date.now(),
+            //   });
+            //   const counter = await newCounter.save();
+            //   const guvohnoma = await Guvohnoma.findByIdAndUpdate(file_id, {
+            //     $set: {
+            //       holat: "QABUL_QILINDI",
+            //       document_number: counter.value + 1,
+            //     },
+            //   }).then(() => {
+            //     // ctx.editMessageCaption(`<a href="https://t.me/${guvohnoma}">${ctx.from.first_name}</a>\n` +
+            //     // `status: |<b> YANGI </b>|        #game_over\n` +
+            //     // `<code>${guvohnoma.kod}</code>\n` +
+            //     // `<i>${ctx.message.text}</i>\n` +
+            //     // `powered by <a href="https://t.me/oliy_ong">Oliy_Ong</a>`)
+            //   });
+          });
+        return;
+      }
       const doneCb = ctx.update.callback_query.data.match(/done_\w+/g)[0];
-      if (doneCb) {
+      const admin = await Admin.findOne({ user_id: ctx.from.id });
+
+      if (doneCb && admin) {
         const req = await MultiplyRequest.findById(doneCb.split("_")[1]);
-        console.log(req);
+        await req
+          .updateOne({
+            $set: {
+              confirm: true,
+            },
+          })
+          .then(() => {
+            ctx.telegram
+              .sendMessage(
+                req.from.id,
+                `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n ✅✅ Tasdiqlandi`,
+                { parse_mode: "HTML" }
+              )
+              .then(() => {
+                ctx.answerCbQuery(messages.lotin.sended);
+                ctx.editMessageText(
+                  `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.KOD}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+                  { parse_mode: "HTML", disable_web_page_preview: true }
+                );
+              });
+          });
       }
     } catch (error) {
+      // Agar asliddin aka tushumni tashlasa
+
       console.log(error);
+      if (
+        ctx.message.from.id == 1694346147 ||
+        (ctx.message.from.id == 955276498 && ctx.message.photo[1].file_id)
+      ) {
+        ctx.forwardMessage(process.env.NAZORATCHILAR_GURUPPASI);
+      }
     }
   } else {
     next();

@@ -67,9 +67,9 @@ composer.hears(["⚙Sozlamalar", "⚙Созламалар"], (ctx) => {
   );
 });
 // Ma'lumotlarni o'zgartirish funcsiyalariga yo'llash
-// composer.action("o'lim guvohnomasi", (ctx) => {
-//   ctx.scene.enter("GUVOHNOMA_KIRITISH");
-// });
+composer.action("o'lim guvohnomasi", (ctx) => {
+  ctx.scene.enter("GUVOHNOMA_KIRITISH");
+});
 
 // Fuqoro rasmini tashlash
 composer.action("fuqoro_rasmi", (ctx) => {
