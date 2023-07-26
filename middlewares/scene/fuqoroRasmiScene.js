@@ -49,6 +49,7 @@ const fuqoroRasmiScene = new Scenes.WizardScene(
             ctx.message.photo[ctx.message.photo.length - 1].file_id,
           kod: ctx.wizard.state.KOD,
           type: "FUQORO_RASMI",
+          createdAt: Date.now(),
         });
         await newPhoto.save().then((res) => {
           ctx.telegram

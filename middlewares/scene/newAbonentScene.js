@@ -68,7 +68,10 @@ const newAbonentScene = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       ctx.scene.state.PASSPORT = ctx.message.text;
-      ctx.reply(messages[ctx.session.til].enterPasport2);
+      ctx.reply(
+        messages[ctx.session.til].enterPasport2,
+        keyboards.lotin.cancelBtn.resize()
+      );
       ctx.wizard.next();
     } catch (error) {
       console.log(error);
@@ -126,6 +129,7 @@ const newAbonentScene = new Scenes.WizardScene(
           "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DZjJS0SoXq6A&psig=AOvVaw1IOqLHD3CndpvLm1vqLwHJ&ust=1679216266118000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCPDp6ZqO5f0CFQAAAAAdAAAAABAE",
           {
             caption: messages[ctx.session.til].enterReallyPinfl,
+            reply_markup: keyboards.lotin.cancelBtn.resize().reply_markup,
           }
         );
       }

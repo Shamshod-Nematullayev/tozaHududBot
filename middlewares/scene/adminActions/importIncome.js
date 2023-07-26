@@ -44,29 +44,31 @@ const importIncomeScene = new Scenes.WizardScene(
               newJSON.gacha = sheet[3].A;
               newJSON.nazoratchilar = sheet.slice(7, sheet.length - 1);
               nazoratchilar.forEach((ins) => {
-                let found = false;
-                let index;
-                for (let i = 0; i < newJSON.nazoratchilar.length; i++) {
-                  if (ins.id == newJSON.nazoratchilar[i].A) {
-                    found = true;
-                    index = i;
-                    break;
+                if (ins.activ) {
+                  let found = false;
+                  let index;
+                  for (let i = 0; i < newJSON.nazoratchilar.length; i++) {
+                    if (ins.id == newJSON.nazoratchilar[i].A) {
+                      found = true;
+                      index = i;
+                      break;
+                    }
                   }
-                }
-                if (!found) {
-                  newJSON.nazoratchilar.push({
-                    id: ins.id,
-                    name: ins.name,
-                    tushumSoni: 0,
-                    summasi: 0,
-                  });
-                } else {
-                  newJSON.nazoratchilar[index] = {
-                    id: ins.id,
-                    name: ins.name,
-                    tushumSoni: newJSON.nazoratchilar[index].K,
-                    summasi: newJSON.nazoratchilar[index].L,
-                  };
+                  if (!found) {
+                    newJSON.nazoratchilar.push({
+                      id: ins.id,
+                      name: ins.name,
+                      tushumSoni: 0,
+                      summasi: 0,
+                    });
+                  } else {
+                    newJSON.nazoratchilar[index] = {
+                      id: ins.id,
+                      name: ins.name,
+                      tushumSoni: newJSON.nazoratchilar[index].K,
+                      summasi: newJSON.nazoratchilar[index].L,
+                    };
+                  }
                 }
               });
               newJSON.nazoratchilar.sort(

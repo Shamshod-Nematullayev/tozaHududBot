@@ -36,14 +36,33 @@ composer.hears(
     const abonents = await Abonent.find({ ["user.id"]: ctx.from.id });
     let str = "";
     if (abonents.length > 0) {
-      abonents.forEach((elem, i) => {
-        str += `${i + 1}. ${qaysiMahalla(elem.data.MFY_ID)}  ${
-          elem.isCancel
-            ? "<strike>" + elem.data.FISH + "</strike>"
-            : "<b>" + elem.data.FISH + "</b>"
-        }: <code>${elem.kod}</code>\n`;
-      });
-      ctx.reply(str, { parse_mode: "HTML" });
+      let counter = 0;
+      if (abonents.length > 50) {
+        abonents.forEach((elem, i) => {
+          str += `${i + 1}. ${qaysiMahalla(elem.data.MFY_ID)}  ${
+            elem.isCancel
+              ? "<strike>" + elem.data.FISH + "</strike>"
+              : "<b>" + elem.data.FISH + "</b>"
+          }: <code>${elem.kod}</code>\n`;
+          if (i % 50 == 0) {
+            ctx.reply(str, { parse_mode: "HTML" });
+            counter++;
+            str = "";
+          }
+        });
+        if (counter % 50 !== 0) {
+          ctx.reply(str, { parse_mode: "HTML" });
+        }
+      } else {
+        abonents.forEach((elem, i) => {
+          str += `${i + 1}. ${qaysiMahalla(elem.data.MFY_ID)}  ${
+            elem.isCancel
+              ? "<strike>" + elem.data.FISH + "</strike>"
+              : "<b>" + elem.data.FISH + "</b>"
+          }: <code>${elem.kod}</code>\n`;
+        });
+        ctx.reply(str, { parse_mode: "HTML" });
+      }
     } else {
       ctx.reply(messages[ctx.session.til].noAbonent);
     }

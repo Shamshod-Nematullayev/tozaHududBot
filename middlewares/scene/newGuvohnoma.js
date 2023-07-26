@@ -92,8 +92,13 @@ const guvohnomaKiritishScene = new Scenes.WizardScene(
             ]).reply_markup,
             parse_mode: "HTML",
           })
-          .then(() => {
+          .then(async (m) => {
             ctx.reply(messages[ctx.session.til].accepted);
+            await guvohnoma.updateOne({
+              $set: {
+                messageIdChannel: m.message_id,
+              },
+            });
             ctx.scene.leave();
           });
       });

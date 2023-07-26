@@ -1,20 +1,26 @@
 const { Scenes, Markup } = require("telegraf");
 const { keyboards } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
-const { SudBildirishnoma } = require("../../../models/SudBildirishnoma");
+const { Bildirishnoma } = require("../../../models/SudBildirishnoma");
 const isCancel = require("../../smallFunctions/isCancel");
 
 const addNotification = new Scenes.WizardScene(
   "add_notification",
   async (ctx) => {
+    // Bekor qilish tugmasini tekshirish
     if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
+    // Yuborilgan xabar faylmi tekshirish
     if (!ctx.message.document) {
       return ctx.reply(
         messages[ctx.session.til].notFile,
         keyboards[ctx.session.til].cancelBtn.resize()
       );
     }
+
     ctx.wizard.state.file_id = ctx.message.document.file_id;
+    ctx.wizard.state.file_name = ctx.message.document.file_name;
+
+    // Inspektorni tanlash tugmasi
     const inspectors = require("../../../lib/nazoratchilar.json");
     const buttonsArray = [];
     inspectors.forEach((ins) => {
@@ -96,9 +102,9 @@ const addNotification = new Scenes.WizardScene(
       if (txt != "") arr.push(...txt.split(" "));
     });
     ctx.wizard.state.abonents = arr;
-    const documents = await SudBildirishnoma.find();
+    const documents = await Bildirishnoma.find();
     let doc_num = documents[documents.length - 1].doc_num + 1;
-    const newDocument = new SudBildirishnoma({
+    const newDocument = new Bildirishnoma({
       user: ctx.from,
       ...ctx.wizard.state,
       doc_num,
@@ -109,9 +115,12 @@ const addNotification = new Scenes.WizardScene(
   }
 );
 
-addNotification.enter((ctx) => {
-  ctx.reply(
-    messages[ctx.session.til].enterNotificationFile,
+addNotification.enter(async (ctx) => {
+  const documents = await Bildirishnoma.find();
+  let doc_num = documents[documents.length - 1].doc_num + 1;
+  ctx.replyWithHTML(
+    messages[ctx.session.til].enterNotificationFile +
+      `\n<code>${doc_num}</code>`,
     keyboards[ctx.session.til].cancelBtn.resize()
   );
 });
