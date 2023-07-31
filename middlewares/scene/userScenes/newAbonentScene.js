@@ -1,11 +1,11 @@
 const { Scenes, Markup } = require("telegraf");
-const { keyboards } = require("../../lib/keyboards");
-const { messages } = require("../../lib/messages");
-const { Abonent } = require("../../models/YangiAbonent");
-const isCancel = require("../smallFunctions/isCancel");
-const isPinfl = require("../smallFunctions/isPinfl");
-const { kirillga } = require("../smallFunctions/lotinKiril");
-const qaysiMahalla = require("../smallFunctions/qaysiMahalla");
+const { keyboards } = require("../../../lib/keyboards");
+const { messages } = require("../../../lib/messages");
+const { Abonent } = require("../../../models/YangiAbonent");
+const isCancel = require("../../smallFunctions/isCancel");
+const isPinfl = require("../../smallFunctions/isPinfl");
+const { kirillga } = require("../../smallFunctions/lotinKiril");
+const qaysiMahalla = require("../../smallFunctions/qaysiMahalla");
 
 const newAbonentScene = new Scenes.WizardScene(
   "NEW_ABONENT",

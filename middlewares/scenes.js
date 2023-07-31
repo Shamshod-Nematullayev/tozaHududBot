@@ -1,22 +1,25 @@
 const { Scenes } = require("telegraf");
 const { bot } = require("../core/bot");
 const LocalSession = require("telegraf-session-local");
-const newAbonentScene = require("./scene/newAbonentScene");
-const newAdminScene = require("./scene/newAdminScene");
-const findAbonentScene = require("./scene/findAbonentById");
+const newAbonentScene = require("./scene/userScenes/newAbonentScene");
+const newAdminScene = require("./scene/userScenes/newAdminScene");
+const findAbonentScene = require("./scene/userScenes/findAbonentById");
 const sendAnswerScene = require("./scene/adminActions/sendAnswerScene");
 const importIncomeScene = require("./scene/adminActions/importIncome");
-const { fuqoroRasmiScene } = require("./scene/fuqoroRasmiScene");
+const { fuqoroRasmiScene } = require("./scene/userScenes/fuqoroRasmiScene");
 const { showAbonentPic } = require("./scene/adminActions/showAbonentPic");
 const { addNotification } = require("./scene/adminActions/addNotification");
 const generateAlertLetter = require("./scene/adminActions/generateAlertLetter");
-const { searchAbonentbyName } = require("./scene/searchAbonentByName");
-const { multiplyLivingsScene } = require("./scene/multiplyLivings");
-const { guvohnomaKiritishScene } = require("./scene/newGuvohnoma");
+const {
+  searchAbonentbyName,
+} = require("./scene/userScenes/searchAbonentByName");
+const { multiplyLivingsScene } = require("./scene/userScenes/multiplyLivings");
+const { guvohnomaKiritishScene } = require("./scene/userScenes/newGuvohnoma");
 const cancelGuvohnoma = require("./scene/adminActions/cancelGuvohnoma");
 const {
   confirmGuvohnomaScene,
 } = require("./scene/adminActions/completeGuvohnoma");
+const importPlanForInspectors = require("./scene/adminActions/importPlanForInspectors");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -33,6 +36,7 @@ const stage = new Scenes.Stage([
   guvohnomaKiritishScene,
   cancelGuvohnoma,
   confirmGuvohnomaScene,
+  importPlanForInspectors,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

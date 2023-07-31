@@ -1,8 +1,8 @@
 const { Scenes, Markup } = require("telegraf");
-const { keyboards } = require("../../lib/keyboards");
-const { messages } = require("../../lib/messages");
-const { Guvohnoma } = require("../../models/Guvohnoma");
-const isCancel = require("../smallFunctions/isCancel");
+const { keyboards } = require("../../../lib/keyboards");
+const { messages } = require("../../../lib/messages");
+const { Guvohnoma } = require("../../../models/Guvohnoma");
+const isCancel = require("../../smallFunctions/isCancel");
 
 const guvohnomaKiritishScene = new Scenes.WizardScene(
   "GUVOHNOMA_KIRITISH",

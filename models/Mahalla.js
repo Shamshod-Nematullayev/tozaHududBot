@@ -12,6 +12,7 @@ const schema = new mongoose.Schema({
   reja: {
     type: Number,
   },
+  biriktirilganNazoratchi: Object,
 });
 
 module.exports.Mahalla = mongoose.model("mahalla", schema);

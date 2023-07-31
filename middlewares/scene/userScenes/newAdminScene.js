@@ -1,5 +1,5 @@
 const { Scenes } = require("telegraf");
-const { Admin } = require("../../models/Admin");
+const { Admin } = require("../../../models/Admin");
 
 const newAdminScene = new Scenes.WizardScene(
   "newAdmin",

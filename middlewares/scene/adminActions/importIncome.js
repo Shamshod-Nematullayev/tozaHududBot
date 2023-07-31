@@ -224,17 +224,18 @@ const importIncomeScene = new Scenes.WizardScene(
             <td>${mfy.tushum - mfy.xisoblandi}</td>
             </tr>`;
               });
-              tableItems += `<tr>
-          <td></td>
-          <td></td>
-          <td>${jamiXisoblandi}</td>
-          <td>${jamiTushum}</td>
-          <td align="center">${
-            Math.round((jamiTushum / jamiXisoblandi + Number.EPSILON) * 1000) /
-            10
-          }%</td>
-          <td>${jamiTushum - jamiXisoblandi}</td>
-          </tr>`;
+              // Jami summasi kerak bo'lmagan payt shu qism komentga olinadi.
+              //     tableItems += `<tr>
+              // <td></td>
+              // <td></td>
+              // <td>${jamiXisoblandi}</td>
+              // <td>${jamiTushum}</td>
+              // <td align="center">${
+              //   Math.round((jamiTushum / jamiXisoblandi + Number.EPSILON) * 1000) /
+              //   10
+              // }%</td>
+              // <td>${jamiTushum - jamiXisoblandi}</td>
+              // </tr>`;
 
               nodeHtmlToImage({
                 output: "./income.png",

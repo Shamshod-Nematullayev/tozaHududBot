@@ -1,9 +1,8 @@
 const { Scenes, Markup } = require("telegraf");
-const { keyboards } = require("../../lib/keyboards");
-const { messages } = require("../../lib/messages");
-const { MultiplyRequest } = require("../../models/MultiplyRequest");
-const { Picture } = require("../../models/Picture");
-const isCancel = require("../smallFunctions/isCancel");
+const { keyboards } = require("../../../lib/keyboards");
+const { messages } = require("../../../lib/messages");
+const { MultiplyRequest } = require("../../../models/MultiplyRequest");
+const isCancel = require("../../smallFunctions/isCancel");
 
 const multiplyLivingsScene = new Scenes.WizardScene(
   "multiply_livings",

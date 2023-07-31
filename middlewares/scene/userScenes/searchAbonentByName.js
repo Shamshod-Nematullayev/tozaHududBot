@@ -1,8 +1,8 @@
 const { Scenes } = require("telegraf");
-const { keyboards } = require("../../lib/keyboards");
-const { messages } = require("../../lib/messages");
-const isCancel = require("../smallFunctions/isCancel");
-const { kirillga } = require("../smallFunctions/lotinKiril");
+const { keyboards } = require("../../../lib/keyboards");
+const { messages } = require("../../../lib/messages");
+const isCancel = require("../../smallFunctions/isCancel");
+const { kirillga } = require("../../smallFunctions/lotinKiril");
 
 const searchAbonentbyName = new Scenes.WizardScene(
   "SEARCH_BY_NAME",

@@ -108,10 +108,7 @@ composer.action("game_over_play", (ctx) =>
 );
 
 composer.action("set_plan_for_inspectors", (ctx) => {
-  ctx.reply();
+  ctx.scene.enter("import_plan_for_inspectors");
 });
-// composer.on("text", (ctx) => {
-//   if (ctx.from.id == 1382670100) ctx.replyWithDocument(ctx.message.text);
-// });
 
 bot.use(composer);
