@@ -7,6 +7,7 @@ const https = require("https");
 const fs = require("fs");
 const qaysiMahalla = require("../../smallFunctions/qaysiMahalla");
 const nodeHtmlToImage = require("node-html-to-image");
+const { Mahalla } = require("../../../models/Mahalla");
 
 const importIncomeScene = new Scenes.WizardScene(
   "import_income_report",
@@ -186,16 +187,19 @@ const importIncomeScene = new Scenes.WizardScene(
               });
               const sheet = xls[Object.keys(xls)[0]];
               const newJSON = {};
+              newJSON.mahallalar = [];
+
               newJSON.sana = sheet[2].A;
               newJSON.davr = sheet[3].A;
-              newJSON.mahallalar = [];
               for (let i = 0; i < sheet.length - 9; i++) {
-                if (parseInt(sheet[i + 7].F) != 0)
+                if (parseInt(sheet[i + 7].F) != 0) {
+                  const mahalla = await Mahalla.findOne({ id: sheet[i + 7].A });
                   newJSON.mahallalar.push({
                     id: sheet[i + 7].A,
-                    xisoblandi: parseInt(sheet[i + 7].F),
+                    xisoblandi: mahalla.reja,
                     tushum: parseInt(sheet[i + 7].G),
                   });
+                }
               }
               let jamiXisoblandi = 0;
               let jamiTushum = 0;
@@ -305,7 +309,7 @@ const importIncomeScene = new Scenes.WizardScene(
                 <tr>
                 <th>№</th>
                 <th>Махалла</th>
-                <th>Хисобланди</th>
+                <th>Режа</th>
                 <th>Жами тушумлар</th>
                 <th>Фоизда</th>
                 <th>Фарқи</th>

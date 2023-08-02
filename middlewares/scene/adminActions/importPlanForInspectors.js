@@ -13,6 +13,12 @@ const importPlanForInspectors = new Scenes.WizardScene(
   async (ctx) => {
     try {
       if (isCancel(ctx.message.text)) return ctx.scene.leave();
+      if (!ctx.message.document) {
+        return ctx.reply(
+          "Siz excel fayl yubormadingiz",
+          keyboards.lotin.cancelBtn.resize()
+        );
+      }
       const { href } = await ctx.telegram.getFileLink(
         ctx.message.document.file_id
       );
