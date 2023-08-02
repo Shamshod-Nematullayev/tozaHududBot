@@ -95,14 +95,18 @@ composer.action("fuqoro_rasmi", (ctx) => {
   ctx.deleteMessage();
   ctx.scene.enter("fuqoro_rasmini_kiritish");
 });
-bot.action("searchByFISH", (ctx) => {
+composer.action("searchByFISH", (ctx) => {
   ctx.deleteMessage();
   ctx.scene.enter("SEARCH_BY_NAME");
 });
-bot.action("multply livings", (ctx) => {
+composer.action("multply livings", (ctx) => {
   ctx.deleteMessage();
   ctx.scene.enter("multiply_livings");
 });
+
+composer.action("connect_phone_number", (ctx) =>
+  ctx.scene.enter("connect_phone_number")
+);
 
 bot.catch((err, ctx) => {
   ctx.telegram.sendMessage(1382670100, "Xatolik");
