@@ -1,12 +1,4 @@
-const nodeHtmlToImage = require("node-html-to-image");
-const { bot } = require("../core/bot");
-const fs = require("fs");
-const fetch = require("node-fetch");
-const {
-  fetchEcopayTushum,
-  fetchEcopayLogin,
-  fetchEcoTranzaksiyalar,
-} = require("./fetchEcopay");
+const { fetchEcopayTushum, fetchEcoTranzaksiyalar } = require("./fetchEcopay");
 const { drawAndSendTushum } = require("./drawTushum");
 
 // har besh daqiqada ecopay session saqlash uchun fetch yuboradigan funksiya
@@ -16,9 +8,12 @@ const { drawAndSendTushum } = require("./drawTushum");
 // fetchEcopayLogin();
 
 // Har yarim soatda tushumni telegramga tashlaydigan funksiya
-// setInterval(async () => {
-//   const data = await fetchEcopayTushum();
-//   console.log("Tushum tashlandi hukumdorim");
-//   drawAndSendTushum(data);
-//   fetchEcoTranzaksiyalar();
-// }, 60 * 1000 * 60);
+setInterval(async () => {
+  let vaqt = new Date();
+  if (vaqt.getHours() > 19 || vaqt.getHours < 6) {
+  } else {
+    const data = await fetchEcopayTushum();
+    drawAndSendTushum(data);
+    fetchEcoTranzaksiyalar();
+  }
+}, 60 * 1000 * 60);

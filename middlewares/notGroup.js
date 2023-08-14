@@ -18,8 +18,8 @@ bot.use(async (ctx, next) => {
           ctx.callbackQuery.message.reply_markup.inline_keyboard[1][0].url
             .split("=")[1]
             .split("_")[1];
-        await Counter.findOne({ name: "ulim_guvohnoma_document_number" })
-          .then(async (counter) => {
+        await Counter.findOne({ name: "ulim_guvohnoma_document_number" }).then(
+          async (counter) => {
             await Guvohnoma.findByIdAndUpdate(file_id, {
               $set: {
                 holat: "QABUL_QILINDI",
@@ -58,27 +58,8 @@ bot.use(async (ctx, next) => {
                     });
                 });
             });
-          })
-          .catch(async (err) => {
-            //   const newCounter = new Counter({
-            //     name: "ulim_guvohnoma_document_number",
-            //     value: 0,
-            //     last_update: Date.now(),
-            //   });
-            //   const counter = await newCounter.save();
-            //   const guvohnoma = await Guvohnoma.findByIdAndUpdate(file_id, {
-            //     $set: {
-            //       holat: "QABUL_QILINDI",
-            //       document_number: counter.value + 1,
-            //     },
-            //   }).then(() => {
-            //     // ctx.editMessageCaption(`<a href="https://t.me/${guvohnoma}">${ctx.from.first_name}</a>\n` +
-            //     // `status: |<b> YANGI </b>|        #game_over\n` +
-            //     // `<code>${guvohnoma.kod}</code>\n` +
-            //     // `<i>${ctx.message.text}</i>\n` +
-            //     // `powered by <a href="https://t.me/oliy_ong">Oliy_Ong</a>`)
-            //   });
-          });
+          }
+        );
         return;
       }
       if (ctx.update.callback_query) {
@@ -104,6 +85,11 @@ bot.use(async (ctx, next) => {
                   ctx.editMessageText(
                     `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.KOD}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
                     { parse_mode: "HTML", disable_web_page_preview: true }
+                  );
+                  ctx.telegram.forwardMessage(
+                    process.env.NAZORATCHILAR_GURUPPASI,
+                    process.env.CHANNEL,
+                    ctx.callbackQuery.message.message_id
                   );
                 });
             });

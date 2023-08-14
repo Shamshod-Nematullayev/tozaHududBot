@@ -43,6 +43,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
+      if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text)) {
         return ctx.reply(messages[ctx.session.til].enterOnlyNumber);
       }

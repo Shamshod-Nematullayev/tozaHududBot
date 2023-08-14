@@ -20,7 +20,7 @@ const multiplyLivingsScene = new Scenes.WizardScene(
           keyboards[ctx.session.til].cancelBtn.resize()
         );
 
-      const abonents = require("../../lib/abonents.json");
+      const abonents = require("../../../lib/abonents.json");
 
       const abonent = abonents[Object.keys(abonents)[0]].filter((a) => {
         return a.litsavoy == ctx.message.text;

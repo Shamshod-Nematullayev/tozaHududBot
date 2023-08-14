@@ -2,8 +2,7 @@ const nodeHtmlToImage = require("node-html-to-image");
 const { bot } = require("../core/bot");
 const fs = require("fs");
 
-module.exports.drawAndSendTushum = (data, ctx) => {
-  console.log(data);
+module.exports.drawAndSendTushum = (data) => {
   const nazoratchilar = require("../lib/nazoratchilar.json");
   const newJSON = {};
   const date = new Date();
@@ -351,4 +350,113 @@ module.exports.drawSendLastSeen = (data) => {
       });
   });
   console.log(newJSON.tranzaksiyalar);
+};
+
+module.exports.drawDailyIncomeComplating = async (data) => {
+  const newJSON = {};
+  const date = new Date();
+  let sana = `${date.getFullYear(Date.now())}.${
+    date.getMonth(Date.now()) + 1
+  }.${date.getDate(Date.now())} ${date.getHours(Date.now())}:${date.getMinutes(
+    Date.now()
+  )}:${date.getSeconds(Date.now())}`;
+
+  newJSON.sana = sana;
+  newJSON.dan = `Дан: ${date.getFullYear(Date.now())}.${
+    date.getMonth(Date.now()) + 1
+  }.${date.getDate(Date.now())}`;
+  newJSON.gacha = `Гача: ${date.getFullYear(Date.now())}.${
+    date.getMonth(Date.now()) + 1
+  }.${date.getDate(Date.now())}`;
+  data.sort(
+    (a, b) => parseFloat(b.bajarilishiFoizda) - parseFloat(a.bajarilishiFoizda)
+  );
+  let tableItems = ``;
+  let count = 0;
+  data.forEach((nazoratchi, i) => {
+    if (nazoratchi.activ && nazoratchi.reja > 0) {
+      count++;
+      tableItems += `<tr class="${
+        nazoratchi.bajarilishiFoizda >= 100 ? "green" : "red"
+      }">
+        <td class="center">${count}</td>
+        <td>${nazoratchi.name}</td>
+        <td class="align-right">${Math.floor(
+          nazoratchi.kunlikReja
+        ).toLocaleString()}</td>
+        <td class="align-right">${nazoratchi.bugungiTushum.toLocaleString()}</td>
+        <td >${Math.floor(nazoratchi.bajarilishiFoizda)}%</td>
+      </tr>`;
+    }
+  });
+  const imgName = "./" + Date.now() + ".png";
+  await nodeHtmlToImage({
+    output: imgName,
+    html: `<html>
+      <head>
+        <meta charset="UTF-8" />
+        <style>
+          table {
+            overflow: hidden;
+            border-collapse: collapse;
+            padding: 10px;
+          }
+          div {
+            display: inline-block;
+          }
+          th,
+          td {
+            border: 1px solid black;
+            padding: 5px 15px;
+            margin: 0;
+            border-collapse: collapse;
+          }
+          p{
+            text-decoration: underline;
+          }
+          th {
+            background-color: #91d1b0;
+          }
+          td:last-child {
+            text-align: right;
+          }
+          .align-right{
+            text-align: right;
+          }
+          .center{
+            text-align: center;
+          }
+          .green{
+            color: green;
+          }
+          .red{
+            color: red;
+          }
+        </style>
+      </head>
+      <body>
+      <div>
+      <p>${newJSON.sana}</p>
+      <h2>Транзаксиялар хисоботи</h2>
+      <h3>${newJSON.dan}</h3>
+      <h3>${newJSON.gacha}</h3>
+      <table cellscasing="0">
+
+          <tr>
+            <th>№</th>
+            <th>Назоратчи</th>
+            <th>Кунлик режа</th>
+            <th>Бажарилиши</th>
+            <th>Фоизда</th>
+          </tr>
+          ${tableItems}
+        </table>
+        </div>
+      </body>
+    </html>`,
+    type: "png",
+    encoding: "binary",
+    selector: "div",
+  });
+  return imgName;
 };
