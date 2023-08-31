@@ -10,7 +10,7 @@ const { drawAndSendTushum } = require("./drawTushum");
 // Har yarim soatda tushumni telegramga tashlaydigan funksiya
 setInterval(async () => {
   let vaqt = new Date();
-  if (vaqt.getHours() > 19 || vaqt.getHours < 6) {
+  if (vaqt.getHours() > 19 && vaqt.getHours < 6) {
   } else {
     const data = await fetchEcopayTushum();
     drawAndSendTushum(data);

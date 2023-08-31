@@ -45,7 +45,10 @@ const connectPhoneNumber = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text)) {
-        return ctx.reply(messages[ctx.session.til].enterOnlyNumber);
+        return ctx.reply(
+          messages[ctx.session.til].enterOnlyNumber,
+          keyboards[ctx.session.til].cancelBtn.resize()
+        );
       }
 
       if (ctx.message.text.length != 9) {

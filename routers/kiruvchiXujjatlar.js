@@ -2,6 +2,7 @@ const { upload } = require("../middlewares/multer");
 const { IncomingDocument } = require("../models/IncomingDocument");
 const path = require("path");
 const { bot } = require("../core/bot");
+const { Counter } = require("../models/Counter");
 
 const router = require("express").Router();
 
@@ -72,15 +73,22 @@ router.post("/create", upload.single("file"), async (req, res, next) => {
         source: path.join(__dirname, "../uploads/", req.file.filename),
       }
     );
+    const counter = await Counter.findOne({ name: "incoming_document_number" });
     const document = await IncomingDocument.create({
-      user: req.body.user,
       abonent: req.body.abonent,
       abonents: req.body.abonents,
-      date: Date.now(),
       doc_type: req.body.doc_type,
       inspector: req.body.inspector,
       file_id: documentOnTelegram.document.file_id,
       filename: req.file.filename,
+      date: Date.now(),
+      doc_num: counter + 1,
+    });
+    counter.updateOne({
+      $set: {
+        value: counter + 1,
+        last_update: Date.now(),
+      },
     });
 
     return res.json({
@@ -112,3 +120,5 @@ router.put("/:file_id", async (req, res, next) => {
     next(err);
   }
 });
+
+module.exports = router;

@@ -3,7 +3,6 @@ const { default: mongoose } = require("mongoose");
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const { Mahalla } = require("./models/Mahalla");
 
 // App middlewares
 app.use(express.urlencoded());
@@ -17,6 +16,8 @@ app.use("/api/bildirgilar", require("./routers/bildirgilarRouter"));
 app.use("/api/forma1lar", require("./routers/forma1Router"));
 app.use("/api/fetchTelegram", require("./routers/fetchTelegramRouter"));
 app.use("/api/pachkalar", require("./routers/aktPachka"));
+app.use("/api/documents", require("./routers/kiruvchiXujjatlar"));
+app.use("/api/inspectors", require("./routers/inspectorsRouter"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
