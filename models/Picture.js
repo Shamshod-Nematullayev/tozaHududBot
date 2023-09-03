@@ -3,7 +3,6 @@ const { default: mongoose } = require("mongoose");
 const schema = new mongoose.Schema({
   user_id: {
     type: Number,
-    required: true,
   },
   photo_file_id: {
     type: String,
@@ -19,6 +18,9 @@ const schema = new mongoose.Schema({
     default: "YANGI",
   },
   messageIdChannel: Number,
+  createdAt: Date,
+  file_link: String,
+  file_name: String,
 });
 
 const Picture = mongoose.model("picture", schema);

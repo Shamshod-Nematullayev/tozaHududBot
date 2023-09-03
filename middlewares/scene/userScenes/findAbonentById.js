@@ -1,8 +1,8 @@
 const { Scenes } = require("telegraf");
-const { keyboards } = require("../../lib/keyboards");
-const { messages } = require("../../lib/messages");
-const abonentlarJSON = require("../../lib/abonents.json");
-const isCancel = require("../smallFunctions/isCancel");
+const { keyboards } = require("../../../lib/keyboards");
+const { messages } = require("../../../lib/messages");
+const abonentlarJSON = require("../../../lib/abonents.json");
+const isCancel = require("../../smallFunctions/isCancel");
 const lastUpdate = abonentlarJSON.oxirgi_yangilanish;
 
 function findById(id) {

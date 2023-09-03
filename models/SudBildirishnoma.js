@@ -1,13 +1,21 @@
 const { default: mongoose } = require("mongoose");
 
-const schema = new mongoose.Schema({
+const schema = mongoose.Schema({
   user: Object,
-  file_id: String,
-  inspector: Object,
+  file_id: {
+    type: String,
+    required: true,
+  },
+  inspector: {
+    type: Object,
+    required: true,
+  },
   mahallalar: Array,
-  date: Date,
+  date: Object,
   abonents: Array,
+  doc_num: Number,
+  file_link: String,
+  file_name: String,
 });
 
-const SudBildirishnoma = mongoose.model("SudBildirishnoma", schema);
-module.exports = { SudBildirishnoma };
+module.exports.Bildirishnoma = mongoose.model("sudBildirishnoma", schema);

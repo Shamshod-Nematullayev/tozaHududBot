@@ -1,8 +1,8 @@
 const { Scenes, Markup } = require("telegraf");
-const { keyboards } = require("../../lib/keyboards");
-const { messages } = require("../../lib/messages");
-const { Guvohnoma } = require("../../models/Guvohnoma");
-const isCancel = require("../smallFunctions/isCancel");
+const { keyboards } = require("../../../lib/keyboards");
+const { messages } = require("../../../lib/messages");
+const { Guvohnoma } = require("../../../models/Guvohnoma");
+const isCancel = require("../../smallFunctions/isCancel");
 
 const guvohnomaKiritishScene = new Scenes.WizardScene(
   "GUVOHNOMA_KIRITISH",
@@ -66,23 +66,41 @@ const guvohnomaKiritishScene = new Scenes.WizardScene(
         },
       });
       await newGuvohonoma.save().then((guvohnoma) => {
-        ctx.telegram.sendPhoto(process.env.CHANNEL, guvohnoma.file_id, {
-          caption:
-            `<a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n` +
-            `status: |YANGI|\n` +
-            `<code>${guvohnoma.kod}</code>\n` +
-            `<i>${ctx.message.text}</i>\n` +
-            `powered by <a href="https://t.me/oliy_ong">Oliy_Ong</a>`,
-          reply_markup: Markup.inlineKeyboard([
-            Markup.button.url(
-              "Ijro etish",
-              `https://t.me/${ctx.botInfo.username}/?start=${
-                "guvohnoma_" + guvohnoma._id
-              }`
-            ),
-          ]).reply_markup,
-          parse_mode: "HTML",
-        });
+        ctx.telegram
+          .sendPhoto(process.env.CHANNEL, guvohnoma.file_id, {
+            caption:
+              `<a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n` +
+              `status: |<b> YANGI </b>|        #game_over\n` +
+              `<code>${guvohnoma.kod}</code>\n` +
+              `<i>${ctx.message.text}</i>\n` +
+              `powered by <a href="https://t.me/oliy_ong">Oliy_Ong</a>`,
+            reply_markup: Markup.inlineKeyboard([
+              [
+                Markup.button.callback(
+                  "👌 Qabul qilish 👌",
+                  `ulim_guvohnomasini_qabul_qilish`
+                ),
+              ],
+              [
+                Markup.button.url(
+                  "❌ Bekor qilish ❌",
+                  `https://t.me/${ctx.botInfo.username}/?start=${
+                    "guvohnoma_" + guvohnoma._id
+                  }`
+                ),
+              ],
+            ]).reply_markup,
+            parse_mode: "HTML",
+          })
+          .then(async (m) => {
+            ctx.reply(messages[ctx.session.til].accepted);
+            await guvohnoma.updateOne({
+              $set: {
+                messageIdChannel: m.message_id,
+              },
+            });
+            ctx.scene.leave();
+          });
       });
     } catch (error) {
       console.log(error);

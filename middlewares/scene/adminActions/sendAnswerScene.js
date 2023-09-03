@@ -35,9 +35,9 @@ const sendAnswerScene = new Scenes.WizardScene(
               }
             )
             .then(() => {
-              ctx.reply(messages[ctx.session.til].sended).then(() => {
+              ctx.reply(messages[ctx.session.til].sended).then(async () => {
                 const state = res.data;
-                ctx.telegram.editMessageText(
+                await ctx.telegram.editMessageText(
                   process.env.CHANNEL,
                   res.messageIdChannel,
                   0,
@@ -51,6 +51,11 @@ const sendAnswerScene = new Scenes.WizardScene(
                     parse_mode: "HTML",
                     disable_web_page_preview: true,
                   }
+                );
+                await ctx.telegram.forwardMessage(
+                  process.env.NAZORATCHILAR_GURUPPASI,
+                  process.env.CHANNEL,
+                  res.messageIdChannel
                 );
                 ctx.scene.leave();
               });

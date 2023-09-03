@@ -1,13 +1,12 @@
 const { Scenes, Markup } = require("telegraf");
-const { keyboards } = require("../../lib/keyboards");
-const { messages } = require("../../lib/messages");
-const { Guvohnoma } = require("../../models/Guvohnoma");
-const { Picture } = require("../../models/Picture");
-const isCancel = require("../smallFunctions/isCancel");
+const { keyboards } = require("../../../lib/keyboards");
+const { messages } = require("../../../lib/messages");
+const { Picture } = require("../../../models/Picture");
+const isCancel = require("../../smallFunctions/isCancel");
 
 const fuqoroRasmiScene = new Scenes.WizardScene(
   "fuqoro_rasmini_kiritish",
-  (ctx) => {
+  async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text))
@@ -20,6 +19,11 @@ const fuqoroRasmiScene = new Scenes.WizardScene(
           messages[ctx.session.til].enterFullNamber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
+      const rasm = await Picture.findOne({
+        kod: ctx.message.text,
+        confirm: true,
+      });
+      if (rasm) return ctx.reply(`Bu abonentga avval rasm biriktirilgan`);
       ctx.wizard.state.KOD = parseInt(ctx.message.text);
       ctx.reply(
         messages[ctx.session.til].enterPicture,
@@ -45,6 +49,7 @@ const fuqoroRasmiScene = new Scenes.WizardScene(
             ctx.message.photo[ctx.message.photo.length - 1].file_id,
           kod: ctx.wizard.state.KOD,
           type: "FUQORO_RASMI",
+          createdAt: Date.now(),
         });
         await newPhoto.save().then((res) => {
           ctx.telegram
