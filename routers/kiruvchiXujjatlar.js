@@ -67,6 +67,7 @@ router.post("/search", async (req, res, next) => {
 
 router.post("/create", upload.single("file"), async (req, res, next) => {
   try {
+    console.log(req.body);
     const documentOnTelegram = await bot.telegram.sendDocument(
       process.env.TEST_BASE_CHANNEL_ID,
       {
@@ -80,13 +81,14 @@ router.post("/create", upload.single("file"), async (req, res, next) => {
       doc_type: req.body.doc_type,
       inspector: req.body.inspector,
       file_id: documentOnTelegram.document.file_id,
-      filename: req.file.filename,
+      file_name: req.file.filename,
+      comment: req.body.comment,
       date: Date.now(),
-      doc_num: counter + 1,
+      doc_num: counter.value + 1,
     });
-    counter.updateOne({
+    await counter.updateOne({
       $set: {
-        value: counter + 1,
+        value: counter.value + 1,
         last_update: Date.now(),
       },
     });
