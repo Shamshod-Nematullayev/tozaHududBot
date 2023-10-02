@@ -91,18 +91,6 @@ bot.use(async (ctx, next) => {
                     process.env.CHANNEL,
                     ctx.callbackQuery.message.message_id
                   );
-                })
-                .catch((err) => {
-                  console.log(err);
-                  ctx.editMessageText(
-                    `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.KOD}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
-                    { parse_mode: "HTML", disable_web_page_preview: true }
-                  );
-                  ctx.telegram.forwardMessage(
-                    process.env.NAZORATCHILAR_GURUPPASI,
-                    process.env.CHANNEL,
-                    ctx.callbackQuery.message.message_id
-                  );
                 });
             });
         }

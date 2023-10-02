@@ -1,10 +1,9 @@
 const nodeHtmlToImage = require("node-html-to-image");
 const { bot } = require("../core/bot");
 const fs = require("fs");
-const { Nazoratchi } = require("../models/Nazoratchi");
 
-module.exports.drawAndSendTushum = async (data) => {
-  const nazoratchilar = await Nazoratchi.find({ activ: true });
+module.exports.drawAndSendTushum = (data) => {
+  const nazoratchilar = require("../lib/nazoratchilar.json");
   const newJSON = {};
   const date = new Date();
   let sana = `${date.getFullYear(Date.now())}.${
@@ -172,10 +171,10 @@ String.prototype.toHHMMSS = function () {
   }
   return hours + ":" + minutes;
 };
-module.exports.drawSendLastSeen = async (data) => {
+module.exports.drawSendLastSeen = (data) => {
   const newJSON = {};
   const date = new Date();
-  const nazoratchilar = await Nazoratchi.find({ activ: true });
+  const nazoratchilar = require("../lib/nazoratchilar.json");
   let sana = `${date.getFullYear(Date.now())}.${
     date.getMonth(Date.now()) + 1
   }.${date.getDate(Date.now())} ${date.getHours(Date.now())}:${date.getMinutes(

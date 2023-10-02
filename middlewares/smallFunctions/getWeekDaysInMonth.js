@@ -13,4 +13,13 @@ function getWeekdaysInMonth(today, month, year) {
   }
   return weekdays;
 }
+function getAllWeekdaysInMonth(month, year) {
+  var days = daysInMonth(month, year);
+  var weekdays = 0;
+  for (var i = 0; i < days; i++) {
+    if (isWeekday(year, month, i + 1)) weekdays++;
+  }
+  return weekdays;
+}
 module.exports = { getWeekdaysInMonth };
+module.exports = { getAllWeekdaysInMonth };
