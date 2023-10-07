@@ -5,7 +5,9 @@ const { Guvohnoma } = require("../models/Guvohnoma");
 const { MultiplyRequest } = require("../models/MultiplyRequest");
 const { Counter } = require("../models/Counter");
 
+// bot.telegram.se
 bot.use(async (ctx, next) => {
+  console.log(ctx.message);
   if (ctx.chat.id < 0) {
     try {
       const admin = await Admin.findOne({ user_id: ctx.from.id });

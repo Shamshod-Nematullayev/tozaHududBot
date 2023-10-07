@@ -21,6 +21,9 @@ const {
 } = require("./scene/adminActions/completeGuvohnoma");
 const importPlanForInspectors = require("./scene/adminActions/importPlanForInspectors");
 const { connectPhoneNumber } = require("./scene/userScenes/connectPhoneNumber");
+const {
+  chargeCleanCityViloyatScene,
+} = require("./scene/adminActions/chargeCleanCityViloyat");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -39,6 +42,7 @@ const stage = new Scenes.Stage([
   confirmGuvohnomaScene,
   importPlanForInspectors,
   connectPhoneNumber,
+  chargeCleanCityViloyatScene,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

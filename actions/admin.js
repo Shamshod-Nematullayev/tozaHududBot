@@ -76,6 +76,11 @@ composer.action("show_abonent_pic", (ctx) => {
 composer.action("game_over_play", (ctx) =>
   ctx.scene.enter("confirm_game_over")
 );
+composer.action("CHARGE_VILOYAT_LOGIN", (ctx) => {
+  if (isAdmin(ctx)) {
+    ctx.scene.enter("CHARGE_VILOYAT_LOGIN");
+  }
+});
 
 composer.action("set_plan_for_inspectors", (ctx) => {
   ctx.scene.enter("import_plan_for_inspectors");
