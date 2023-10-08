@@ -28,7 +28,7 @@ require("./core/bot");
 require("./middlewares");
 require("./actions");
 mongoose
-  .connect(process.env.MONGO)
+  .connect("mongodb+srv://maxxadsen:rich1234@cluster0.6ilxm5x.mongodb.net/?retryWrites=true&w=majority")
   .then(async () => {
     console.log(`Ma'lumotlar bazasiga ulandi`);
   })
