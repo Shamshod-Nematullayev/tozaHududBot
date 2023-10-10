@@ -6,7 +6,7 @@ const isCancel = require("../../smallFunctions/isCancel");
 
 const connectPhoneNumber = new Scenes.WizardScene(
   "connect_phone_number",
-  (ctx) => {
+  async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text))
@@ -25,6 +25,13 @@ const connectPhoneNumber = new Scenes.WizardScene(
         return a.litsavoy == ctx.message.text;
       })[0];
       if (abonent) {
+        const request = await PhoneConnect.findOne({ KOD: ctx.message.text });
+        if (request) {
+          return ctx.reply(
+            `🛑 Ushbu xisob raqamiga allaqachon telefon raqami biriktirilgan 🛑`
+          );
+          ctx.scene.leave();
+        }
         ctx.wizard.state.abonent = abonent;
         ctx.wizard.state.KOD = ctx.message.text;
         ctx.replyWithHTML(
@@ -55,6 +62,13 @@ const connectPhoneNumber = new Scenes.WizardScene(
         return ctx.reply(`Telefon raqam noto'g'ri formatda yuborildi`);
       }
       ctx.wizard.state.phone = ctx.message.text;
+      const request = await PhoneConnect.findOne({ phone: ctx.message.text });
+      if (request) {
+        return ctx.reply(
+          `Ushbu telefon raqam ${request.KOD} hisob raqamiga allaqachon ulab bo'lingan, iltomos boshqa telefon raqami kiriting!`,
+          keyboards[ctx.session.til].cancelBtn.resize()
+        );
+      }
       await PhoneConnect.create({
         ...ctx.wizard.state,
         from: ctx.message.from,
