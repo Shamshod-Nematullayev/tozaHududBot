@@ -51,8 +51,6 @@ const chargeCleanCityViloyatScene = new Scenes.WizardScene(
         process.env.COOKIE = wizard.state.COOKIE;
         ctx.scene.leave();
       } else {
-        console.log(res)
-        console.log(data)
         ctx.reply(
           "Nimadur noto'g'ri ketdi",
           keyboards.lotin.adminKeyboard.resize()
