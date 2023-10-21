@@ -3,7 +3,7 @@ const { keyboards } = require("../lib/keyboards");
 const { messages } = require("../lib/messages");
 
 require("./start");
-require("./mainCommands");
+//require("./mainCommands");
 require("./admin");
 require("./language");
 bot.on("text", (ctx) => {
