@@ -50,7 +50,7 @@ composer.hears(
             str = "";
           }
         });
-        if (counter % 50 !== 0) {
+        if ((counter - 1) % 50 !== 0) {
           ctx.reply(str, { parse_mode: "HTML" });
         }
       } else {

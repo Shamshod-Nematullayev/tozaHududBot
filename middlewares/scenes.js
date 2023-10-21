@@ -25,6 +25,7 @@ const {
   chargeCleanCityViloyatScene,
 } = require("./scene/adminActions/chargeCleanCityViloyat");
 const { importAbonentsScene } = require("./scene/adminActions/importAbonents");
+const { generateSBuyruq } = require("./scene/adminActions/generateSudBuyruq");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -45,6 +46,7 @@ const stage = new Scenes.Stage([
   connectPhoneNumber,
   chargeCleanCityViloyatScene,
   importAbonentsScene,
+  generateSBuyruq,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

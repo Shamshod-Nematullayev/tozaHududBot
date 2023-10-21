@@ -71,28 +71,40 @@ const importIncomeScene = new Scenes.WizardScene(
                 tableItems += `<tr>
             <td>${index + 1}</td>
             <td align="left" class="left">${qaysiMahalla(mfy.id)}</td>
-            <td>${mfy.xisoblandi.toLocaleString()}</td>
-            <td>${mfy.tushum.toLocaleString()}</td>
+            <td>${Math.floor(mfy.xisoblandi)
+              .toLocaleString()
+              .replace(/,/g, " ")}</td>
+            <td>${Math.floor(mfy.tushum)
+              .toLocaleString()
+              .replace(/,/g, " ")}</td>
             <td align="center">${
               Math.round(
                 (mfy.tushum / mfy.xisoblandi + Number.EPSILON) * 1000
               ) / 10
             }%</td>
-            <td>${(mfy.tushum - mfy.xisoblandi).toLocaleString()}</td>
+            <td>${Math.floor(mfy.tushum - mfy.xisoblandi)
+              .toLocaleString()
+              .replace(/,/g, " ")}</td>
             </tr>`;
               });
               // Jami summasi kerak bo'lmagan payt shu qism komentga olinadi.
               tableItems += `<tr>
               <td></td>
               <td></td>
-              <td>${jamiXisoblandi.toLocaleString()}</td>
-              <td>${jamiTushum.toLocaleString()}</td>
-              <td align="center">${
+              <th>${Math.floor(jamiXisoblandi)
+                .toLocaleString()
+                .replace(/,/g, " ")}</th>
+              <th>${Math.floor(jamiTushum)
+                .toLocaleString()
+                .replace(/,/g, " ")}</th>
+              <th align="center">${
                 Math.round(
                   (jamiTushum / jamiXisoblandi + Number.EPSILON) * 1000
                 ) / 10
-              }%</td>
-              <td>${(jamiTushum - jamiXisoblandi).toLocaleString()}</td>
+              }%</th>
+              <th>${Math.floor(jamiTushum - jamiXisoblandi)
+                .toLocaleString()
+                .replace(/,/g, " ")}</th>
               </tr>`;
 
               await nodeHtmlToImage({
@@ -129,6 +141,7 @@ const importIncomeScene = new Scenes.WizardScene(
                   padding: 2px 5px;
                   margin: 0;
                   border-collapse: collapse;
+                  font-weight: bold;
                 }
                 td{
                   text-align: right;
@@ -162,11 +175,11 @@ const importIncomeScene = new Scenes.WizardScene(
                 <table cellscasing="0">
                 <tr>
                 <th>№</th>
-                <th>Махалла</th>
-                <th>Режа</th>
-                <th>Жами тушумлар</th>
+                <th style="width: 250px">Махалла</th>
+                <th style="width: 120px">Режа</th>
+                <th style="width: 120px">Жами тушумлар</th>
                 <th>Фоизда</th>
-                <th>Фарқи</th>
+                <th style="width: 120px">Фарқи</th>
                 </tr>
                 ${tableItems}
                 </table>

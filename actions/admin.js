@@ -86,6 +86,11 @@ composer.action("import_abonents_data", (ctx) => {
     ctx.scene.enter("import_abonents_data");
   }
 });
+composer.action("generate_sud_buyruq", (ctx) => {
+  if (isAdmin(ctx)) {
+    ctx.scene.enter("generate_sud_buyruq");
+  }
+});
 
 composer.action("set_plan_for_inspectors", (ctx) => {
   ctx.scene.enter("import_plan_for_inspectors");
