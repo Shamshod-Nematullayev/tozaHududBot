@@ -27,6 +27,8 @@ app.listen(PORT, async () => {
 require("./core/bot");
 require("./middlewares");
 require("./actions");
+require("./intervals");
+
 mongoose
   .connect(process.env.MONGO)
   .then(async () => {

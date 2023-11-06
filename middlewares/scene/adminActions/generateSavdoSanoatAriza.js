@@ -10,8 +10,8 @@ const https = require("https");
 const excelToJson = require("convert-excel-to-json");
 const path = require("path");
 
-const generateSBuyruq = new Scenes.WizardScene(
-  "generate_sud_buyruq",
+const generateSavdoSanoatAriza = new Scenes.WizardScene(
+  "generateSavdoSanoatAriza",
   async (ctx) => {
     try {
       if (isCancel(ctx.message?.text)) return ctx.scene.leave();
@@ -49,7 +49,7 @@ const generateSBuyruq = new Scenes.WizardScene(
               });
             }
             ejs.renderFile(
-              path.join(__dirname, `../../../lib/sudbuyruq.ejs`),
+              path.join(__dirname, `../../../lib/sudbuyruq copy.ejs`),
               { rows },
               {},
               async (err, str) => {
@@ -100,11 +100,11 @@ const generateSBuyruq = new Scenes.WizardScene(
   }
 );
 
-generateSBuyruq.enter((ctx) => {
+generateSavdoSanoatAriza.enter((ctx) => {
   ctx.replyWithDocument(importSudBuyruqlariExample, {
     caption: `Sud buyruqlari generatsiya qilinadigan abonentlar ma'lumotini ushbu shablonga ko'ra menga yuboring!`,
     reply_markup: keyboards.lotin.cancelBtn,
   });
 });
 
-module.exports = { generateSBuyruq };
+module.exports = { generateSavdoSanoatAriza };

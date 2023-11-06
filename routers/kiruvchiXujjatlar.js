@@ -68,6 +68,7 @@ router.post("/search", async (req, res, next) => {
 router.post("/create", upload.single("file"), async (req, res, next) => {
   try {
     console.log(req.body);
+    console.log(process.env.TEST_BASE_CHANNEL_ID);
     const documentOnTelegram = await bot.telegram.sendDocument(
       process.env.TEST_BASE_CHANNEL_ID,
       {

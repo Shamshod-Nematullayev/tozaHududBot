@@ -13,6 +13,10 @@ const schema = new mongoose.Schema({
     type: Number,
   },
   biriktirilganNazoratchi: Object,
+  groups: {
+    type: Array,
+    default: [],
+  },
 });
 
 module.exports.Mahalla = mongoose.model("mahalla", schema);

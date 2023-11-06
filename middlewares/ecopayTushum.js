@@ -56,14 +56,14 @@ const sendViloyatKunlikReja = async (resType, senderId) => {
       );
     }
     data.rows.forEach((row) => {
-      viloyatRejasi += row.all_nachis / (weekdays - 1);
+      viloyatRejasi += row.all_nachis / weekdays;
       viloyatKunlikTushum += parseInt(row.all_sum);
       newJSON.push({
         id: row.id,
-        kunlikReja: row.all_nachis / (weekdays - 1), // -1 bir kun bayram borligi uchun
+        kunlikReja: row.all_nachis / weekdays, // -1 bir kun bayram borligi uchun
         birKunlikTushum: row.all_sum,
         foizda: Math.floor(
-          (Number(row.all_sum) / (row.all_nachis / (weekdays - 1))) * 100
+          (Number(row.all_sum) / (row.all_nachis / weekdays)) * 100
         ),
         name: row.name,
       });
@@ -242,19 +242,20 @@ setInterval(async () => {
 
   try {
     if (
-      (soat == 10 && minut == 0) ||
-      (soat == 11 && minut == 0) ||
-      (soat == 12 && minut == 0) ||
-      (soat == 13 && minut == 0) ||
-      (soat == 14 && minut == 0) ||
-      (soat == 15 && minut == 0) ||
-      (soat == 16 && minut == 0) ||
-      (soat == 17 && minut == 0) ||
-      (soat == 18 && minut == 0) ||
-      (soat == 19 && minut == 0) ||
-      (soat == 21 && minut == 0) ||
-      (soat == 22 && minut == 0) ||
-      (soat == 23 && minut == 0)
+      // (soat == 10 && minut == 0) ||
+      // (soat == 11 && minut == 0) ||
+      // (soat == 12 && minut == 0) ||
+      // (soat == 13 && minut == 0) ||
+      // (soat == 14 && minut == 0) ||
+      // (soat == 15 && minut == 0) ||
+      // (soat == 16 && minut == 0) ||
+      // (soat == 17 && minut == 0) ||
+      // (soat == 18 && minut == 0) ||
+      // (soat == 19 && minut == 0) ||
+      // (soat == 21 && minut == 0) ||
+      // (soat == 22 && minut == 0) ||
+      // (soat == 23 && minut == 0)
+      false
     ) {
       sendViloyatKunlikReja();
     } else if (date.getMinutes() % 10 === 0) {

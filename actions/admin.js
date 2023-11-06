@@ -28,6 +28,7 @@ composer.command("admin", async (ctx) => {
 });
 
 composer.hears(["👨‍💻 Ish maydoni", "👨‍💻 Иш майдони"], async (ctx) => {
+  console.log(keyboards);
   const confirm = isAdmin(ctx);
   if (!confirm) {
     ctx.reply(messages[ctx.session.til].youAreNotAdmin);
@@ -91,6 +92,18 @@ composer.action("generate_sud_buyruq", (ctx) => {
     ctx.scene.enter("generate_sud_buyruq");
   }
 });
+composer.action("connect_mfy_tg_group", (ctx) => {
+  if (isAdmin(ctx)) {
+    ctx.scene.enter("connect_mfy_tg_group");
+  }
+});
+composer.action("generateSavdoSanoatAriza", (ctx) => {
+  if (isAdmin(ctx)) {
+    ctx.scene.enter("generateSavdoSanoatAriza");
+  }
+});
+
+composer.hears("olala", (ctx) => ctx.scene.enter("viloyatlogintest"));
 
 composer.action("set_plan_for_inspectors", (ctx) => {
   ctx.scene.enter("import_plan_for_inspectors");

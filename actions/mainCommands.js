@@ -26,9 +26,9 @@ composer.hears(["🔎Izlash", "🔎Излаш"], (ctx) => {
 composer.action("searchByID", (ctx) => {
   ctx.scene.enter("searchByID");
 });
-composer.action("searchByFISH", (ctx) => {
-  ctx.reply("Bu funksiya hali to'liq ishlab chiqilmadi");
-});
+// composer.action("searchByFISH", (ctx) => {
+//   ctx.reply("Bu funksiya hali to'liq ishlab chiqilmadi");
+// });
 
 composer.hears(
   ["👥Mening abonentlarim", "👥Менинг абонентларим"],

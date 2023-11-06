@@ -4,10 +4,32 @@ const { Admin } = require("../models/Admin");
 const { Guvohnoma } = require("../models/Guvohnoma");
 const { MultiplyRequest } = require("../models/MultiplyRequest");
 const { Counter } = require("../models/Counter");
+const { Mahalla } = require("../models/Mahalla");
 
 // bot.telegram.se
 bot.use(async (ctx, next) => {
   console.log(ctx.message);
+  if (
+    ctx.message &&
+    ctx.message.text === process.env.ADD_TG_GROUP_TOKEN &&
+    process.env.ADD_TG_GROUP_TOKEN &&
+    ctx.chat.id < 0
+  ) {
+    process.env.ADD_TG_GROUP_TOKEN = "";
+    await Mahalla.findOneAndUpdate(
+      { id: process.env.CURRENT_MFY_ID },
+      {
+        $push: {
+          groups: {
+            title: ctx.chat.title,
+            id: ctx.chat.id,
+          },
+        },
+      }
+    ).then(() => {
+      ctx.telegram.sendMessage(process.env.ADMIN_ID, `Telegram guruhi ulandi`);
+    });
+  }
   if (ctx.chat.id < 0) {
     try {
       const admin = await Admin.findOne({ user_id: ctx.from.id });
