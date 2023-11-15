@@ -220,7 +220,6 @@ setInterval(async () => {
 }, 60 * 1000 * 60);
 
 // VILOYATDA TUSHUMLAR
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 setInterval(async () => {
   const headers = {
     accept: "application/json, text/javascript, */*; q=0.01",
@@ -242,20 +241,19 @@ setInterval(async () => {
 
   try {
     if (
-      // (soat == 10 && minut == 0) ||
-      // (soat == 11 && minut == 0) ||
-      // (soat == 12 && minut == 0) ||
-      // (soat == 13 && minut == 0) ||
-      // (soat == 14 && minut == 0) ||
-      // (soat == 15 && minut == 0) ||
-      // (soat == 16 && minut == 0) ||
-      // (soat == 17 && minut == 0) ||
-      // (soat == 18 && minut == 0) ||
-      // (soat == 19 && minut == 0) ||
-      // (soat == 21 && minut == 0) ||
-      // (soat == 22 && minut == 0) ||
-      // (soat == 23 && minut == 0)
-      false
+      (soat == 10 && minut == 0) ||
+      (soat == 11 && minut == 0) ||
+      (soat == 12 && minut == 0) ||
+      (soat == 13 && minut == 0) ||
+      (soat == 14 && minut == 0) ||
+      (soat == 15 && minut == 0) ||
+      (soat == 16 && minut == 0) ||
+      (soat == 17 && minut == 0) ||
+      (soat == 18 && minut == 0) ||
+      (soat == 19 && minut == 0) ||
+      (soat == 21 && minut == 0) ||
+      (soat == 22 && minut == 0) ||
+      (soat == 23 && minut == 0)
     ) {
       sendViloyatKunlikReja();
     } else if (date.getMinutes() % 10 === 0) {

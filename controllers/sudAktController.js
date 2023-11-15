@@ -52,13 +52,13 @@ module.exports.createNewAkt = async (req, res, next) => {
         bildirish_xati_raqami,
       });
     }
-    const akt = await SudAkt.findOne({ kod });
-    if (akt) {
-      return res.json({
-        ok: false,
-        message: "Siz yuborgan kodga allaqachon akt yaratilgan" + " " + kod,
-      });
-    }
+    // const akt = await SudAkt.findOne({ kod });
+    // if (akt) {
+    //   return res.json({
+    //     ok: false,
+    //     message: "Siz yuborgan kodga allaqachon akt yaratilgan" + " " + kod,
+    //   });
+    // }
     await SudAkt.create({
       kod,
       bildirish_xat: {

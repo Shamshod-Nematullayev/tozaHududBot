@@ -3,5 +3,4 @@ require("./haveUsername");
 require("./scenes");
 require("./setLanguage");
 require("./saveUser");
-require("./onDoneBtn");
 require("./ecopayTushum");

@@ -1,4 +1,5 @@
 require("dotenv").config();
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 const { default: mongoose } = require("mongoose");
 const express = require("express");
 const app = express();

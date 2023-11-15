@@ -30,7 +30,13 @@ const {
   connect_mfy_tg_group_scene,
 } = require("./scene/adminActions/connect_mfy_tg_group");
 const { loginviloyat } = require("./scene/adminActions/loginviloyat");
-const { generateSavdoSanoatAriza } = require("./scene/adminActions/generateSavdoSanoatAriza");
+const {
+  generateSavdoSanoatAriza,
+} = require("./scene/adminActions/generateSavdoSanoatAriza");
+const { loginCleanCityScene } = require("./scene/adminActions/cleancity/login");
+const {
+  recoverCleanCitySession,
+} = require("./scene/adminActions/cleancity/recoverSession");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -54,7 +60,9 @@ const stage = new Scenes.Stage([
   generateSBuyruq,
   connect_mfy_tg_group_scene,
   loginviloyat,
-  generateSavdoSanoatAriza
+  generateSavdoSanoatAriza,
+  loginCleanCityScene,
+  recoverCleanCitySession,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());
