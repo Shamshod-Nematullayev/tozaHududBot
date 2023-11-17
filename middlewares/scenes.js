@@ -21,9 +21,6 @@ const {
 } = require("./scene/adminActions/completeGuvohnoma");
 const importPlanForInspectors = require("./scene/adminActions/importPlanForInspectors");
 const { connectPhoneNumber } = require("./scene/userScenes/connectPhoneNumber");
-const {
-  chargeCleanCityViloyatScene,
-} = require("./scene/adminActions/chargeCleanCityViloyat");
 const { importAbonentsScene } = require("./scene/adminActions/importAbonents");
 const { generateSBuyruq } = require("./scene/adminActions/generateSudBuyruq");
 const {
@@ -37,6 +34,9 @@ const { loginCleanCityScene } = require("./scene/adminActions/cleancity/login");
 const {
   recoverCleanCitySession,
 } = require("./scene/adminActions/cleancity/recoverSession");
+const {
+  loginCleanCityViloyatScene,
+} = require("./scene/adminActions/cleancity/viloyat/login");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -55,13 +55,13 @@ const stage = new Scenes.Stage([
   confirmGuvohnomaScene,
   importPlanForInspectors,
   connectPhoneNumber,
-  chargeCleanCityViloyatScene,
   importAbonentsScene,
   generateSBuyruq,
   connect_mfy_tg_group_scene,
   loginviloyat,
   generateSavdoSanoatAriza,
   loginCleanCityScene,
+  loginCleanCityViloyatScene,
   recoverCleanCitySession,
 ]);
 

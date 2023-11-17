@@ -6,6 +6,8 @@ const {
 const nodeHtmlToImage = require("node-html-to-image");
 const { bot } = require("../core/bot");
 const path = require("path");
+const { CleanCitySession } = require("../models/CleanCitySession");
+const { JSDOM } = require("jsdom");
 
 // har besh daqiqada ecopay session saqlash uchun fetch yuboradigan funksiya
 // setInterval(async () => {
@@ -13,8 +15,30 @@ const path = require("path");
 // }, 0600 * 60 * 1000);
 // fetchEcopayLogin();
 
+const cc = "https://cleancity.uz";
 const sendViloyatKunlikReja = async (resType, senderId) => {
   try {
+    // hisobot olish xenc aniqlash
+    const session = await CleanCitySession.findOne({ type: "stm_reports" });
+    const res = await fetch(cc + "/startpage", {
+      headers: {
+        Cookie: session.cookie,
+      },
+    });
+
+    const startpage = new JSDOM(await res.text()).window.document;
+    const tushumUrl = startpage.querySelector(
+      "#g_acccordion > div > div > ul > li:nth-child(13) > a"
+    ).href;
+
+    const res2 = await fetch(`${cc}/startpage${tushumUrl}`, {
+      headers: {
+        Cookie: session.cookie,
+      },
+    });
+    const text = await res2.text();
+
+    // Hisobotni keltirish
     const date = new Date();
     const headers = {
       accept: "application/json, text/javascript, */*; q=0.01",
@@ -28,11 +52,11 @@ const sendViloyatKunlikReja = async (resType, senderId) => {
       "sec-fetch-mode": "cors",
       "sec-fetch-site": "same-origin",
       "x-requested-with": "XMLHttpRequest",
-      Cookie: "JSESSIONID=" + process.env.COOKIE,
+      Cookie: session.cookie,
     };
 
-    const res = await fetch(
-      "https://cleancity.uz/ds?xenc=" + process.env.XENC,
+    const resReport = await fetch(
+      `${cc}/${text.match(/url:\s*'([^']+)'/g)[1].split("'")[1]}`,
       {
         headers,
         body: `mes=${
@@ -43,7 +67,7 @@ const sendViloyatKunlikReja = async (resType, senderId) => {
         credentials: "include",
       }
     );
-    const data = await res.json();
+    const data = await resReport.json();
     const newJSON = [];
     const weekdays = getAllWeekdaysInMonth(date.getMonth(), date.getFullYear());
     let viloyatRejasi = 0;
@@ -70,7 +94,7 @@ const sendViloyatKunlikReja = async (resType, senderId) => {
     });
 
     const resUmumiy = await fetch(
-      "https://cleancity.uz/ds?xenc=" + process.env.XENC,
+      `${cc}/${text.match(/url:\s*'([^']+)'/g)[1].split("'")[1]}`,
       {
         headers,
         body: `mes=${
@@ -258,7 +282,7 @@ setInterval(async () => {
       sendViloyatKunlikReja();
     } else if (date.getMinutes() % 10 === 0) {
       const res = await fetch(
-        "https://cleancity.uz/ds?xenc=" + process.env.XENC,
+        `${cc}/${text.match(/url:\s*'([^']+)'/g)[1].split("'")[1]}`,
         {
           headers,
           body: `mes=${

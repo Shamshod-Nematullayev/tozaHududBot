@@ -6,6 +6,10 @@ const schema = new Schema(
     cookie: String,
     login: String,
     password: String,
+    type: {
+      type: String,
+      default: "dxsh",
+    },
     path: {
       type: Object,
       default: {

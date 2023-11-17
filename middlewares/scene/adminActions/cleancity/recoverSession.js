@@ -1,11 +1,16 @@
 const { Scenes } = require("telegraf");
 const { CleanCitySession } = require("../../../../models/CleanCitySession");
+const { JSDOM } = require("jsdom");
+const nodeFetch = require("node-fetch");
+const fs = require("fs");
 
 const recoverCleanCitySession = new Scenes.WizardScene(
   "recover_clean_city_session",
   async (ctx) => {
     try {
-      const session = await CleanCitySession.findOne({ user_id: ctx.from.id });
+      const session = await CleanCitySession.findOne({
+        type: ctx.session.session_type,
+      });
       const resLogin = await fetch(
         "https://cleancity.uz/startpage" +
           ctx.session.loginpath +
@@ -25,7 +30,7 @@ const recoverCleanCitySession = new Scenes.WizardScene(
             "wicket-focusedelementid": "submit_btn",
             cookie: ctx.session.cookie,
           },
-          body: `SignInForm_hf_0=&username=${ctx.session.username}&password=${ctx.session.password}&security_code=${ctx.message.text}&signin_submit=1`,
+          body: `SignInForm_hf_0=&username=${session.login}&password=${session.password}&security_code=${ctx.message.text}&signin_submit=1`,
           method: "POST",
         }
       );

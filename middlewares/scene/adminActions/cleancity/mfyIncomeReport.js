@@ -19,7 +19,7 @@ composer.action("mfy_income_report", async (ctx) => {
   if (sessions.length < 1) {
     await ctx.reply(`Faol sessiyalar mavjud emas qaytadan login qiling`);
     // session yaratish sahnasi va callback function shu joyida tugab yangi sahna boshlanadi
-    await ctx.scene.enter("recover_clean_city_session");
+    await ctx.scene.enter("login_clean_city");
     return;
   }
   //   foydalanuvchi kiritgan har bir session bo'yicha tushumlar tahlili qilinadi
@@ -41,6 +41,7 @@ composer.action("mfy_income_report", async (ctx) => {
     ) {
       await ctx.reply(`Faol sessiyalar mavjud emas qaytadan login qiling`);
       // session yaratish sahnasi va callback function shu joyida tugab yangi sahna boshlanadi
+      ctx.session.session_type = "dxsh";
       await ctx.scene.enter("recover_clean_city_session");
       return;
     }
