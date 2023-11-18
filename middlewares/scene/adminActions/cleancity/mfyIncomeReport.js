@@ -12,6 +12,7 @@ const composer = new Composer();
 composer.action("mfy_income_report", async (ctx) => {
   const sessions = await CleanCitySession.find({
     user_id: ctx.from.id,
+    type: "dxsh",
     active: true,
   });
 

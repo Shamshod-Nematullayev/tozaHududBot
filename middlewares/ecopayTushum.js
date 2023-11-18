@@ -8,6 +8,9 @@ const { bot } = require("../core/bot");
 const path = require("path");
 const { CleanCitySession } = require("../models/CleanCitySession");
 const { JSDOM } = require("jsdom");
+const {
+  drawDebitViloyat,
+} = require("./scene/adminActions/cleancity/viloyat/toSendDebitorReport");
 
 // har besh daqiqada ecopay session saqlash uchun fetch yuboradigan funksiya
 // setInterval(async () => {
@@ -16,6 +19,7 @@ const { JSDOM } = require("jsdom");
 // fetchEcopayLogin();
 
 const cc = "https://cleancity.uz";
+let text = "";
 const sendViloyatKunlikReja = async (resType, senderId) => {
   try {
     // hisobot olish xenc aniqlash
@@ -36,7 +40,7 @@ const sendViloyatKunlikReja = async (resType, senderId) => {
         Cookie: session.cookie,
       },
     });
-    const text = await res2.text();
+    text = await res2.text();
 
     // Hisobotni keltirish
     const date = new Date();
@@ -245,6 +249,7 @@ setInterval(async () => {
 
 // VILOYATDA TUSHUMLAR
 setInterval(async () => {
+  const session = await CleanCitySession.findOne({ type: "stm_reports" });
   const headers = {
     accept: "application/json, text/javascript, */*; q=0.01",
     "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
@@ -257,7 +262,7 @@ setInterval(async () => {
     "sec-fetch-mode": "cors",
     "sec-fetch-site": "same-origin",
     "x-requested-with": "XMLHttpRequest",
-    Cookie: "JSESSIONID=" + process.env.COOKIE,
+    Cookie: session.cookie,
   };
   const date = new Date();
   const soat = date.getHours();
@@ -279,6 +284,7 @@ setInterval(async () => {
       (soat == 22 && minut == 0) ||
       (soat == 23 && minut == 0)
     ) {
+      drawDebitViloyat("toViloyat");
       sendViloyatKunlikReja();
     } else if (date.getMinutes() % 10 === 0) {
       const res = await fetch(

@@ -11,6 +11,10 @@ const {
   fetchEcoTranzaksiyalar,
 } = require("../middlewares/fetchEcopay");
 const { CleanCitySession } = require("../models/CleanCitySession");
+const {
+  toSendDebitor,
+  drawDebitViloyat,
+} = require("../middlewares/scene/adminActions/cleancity/viloyat/toSendDebitorReport");
 
 const composer = new Composer();
 async function isAdmin(ctx) {
@@ -112,10 +116,12 @@ composer.action("generateSavdoSanoatAriza", (ctx) => {
   }
 });
 
-composer.hears("olala", (ctx) => ctx.scene.enter("viloyatlogintest"));
-
 composer.action("set_plan_for_inspectors", (ctx) => {
   ctx.scene.enter("import_plan_for_inspectors");
+});
+
+composer.hears("debit", (ctx) => {
+  drawDebitViloyat("toMySelf");
 });
 
 bot.use(composer);
