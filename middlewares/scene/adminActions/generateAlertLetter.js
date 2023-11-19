@@ -67,7 +67,10 @@ const generateAlertLetter = new Scenes.WizardScene(
                 if (error) throw error;
                 ctx
                   .replyWithDocument({ source: "./lib/xatlar.PDF" })
-                  .then(() => {
+                  .then(async () => {
+                    await fs.unlink("./lib/xatlar.PDF", (err) =>
+                      err ? console.log(err) : ""
+                    );
                     ctx.scene.leave();
                   });
               });
@@ -90,7 +93,7 @@ generateAlertLetter.enter((ctx) => {
   ctx
     .replyWithDocument(
       // Na'muna uchun ajtarilgan fayl id
-      `BQACAgIAAxkDAAIVUmRV4mAxBvQKyqIvbudNJUo7e1pDAAK6JgACvROxSorrbB2euUm-LwQ`,
+      process.env.INPUT_ALERT_LETTER_EXCEL,
       {
         caption:
           `Ogohlantirish xati namuna \n` +
