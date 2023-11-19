@@ -26,7 +26,7 @@ setInterval(async () => {
       const filename = `./yuqoriqarz${Date.now()}.png`;
       let html = "";
       ejs.renderFile(
-        path.join(__dirname, "../", "lib", "qarzdorAbonentlar.ejs"),
+        path.join(__dirname, "../", "views", "qarzdorAbonentlar.ejs"),
         { data },
         {},
         (err, str) => {

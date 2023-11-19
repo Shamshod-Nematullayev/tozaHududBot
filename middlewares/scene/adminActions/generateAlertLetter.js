@@ -51,7 +51,7 @@ const generateAlertLetter = new Scenes.WizardScene(
                   SALDO: elem.E,
                   SANA: bugungiSana(),
                 };
-                ejs.renderFile("./lib/ox.ejs", { abonent }, (err, res) => {
+                ejs.renderFile("./views/ox.ejs", { abonent }, (err, res) => {
                   if (err) throw err;
                   xatlar += res;
                 });

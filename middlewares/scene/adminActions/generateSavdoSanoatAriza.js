@@ -49,7 +49,7 @@ const generateSavdoSanoatAriza = new Scenes.WizardScene(
               });
             }
             ejs.renderFile(
-              path.join(__dirname, `../../../lib/sudbuyruq copy.ejs`),
+              path.join(__dirname, `../../../views/sudbuyruq copy.ejs`),
               { rows },
               {},
               async (err, str) => {
@@ -59,8 +59,8 @@ const generateSavdoSanoatAriza = new Scenes.WizardScene(
                   footer: true,
                   pageNumber: true,
                   pageSize: {
-                    height: '1123px',
-                    width: '794px'
+                    height: "1123px",
+                    width: "794px",
                   },
                   // margins: {
                   //   top: '0.7cm',
