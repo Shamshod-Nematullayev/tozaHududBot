@@ -46,7 +46,7 @@ const toSendDebitor = async (ctx) => {
 };
 
 const drawDebitViloyat = async (sendingType) => {
-  const rows = await toSendDebitor();
+  let rows = await toSendDebitor();
   const date = new Date();
   let jamiDebitN = 0;
   let jamiDebitK = 0;
@@ -55,9 +55,7 @@ const drawDebitViloyat = async (sendingType) => {
     jamiDebitK += parseInt(row.debet_k);
     jamiDebitN += parseInt(row.debet_n);
   }
-  rows.sort((a, b) => {
-    return b.debet_k - a.debet_k;
-  });
+  rows = rows.sort((a, b) => b.debet_k - b.debet_n - (a.debet_k - a.debet_n));
   let html = "";
   ejs.renderFile(
     path.join(__dirname, "../../../../../", "views", "viloyatdebitor.ejs"),

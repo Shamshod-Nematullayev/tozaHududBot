@@ -53,6 +53,9 @@
       .text-red{
         color: red;
       }
+      .text-green{
+        color: green;
+      }
       #oliy_ong {
         position: absolute;
         top: 0;
@@ -94,7 +97,7 @@
             %>
           </td>
           
-          <td class="<%= hudud.debet_k - hudud.debet_n > 0 ? "text-red" : ""  %>">
+          <td class="<%= hudud.debet_k - hudud.debet_n > 0 ? "text-red" : "text-green"  %>">
             <%= Math.floor(hudud.debet_k - hudud.debet_n) .toLocaleString()
             .replace(/,/g, " ") %>
           </td>

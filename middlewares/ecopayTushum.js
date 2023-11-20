@@ -11,6 +11,7 @@ const { JSDOM } = require("jsdom");
 const {
   drawDebitViloyat,
 } = require("./scene/adminActions/cleancity/viloyat/toSendDebitorReport");
+const fs = require("fs");
 
 // har besh daqiqada ecopay session saqlash uchun fetch yuboradigan funksiya
 // setInterval(async () => {
@@ -217,9 +218,15 @@ ${tableItems}
 </div>`,
     });
     if (resType == "test") {
-      await bot.telegram.sendPhoto(senderId, {
-        source: path.join(__dirname, "../viloyatKunlikReja.png"),
-      });
+      await bot.telegram
+        .sendPhoto(senderId, {
+          source: path.join(__dirname, "../viloyatKunlikReja.png"),
+        })
+        .finally(() => {
+          fs.unlink(path.join(__dirname, "../viloyatKunlikReja.png"), (err) =>
+            err ? console.log(err) : ""
+          );
+        });
       return;
     }
     await bot.telegram.sendPhoto(process.env.STM_GROUP_ID, {
@@ -228,9 +235,15 @@ ${tableItems}
     await bot.telegram.sendPhoto(process.env.TOZAHUDUD_GR_ID, {
       source: path.join(__dirname, "../viloyatKunlikReja.png"),
     });
-    await bot.telegram.sendPhoto(process.env.ANVARJON_BZ_GR_ID, {
-      source: path.join(__dirname, "../viloyatKunlikReja.png"),
-    });
+    await bot.telegram
+      .sendPhoto(process.env.ANVARJON_BZ_GR_ID, {
+        source: path.join(__dirname, "../viloyatKunlikReja.png"),
+      })
+      .finally(() => {
+        fs.unlink(path.join(__dirname, "../viloyatKunlikReja.png"), (err) =>
+          err ? console.log(err) : ""
+        );
+      });
   } catch (error) {
     console.log(error);
     bot.telegram.sendMessage(5347896070, JSON.stringify(error));
@@ -284,7 +297,7 @@ setInterval(async () => {
       (soat == 22 && minut == 0) ||
       (soat == 23 && minut == 0)
     ) {
-      drawDebitViloyat("toViloyat");
+      if (date.getDate() > 18) drawDebitViloyat("toViloyat");
       sendViloyatKunlikReja();
     } else if (date.getMinutes() % 10 === 0) {
       const res = await fetch(
