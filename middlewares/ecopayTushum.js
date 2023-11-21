@@ -249,16 +249,6 @@ ${tableItems}
     bot.telegram.sendMessage(5347896070, JSON.stringify(error));
   }
 };
-// Har yarim soatda tushumni telegramga tashlaydigan funksiya
-setInterval(async () => {
-  let vaqt = new Date();
-  if (vaqt.getHours() > 19 && vaqt.getHours < 6) {
-  } else {
-    const data = await fetchEcopayTushum();
-    drawAndSendTushum(data);
-    fetchEcoTranzaksiyalar();
-  }
-}, 60 * 1000 * 60);
 
 // VILOYATDA TUSHUMLAR
 setInterval(async () => {
@@ -298,6 +288,9 @@ setInterval(async () => {
       (soat == 23 && minut == 0)
     ) {
       if (date.getDate() > 18) drawDebitViloyat("toViloyat");
+      const data = await fetchEcopayTushum();
+      drawAndSendTushum(data);
+      fetchEcoTranzaksiyalar();
       sendViloyatKunlikReja();
     } else if (date.getMinutes() % 10 === 0) {
       const res = await fetch(
