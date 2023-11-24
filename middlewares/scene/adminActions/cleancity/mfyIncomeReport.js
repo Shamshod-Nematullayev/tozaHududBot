@@ -66,7 +66,7 @@ const mfyIncomeReport = async (ctx = false) => {
     );
     // Ma'lumotlarni json shaklida beradigan linkni aniqlash
     const textTushumlarTahliliPage = await resTushumlarTahlili.text();
-    const url = textTushumlarTahliliPage.match(/url:\s*'([^']+)'/)[1];
+    const url = textTushumlarTahliliPage.match(/url:\s*'([^']+)'/g)[1];
     let myHeaders = new Headers();
     myHeaders.append("Cookie", session.cookie);
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -144,7 +144,7 @@ const mfyIncomeReport = async (ctx = false) => {
               .then(() => {
                 if (ctx)
                   ctx.replyWithPhoto({ source: "./income.png" }).then(() => {
-                    fs.unlink("./lastseen.png", (err) => {
+                    fs.unlink("./income.png", (err) => {
                       if (err) throw err;
                     });
                   });
@@ -160,7 +160,7 @@ const mfyIncomeReport = async (ctx = false) => {
                     )
 
                     .then(() => {
-                      fs.unlink("./lastseen.png", (err) => {
+                      fs.unlink("./income.png", (err) => {
                         if (err) throw err;
                       });
                     });
