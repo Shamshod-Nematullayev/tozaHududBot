@@ -77,8 +77,7 @@ const generateSBuyruq = new Scenes.WizardScene(
                     console.log("Docx file creation failed");
                     return;
                   }
-                  ctx.replyWithDocument({ source: filePath });
-                  console.log("Docx file created successfully");
+                  ctx.replyWithDocument({ source: filePath }).finally(() => {});
                 });
                 // ctx.scene.leave();
               }

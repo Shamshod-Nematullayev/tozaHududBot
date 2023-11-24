@@ -90,19 +90,16 @@ const generateAlertLetter = new Scenes.WizardScene(
 );
 
 generateAlertLetter.enter((ctx) => {
-  ctx
-    .replyWithDocument(
-      // Na'muna uchun ajtarilgan fayl id
-      process.env.INPUT_ALERT_LETTER_EXCEL,
-      {
-        caption:
-          `Ogohlantirish xati namuna \n` +
-          messages[ctx.session.til].enterExcelFile,
-        reply_markup:
-          keyboards[ctx.session.til].cancelBtn.resize().reply_markup,
-      }
-    )
-    .then((res) => console.log(res.document));
+  ctx.replyWithDocument(
+    // Na'muna uchun ajtarilgan fayl id
+    process.env.INPUT_ALERT_LETTER_EXCEL,
+    {
+      caption:
+        `Ogohlantirish xati namuna \n` +
+        messages[ctx.session.til].enterExcelFile,
+      reply_markup: keyboards[ctx.session.til].cancelBtn.resize().reply_markup,
+    }
+  );
 });
 
 generateAlertLetter.leave((ctx) => {

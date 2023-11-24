@@ -12,6 +12,9 @@ const { CleanCitySession } = require("../models/CleanCitySession");
 const {
   drawDebitViloyat,
 } = require("../middlewares/scene/adminActions/cleancity/viloyat/toSendDebitorReport");
+const {
+  yashovchiSoniKopaytirish,
+} = require("../middlewares/scene/adminActions/cleancity/yashovchiSoniKopaytirish");
 
 // =====================================================================================
 const composer = new Composer();
@@ -97,5 +100,6 @@ composer.command("tushum", async (ctx) => {
 composer.hears("debit", (ctx) => {
   drawDebitViloyat("toMySelf");
 });
+composer.hears("quc", (ctx) => yashovchiSoniKopaytirish("105120390245"));
 
 bot.use(composer);

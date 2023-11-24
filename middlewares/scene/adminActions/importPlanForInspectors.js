@@ -49,7 +49,6 @@ const importPlanForInspectors = new Scenes.WizardScene(
           );
           xls.forEach(async (row, i) => {
             if (i !== 0) {
-              console.log(row);
               await Mahalla.updateOne(
                 { id: row.A },
                 {

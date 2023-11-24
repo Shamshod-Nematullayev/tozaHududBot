@@ -4,6 +4,10 @@ const TOKEN = process.env.TOKEN;
 
 const bot = new Telegraf(TOKEN);
 
+bot.catch((err, ctx) => {
+  if (err) console.log(err);
+});
+
 bot
   .launch()
   .then(() => {

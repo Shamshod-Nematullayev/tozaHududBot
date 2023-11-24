@@ -1,3 +1,4 @@
+// ==============================================================
 const { Composer } = require("telegraf");
 const { bot } = require("../../../../core/bot");
 const { CleanCitySession } = require("../../../../models/CleanCitySession");
@@ -6,18 +7,21 @@ const { Mahalla } = require("../../../../models/Mahalla");
 const ejs = require("ejs");
 const nodeHtmlToImage = require("node-html-to-image");
 const path = require("path");
+const fs = require("fs");
+
+// ==============================================================
+// MAIN FUNCTION
 
 const composer = new Composer();
 
-composer.action("mfy_income_report", async (ctx) => {
+const mfyIncomeReport = async (ctx = false) => {
   const sessions = await CleanCitySession.find({
-    user_id: ctx.from.id,
     type: "dxsh",
     active: true,
   });
 
   //   Foydalanuvchi tomonidan kiritilgan va hozirda aktiv bo'lgan sessionlar topilmaganda session yaratish sahnasiga o'tkazib yuboriladi
-  if (sessions.length < 1) {
+  if (sessions.length < 1 && ctx) {
     await ctx.reply(`Faol sessiyalar mavjud emas qaytadan login qiling`);
     // session yaratish sahnasi va callback function shu joyida tugab yangi sahna boshlanadi
     await ctx.scene.enter("login_clean_city");
@@ -38,7 +42,8 @@ composer.action("mfy_income_report", async (ctx) => {
     if (
       !docHomePage.querySelector(
         "#g_acccordion > div > div:nth-child(5) > ul > li:nth-child(4) > a"
-      )
+      ) &&
+      ctx
     ) {
       await ctx.reply(`Faol sessiyalar mavjud emas qaytadan login qiling`);
       // session yaratish sahnasi va callback function shu joyida tugab yangi sahna boshlanadi
@@ -61,7 +66,7 @@ composer.action("mfy_income_report", async (ctx) => {
     );
     // Ma'lumotlarni json shaklida beradigan linkni aniqlash
     const textTushumlarTahliliPage = await resTushumlarTahlili.text();
-    const url = textTushumlarTahliliPage.match(/url:\s*'([^']+)'/)[1];
+    const url = textTushumlarTahliliPage.match(/url:\s*'([^']+)'/g)[1];
     let myHeaders = new Headers();
     myHeaders.append("Cookie", session.cookie);
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -78,7 +83,6 @@ composer.action("mfy_income_report", async (ctx) => {
       body: urlencoded,
       redirect: "follow",
     };
-    console.log(url);
     fetch("https://cleancity.uz/" + url, requestOptions)
       .then((response) => response.json())
       .then(async (result) => {
@@ -138,10 +142,31 @@ composer.action("mfy_income_report", async (ctx) => {
               selector: "div",
             })
               .then(() => {
-                ctx.replyWithPhoto({ source: "./income.png" });
+                if (ctx)
+                  ctx.replyWithPhoto({ source: "./income.png" }).then(() => {
+                    fs.unlink("./income.png", (err) => {
+                      if (err) throw err;
+                    });
+                  });
+                else
+                  bot.telegram
+                    .sendPhoto(
+                      process.env.NAZORATCHILAR_GURUPPASI,
+                      { source: "./income.png" },
+                      {
+                        caption: `${newJSON.sana} holatiga hisobot.\n coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
+                        parse_mode: "HTML",
+                      }
+                    )
+
+                    .then(() => {
+                      fs.unlink("./income.png", (err) => {
+                        if (err) throw err;
+                      });
+                    });
               })
               .catch((err) => {
-                ctx.reply("Hisobotni rasmga o'girishda xatolik");
+                if (ctx) ctx.reply("Hisobotni rasmga o'girishda xatolik");
                 console.log(err);
               });
           }
@@ -153,6 +178,9 @@ composer.action("mfy_income_report", async (ctx) => {
         ctx.reply("xatolik tushumlar ma'lumotini json formatida olishda");
       });
   });
-});
+};
 
+// =========== EXPORT ======================//
+composer.action("mfy_income_report", mfyIncomeReport);
+module.exports = { mfyIncomeReport };
 bot.use(composer);
