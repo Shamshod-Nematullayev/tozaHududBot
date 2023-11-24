@@ -86,7 +86,6 @@ const loginviloyat = new Scenes.WizardScene(
       }
     );
     ctx.scene.leave();
-    console.log(await res.text());
   }
 );
 loginviloyat.enter(enterFunction);

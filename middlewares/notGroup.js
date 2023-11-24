@@ -8,7 +8,6 @@ const { Mahalla } = require("../models/Mahalla");
 
 // bot.telegram.se
 bot.use(async (ctx, next) => {
-  console.log(ctx.message);
   if (
     ctx.message &&
     ctx.message.text === process.env.ADD_TG_GROUP_TOKEN &&

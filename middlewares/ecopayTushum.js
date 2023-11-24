@@ -12,12 +12,9 @@ const {
   drawDebitViloyat,
 } = require("./scene/adminActions/cleancity/viloyat/toSendDebitorReport");
 const fs = require("fs");
-
-// har besh daqiqada ecopay session saqlash uchun fetch yuboradigan funksiya
-// setInterval(async () => {
-//   console.log({ tushum: await fetchEcopayTushum() });
-// }, 0600 * 60 * 1000);
-// fetchEcopayLogin();
+const {
+  mfyIncomeReport,
+} = require("./scene/adminActions/cleancity/mfyIncomeReport");
 
 const cc = "https://cleancity.uz";
 let text = "";
@@ -288,6 +285,7 @@ setInterval(async () => {
       (soat == 23 && minut == 0)
     ) {
       if (date.getDate() > 18) drawDebitViloyat("toViloyat");
+      if (soat === 8) mfyIncomeReport();
       const data = await fetchEcopayTushum();
       drawAndSendTushum(data);
       fetchEcoTranzaksiyalar();

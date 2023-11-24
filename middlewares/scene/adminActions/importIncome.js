@@ -66,7 +66,6 @@ const importIncomeScene = new Scenes.WizardScene(
                 jamiXisoblandi += mfy.xisoblandi;
                 jamiTushum += mfy.tushum;
                 if (!qaysiMahalla(mfy.id)) {
-                  console.log(mfy);
                 }
                 tableItems += `<tr>
             <td>${index + 1}</td>

@@ -55,8 +55,8 @@ module.exports.drawAndSendTushum = (data) => {
   let countIncome = 0;
   let countPrice = 0;
   newJSON.nazoratchilar.forEach((ins, index) => {
-    countIncome += ins.tushumSoni;
-    countPrice += ins.summasi;
+    if (ins.tushumSoni) countIncome += ins.tushumSoni;
+    if (ins.summasi) countPrice += ins.summasi;
     tableItems += `<tr>
                               <td>${index + 1}</td>
                               <td>${ins.name}</td>
@@ -349,7 +349,6 @@ module.exports.drawSendLastSeen = (data) => {
         });
       });
   });
-  console.log(newJSON.tranzaksiyalar);
 };
 
 module.exports.drawDailyIncomeComplating = async (data) => {
