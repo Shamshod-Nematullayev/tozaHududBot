@@ -17,6 +17,7 @@ const {
 } = require("../middlewares/scene/adminActions/cleancity/yashovchiSoniKopaytirish");
 const { Counter } = require("../models/Counter");
 const { Guvohnoma } = require("../models/Guvohnoma");
+const { MultiplyRequest } = require("../models/MultiplyRequest");
 
 // =====================================================================================
 const composer = new Composer();
@@ -157,6 +158,34 @@ composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
     // You might want to return an error message to the user or log it for further investigation
     ctx.reply("An error occurred while processing your request.");
   }
+});
+
+// yashovchi soni ko'paytirish so'rovini tasdiqlash funksiyasi
+composer.action(/done_\w+/g, async (ctx) => {
+  if (!(await isAdmin(ctx)))
+    return ctx.reply(messages[ctx.session.til].youAreNotAdmin);
+
+  const doneCb = ctx.update.callback_query.data;
+  const req = await MultiplyRequest.findById(doneCb.split("_")[1]);
+  await req.updateOne({
+    $set: {
+      confirm: true,
+    },
+  });
+  await ctx.telegram.sendMessage(
+    req.from.id,
+    `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n ✅✅ Tasdiqlandi`,
+    { parse_mode: "HTML" }
+  );
+  await ctx.editMessageText(
+    `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.KOD}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+    { parse_mode: "HTML", disable_web_page_preview: true }
+  );
+  await ctx.telegram.forwardMessage(
+    process.env.NAZORATCHILAR_GURUPPASI,
+    process.env.CHANNEL,
+    ctx.callbackQuery.message.message_id
+  );
 });
 
 composer.hears("quc", (ctx) => {
