@@ -162,30 +162,49 @@ composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
 
 // yashovchi soni ko'paytirish so'rovini tasdiqlash funksiyasi
 composer.action(/done_\w+/g, async (ctx) => {
-  if (!(await isAdmin(ctx)))
-    return ctx.reply(messages[ctx.session.til].youAreNotAdmin);
+  try {
+    if (!(await isAdmin(ctx)))
+      return ctx.reply(messages[ctx.session.til].youAreNotAdmin);
 
-  const doneCb = ctx.update.callback_query.data;
-  const req = await MultiplyRequest.findById(doneCb.split("_")[1]);
-  await req.updateOne({
-    $set: {
-      confirm: true,
-    },
-  });
-  await ctx.telegram.sendMessage(
-    req.from.id,
-    `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n ✅✅ Tasdiqlandi`,
-    { parse_mode: "HTML" }
-  );
-  await ctx.editMessageText(
-    `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.KOD}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
-    { parse_mode: "HTML", disable_web_page_preview: true }
-  );
-  await ctx.telegram.forwardMessage(
-    process.env.NAZORATCHILAR_GURUPPASI,
-    process.env.CHANNEL,
-    ctx.callbackQuery.message.message_id
-  );
+    const doneCb = ctx.update.callback_query.data;
+    const req = await MultiplyRequest.findById(doneCb.split("_")[1]);
+
+    const cleancityResponse = await yashovchiSoniKopaytirish(
+      req.KOD,
+      req.YASHOVCHILAR
+    );
+    if (!cleancityResponse.success) {
+      await ctx.telegram.sendMessage(
+        req.from.id,
+        `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n 🟥🟥 Bekor qilindi. \n Asos: ${cleancityResponse.msg}`,
+        { parse_mode: "HTML" }
+      );
+      await req.updateOne({
+        $set: {
+          confirm: false,
+        },
+      });
+      await ctx.answerCbQuery(cleancityResponse.msg);
+    } else {
+      await ctx.answerCbQuery(JSON.stringify(cleancityResponse));
+      await ctx.telegram.sendMessage(
+        req.from.id,
+        `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n ✅✅ Tasdiqlandi`,
+        { parse_mode: "HTML" }
+      );
+      await ctx.editMessageText(
+        `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.KOD}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+        { parse_mode: "HTML", disable_web_page_preview: true }
+      );
+      await ctx.telegram.forwardMessage(
+        process.env.NAZORATCHILAR_GURUPPASI,
+        process.env.CHANNEL,
+        ctx.callbackQuery.message.message_id
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 composer.hears("quc", (ctx) => {
