@@ -18,6 +18,9 @@ const {
 const { Counter } = require("../models/Counter");
 const { Guvohnoma } = require("../models/Guvohnoma");
 const { MultiplyRequest } = require("../models/MultiplyRequest");
+const {
+  yangiAbonent,
+} = require("../middlewares/scene/adminActions/cleancity/yangiAbonent");
 
 // =====================================================================================
 const composer = new Composer();
@@ -207,14 +210,8 @@ composer.action(/done_\w+/g, async (ctx) => {
   }
 });
 
-composer.hears("quc", (ctx) => {
-  yashovchiSoniKopaytirish("105120390245", 3)
-    .then((finalResult) => {
-      console.log(Boolean(finalResult.success));
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+composer.hears("q", (ctx) => {
+  yangiAbonent();
 });
 
 bot.use(composer);
