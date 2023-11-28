@@ -12,27 +12,10 @@ const yashovchiSoniKopaytirish = async (litsavoy, yashovchiSoni) => {
     });
     const startpageText = await startpage.text();
 
-    function extractDsXencValue(input) {
-      // Define the regex pattern to match the ds?xenc parameter
-      var regex = /url:\s*'ds\?xenc=([^']+)'/;
-
-      // Use the exec method to extract the value
-      var match = regex.exec(input);
-
-      // Check if there is a match and return the value
-      if (match && match[1]) {
-        return match[1];
-      } else {
-        return null; // Return null if no match is found
-      }
-    }
-
-    // Example usage for initAboGrid
-    var urlValueAboGrid = extractDsXencValue(startpageText);
-    console.log(urlValueAboGrid);
-
+    // to get to find abonent url
     let url = startpageText.match(/url:\s*'ds\?xenc=([^']+)'/g);
-    console.log(url);
+    let urlX = startpageText.match(/action=["'](.*?)["']/g)[1].split(`"`)[1];
+
     const res = await fetch(cc + `${url[1].split("'")[1]}`, {
       method: "POST",
       headers: {
@@ -54,8 +37,33 @@ const yashovchiSoniKopaytirish = async (litsavoy, yashovchiSoni) => {
       mode: "cors",
       credentials: "include",
     });
-    console.log(await res.json());
-    // const startpageDoc = new JSDOM(await startpage.text());
+    console.log(urlX);
+    const abonentData = await res.json();
+    const res1 = await fetch("https://cleancity.uz/dashboard" + urlX, {
+      headers: {
+        accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+        "cache-control": "max-age=0",
+        "content-type": "application/x-www-form-urlencoded",
+        "sec-ch-ua":
+          '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "same-origin",
+        "sec-fetch-user": "?1",
+        "upgrade-insecure-requests": "1",
+      },
+      referrerPolicy: "strict-origin-when-cross-origin",
+      body: `to_card_abo_hf_0=&id=${abonentData.rows[0].id}&companies_id=1144`,
+      method: "POST",
+      mode: "cors",
+      credentials: "include",
+    });
+    // console.log(await res1.text());
+    console.log(res1.url);
   } catch (err) {
     console.log(err);
   }
