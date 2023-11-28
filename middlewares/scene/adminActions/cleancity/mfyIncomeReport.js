@@ -66,7 +66,9 @@ const mfyIncomeReport = async (ctx = false) => {
     );
     // Ma'lumotlarni json shaklida beradigan linkni aniqlash
     const textTushumlarTahliliPage = await resTushumlarTahlili.text();
-    const url = textTushumlarTahliliPage.match(/url:\s*'([^']+)'/g)[1];
+    const url = textTushumlarTahliliPage
+      .match(/url:\s*'([^']+)'/g)[0]
+      .split("'")[1];
     let myHeaders = new Headers();
     myHeaders.append("Cookie", session.cookie);
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -86,7 +88,6 @@ const mfyIncomeReport = async (ctx = false) => {
     fetch("https://cleancity.uz/" + url, requestOptions)
       .then((response) => response.json())
       .then(async (result) => {
-        // return;
         // linkni mongodb sessionga qo'shib qo'yish keyinchalik ishlatish uchun
         await session.updateOne({ $set: { "path.getIncomes": url } });
         // tushumlar tahlilini telegram guruhlarga yuborish

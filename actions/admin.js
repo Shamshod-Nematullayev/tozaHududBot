@@ -15,6 +15,9 @@ const {
 const {
   yashovchiSoniKopaytirish,
 } = require("../middlewares/scene/adminActions/cleancity/yashovchiSoniKopaytirish");
+const { Counter } = require("../models/Counter");
+const { Guvohnoma } = require("../models/Guvohnoma");
+const { MultiplyRequest } = require("../models/MultiplyRequest");
 
 // =====================================================================================
 const composer = new Composer();
@@ -100,6 +103,118 @@ composer.command("tushum", async (ctx) => {
 composer.hears("debit", (ctx) => {
   drawDebitViloyat("toMySelf");
 });
-composer.hears("quc", (ctx) => yashovchiSoniKopaytirish("105120390245"));
+
+composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
+  try {
+    if (!(await isAdmin(ctx))) {
+      return ctx.reply(messages[ctx.session.til].youAreNotAdmin);
+    }
+
+    const file_id =
+      ctx.callbackQuery.message.reply_markup.inline_keyboard[1][0].url
+        .split("=")[1]
+        .split("_")[1];
+
+    const counter = await Counter.findOne({
+      name: "ulim_guvohnoma_document_number",
+    });
+
+    const guvohnoma = await Guvohnoma.findByIdAndUpdate(file_id, {
+      $set: {
+        holat: "QABUL_QILINDI",
+        document_number: counter.value + 1,
+      },
+    });
+
+    await counter.updateOne({
+      $set: {
+        value: counter.value + 1,
+        last_update: Date.now(),
+      },
+    });
+
+    await ctx.editMessageCaption(
+      `<b>guvohnoma№_${counter.value + 1}</b> <a href="https://t.me/${
+        guvohnoma.user.username
+      }">${guvohnoma.user.fullname}</a>\n` +
+        `status: |<b> 🟡QABUL_QILINDI🟡 </b>|        #game_over\n` +
+        `<code>${guvohnoma.kod}</code>\n` +
+        `<i>${guvohnoma.comment}</i>\n` +
+        `✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+      { parse_mode: "HTML", disable_web_page_preview: true }
+    );
+
+    await ctx.telegram.sendPhoto(guvohnoma.user.id, guvohnoma.file_id, {
+      caption: `Siz yuborgan O'lim guvohnomasi operator tomonidan qabul qilindi. Tez orada sizga natijasini yetkazamiz\n\n№ <code>${
+        counter.value + 1
+      }</code>`,
+      parse_mode: "HTML",
+    });
+
+    await ctx.answerCbQuery(messages.lotin.sended);
+  } catch (error) {
+    console.error(error);
+    // Handle errors here
+    // You might want to return an error message to the user or log it for further investigation
+    ctx.reply("An error occurred while processing your request.");
+  }
+});
+
+// yashovchi soni ko'paytirish so'rovini tasdiqlash funksiyasi
+composer.action(/done_\w+/g, async (ctx) => {
+  try {
+    if (!(await isAdmin(ctx)))
+      return ctx.reply(messages[ctx.session.til].youAreNotAdmin);
+
+    const doneCb = ctx.update.callback_query.data;
+    const req = await MultiplyRequest.findById(doneCb.split("_")[1]);
+
+    const cleancityResponse = await yashovchiSoniKopaytirish(
+      req.KOD,
+      req.YASHOVCHILAR
+    );
+    if (!cleancityResponse.success) {
+      await ctx.telegram.sendMessage(
+        req.from.id,
+        `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n 🟥🟥 Bekor qilindi. \n Asos: ${cleancityResponse.msg}`,
+        { parse_mode: "HTML" }
+      );
+      await req.updateOne({
+        $set: {
+          confirm: false,
+        },
+      });
+      await ctx.answerCbQuery(cleancityResponse.msg);
+    } else {
+      await ctx.answerCbQuery(JSON.stringify(cleancityResponse));
+      await ctx.telegram.sendMessage(
+        req.from.id,
+        `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n ✅✅ Tasdiqlandi`,
+        { parse_mode: "HTML" }
+      );
+      await ctx.editMessageText(
+        `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.KOD}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+        { parse_mode: "HTML", disable_web_page_preview: true }
+      );
+      await ctx.telegram.forwardMessage(
+        process.env.NAZORATCHILAR_GURUPPASI,
+        process.env.CHANNEL,
+        ctx.callbackQuery.message.message_id
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+composer.hears("quc", (ctx) => {
+  yashovchiSoniKopaytirish("105120390245", 3)
+    .then((finalResult) => {
+      console.log(Boolean(finalResult.success));
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
 
 bot.use(composer);

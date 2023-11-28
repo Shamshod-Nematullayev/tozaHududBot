@@ -53,30 +53,26 @@ const multiplyLivingsScene = new Scenes.WizardScene(
         );
       } else {
         const abonent = ctx.wizard.state.abonent;
-        if (abonent.yashovchilar_soni < ctx.message.text) {
-          ctx.scene.state.YASHOVCHILAR = parseInt(ctx.message.text);
-          const request = new MultiplyRequest({
-            ...ctx.wizard.state,
-            date: Date.now(),
-            from: ctx.from,
-          });
-          await request.save();
-          ctx.reply(messages[ctx.session.til].accepted);
-          ctx.telegram.sendMessage(
-            process.env.CHANNEL,
-            `#yashovchisoni by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n<code>${ctx.wizard.state.KOD}</code>\n${ctx.message.text} kishi`,
-            {
-              parse_mode: "HTML",
-              reply_markup: Markup.inlineKeyboard([
-                [Markup.button.callback("✅✅✅", "done_" + request._id)],
-              ]).reply_markup,
-              disable_web_page_preview: true,
-            }
-          );
-          ctx.scene.leave();
-        } else {
-          ctx.reply(messages[ctx.session.til].enterHigherNumber);
-        }
+        ctx.scene.state.YASHOVCHILAR = parseInt(ctx.message.text);
+        const request = new MultiplyRequest({
+          ...ctx.wizard.state,
+          date: Date.now(),
+          from: ctx.from,
+        });
+        await request.save();
+        ctx.reply(messages[ctx.session.til].accepted);
+        ctx.telegram.sendMessage(
+          process.env.CHANNEL,
+          `#yashovchisoni by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n<code>${ctx.wizard.state.KOD}</code>\n${ctx.message.text} kishi`,
+          {
+            parse_mode: "HTML",
+            reply_markup: Markup.inlineKeyboard([
+              [Markup.button.callback("✅✅✅", "done_" + request._id)],
+            ]).reply_markup,
+            disable_web_page_preview: true,
+          }
+        );
+        ctx.scene.leave();
       }
     } catch (error) {
       console.log(error);
