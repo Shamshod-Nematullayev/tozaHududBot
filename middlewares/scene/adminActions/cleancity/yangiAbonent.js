@@ -4,7 +4,16 @@ const { JSDOM } = require("jsdom");
 
 // ========================================================================
 
-const yangiAbonent = async (litsavoy, yashovchiSoni) => {
+const yangiAbonent = async (
+  mfy_id,
+  fish,
+  street_id,
+  yashovchi_soni,
+  kadastr_number,
+  phone,
+  passport_number,
+  pinfl
+) => {
   const date = new Date();
   try {
     const session = await CleanCitySession.findOne({ type: "dxsh" });
@@ -24,7 +33,18 @@ const yangiAbonent = async (litsavoy, yashovchiSoni) => {
     const abonents_page_url = await fetch(cc + find_abonents_page_url, {
       headers: { Cookie: session.cookie },
     });
-    console.log(abonents_page_url.url);
+    const abonents_page_res = await fetch(abonents_page_url.url, {
+      headers: { Cookie: session.cookie },
+    });
+    const abonents_page_text = await abonents_page_res.text();
+    const match_new_abonent_url = abonents_page_text
+      .match(/url\s*=\s*'([^']+)'/g)[3]
+      .split("'")[1]; //uchinchi topilgan url yangi abonent ochish yo'li
+    const matched_get_litschet_url = abonents_page_text
+      .match(/\$\.post\(\'ds\?xenc=([^'";\s]+)/g)[9]
+      .split("'")[1]; //[3].split("'")[1]; //uchinchi topilgan url yangi abonent ochish yo'li
+
+    console.log({ matched_get_litschet_url });
     return;
     const res = await fetch(cc + `${url[1].split("'")[1]}`, {
       method: "POST",

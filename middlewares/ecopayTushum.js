@@ -284,8 +284,8 @@ setInterval(async () => {
       (soat == 22 && minut == 0) ||
       (soat == 23 && minut == 0)
     ) {
-      if (date.getDate() > 18) drawDebitViloyat("toViloyat");
-      if (soat === 8) mfyIncomeReport();
+      drawDebitViloyat("toViloyat");
+      mfyIncomeReport();
       const data = await fetchEcopayTushum();
       drawAndSendTushum(data);
       fetchEcoTranzaksiyalar();
@@ -328,6 +328,13 @@ bot.hears("lol", (ctx) => {
 bot.hears("oliy", (ctx) => {
   try {
     sendViloyatKunlikReja();
+  } catch (err) {
+    ctx.reply(JSON.stringify(err));
+  }
+});
+bot.hears("oliy_ong", (ctx) => {
+  try {
+    mfyIncomeReport();
   } catch (err) {
     ctx.reply(JSON.stringify(err));
   }

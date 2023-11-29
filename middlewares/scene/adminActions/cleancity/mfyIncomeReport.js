@@ -155,7 +155,7 @@ const mfyIncomeReport = async (ctx = false) => {
                       process.env.NAZORATCHILAR_GURUPPASI,
                       { source: "./income.png" },
                       {
-                        caption: `${newJSON.sana} holatiga hisobot.\n coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
+                        caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
                         parse_mode: "HTML",
                       }
                     )
