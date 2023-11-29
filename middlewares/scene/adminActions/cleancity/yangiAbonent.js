@@ -16,11 +16,15 @@ const yangiAbonent = async (litsavoy, yashovchiSoni) => {
     // let url = startpageText.match(/href="?x=([^"]+)'/g);
     // console.log(url);
     const startpageDoc = new JSDOM(startpageText).window.document;
-    let abonents_page_url = startpageDoc.querySelector(
-      "#g_acccordion > div > div:nth-child(1) > div.panel-body.accordion-body > ul > li:nth-child(1) > a"
-    );
-    //   .getAttribute("href");
-    console.log(abonents_page_url.textContent);
+    let find_abonents_page_url = startpageDoc
+      .querySelector(
+        "#g_acccordion > div > div:nth-child(1) > ul > li:nth-child(1) > a"
+      )
+      .getAttribute("href");
+    const abonents_page_url = await fetch(cc + find_abonents_page_url, {
+      headers: { Cookie: session.cookie },
+    });
+    console.log(abonents_page_url.url);
     return;
     const res = await fetch(cc + `${url[1].split("'")[1]}`, {
       method: "POST",
