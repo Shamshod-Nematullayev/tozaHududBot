@@ -37,6 +37,9 @@ const {
 const {
   loginCleanCityViloyatScene,
 } = require("./scene/adminActions/cleancity/viloyat/login");
+const {
+  new_abonent_by_pinfl_scene,
+} = require("./scene/adminActions/newAbonentByPinfl");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -63,6 +66,7 @@ const stage = new Scenes.Stage([
   loginCleanCityScene,
   loginCleanCityViloyatScene,
   recoverCleanCitySession,
+  new_abonent_by_pinfl_scene,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());
