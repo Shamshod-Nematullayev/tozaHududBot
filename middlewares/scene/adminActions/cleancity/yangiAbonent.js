@@ -44,6 +44,24 @@ const yangiAbonent = async (
       .match(/\$\.post\(\'ds\?xenc=([^'";\s]+)/g)[9]
       .split("'")[1]; //[3].split("'")[1]; //uchinchi topilgan url yangi abonent ochish yo'li
 
+    const litsavoy = await fetch(cc + matched_get_litschet_url, {
+      headers: {
+        accept: "application/json, text/javascript, */*; q=0.01",
+        "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "sec-ch-ua":
+          '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "x-requested-with": "XMLHttpRequest",
+        Cookie: session.cookie,
+      },
+      method: "POST",
+      body: `mahallas_id=${mfy_id}&companies_id=1144`,
+    });
     console.log({ matched_get_litschet_url });
     return;
     const res = await fetch(cc + `${url[1].split("'")[1]}`, {
