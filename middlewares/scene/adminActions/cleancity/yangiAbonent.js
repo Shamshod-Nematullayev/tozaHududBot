@@ -46,9 +46,7 @@ const yangiAbonent = async ({
       .match(/\$\.post\(\'ds\?xenc=([^'";\s]+)/g)[9]
       .split("'")[1]; //[3].split("'")[1]; //uchinchi topilgan url yangi abonent ochish yo'li
 
-    console.log({ matched_get_litschet_url });
-    return;
-    const res = await fetch(cc + `${url[1].split("'")[1]}`, {
+    let availableKOD = await fetch(cc + get_litschet_url, {
       method: "POST",
       headers: {
         accept: "application/json, text/javascript, */*; q=0.01",
@@ -86,7 +84,7 @@ const yangiAbonent = async ({
         date.getMonth() + 1 > 9
           ? date.getMonth() + 1
           : "0" + date.getMonth() + 1
-      }.${date.getFullYear()}&energy_licshet=&energy_coato=&phone=&home_phone=&email=&description=&passport_location=&passport_number=${passport_number}&brith_date=&passport_given_date=&passport_expire_date=&pinfl=${pinfl}`,
+      }.${date.getFullYear()}&energy_licshet=&energy_coato=&phone=&home_phone=&email=&description=Added from telegram bot&passport_location=&passport_number=${passport_number}&brith_date=&passport_given_date=&passport_expire_date=&pinfl=${pinfl}`,
       method: "POST",
       mode: "cors",
       credentials: "include",
@@ -101,7 +99,10 @@ const yangiAbonent = async ({
         },
       });
     }
-    return final; // Return the 'final' variable
+    return {
+      litschet: availableKOD.value,
+      ...final,
+    }; // Return the 'final' variable
   } catch (err) {
     console.error(err.message);
     throw err;
