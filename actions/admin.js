@@ -21,6 +21,10 @@ const { MultiplyRequest } = require("../models/MultiplyRequest");
 const {
   yangiAbonent,
 } = require("../middlewares/scene/adminActions/cleancity/yangiAbonent");
+const {
+  find_one_by_pinfil_from_mvd,
+  find_address_by_pinfil_from_mvd,
+} = require("../api/mvd-pinfil");
 
 // =====================================================================================
 const composer = new Composer();
@@ -35,6 +39,7 @@ const ADMIN_ACTIONS = [
   "show_abonent_pic",
   "generate_alert_letter",
   "add_notification",
+  "new_abonent",
 ];
 
 // main required functions
@@ -210,8 +215,32 @@ composer.action(/done_\w+/g, async (ctx) => {
   }
 });
 
-composer.hears("q", (ctx) => {
-  yangiAbonent();
+composer.hears(/mvd_\w+/g, (ctx) => {
+  find_one_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
+    (res) => {
+      console.log(res);
+    }
+  );
+  // find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
+  //   (res) => {
+  //     console.log(res);
+  //   }
+  // );
+});
+
+composer.hears("q", async (ctx) => {
+  yangiAbonent({
+    mfy_id: 18161,
+    fish: "Omonova",
+    kadastr_number: "14:05:09:01:02:0317",
+    passport_number: "AB6171496",
+    pinfl: 41811943920084,
+    phone: "991234565",
+    yashovchi_soni: 3,
+    street_id: 205791,
+  }).then((res) => {
+    console.log(res);
+  });
 });
 
 bot.use(composer);
