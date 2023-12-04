@@ -17,13 +17,10 @@ const findAbonentScene = new Scenes.WizardScene("searchByID", (ctx) => {
     if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
 
     if (isNaN(ctx.message.text)) {
-      ctx.reply(
-        messages[ctx.session.til].enterOnlyNumber,
-        messages[ctx.session.til].cancelBtn.resize()
-      );
+      ctx.reply(messages.enterOnlyNumber, messages.cancelBtn.resize());
     } else if (ctx.message.text.length !== 12) {
       ctx.reply(
-        messages[ctx.session.til].enterFullNamber,
+        messages.enterFullNamber,
         keyboards[ctx.session.til].cancelBtn.resize()
       );
     } else {
@@ -48,7 +45,7 @@ const findAbonentScene = new Scenes.WizardScene("searchByID", (ctx) => {
             keyboards[ctx.session.til].cancelBtn.resize()
           )
         : ctx.reply(
-            messages[ctx.session.til].notFoundData,
+            messages.notFoundData,
             keyboards[ctx.session.til].cancelBtn.resize()
           );
     }
@@ -56,13 +53,13 @@ const findAbonentScene = new Scenes.WizardScene("searchByID", (ctx) => {
 });
 findAbonentScene.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].enterLitsavoy,
+    messages.enterLitsavoy,
     keyboards[ctx.session.til].cancelBtn.resize()
   );
 });
 findAbonentScene.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].startGreeting,
+    messages.startGreeting,
     keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });

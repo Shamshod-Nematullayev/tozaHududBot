@@ -11,7 +11,7 @@ const sendAnswerScene = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) {
         ctx.reply(
-          messages[ctx.session.til].ogohlantirishKiriting,
+          messages.ogohlantirishKiriting,
           keyboards[ctx.session.til].adminAnswerKeyboard.resize()
         );
         return ctx.wizard.next();
@@ -35,7 +35,7 @@ const sendAnswerScene = new Scenes.WizardScene(
               }
             )
             .then(() => {
-              ctx.reply(messages[ctx.session.til].sended).then(async () => {
+              ctx.reply(messages.sended).then(async () => {
                 const state = res.data;
                 await ctx.telegram.editMessageText(
                   process.env.CHANNEL,
@@ -63,7 +63,7 @@ const sendAnswerScene = new Scenes.WizardScene(
         })
         .catch(() => {
           ctx.reply(
-            messages[ctx.session.til].kodOchilmadi,
+            messages.kodOchilmadi,
             keyboards[ctx.session.til].cancelBtn.resize()
           );
         });
@@ -79,7 +79,7 @@ const sendAnswerScene = new Scenes.WizardScene(
       $set: { isCancel: true },
     })
       .then((res) => {
-        ctx.reply(messages[ctx.session.til].sended);
+        ctx.reply(messages.sended);
         ctx.telegram
           .sendMessage(
             res.user.id,
@@ -116,14 +116,14 @@ const sendAnswerScene = new Scenes.WizardScene(
           });
       })
       .catch((err) => {
-        return ctx.reply(messages[ctx.session.til].errorOccured);
+        return ctx.reply(messages.errorOccured);
       });
   }
 );
 
 sendAnswerScene.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].enterAbonentKod,
+    messages.enterAbonentKod,
     keyboards[ctx.session.til].adminAnswerKeyboard.resize()
   );
 });

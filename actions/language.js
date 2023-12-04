@@ -7,7 +7,7 @@ const composer = new Composer();
 composer.action("language", (ctx) => {
   ctx.deleteMessage();
   return ctx.reply(
-    messages[ctx.session.til].chooseLanguage,
+    messages.chooseLanguage,
     keyboards[ctx.session.til].chooseLanguge
   );
 });
@@ -15,7 +15,7 @@ composer.action("lotin_tili_tanlash", (ctx) => {
   ctx.deleteMessage();
   ctx.session.til = "lotin";
   ctx.reply(
-    messages[ctx.session.til].choosedLang,
+    messages.choosedLang,
     keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });
@@ -23,7 +23,7 @@ composer.action("kiril_tili_tanlash", (ctx) => {
   ctx.deleteMessage();
   ctx.session.til = "kiril";
   ctx.reply(
-    messages[ctx.session.til].choosedLang,
+    messages.choosedLang,
     keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });

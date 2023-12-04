@@ -94,9 +94,7 @@ generateAlertLetter.enter((ctx) => {
     // Na'muna uchun ajtarilgan fayl id
     process.env.INPUT_ALERT_LETTER_EXCEL,
     {
-      caption:
-        `Ogohlantirish xati namuna \n` +
-        messages[ctx.session.til].enterExcelFile,
+      caption: `Ogohlantirish xati namuna \n` + messages.enterExcelFile,
       reply_markup: keyboards[ctx.session.til].cancelBtn.resize().reply_markup,
     }
   );

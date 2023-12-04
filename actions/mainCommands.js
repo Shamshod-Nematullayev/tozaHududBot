@@ -18,10 +18,7 @@ composer.hears(["👤Yangi abonent ochish", "👤Янги абонент"], (ctx
   ctx.scene.enter("NEW_ABONENT");
 });
 composer.hears(["🔎Izlash", "🔎Излаш"], (ctx) => {
-  ctx.reply(
-    messages[ctx.session.til].izlashUsuliTanlash,
-    keyboards[ctx.session.til].searchType
-  );
+  ctx.reply(messages.izlashUsuliTanlash, keyboards[ctx.session.til].searchType);
 });
 composer.action("searchByID", (ctx) => {
   ctx.scene.enter("searchByID");
@@ -64,7 +61,7 @@ composer.hears(
         ctx.reply(str, { parse_mode: "HTML" });
       }
     } else {
-      ctx.reply(messages[ctx.session.til].noAbonent);
+      ctx.reply(messages.noAbonent);
     }
   }
 );
@@ -74,16 +71,13 @@ composer.hears(["📓Qo`llanma", "📓Қўлланма"], (ctx) => {
 });
 composer.hears(["✏️Ma'lumotlarini o'zgartirish", "✏️Тахрирлаш"], (ctx) => {
   ctx.reply(
-    messages[ctx.session.til].chooseEditType,
+    messages.chooseEditType,
     keyboards[ctx.session.til].editTypes.oneTime()
   );
 });
 
 composer.hears(["⚙Sozlamalar", "⚙Созламалар"], (ctx) => {
-  ctx.reply(
-    messages[ctx.session.til].chooseMenu,
-    keyboards[ctx.session.til].settings
-  );
+  ctx.reply(messages.chooseMenu, keyboards[ctx.session.til].settings);
 });
 // Ma'lumotlarni o'zgartirish funcsiyalariga yo'llash
 composer.action("o'lim guvohnomasi", (ctx) => {

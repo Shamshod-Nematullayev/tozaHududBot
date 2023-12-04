@@ -91,14 +91,14 @@ const confirmGuvohnomaScene = new Scenes.WizardScene(
 
 confirmGuvohnomaScene.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].enterGuvohnomaNumber,
+    messages.enterGuvohnomaNumber,
     keyboards[ctx.session.til].cancelBtn.resize()
   );
 });
 
 confirmGuvohnomaScene.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].heyAdmin,
+    messages.heyAdmin,
     keyboards[ctx.session.til].adminKeyboard.resize()
   );
 });

@@ -53,7 +53,7 @@ composer.start(async (ctx) => {
                         caption: messages.lotin.acceptedPicture,
                       })
                       .then(() => {
-                        ctx.reply(messages[ctx.session.til].sended);
+                        ctx.reply(messages.sended);
                       });
                   } else {
                     return ctx.telegram
@@ -61,14 +61,14 @@ composer.start(async (ctx) => {
                         caption: messages.lotin.canceledPicture,
                       })
                       .then(() => {
-                        ctx.reply(messages[ctx.session.til].sended);
+                        ctx.reply(messages.sended);
                       });
                   }
                 });
             });
         } else {
           return ctx.reply(
-            messages[ctx.session.til].youAreNotAdmin,
+            messages.youAreNotAdmin,
             keyboards[ctx.session.til].mainKeyboard.resize()
           );
         }
@@ -81,14 +81,14 @@ composer.start(async (ctx) => {
               ctx.scene.enter("answer_to_inspector");
             } else {
               ctx.reply(
-                messages[ctx.session.til].youAreNotAdmin,
+                messages.youAreNotAdmin,
                 keyboards[ctx.session.til].mainKeyboard.resize()
               );
             }
           })
           .catch((err) => {
             console.log(err);
-            ctx.reply(messages[ctx.session.til].notFoundData);
+            ctx.reply(messages.notFoundData);
           });
       }
     } else {
@@ -96,12 +96,12 @@ composer.start(async (ctx) => {
       if (admin) {
         // Admin dashboard
         ctx.reply(
-          messages[ctx.session.til].heyAdmin,
+          messages.heyAdmin,
           keyboards[ctx.session.til].adminKeyboard.resize()
         );
       } else {
         ctx.reply(
-          messages[ctx.session.til].startGreeting,
+          messages.startGreeting,
           keyboards[ctx.session.til].mainKeyboard.resize()
         );
       }

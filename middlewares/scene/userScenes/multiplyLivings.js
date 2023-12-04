@@ -11,12 +11,12 @@ const multiplyLivingsScene = new Scenes.WizardScene(
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text))
         return ctx.reply(
-          messages[ctx.session.til].enterOnlyNumber,
+          messages.enterOnlyNumber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       if (ctx.message.text.length != 12)
         return ctx.reply(
-          messages[ctx.session.til].enterFullNamber,
+          messages.enterFullNamber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
 
@@ -31,12 +31,12 @@ const multiplyLivingsScene = new Scenes.WizardScene(
         ctx.wizard.state.KOD = ctx.message.text;
         ctx.replyWithHTML(
           `<b>${abonent.FISH}</b> ${abonent.MFY} MFY\n` +
-            messages[ctx.session.til].enterYashovchiSoni,
+            messages.enterYashovchiSoni,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
         ctx.wizard.next();
       } else {
-        ctx.reply(messages[ctx.session.til].abonentNotFound);
+        ctx.reply(messages.abonentNotFound);
       }
     } catch (error) {
       console.log(error);
@@ -48,7 +48,7 @@ const multiplyLivingsScene = new Scenes.WizardScene(
       if (isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text)) {
         ctx.reply(
-          messages[ctx.session.til].enterYashovchiSoni,
+          messages.enterYashovchiSoni,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       } else {
@@ -60,7 +60,7 @@ const multiplyLivingsScene = new Scenes.WizardScene(
           from: ctx.from,
         });
         await request.save();
-        ctx.reply(messages[ctx.session.til].accepted);
+        ctx.reply(messages.accepted);
         ctx.telegram.sendMessage(
           process.env.CHANNEL,
           `#yashovchisoni by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n<code>${ctx.wizard.state.KOD}</code>\n${ctx.message.text} kishi`,
@@ -81,13 +81,13 @@ const multiplyLivingsScene = new Scenes.WizardScene(
 );
 multiplyLivingsScene.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].enterAbonentKod,
+    messages.enterAbonentKod,
     keyboards[ctx.session.til].cancelBtn.resize()
   );
 });
 multiplyLivingsScene.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].startGreeting,
+    messages.startGreeting,
     keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });

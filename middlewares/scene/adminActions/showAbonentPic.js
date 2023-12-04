@@ -11,12 +11,12 @@ const showAbonentPic = new Scenes.WizardScene(
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text))
         return ctx.reply(
-          messages[ctx.session.til].enterOnlyNumber,
+          messages.enterOnlyNumber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       if (ctx.message.text.length != 12)
         return ctx.reply(
-          messages[ctx.session.til].enterFullNamber,
+          messages.enterFullNamber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       const pictures = await Picture.find({ kod: ctx.message.text });
@@ -28,7 +28,7 @@ const showAbonentPic = new Scenes.WizardScene(
         });
       } else
         ctx.reply(
-          messages[ctx.session.til].notFoundData,
+          messages.notFoundData,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
     } catch (error) {
@@ -39,7 +39,7 @@ const showAbonentPic = new Scenes.WizardScene(
 
 showAbonentPic.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].enterAbonentKod,
+    messages.enterAbonentKod,
     keyboards[ctx.session.til].adminAnswerKeyboard.resize()
   );
 });

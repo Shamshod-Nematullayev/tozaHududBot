@@ -11,12 +11,12 @@ const connectPhoneNumber = new Scenes.WizardScene(
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text))
         return ctx.reply(
-          messages[ctx.session.til].enterOnlyNumber,
+          messages.enterOnlyNumber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       if (ctx.message.text.length != 12)
         return ctx.reply(
-          messages[ctx.session.til].enterFullNamber,
+          messages.enterFullNamber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       const abonents = require("../../../lib/abonents.json");
@@ -41,7 +41,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
         );
         ctx.wizard.next();
       } else {
-        ctx.reply(messages[ctx.session.til].abonentNotFound);
+        ctx.reply(messages.abonentNotFound);
       }
     } catch (error) {
       ctx.reply(`Xatolik haqida menga xabar bering`);
@@ -53,7 +53,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text)) {
         return ctx.reply(
-          messages[ctx.session.til].enterOnlyNumber,
+          messages.enterOnlyNumber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       }
@@ -90,7 +90,7 @@ connectPhoneNumber.enter((ctx) => {
 });
 connectPhoneNumber.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].startGreeting,
+    messages.startGreeting,
     keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });

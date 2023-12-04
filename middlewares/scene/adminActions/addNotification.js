@@ -12,7 +12,7 @@ const addNotification = new Scenes.WizardScene(
     // Yuborilgan xabar faylmi tekshirish
     if (!ctx.message.document) {
       return ctx.reply(
-        messages[ctx.session.til].notFile,
+        messages.notFile,
         keyboards[ctx.session.til].cancelBtn.resize()
       );
     }
@@ -27,7 +27,7 @@ const addNotification = new Scenes.WizardScene(
       buttonsArray.push([Markup.button.callback(ins.name, ins.id)]);
     });
     ctx.reply(
-      messages[ctx.session.til].chooseInspektor,
+      messages.chooseInspektor,
       Markup.inlineKeyboard(buttonsArray).oneTime()
     );
     ctx.wizard.next();
@@ -41,7 +41,7 @@ const addNotification = new Scenes.WizardScene(
       )[0];
       ctx.wizard.state.mahallalar = [];
       ctx.editMessageText(
-        messages[ctx.session.til].enterMahalla,
+        messages.enterMahalla,
         keyboards[ctx.session.til].mahallalar
       );
       ctx.wizard.next();
@@ -54,7 +54,7 @@ const addNotification = new Scenes.WizardScene(
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (ctx.message && ctx.message.text == "tayyor") {
         ctx.reply(
-          messages[ctx.session.til].enterDate,
+          messages.enterDate,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
         return ctx.wizard.next();
@@ -65,10 +65,7 @@ const addNotification = new Scenes.WizardScene(
             (mfy) => ctx.update.callback_query.data.split("_")[1] == mfy.id
           )[0]
         );
-        ctx.reply(
-          messages[ctx.session.til].isDone,
-          Markup.keyboard(["tayyor"]).resize()
-        );
+        ctx.reply(messages.isDone, Markup.keyboard(["tayyor"]).resize());
       }
     } catch (error) {
       ctx.reply("Xatolik");
@@ -79,7 +76,7 @@ const addNotification = new Scenes.WizardScene(
     if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
     if (ctx.message && ctx.message.text.split(".").length != 3) {
       return ctx.reply(
-        messages[ctx.session.til].enterDate,
+        messages.enterDate,
         keyboards[ctx.session.til].cancelBtn.resize()
       );
     }
@@ -90,7 +87,7 @@ const addNotification = new Scenes.WizardScene(
       year: date[2],
     };
     ctx.reply(
-      messages[ctx.session.til].enterAbonents,
+      messages.enterAbonents,
       keyboards[ctx.session.til].cancelBtn.resize()
     );
     ctx.wizard.next();
@@ -119,15 +116,14 @@ addNotification.enter(async (ctx) => {
   const documents = await Bildirishnoma.find();
   let doc_num = documents[documents.length - 1].doc_num + 1;
   ctx.replyWithHTML(
-    messages[ctx.session.til].enterNotificationFile +
-      `\n<code>${doc_num}</code>`,
+    messages.enterNotificationFile + `\n<code>${doc_num}</code>`,
     keyboards[ctx.session.til].cancelBtn.resize()
   );
 });
 
 addNotification.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].heyAdmin,
+    messages.heyAdmin,
     keyboards[ctx.session.til].adminKeyboard.resize()
   );
 });

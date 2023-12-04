@@ -11,7 +11,7 @@ const cancelGuvohnoma = new Scenes.WizardScene(
     if (isCancel(ctx.message.text)) {
       return ctx.scene.leave();
     }
-    ctx.reply(messages[ctx.session.til].sended);
+    ctx.reply(messages.sended);
     const res = await Guvohnoma.findById(ctx.session.guvohnoma_id);
     ctx.telegram
       .sendPhoto(
@@ -63,7 +63,7 @@ const cancelGuvohnoma = new Scenes.WizardScene(
 
 cancelGuvohnoma.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].ogohlantirishKiriting,
+    messages.ogohlantirishKiriting,
     keyboards[ctx.session.til].cancelBtn.resize()
   );
 });

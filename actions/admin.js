@@ -58,7 +58,7 @@ function enterAdminAction(actionType) {
       ctx.deleteMessage();
       ctx.scene.enter(actionType);
     } else {
-      ctx.reply(messages[ctx.session.til].youAreNotAdmin);
+      ctx.reply(messages.youAreNotAdmin);
     }
   });
 }
@@ -70,25 +70,19 @@ composer.command("admin", async (ctx) => {
 });
 
 composer.hears(["👨‍💻 Ish maydoni", "👨‍💻 Иш майдони"], async (ctx) => {
-  if (!(await isAdmin(ctx)))
-    return ctx.reply(messages[ctx.session.til].youAreNotAdmin);
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 
-  ctx.reply(
-    messages[ctx.session.til].chooseMenu,
-    keyboards[ctx.session.til].adminWorkSpace
-  );
+  ctx.reply(messages.chooseMenu, keyboards[ctx.session.til].adminWorkSpace);
 });
 
 composer.hears(["Тушумни ташлаш", "Tushumni tashlash"], async (ctx) => {
-  if (!(await isAdmin(ctx)))
-    return ctx.reply(messages[ctx.session.til].youAreNotAdmin);
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 
   ctx.scene.enter("import_income_report");
 });
 
 composer.action("CHARGE_VILOYAT_LOGIN", async (ctx) => {
-  if (!(await isAdmin(ctx)))
-    return ctx.reply(messages[ctx.session.til].youAreNotAdmin);
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 
   const session = await CleanCitySession.findOne({
     type: "stm_reports",
@@ -115,7 +109,7 @@ composer.hears("debit", (ctx) => {
 composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
   try {
     if (!(await isAdmin(ctx))) {
-      return ctx.reply(messages[ctx.session.til].youAreNotAdmin);
+      return ctx.reply(messages.youAreNotAdmin);
     }
 
     const file_id =
@@ -171,8 +165,7 @@ composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
 // yashovchi soni ko'paytirish so'rovini tasdiqlash funksiyasi
 composer.action(/done_\w+/g, async (ctx) => {
   try {
-    if (!(await isAdmin(ctx)))
-      return ctx.reply(messages[ctx.session.til].youAreNotAdmin);
+    if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 
     const doneCb = ctx.update.callback_query.data;
     const req = await MultiplyRequest.findById(doneCb.split("_")[1]);

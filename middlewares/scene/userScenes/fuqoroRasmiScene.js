@@ -11,12 +11,12 @@ const fuqoroRasmiScene = new Scenes.WizardScene(
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text))
         return ctx.reply(
-          messages[ctx.session.til].enterOnlyNumber,
+          messages.enterOnlyNumber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       if (ctx.message.text.length != 12)
         return ctx.reply(
-          messages[ctx.session.til].enterFullNamber,
+          messages.enterFullNamber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       const rasm = await Picture.findOne({
@@ -26,7 +26,7 @@ const fuqoroRasmiScene = new Scenes.WizardScene(
       if (rasm) return ctx.reply(`Bu abonentga avval rasm biriktirilgan`);
       ctx.wizard.state.KOD = parseInt(ctx.message.text);
       ctx.reply(
-        messages[ctx.session.til].enterPicture,
+        messages.enterPicture,
         keyboards[ctx.session.til].cancelBtn.resize()
       );
       ctx.wizard.next();
@@ -38,7 +38,7 @@ const fuqoroRasmiScene = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (!ctx.message.photo || ctx.message.photo.length < 1) {
-        return ctx.reply(messages[ctx.session.til].enterPicture);
+        return ctx.reply(messages.enterPicture);
       } else {
         ctx.wizard.state.PICTURE_ID =
           ctx.message.photo[ctx.message.photo.length - 1].file_id;
@@ -76,7 +76,7 @@ const fuqoroRasmiScene = new Scenes.WizardScene(
               parse_mode: "HTML",
             })
             .then(async (msg) => {
-              ctx.reply(messages[ctx.session.til].accepted);
+              ctx.reply(messages.accepted);
               await newPhoto.updateOne({
                 $set: { messageIdChannel: msg.message_id },
               });
@@ -91,13 +91,13 @@ const fuqoroRasmiScene = new Scenes.WizardScene(
 );
 fuqoroRasmiScene.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].enterAbonentKod,
+    messages.enterAbonentKod,
     keyboards[ctx.session.til].cancelBtn.resize()
   );
 });
 fuqoroRasmiScene.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].startGreeting,
+    messages.startGreeting,
     keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });

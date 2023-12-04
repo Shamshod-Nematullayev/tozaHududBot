@@ -23,7 +23,7 @@ const new_abonent_by_pinfl_scene = new Scenes.WizardScene(
         ctx.replyWithPhoto(
           "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DZjJS0SoXq6A&psig=AOvVaw1IOqLHD3CndpvLm1vqLwHJ&ust=1679216266118000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCPDp6ZqO5f0CFQAAAAAdAAAAABAE",
           {
-            caption: messages[ctx.session.til].enterReallyPinfl,
+            caption: messages.enterReallyPinfl,
             reply_markup: keyboards.lotin.cancelBtn.resize().reply_markup,
           }
         );

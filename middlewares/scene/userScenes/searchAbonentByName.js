@@ -13,7 +13,7 @@ const searchAbonentbyName = new Scenes.WizardScene(
       const mfy_id = ctx.update.callback_query.data.split("_")[1];
       ctx.scene.state.MFY_ID = mfy_id;
       ctx.deleteMessage();
-      ctx.reply(messages[ctx.session.til].enterFISH);
+      ctx.reply(messages.enterFISH);
       ctx.wizard.next();
     } catch (error) {
       ctx.reply("Xatolik", keyboards.lotin.cancelBtn.resize());
@@ -50,7 +50,7 @@ const searchAbonentbyName = new Scenes.WizardScene(
         );
       } else {
         ctx.reply(
-          messages[ctx.session.til].notFoundData,
+          messages.notFoundData,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       }
@@ -62,13 +62,13 @@ const searchAbonentbyName = new Scenes.WizardScene(
 );
 searchAbonentbyName.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].enterMahalla,
+    messages.enterMahalla,
     keyboards[ctx.session.til].mahallalar.oneTime()
   );
 });
 searchAbonentbyName.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].startGreeting,
+    messages.startGreeting,
     keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });

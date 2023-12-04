@@ -334,7 +334,7 @@ const importIncomeScene = new Scenes.WizardScene(
 
 importIncomeScene.enter((ctx) => {
   ctx.reply(
-    messages[ctx.session.til].enterIncomeReport,
+    messages.enterIncomeReport,
     keyboards[ctx.session.til].cancelBtn.resize()
   );
 });
