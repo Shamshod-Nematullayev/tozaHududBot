@@ -291,6 +291,9 @@ setInterval(async () => {
       fetchEcoTranzaksiyalar();
       sendViloyatKunlikReja();
     } else if (date.getMinutes() % 10 === 0) {
+      if (text == undefined) {
+        sendViloyatKunlikReja("test", 5347896070);
+      }
       const res = await fetch(
         `${cc}/${text.match(/url:\s*'([^']+)'/g)[1].split("'")[1]}`,
         {

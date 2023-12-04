@@ -1,0 +1,14 @@
+module.exports = {
+  apps: [
+    {
+      name: "toza-hudud-bot",
+      script: "index.js", // Replace with the actual filename of your script
+      watch: true,
+      ignore_watch: ["node_modules", "session.json"],
+      env: {
+        NODE_TLS_REJECT_UNAUTHORIZED: "0",
+        PORT: 5000,
+      },
+    },
+  ],
+};

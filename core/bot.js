@@ -14,7 +14,7 @@ bot
     console.log("Server connected to telegram");
   })
   .catch((err) => {
-    console.error(err);
+    throw err;
   });
 
 process.once("SIGINT", () => bot.stop("SIGINT"));
