@@ -29,6 +29,11 @@ const sendViloyatKunlikReja = async (resType, senderId) => {
     });
 
     const startpage = new JSDOM(await res.text()).window.document;
+    console.log(
+      startpage.querySelector(
+        "#g_acccordion > div > div > ul > li:nth-child(13) > a"
+      )
+    );
     const tushumUrl = startpage.querySelector(
       "#g_acccordion > div > div > ul > li:nth-child(13) > a"
     ).href;
@@ -131,7 +136,10 @@ const sendViloyatKunlikReja = async (resType, senderId) => {
       .toLocaleString()
       .replace(/,/g, " ")}</td>
     <td class="${
-      mfy.foizda > (viloyatKunlikTushum / viloyatRejasi) * 100 ? "" : "bad"
+      mfy.foizda > (viloyatKunlikTushum / viloyatRejasi) * 100 ||
+      mfy.foizda > 100
+        ? ""
+        : "bad"
     }" style="text-align: center;" class="">${mfy.foizda} %</td>
     <td style="text-align: right;">${parseInt(mfy.oyBoshidanTushum)
       .toLocaleString()
@@ -284,7 +292,7 @@ setInterval(async () => {
       (soat == 22 && minut == 0) ||
       (soat == 23 && minut == 0)
     ) {
-      drawDebitViloyat("toViloyat");
+      // drawDebitViloyat("toViloyat");
       //mfyIncomeReport();
       const data = await fetchEcopayTushum();
       drawAndSendTushum(data);
@@ -330,6 +338,7 @@ bot.hears("lol", (ctx) => {
 });
 bot.hears("oliy", (ctx) => {
   try {
+    drawDebitViloyat("toViloyat");
     sendViloyatKunlikReja();
   } catch (err) {
     ctx.reply(JSON.stringify(err));

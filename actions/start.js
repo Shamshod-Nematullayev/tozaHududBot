@@ -50,7 +50,7 @@ composer.start(async (ctx) => {
                   if (confirm == "TASDIQLANDI") {
                     return ctx.telegram
                       .sendPhoto(pic.user_id, pic.photo_file_id, {
-                        caption: messages.lotin.acceptedPicture,
+                        caption: messages.acceptedPicture,
                       })
                       .then(() => {
                         ctx.reply(messages.sended);
@@ -58,7 +58,7 @@ composer.start(async (ctx) => {
                   } else {
                     return ctx.telegram
                       .sendPhoto(pic.user_id, pic.photo_file_id, {
-                        caption: messages.lotin.canceledPicture,
+                        caption: messages.canceledPicture,
                       })
                       .then(() => {
                         ctx.reply(messages.sended);

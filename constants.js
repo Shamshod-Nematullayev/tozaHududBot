@@ -1,2 +1,3 @@
 module.exports.importPlanInspectorsFileId = `BQACAgIAAxkBAAJJ3GTDTwkUATMBRSBtldjVxJkoFJV1AAKTLgACJ8YhSkwaDIhEN-6-LwQ`;
 module.exports.importSudBuyruqlariExample = `BQACAgIAAxkBAAKQdGUqHGL5vpw6ZY9o91VTM7xcGkoBAALNNgACtXhRSVqQBQekLD9tMAQ`;
+module.exports.shaxsiTasdiqlandiBildirishXatiImportExcel = `BQACAgIAAxkBAALOymV8QzeLyK1a2X6K70HCl3zStGIFAALYOQAC25_hSzlqQPr8ds8MMwQ`;

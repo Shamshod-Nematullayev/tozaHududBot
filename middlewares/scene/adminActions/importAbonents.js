@@ -56,19 +56,23 @@ const importAbonentsScene = new Scenes.WizardScene(
             ctx.scene.leave();
           } else {
             await ctx.reply("Baza yangilanyapti...");
-            data.rows.forEach(async (row) => {
+            for (let i = 0; i < data.rows.length; i++) {
+              const row = data.rows[i];
+
               const abonent = await Abonent.findOne({ licshet: row.licshet });
               if (abonent) {
                 await abonent.updateOne({
-                  ...row,
+                  $set: {
+                    ...row,
+                  },
                 });
               } else {
                 await Abonent.create({
                   ...row,
                 });
               }
-            });
-            ctx
+            }
+            await ctx
               .reply(
                 `${mfy.name} yangilandi. ${indexMFY + 1} of ${
                   mahallalar.length

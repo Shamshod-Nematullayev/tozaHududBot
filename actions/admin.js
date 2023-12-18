@@ -40,6 +40,7 @@ const ADMIN_ACTIONS = [
   "generate_alert_letter",
   "add_notification",
   "new_abonent",
+  "shaxsi_tashdiqlandi_bildirish_xati",
 ];
 
 // main required functions
@@ -153,7 +154,7 @@ composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
       parse_mode: "HTML",
     });
 
-    await ctx.answerCbQuery(messages.lotin.sended);
+    await ctx.answerCbQuery(messages.sended);
   } catch (error) {
     console.error(error);
     // Handle errors here
@@ -209,16 +210,35 @@ composer.action(/done_\w+/g, async (ctx) => {
 });
 
 composer.hears(/mvd_\w+/g, (ctx) => {
-  find_one_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
-    (res) => {
-      console.log(res);
-    }
-  );
-  // find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
+  // find_one_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
   //   (res) => {
   //     console.log(res);
   //   }
   // );
+  find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1]))
+    .then((res) => {
+      console.log(res);
+      ctx.reply(
+        `<code>${res.details.PermanentRegistration.Cadastre}</code>\n<code>${res.details.PermanentRegistration.Address}</code>`,
+        { parse_mode: "HTML" }
+      );
+    })
+    .catch((err) => console.log(err));
+});
+composer.hears(/k_\w+/g, (ctx) => {
+  // find_one_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
+  //   (res) => {
+  //     console.log(res);
+  //   }
+  // );
+  find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
+    (res) => {
+      ctx.reply(
+        `<code>${res.details.PermanentRegistration.Cadastre}</code>\n<code>${res.details.PermanentRegistration.Address}</code>`,
+        { parse_mode: "HTML" }
+      );
+    }
+  );
 });
 
 composer.hears("q", async (ctx) => {

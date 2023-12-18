@@ -1,11 +1,4 @@
-const cc = `https://cleancity.uz/`;
-const { CleanCitySession } = require("../../../../models/CleanCitySession");
-const { JSDOM } = require("jsdom");
-const { Abonent } = require("../../../../models/Abonent");
-
-// ========================================================================
-
-const yashovchiSoniKopaytirish = async (litsavoy, yashovchiSoni) => {
+async function getLastAlertLetter(litsavoy) {
   const date = new Date();
   try {
     const session = await CleanCitySession.findOne({ type: "dxsh" });
@@ -13,12 +6,10 @@ const yashovchiSoniKopaytirish = async (litsavoy, yashovchiSoni) => {
       headers: { Cookie: session.cookie },
     });
     const startpageText = await startpage.text();
-
     const startpageDoc = new JSDOM(startpageText).window.document;
     let to_card_abo_url = startpageDoc
       .getElementById("to_card_abo")
       .getAttribute("action");
-
     const abonent_data = await Abonent.findOne({ licshet: litsavoy });
     const response = await fetch(
       "https://cleancity.uz/dashboard" + to_card_abo_url,
@@ -47,31 +38,7 @@ const yashovchiSoniKopaytirish = async (litsavoy, yashovchiSoni) => {
         credentials: "include",
       }
     );
-
-    const responseText = await response.text();
-    const inrementLiversUrl = responseText
-      .match(/url\s*=\s*'([^']+)'/g)[3]
-      .split("'")[1];
-
-    const incrementResponse = await fetch(
-      "https://cleancity.uz/" +
-        inrementLiversUrl +
-        `${date.getMonth() + 1}&god=${date.getFullYear()}`,
-      {
-        method: "POST",
-        headers: {
-          "content-type": "application/x-www-form-urlencoded",
-          Cookie: session.cookie,
-        },
-        body: `id=${abonent_data.id}&prescribed_cnt=${yashovchiSoni}&description=increment_from_telegram_bot`,
-      }
-    );
-    const final = await incrementResponse.json();
-    return final; // Return the 'final' variable
-  } catch (err) {
-    console.error(err.message);
-    throw err;
+  } catch (error) {
+    throw error;
   }
-};
-// yashovchiSoniKopaytirish(105120390245);
-module.exports = { yashovchiSoniKopaytirish };
+}

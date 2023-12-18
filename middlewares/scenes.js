@@ -40,6 +40,9 @@ const {
 const {
   new_abonent_by_pinfl_scene,
 } = require("./scene/adminActions/newAbonentByPinfl");
+const {
+  personConfirm,
+} = require("./scene/adminActions/addNotificationPersonConfirm");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -67,6 +70,7 @@ const stage = new Scenes.Stage([
   loginCleanCityViloyatScene,
   recoverCleanCitySession,
   new_abonent_by_pinfl_scene,
+  personConfirm,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

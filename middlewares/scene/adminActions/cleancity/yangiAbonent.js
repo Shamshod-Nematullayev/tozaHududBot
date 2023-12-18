@@ -17,35 +17,43 @@ const yangiAbonent = async ({
   const date = new Date();
   try {
     const session = await CleanCitySession.findOne({ type: "dxsh" });
-    const startpage = await fetch(cc + "startpage", {
-      headers: { Cookie: session.cookie },
-    });
-    const startpageText = await startpage.text();
+    if (!session) {
+      return { success: false, msg: "Session not available" };
+    }
 
-    // let url = startpageText.match(/href="?x=([^"]+)'/g);
-    // console.log(url);
-    const startpageDoc = new JSDOM(startpageText).window.document;
-    let find_abonents_page_url = startpageDoc
-      .querySelector(
-        "#g_acccordion > div > div:nth-child(1) > ul > li:nth-child(1) > a"
-      )
-      .getAttribute("href");
-    const abonents_page_url = await fetch(cc + find_abonents_page_url, {
-      headers: { Cookie: session.cookie },
-    });
-    const abonents_page_res = await fetch(abonents_page_url.url, {
-      headers: { Cookie: session.cookie },
-    });
-    const abonents_page_text = await abonents_page_res.text();
-    const new_abonent_url = abonents_page_text
-      .match(/url\s*=\s*'([^']+)'/g)[2]
-      .split("'")[1]; //uchinchi topilgan url yangi abonent ochish yo'li
+    let new_abonent_url = session.path.get_litschet_url;
+    let get_litschet_url = session.path.new_abonent_url;
 
-    // return;
-    const get_litschet_url = abonents_page_text
-      .match(/\$\.post\(\'ds\?xenc=([^'";\s]+)/g)[9]
-      .split("'")[1]; //[3].split("'")[1]; //uchinchi topilgan url yangi abonent ochish yo'li
+    if (!new_abonent_url || !get_litschet_url) {
+      const startpage = await fetch(cc + "startpage", {
+        headers: { Cookie: session.cookie },
+      });
+      const startpageText = await startpage.text();
 
+      // let url = startpageText.match(/href="?x=([^"]+)'/g);
+      // console.log(url);
+      const startpageDoc = new JSDOM(startpageText).window.document;
+      let find_abonents_page_url = startpageDoc
+        .querySelector(
+          "#g_acccordion > div > div:nth-child(1) > ul > li:nth-child(1) > a"
+        )
+        .getAttribute("href");
+      const abonents_page_url = await fetch(cc + find_abonents_page_url, {
+        headers: { Cookie: session.cookie },
+      });
+      const abonents_page_res = await fetch(abonents_page_url.url, {
+        headers: { Cookie: session.cookie },
+      });
+      const abonents_page_text = await abonents_page_res.text();
+      new_abonent_url = abonents_page_text
+        .match(/url\s*=\s*'([^']+)'/g)[2]
+        .split("'")[1]; //uchinchi topilgan url yangi abonent ochish yo'li
+
+      // return;
+      get_litschet_url = abonents_page_text
+        .match(/\$\.post\(\'ds\?xenc=([^'";\s]+)/g)[9]
+        .split("'")[1]; //[3].split("'")[1]; //uchinchi topilgan url yangi abonent ochish yo'li
+    }
     let availableKOD = await fetch(cc + get_litschet_url, {
       method: "POST",
       headers: {
@@ -78,7 +86,9 @@ const yangiAbonent = async ({
       referrerPolicy: "strict-origin-when-cross-origin",
       body: `id=&fio=${fish}&prescribed_cnt=${yashovchi_soni}&mahallas_id=${mfy_id}&licshet=${
         availableKOD.value
-      }&streets_id=${street_id}&kadastr_number=${kadastr_number}&headquarters_id=&ind=&house=&flat=&house_type_id=1&inn=&contract_number=&contract_date=${
+      }&streets_id=${street_id}&kadastr_number=${
+        availableKOD.value /*kadastr_number*/
+      }&headquarters_id=&ind=&house=&flat=&house_type_id=1&inn=&contract_number=&contract_date=${
         date.getDate() > 9 ? date.getDate() : "0" + date.getDate()
       }.${
         date.getMonth() + 1 > 9
@@ -91,14 +101,15 @@ const yangiAbonent = async ({
     });
 
     const final = await finalResponse.json();
-    if (final.success) {
-      await session.updateOne({
-        $set: {
-          "path.new_abonent_url": new_abonent_url,
-          "path.get_litschet_url": get_litschet_url,
-        },
-      });
-    }
+    console.log({ final });
+    // if (final.success) {
+    //   await session.updateOne({
+    //     $set: {
+    //       "path.new_abonent_url": new_abonent_url,
+    //       "path.get_litschet_url": get_litschet_url,
+    //     },
+    //   });
+    // }
     return {
       litschet: availableKOD.value,
       ...final,

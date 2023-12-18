@@ -51,6 +51,10 @@ const newAbonentScene = new Scenes.WizardScene(
       ctx.reply(messages.enterKocha);
       ctx.wizard.next();
     } catch (error) {
+      ctx.reply(
+        "Kutilgan amal bajarilmadi.",
+        keyboards[ctx.session.til].cancelBtn.resize()
+      );
       console.log(error);
     }
   },

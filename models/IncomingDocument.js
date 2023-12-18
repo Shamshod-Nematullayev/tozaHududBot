@@ -16,11 +16,4 @@ const schema = new mongoose.Schema({
 
 const IncomingDocument = mongoose.model("IncomingDocument", schema);
 
-// creating counter for incoming document serial number
-(async () => {
-  const counter = await Counter.findOne({ name: "incoming_document_number" });
-  if (!counter) {
-    await Counter.create({ name: "incoming_document_number", value: 0 });
-  }
-})();
 module.exports = { IncomingDocument };

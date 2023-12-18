@@ -29,7 +29,6 @@ const new_abonent_by_pinfl_scene = new Scenes.WizardScene(
         );
       } else {
         const customDates = await find_one_by_pinfil_from_mvd(ctx.message.text);
-        log(customDates);
         if (customDates.first_name == "" || customDates.success === false) {
           return ctx.reply("Ushbu fuqoroga tegishli ma'lumotlar topilmadi");
         }
@@ -113,7 +112,6 @@ const new_abonent_by_pinfl_scene = new Scenes.WizardScene(
           keyboardsArray.push([Markup.button.callback(street.name, street.id)]);
         }
         ctx.deleteMessage();
-        console.log(keyboardsArray);
         await ctx.reply(
           "Ko'chani tanlang",
           Markup.inlineKeyboard(keyboardsArray).oneTime()
@@ -171,8 +169,13 @@ const new_abonent_by_pinfl_scene = new Scenes.WizardScene(
       });
 
       if (abonent.success) {
-        ctx.reply(`Yangi abonent qo'shildi <code>${abonent.litschet}</code>`);
+        ctx.reply(`Yangi abonent qo'shildi <code>${abonent.litschet}</code>`, {
+          parse_mode: "HTML",
+        });
+      } else {
+        ctx.reply(abonent.msg);
       }
+      ctx.scene.leave();
     } catch (error) {
       console.log(error);
     }

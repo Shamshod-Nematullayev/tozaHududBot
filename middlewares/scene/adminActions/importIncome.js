@@ -203,7 +203,7 @@ const importIncomeScene = new Scenes.WizardScene(
         }
       } else {
         ctx.reply(
-          messages.lotin.notExcelFile,
+          messages.notExcelFile,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       }
@@ -333,15 +333,12 @@ const importIncomeScene = new Scenes.WizardScene(
 );
 
 importIncomeScene.enter((ctx) => {
-  ctx.reply(
-    messages.enterIncomeReport,
-    keyboards[ctx.session.til].cancelBtn.resize()
-  );
+  ctx.reply(messages.enterIncomeReport, keyboards.cancelBtn.resize());
 });
 
 importIncomeScene.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].heyAdmin,
+    messages.heyAdmin,
     keyboards[
       ctx.session.til ? ctx.session.til : "lotin"
     ].adminKeyboard.resize()

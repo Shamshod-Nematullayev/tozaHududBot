@@ -9,7 +9,7 @@ bot.use(async (ctx, next) => {
   }
   if (ctx.message && ctx.message.from && ctx.chat.id > 0) {
     const username = ctx.message.from.username;
-    username ? next() : ctx.reply(messages["lotin"].haveNotUsername);
+    username ? next() : ctx.reply(messages.haveNotUsername);
   } else {
     next();
   }
