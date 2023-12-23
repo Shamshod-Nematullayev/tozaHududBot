@@ -63,6 +63,7 @@ const recoverCleanCitySession = new Scenes.WizardScene(
         cookie: ctx.session.cookie,
         login: session.login,
         password: session.password,
+        path: {},
         active: true,
       });
       ctx.reply("Muvaffaqqiyatli login qilindi");
