@@ -338,7 +338,8 @@ bot.hears("lol", (ctx) => {
 });
 bot.hears("oliy", (ctx) => {
   try {
-    drawDebitViloyat("toViloyat");
+    // drawDebitViloyat("toViloyat");
+    mfyIncomeReport();
     sendViloyatKunlikReja();
   } catch (err) {
     ctx.reply(JSON.stringify(err));

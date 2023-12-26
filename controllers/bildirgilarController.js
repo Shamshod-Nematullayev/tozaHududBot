@@ -3,7 +3,7 @@ const { Bildirishnoma } = require("../models/SudBildirishnoma");
 // GET get all datas
 module.exports.getAllBildirgilar = async (req, res, next) => {
   try {
-    const bildirgilar = await Bildirishnoma.find();
+    const bildirgilar = await Bildirishnoma.find({ type: "sudga_chiqoring" });
     res.status(200).json({
       ok: true,
       bildirgilar,
