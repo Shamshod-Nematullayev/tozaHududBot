@@ -127,7 +127,7 @@ const mfyIncomeReport = async (ctx = false) => {
           date.getMonth() + 1
         } ${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`;
         ejs.renderFile(
-          path.join(__dirname, `../../../../views/mfyIncome.ejs`),
+          path.join(__dirname, `../../../../../views/mfyIncome.ejs`),
           { data: mahallalar, jamiTushum, jamiXisoblandi, sana },
           {},
           async (err, str) => {

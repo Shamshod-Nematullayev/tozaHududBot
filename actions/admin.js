@@ -25,6 +25,9 @@ const {
   find_one_by_pinfil_from_mvd,
   find_address_by_pinfil_from_mvd,
 } = require("../api/mvd-pinfil");
+const {
+  changeAbonentDates,
+} = require("../middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");
 
 // =====================================================================================
 const composer = new Composer();
@@ -242,18 +245,7 @@ composer.hears(/k_\w+/g, (ctx) => {
 });
 
 composer.hears("q", async (ctx) => {
-  yangiAbonent({
-    mfy_id: 18161,
-    fish: "Omonova",
-    kadastr_number: "14:05:09:01:02:0317",
-    passport_number: "AB6171496",
-    pinfl: 41811943920084,
-    phone: "991234565",
-    yashovchi_soni: 3,
-    street_id: 205791,
-  }).then((res) => {
-    console.log(res);
-  });
+  changeAbonentDates({ abonent_id: 12529474 });
 });
 
 bot.use(composer);
