@@ -7,7 +7,7 @@ const { Abonent } = require("../../../models/YangiAbonent");
 const isCancel = require("../../smallFunctions/isCancel");
 const { kirillga } = require("../../smallFunctions/lotinKiril");
 const qaysiMahalla = require("../../smallFunctions/qaysiMahalla");
-const { yangiAbonent } = require("./cleancity/yangiAbonent");
+const { yangiAbonent } = require("./cleancity/dxsh/yangiAbonent");
 const cc = "https://cleancity.uz/";
 
 const sendAnswerScene = new Scenes.WizardScene(

@@ -14,13 +14,13 @@ const {
 } = require("../middlewares/scene/adminActions/cleancity/viloyat/toSendDebitorReport");
 const {
   yashovchiSoniKopaytirish,
-} = require("../middlewares/scene/adminActions/cleancity/yashovchiSoniKopaytirish");
+} = require("../middlewares/scene/adminActions/cleancity/dxsh/yashovchiSoniKopaytirish");
 const { Counter } = require("../models/Counter");
 const { Guvohnoma } = require("../models/Guvohnoma");
 const { MultiplyRequest } = require("../models/MultiplyRequest");
 const {
   yangiAbonent,
-} = require("../middlewares/scene/adminActions/cleancity/yangiAbonent");
+} = require("../middlewares/scene/adminActions/cleancity/dxsh/yangiAbonent");
 const {
   find_one_by_pinfil_from_mvd,
   find_address_by_pinfil_from_mvd,

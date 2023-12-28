@@ -14,7 +14,7 @@ const {
 const fs = require("fs");
 const {
   mfyIncomeReport,
-} = require("./scene/adminActions/cleancity/mfyIncomeReport");
+} = require("./scene/adminActions/cleancity/dxsh/mfyIncomeReport");
 
 const cc = "https://cleancity.uz";
 let text = "";
@@ -292,8 +292,8 @@ setInterval(async () => {
       (soat == 22 && minut == 0) ||
       (soat == 23 && minut == 0)
     ) {
-      // drawDebitViloyat("toViloyat");
-      //mfyIncomeReport();
+      drawDebitViloyat("toViloyat");
+      mfyIncomeReport();
       const data = await fetchEcopayTushum();
       drawAndSendTushum(data);
       fetchEcoTranzaksiyalar();
@@ -338,7 +338,7 @@ bot.hears("lol", (ctx) => {
 });
 bot.hears("oliy", (ctx) => {
   try {
-    // drawDebitViloyat("toViloyat");
+    drawDebitViloyat("toViloyat");
     mfyIncomeReport();
     sendViloyatKunlikReja();
   } catch (err) {

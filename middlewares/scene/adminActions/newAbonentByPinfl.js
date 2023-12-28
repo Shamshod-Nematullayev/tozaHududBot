@@ -8,7 +8,7 @@ const { messages } = require("../../../lib/messages");
 const { log } = require("console");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const { kirillga } = require("../../smallFunctions/lotinKiril");
-const { yangiAbonent } = require("./cleancity/yangiAbonent");
+const { yangiAbonent } = require("./cleancity/dxsh/yangiAbonent");
 const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {

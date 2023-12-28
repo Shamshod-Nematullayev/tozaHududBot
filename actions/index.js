@@ -6,7 +6,7 @@ require("./start");
 require("./mainCommands");
 require("./admin");
 require("./language");
-require("./../middlewares/scene/adminActions/cleancity/mfyIncomeReport");
+require("./../middlewares/scene/adminActions/cleancity/dxsh/mfyIncomeReport");
 bot.on("text", (ctx) => {
   ctx.reply(
     messages.startGreeting,
