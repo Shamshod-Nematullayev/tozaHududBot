@@ -44,6 +44,7 @@ const ADMIN_ACTIONS = [
   "add_notification",
   "new_abonent",
   "shaxsi_tashdiqlandi_bildirish_xati",
+  "user_to_inspektor",
 ];
 
 // main required functions
@@ -245,7 +246,10 @@ composer.hears(/k_\w+/g, (ctx) => {
 });
 
 composer.hears("q", async (ctx) => {
-  changeAbonentDates({ abonent_id: 12529474 });
+  changeAbonentDates({
+    abonent_id: 12529474,
+    abo_data: { description: "test5" },
+  });
 });
 
 bot.use(composer);

@@ -4,6 +4,10 @@ const schema = new mongoose.Schema({
   user: Object,
   level: Number,
   job: String,
+  nazoratchiQilingan: {
+    type: Boolean,
+    default: false,
+  },
   created: Date,
 });
 
