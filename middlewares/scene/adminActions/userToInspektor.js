@@ -46,23 +46,19 @@ const userToInspektor = new Scenes.WizardScene(
         await ctx.reply("Bekor qilindi");
         return ctx.scene.leave();
       }
+      ctx.deleteMessage();
 
       await User.updateOne(
-        { "user.id": Number(ctx.message.text) },
+        { "user.id": Number(ctx.update.callback_query.data) },
         { $set: { nazoratchiQilingan: true } }
       );
-      const inspector = await Nazoratchi.findOneAndUpdate(
-        { id: ctx.update.callback_query.data },
+      await Nazoratchi.findOneAndUpdate(
+        { id: ctx.update.callback_query?.data },
         { $push: { telegram_id: parseInt(ctx.wizard.state.telegram_id) } }
       );
       await ctx.reply(
         "Muvaffaqqiyatli biriktirildi. Yana biriktiramizmi?",
-        Markup.inlineKeyboard(
-          createInlineKeyboard([
-            ["Xa", "xa"],
-            ["Yo'q", "yoq"],
-          ])
-        )
+        createInlineKeyboard([[["Xa", "xa"]], [["Yo'q", "yoq"]]])
       );
       ctx.wizard.next();
     } catch (error) {
@@ -72,12 +68,17 @@ const userToInspektor = new Scenes.WizardScene(
   },
   (ctx) => {
     try {
-      switch (ctx.callbackQuery.data) {
+      if (ctx.message?.text) {
+        ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
+        ctx.scene.leave();
+      }
+      switch (ctx.callbackQuery?.data) {
         case "xa":
           ctx.reply("Foydalanuvchi telegram ID raqamini kiriting!");
           ctx.wizard.selectStep(0);
           break;
         case "yoq":
+          ctx.deleteMessage();
           ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
           ctx.scene.leave();
           break;
