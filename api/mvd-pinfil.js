@@ -1,6 +1,6 @@
 const find_one_by_pinfil_from_mvd = async (pinfil) => {
   const res = await fetch(
-    "https://adolatapi1.sud.uz/api/cabinet/guide/persons/find-one-by-pinfl",
+    "https://cabinetapi.sud.uz/api/cabinet/guide/persons/find-one-by-pinfl",
     {
       headers: {
         accept: "application/json, text/plain, */*",
@@ -28,12 +28,17 @@ const find_one_by_pinfil_from_mvd = async (pinfil) => {
   );
   const data = await res.json();
   if (data.success === false) return data;
+
+  if (data.statusCode > 400) {
+    return { ...data, success: false };
+  }
   const { scp_data } = data;
-  return scp_data[0].entity_details;
+
+  return { ...scp_data[0].entity_details, success: true };
 };
 const find_address_by_pinfil_from_mvd = async (pinfil) => {
   const res = await fetch(
-    "https://adolatapi1.sud.uz/api/cabinet/guide/persons/find-address-by-pinfl",
+    "https://cabinetapi.sud.uz/api/cabinet/guide/persons/find-address-by-pinfl",
     {
       headers: {
         accept: "application/json, text/plain, */*",

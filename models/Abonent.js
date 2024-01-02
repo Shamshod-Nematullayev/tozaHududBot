@@ -39,6 +39,13 @@ const schema = new Schema(
     phone: String,
     pinfl: Number,
     passport_number: String,
+    photo: String,
+    shaxsi_tasdiqlandi: {
+      type: Object,
+      default: {
+        confirm: false,
+      },
+    },
   },
   {
     timestamps: true,

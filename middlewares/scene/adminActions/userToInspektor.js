@@ -14,7 +14,6 @@ const userToInspektor = new Scenes.WizardScene(
       }
 
       const user = await User.findOne({ "user.id": Number(ctx.message.text) });
-      console.log(user);
       if (!user) {
         return ctx.reply("Bunday id raqamiga ega foydalanuvchi topilmadi");
       }
@@ -24,6 +23,9 @@ const userToInspektor = new Scenes.WizardScene(
         );
       }
       ctx.wizard.state.telegram_id = ctx.message.text;
+      ctx.replyWithHTML(
+        `<a href="https://t.me/${user.user.username}">${user.user.first_name}</a>`
+      );
 
       const inspectors = await Nazoratchi.find();
       const buttonsArray = [];
@@ -42,16 +44,17 @@ const userToInspektor = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      if (isCancel(ctx.message?.text)) {
+      if (ctx.message?.text) {
         await ctx.reply("Bekor qilindi");
         return ctx.scene.leave();
       }
       ctx.deleteMessage();
 
-      await User.updateOne(
-        { "user.id": Number(ctx.update.callback_query.data) },
+      const a = await User.findOneAndUpdate(
+        { "user.id": Number(ctx.wizard.state.telegram_id) },
         { $set: { nazoratchiQilingan: true } }
       );
+      console.log(a);
       await Nazoratchi.findOneAndUpdate(
         { id: ctx.update.callback_query?.data },
         { $push: { telegram_id: parseInt(ctx.wizard.state.telegram_id) } }
@@ -72,6 +75,7 @@ const userToInspektor = new Scenes.WizardScene(
         ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
         ctx.scene.leave();
       }
+      if (ctx.callbackQuery?.data) ctx.deleteMessage();
       switch (ctx.callbackQuery?.data) {
         case "xa":
           ctx.reply("Foydalanuvchi telegram ID raqamini kiriting!");

@@ -1,0 +1,18 @@
+const { Schema, model, default: mongoose } = require("mongoose");
+
+const schema = new Schema(
+  {
+    user: Object,
+    data: Object,
+    inspector_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    licshet: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+module.exports.CustomDataRequest = model("custom_data_request", schema);

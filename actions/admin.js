@@ -247,7 +247,7 @@ composer.hears(/k_\w+/g, (ctx) => {
 
 composer.hears("q", async (ctx) => {
   changeAbonentDates({
-    abonent_id: 12529474,
+    abonent_id: 7319892,
     abo_data: { description: "test5" },
   });
 });

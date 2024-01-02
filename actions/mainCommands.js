@@ -97,6 +97,10 @@ composer.action("multply livings", (ctx) => {
   ctx.deleteMessage();
   ctx.scene.enter("multiply_livings");
 });
+composer.action("update_abonent_date_by_pinfil", (ctx) => {
+  ctx.deleteMessage();
+  ctx.scene.enter("update_abonent_date_by_pinfil");
+});
 
 composer.action("connect_phone_number", (ctx) =>
   ctx.scene.enter("connect_phone_number")
