@@ -7,6 +7,7 @@ require("./mainCommands");
 require("./admin");
 require("./language");
 require("./../middlewares/scene/adminActions/cleancity/dxsh/mfyIncomeReport");
+require("./shaxsiTasdiqlandi");
 bot.on("text", (ctx) => {
   ctx.reply(
     messages.startGreeting,

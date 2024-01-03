@@ -44,6 +44,9 @@ const {
   personConfirm,
 } = require("./scene/adminActions/addNotificationPersonConfirm");
 const { userToInspektor } = require("./scene/adminActions/userToInspektor");
+const {
+  updateAbonentDatesByPinfl,
+} = require("./scene/userScenes/updateAbonentDatesPinfil");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -73,6 +76,7 @@ const stage = new Scenes.Stage([
   new_abonent_by_pinfl_scene,
   personConfirm,
   userToInspektor,
+  updateAbonentDatesByPinfl,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

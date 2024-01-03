@@ -97,9 +97,7 @@ async function changeAbonentDates({
         credentials: "include",
       }
     );
-    console.log({ abonent_id: abonent_data.fio });
-    console.log(session.path.updateAboDataUrl);
-    console.log(await res.json());
+    return await res.json();
   } else if (session.path.toCardAboUrl) {
     // Abonent kartasini topish manzili mavjud bo'lganida
     const abonentCardPage = await fetch(
