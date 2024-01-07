@@ -40,6 +40,7 @@ const schema = new Schema(
     pinfl: Number,
     passport_number: String,
     photo: String,
+    prescribed_cnt: Number,
     shaxsi_tasdiqlandi: {
       type: Object,
       default: {

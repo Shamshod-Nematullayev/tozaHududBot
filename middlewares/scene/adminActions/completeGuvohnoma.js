@@ -82,7 +82,7 @@ const confirmGuvohnomaScene = new Scenes.WizardScene(
             res.message_id
           )
           .then(() => {
-            ctx.reply(messages.lotin.sended);
+            ctx.reply(messages.sended);
             return ctx.scene.leave();
           });
       });

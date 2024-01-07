@@ -47,6 +47,7 @@ const { userToInspektor } = require("./scene/adminActions/userToInspektor");
 const {
   updateAbonentDatesByPinfl,
 } = require("./scene/userScenes/updateAbonentDatesPinfil");
+const { aborotkaChiqorish } = require("./scene/adminActions/aborotkaChiqorish");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -77,6 +78,7 @@ const stage = new Scenes.Stage([
   personConfirm,
   userToInspektor,
   updateAbonentDatesByPinfl,
+  aborotkaChiqorish,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

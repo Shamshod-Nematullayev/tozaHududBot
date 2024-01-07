@@ -18,7 +18,7 @@ const importAbonentsScene = new Scenes.WizardScene(
     ctx.wizard.state.COOKIE = ctx.message.text;
     const date = new Date();
     ctx.reply("Qabul qilindi, iltimos kutib turing");
-    const mahallalar = [{ id: 43025 }]; // await Mahalla.find({ reja: { $gt: 0 } });
+    const mahallalar = [{ id: 55545 }]; // await Mahalla.find({ reja: { $gt: 0 } });
     // mahallalar.forEach(async (mfy, indexMFY) => {
     let indexMFY = 0;
     async function fech() {
