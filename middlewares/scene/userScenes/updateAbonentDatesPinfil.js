@@ -41,6 +41,9 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         keyboards.lotin.cancelBtn.resize()
       );
     }
+    if (abonent.shaxsi_tasdiqlandi && abonent.shaxsi_tasdiqlandi.confirm) {
+      return ctx.reply("Bu abonent ma'lumoti kiritilib bo'lingan");
+    }
     ctx.replyWithHTML(
       `<b>${abonent.fio}</b>\n Pasport pinfil raqamini kiriting`
     );

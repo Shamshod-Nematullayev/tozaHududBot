@@ -24,7 +24,7 @@ const importIncomeScene = new Scenes.WizardScene(
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
           ctx.message.document.mime_type == "application/vnd.ms-excel")
       ) {
-        const waiterMessage = await ctx.reply(messages.lotin.pleaseWait);
+        const waiterMessage = await ctx.reply(messages.pleaseWait);
         if (ctx.message.document.mime_type == "application/vnd.ms-excel") {
           const xlsx = await ctx.telegram.getFileLink(
             ctx.message.document.file_id

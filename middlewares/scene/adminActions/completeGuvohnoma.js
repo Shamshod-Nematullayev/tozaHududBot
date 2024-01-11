@@ -11,8 +11,7 @@ const confirmGuvohnomaScene = new Scenes.WizardScene(
       // bekor qilish tugmasimi?
       if (isCancel(ctx.message.text)) return ctx.scene.leave();
       //   Raqam kiritilyaptimi?
-      if (isNaN(ctx.message.text))
-        return ctx.reply(messages.lotin.enterOnlyNumber);
+      if (isNaN(ctx.message.text)) return ctx.reply(messages.enterOnlyNumber);
 
       const guvohnoma = await Guvohnoma.findOne({
         document_number: ctx.message.text,
@@ -20,7 +19,7 @@ const confirmGuvohnomaScene = new Scenes.WizardScene(
 
       //   Guvohnoma topilmadimi?
       if (!guvohnoma) {
-        return ctx.reply(messages.lotin.notFoundData);
+        return ctx.reply(messages.notFoundData);
       }
 
       // if (guvohnoma.holat == "BAJARILDI") {

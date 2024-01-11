@@ -21,7 +21,7 @@ const generateSavdoSanoatAriza = new Scenes.WizardScene(
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
           ctx.message.document.mime_type == "application/vnd.ms-excel")
       ) {
-        const waiterMessage = await ctx.reply(messages.lotin.pleaseWait);
+        const waiterMessage = await ctx.reply(messages.pleaseWait);
         // excel fileni yuklab olish
         const xlsx = await ctx.telegram.getFileLink(
           ctx.message.document.file_id
@@ -87,7 +87,7 @@ const generateSavdoSanoatAriza = new Scenes.WizardScene(
         });
       } else {
         ctx.reply(
-          messages.lotin.notExcelFile,
+          messages.notExcelFile,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       }

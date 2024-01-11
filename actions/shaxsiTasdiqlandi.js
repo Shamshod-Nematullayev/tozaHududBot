@@ -21,8 +21,11 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
     if (JSON.parse(tasdiqlandi)) {
       const abonent = await Abonent.findOne({ licshet: req.licshet });
       const [yil, oy, kun] = req.data.birth_date.split("-");
+      if (abonent.shaxsi_tasdiqlandi && abonent.shaxsi_tasdiqlandi.confirm) {
+        return ctx.answerCbQuery("Bu abonent ma'lumoti kiritilib bo'lingan");
+      }
       //   billingga yangilov so'rovini yuborish
-      await changeAbonentDates({
+      const res = await changeAbonentDates({
         abonent_id: abonent.id,
         abo_data: {
           brith_date: `${kun}.${oy}.${yil}`,
@@ -36,8 +39,13 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
               }.${req.data.details.doc_end_date.split("-")[0]}`
             : undefined,
           pinfl: req.data.pinfl,
+          passport_location: req.data.details.division,
         },
       });
+      if (!res.success) {
+        console.log(res);
+        return ctx.answerCbQuery(res.msg);
+      }
       //   mongodb ma'lumotlar bazada yangilanish
       await abonent.updateOne({
         $set: {
@@ -71,7 +79,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         process.env.CHANNEL_ID_SHAXSI_TASDIQLANDI,
         ctx.update.callback_query.message.message_id,
         0,
-        `KOD: ${req.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+        `KOD: ${req.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${req.user.first_name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
         { parse_mode: "HTML" }
       );
       //   tizimga kiritgan nazoratchiga javob yo'llash
@@ -92,7 +100,8 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       );
       // telegram kanaldagi xabarni o'zgartirish
       ctx.editMessageCaption(
-        `KOD: ${ctx.wizard.state.abonent.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\nBekor qilindi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`
+        `KOD: ${req.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${req.user.first_name}</a>\nBekor qilindi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+        { parse_mode: "HTML" }
       );
     }
   } catch (error) {
