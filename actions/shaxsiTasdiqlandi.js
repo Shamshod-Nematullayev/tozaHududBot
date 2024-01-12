@@ -79,7 +79,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         process.env.CHANNEL_ID_SHAXSI_TASDIQLANDI,
         ctx.update.callback_query.message.message_id,
         0,
-        `KOD: ${req.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${req.user.first_name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+        `KOD: ${req.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
         { parse_mode: "HTML" }
       );
       //   tizimga kiritgan nazoratchiga javob yo'llash
@@ -100,7 +100,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       );
       // telegram kanaldagi xabarni o'zgartirish
       ctx.editMessageCaption(
-        `KOD: ${req.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${req.user.first_name}</a>\nBekor qilindi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+        `KOD: ${req.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nBekor qilindi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
         { parse_mode: "HTML" }
       );
     }

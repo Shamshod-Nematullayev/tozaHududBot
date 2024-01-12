@@ -20,6 +20,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       return ctx.scene.leave();
     }
     ctx.wizard.state.inspector_id = inspektor._id;
+    ctx.wizard.state.inspector_name = inspektor.name;
     if (ctx.message && isCancel(ctx.message.text)) {
       ctx.reply("Bekor qilindi");
       return ctx.scene.leave();
