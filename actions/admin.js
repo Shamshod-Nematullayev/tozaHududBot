@@ -28,6 +28,9 @@ const {
 const {
   changeAbonentDates,
 } = require("../middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");
+const {
+  downloadAlertLetter,
+} = require("../middlewares/scene/adminActions/cleancity/dxsh/ogohlantirishXatiYuklabOlish");
 
 // =====================================================================================
 const composer = new Composer();
@@ -246,10 +249,7 @@ composer.hears(/k_\w+/g, (ctx) => {
 });
 
 composer.hears("q", async (ctx) => {
-  changeAbonentDates({
-    abonent_id: 7319892,
-    abo_data: { description: "test5" },
-  });
+  downloadAlertLetter(13279105);
 });
 
 bot.use(composer);
