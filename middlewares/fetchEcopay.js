@@ -7,11 +7,11 @@ module.exports.fetchEcopayTushum = async () => {
   const res = await fetch(
     `https://ekopay.uz/api/ecopay/transaction-report;descending=false;page=1;perPage=100?parent_id=32&date_from=${date.getDate(
       Date.now()
-    )}.${date.getMonth(Date.now()) + 1}.2023&date_to=${date.getDate(
+    )}.${date.getMonth(Date.now()) + 1}.${date.getFullYear(
       Date.now()
-    )}.${
+    )}&date_to=${date.getDate(Date.now())}.${
       date.getMonth(Date.now()) + 1
-    }.2023&companies_id=1144&sys_companies_id=336`,
+    }.${date.getFullYear(Date.now())}&companies_id=1144&sys_companies_id=336`,
     {
       method: "GET",
       headers: { Cookie: "JSESSIONID=" + cookie },
@@ -56,9 +56,9 @@ module.exports.fetchEcoTranzaksiyalar = () => {
   fetch(
     `https://ekopay.uz/api/ecopay/eopc-transactions;sortBy=id;descending=true;page=1;perPage=500?branchs_id=32&from_date=${date.getDate()}.${
       date.getMonth() + 1
-    }.2023&to_date=${date.getDate()}.${
+    }.${date.getFullYear(Date.now())}&to_date=${date.getDate()}.${
       date.getMonth() + 1
-    }.2023&companies_id=336`,
+    }.${date.getFullYear(Date.now())}&companies_id=336`,
     {
       headers: {
         accept: "application/json, text/plain, */*",

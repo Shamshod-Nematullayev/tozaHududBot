@@ -27,6 +27,7 @@ const find_one_by_pinfil_from_mvd = async (pinfil) => {
     }
   );
   const data = await res.json();
+  console.log(data);
   if (data.success === false) return data;
 
   if (data.statusCode > 400) {
@@ -65,6 +66,7 @@ const find_address_by_pinfil_from_mvd = async (pinfil) => {
     }
   );
   const data = await res.json();
+  console.log(data);
   if (data.success === false) return data;
 
   if (data.statusCode == 500) {

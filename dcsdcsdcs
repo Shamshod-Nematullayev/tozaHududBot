@@ -1,0 +1,29 @@
+[1mdiff --git a/actions/admin.js b/actions/admin.js[m
+[1mindex 3ea9cd1..00b635d 100644[m
+[1m--- a/actions/admin.js[m
+[1m+++ b/actions/admin.js[m
+[36m@@ -28,6 +28,9 @@[m [mconst {[m
+ const {[m
+   changeAbonentDates,[m
+ } = require("../middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");[m
+[32m+[m[32mconst {[m
+[32m+[m[32m  downloadAlertLetter,[m
+[32m+[m[32m} = require("../middlewares/scene/adminActions/cleancity/dxsh/ogohlantirishXatiYuklabOlish");[m
+ [m
+ // =====================================================================================[m
+ const composer = new Composer();[m
+[36m@@ -246,10 +249,7 @@[m [mcomposer.hears(/k_\w+/g, (ctx) => {[m
+ });[m
+ [m
+ composer.hears("q", async (ctx) => {[m
+[31m-  changeAbonentDates({[m
+[31m-    abonent_id: 7319892,[m
+[31m-    abo_data: { description: "test5" },[m
+[31m-  });[m
+[32m+[m[32m  downloadAlertLetter(13279105);[m
+ });[m
+ [m
+ bot.use(composer);[m
+[1mdiff --git a/captcha.png b/captcha.png[m
+[1mindex e766b5e..d1a95ff 100644[m
+Binary files a/captcha.png and b/captcha.png differ

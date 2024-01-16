@@ -24,7 +24,7 @@ const generateAlertLetter = new Scenes.WizardScene(
           ctx.message.document.file_id
         );
         const excelFile = fs.createWriteStream("./alert_letter.xls");
-        ctx.reply(messages.lotin.pleaseWait);
+        ctx.reply(messages.pleaseWait);
         https.get(xlsx.href, (res) => {
           res.pipe(excelFile);
           excelFile.on("finish", (cb) => {
@@ -78,7 +78,7 @@ const generateAlertLetter = new Scenes.WizardScene(
         });
       } else {
         ctx.reply(
-          messages.lotin.notExcelFile,
+          messages.notExcelFile,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       }
@@ -102,7 +102,7 @@ generateAlertLetter.enter((ctx) => {
 
 generateAlertLetter.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].heyAdmin,
+    messages.heyAdmin,
     keyboards[
       ctx.session.til ? ctx.session.til : "lotin"
     ].adminKeyboard.resize()

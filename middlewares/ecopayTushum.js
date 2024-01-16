@@ -87,14 +87,14 @@ const sendViloyatKunlikReja = async (resType, senderId) => {
       );
     }
     data.rows.forEach((row) => {
-      viloyatRejasi += row.all_nachis / weekdays;
+      viloyatRejasi += row.all_nachis / (weekdays - 2);
       viloyatKunlikTushum += parseInt(row.all_sum);
       newJSON.push({
         id: row.id,
-        kunlikReja: row.all_nachis / weekdays, // -1 bir kun bayram borligi uchun
+        kunlikReja: row.all_nachis / (weekdays - 2), // -1 bir kun bayram borligi uchun
         birKunlikTushum: row.all_sum,
         foizda: Math.floor(
-          (Number(row.all_sum) / (row.all_nachis / weekdays)) * 100
+          (Number(row.all_sum) / (row.all_nachis / (weekdays - 2))) * 100
         ),
         name: row.name,
       });
@@ -200,9 +200,7 @@ h3 {
 <div>
 
   <h3>${date.getDate() > 9 ? date.getDate() : "0" + date.getDate()}.${
-        date.getMonth() + 1 > 9
-          ? date.getMonth() + 1
-          : "0" + date.getMonth() + 1
+        date.getMonth() + 1 > 9 ? date.getMonth() + 1 : date.getMonth() + 1
       }.${date.getFullYear()} ${date.getHours()}:00 ҳолатига маиший чиқиндилар учун мажбурий тўловлар бўйича тезкор маълумот
 
   </h3>
@@ -292,7 +290,7 @@ setInterval(async () => {
       (soat == 22 && minut == 0) ||
       (soat == 23 && minut == 0)
     ) {
-      drawDebitViloyat("toViloyat");
+      // drawDebitViloyat("toViloyat");
       mfyIncomeReport();
       const data = await fetchEcopayTushum();
       drawAndSendTushum(data);
@@ -338,7 +336,7 @@ bot.hears("lol", (ctx) => {
 });
 bot.hears("oliy", (ctx) => {
   try {
-    drawDebitViloyat("toViloyat");
+    // drawDebitViloyat("toViloyat");
     mfyIncomeReport();
     sendViloyatKunlikReja();
   } catch (err) {

@@ -82,7 +82,7 @@ importPlanForInspectors.enter((ctx) => {
 
 importPlanForInspectors.leave((ctx) => {
   ctx.reply(
-    messages[ctx.session.til ? ctx.session.til : "lotin"].heyAdmin,
+    messages.heyAdmin,
     keyboards[
       ctx.session.til ? ctx.session.til : "lotin"
     ].adminKeyboard.resize()

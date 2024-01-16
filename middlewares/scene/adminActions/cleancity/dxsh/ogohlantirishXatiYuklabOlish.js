@@ -1,0 +1,58 @@
+const { CleanCitySession } = require("../../../../../models/CleanCitySession");
+const { JSDOM } = require("jsdom");
+const cc = "https://cleancity.uz/";
+
+async function downloadAlertLetter(abonent_id) {
+  const session = await CleanCitySession.findOne({ type: "dxsh" });
+  if (session.path.toCardAboUrl) {
+    // Abonent kartasini topish manzili mavjud bo'lganida
+    const abonentCardPage = await fetch(
+      "https://cleancity.uz/dashboard" + session.path.toCardAboUrl,
+      {
+        headers: {
+          accept:
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+          "cache-control": "max-age=0",
+          "content-type": "application/x-www-form-urlencoded",
+          "sec-ch-ua":
+            '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "document",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-site": "same-origin",
+          "sec-fetch-user": "?1",
+          "upgrade-insecure-requests": "1",
+          Cookie: session.cookie,
+        },
+        referrerPolicy: "strict-origin-when-cross-origin",
+        body: `to_card_abo_hf_0=&id=${abonent_id}&companies_id=1144`,
+        method: "POST",
+        mode: "cors",
+        credentials: "include",
+      }
+    );
+    const responseText = await abonentCardPage.text();
+    const get_sud_processes_url = responseText.match(
+      /url:\s*"ds([^']+)==",sortName/g
+    );
+    console.log(get_sud_processes_url);
+  } else {
+    // abonent kartasi topish urlini aniqlash
+    const startpage = await fetch(cc + "startpage", {
+      headers: { Cookie: session.cookie },
+    });
+    const startpageText = await startpage.text();
+
+    const startpageDoc = new JSDOM(startpageText).window.document;
+    let toCardAboUrl = startpageDoc
+      .getElementById("to_card_abo")
+      .getAttribute("action");
+
+    await session.updateOne({ $set: { "path.toCardAboUrl": toCardAboUrl } });
+    downloadAlertLetter(arguments[0]);
+  }
+}
+
+module.exports = { downloadAlertLetter };

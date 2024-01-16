@@ -17,9 +17,10 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       ctx.reply(
         "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!"
       );
-      ctx.scene.leave();
+      return ctx.scene.leave();
     }
     ctx.wizard.state.inspector_id = inspektor._id;
+    ctx.wizard.state.inspector_name = inspektor.name;
     if (ctx.message && isCancel(ctx.message.text)) {
       ctx.reply("Bekor qilindi");
       return ctx.scene.leave();
@@ -40,6 +41,9 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         "Siz kiritgan litsavoy kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
         keyboards.lotin.cancelBtn.resize()
       );
+    }
+    if (abonent.shaxsi_tasdiqlandi && abonent.shaxsi_tasdiqlandi.confirm) {
+      return ctx.reply("Bu abonent ma'lumoti kiritilib bo'lingan");
     }
     ctx.replyWithHTML(
       `<b>${abonent.fio}</b>\n Pasport pinfil raqamini kiriting`
@@ -112,7 +116,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           licshet: ctx.wizard.state.abonent.licshet,
         });
         let filename = "./uploads/" + Date.now() + ".png";
-        if (customDates.photo != null) {
+        if (!customDates.photo) {
           filename = "./lib/personicon.png";
         }
         fs.writeFile(filename, customDates.photo, "base64", async (err) => {
