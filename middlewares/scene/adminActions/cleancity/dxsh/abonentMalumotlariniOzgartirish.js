@@ -99,9 +99,19 @@ async function changeAbonentDates({
     );
     return await res.json();
   } else if (session.path.toCardAboUrl) {
+    const startpage = await fetch(cc + "startpage", {
+      headers: { Cookie: session.cookie },
+    });
+    const startpageText = await startpage.text();
+
+    const startpageDoc = new JSDOM(startpageText).window.document;
+    let toCardAboUrl = startpageDoc
+      .getElementById("to_card_abo")
+      .getAttribute("action");
+
     // Abonent kartasini topish manzili mavjud bo'lganida
     const abonentCardPage = await fetch(
-      "https://cleancity.uz/dashboard" + session.path.toCardAboUrl,
+      "https://cleancity.uz/dashboard" + toCardAboUrl,
       {
         headers: {
           accept:
@@ -135,7 +145,6 @@ async function changeAbonentDates({
     const getAboDataUrl = responseText
       .match(/ds\?xenc=([^']*)'/g)[2]
       .split("'")[0];
-    console.log({ getAboDataUrl });
     await session.updateOne({
       $set: {
         "path.updateAboDataUrl": updateAboDataUrl,

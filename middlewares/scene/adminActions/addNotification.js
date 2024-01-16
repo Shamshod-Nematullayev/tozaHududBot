@@ -99,10 +99,11 @@ const addNotification = new Scenes.WizardScene(
       if (txt != "") arr.push(...txt.split(" "));
     });
     ctx.wizard.state.abonents = arr;
-    const documents = await Bildirishnoma.find();
+    const documents = await Bildirishnoma.find({ type: "sudga_chiqoring" });
     let doc_num = documents[documents.length - 1].doc_num + 1;
     const newDocument = new Bildirishnoma({
       user: ctx.from,
+      type: "sudga_chiqoring",
       ...ctx.wizard.state,
       doc_num,
     });
@@ -113,7 +114,7 @@ const addNotification = new Scenes.WizardScene(
 );
 
 addNotification.enter(async (ctx) => {
-  const documents = await Bildirishnoma.find();
+  const documents = await Bildirishnoma.find({ type: "sudga_chiqoring" });
   let doc_num = documents[documents.length - 1].doc_num + 1;
   ctx.replyWithHTML(
     messages.enterNotificationFile + `\n<code>${doc_num}</code>`,
