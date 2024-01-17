@@ -276,6 +276,7 @@ setInterval(async () => {
 
   try {
     if (
+      (soat == 9 && minut == 0) ||
       (soat == 10 && minut == 0) ||
       (soat == 11 && minut == 0) ||
       (soat == 12 && minut == 0) ||
@@ -291,10 +292,12 @@ setInterval(async () => {
       (soat == 23 && minut == 0)
     ) {
       // drawDebitViloyat("toViloyat");
-      mfyIncomeReport();
-      const data = await fetchEcopayTushum();
-      drawAndSendTushum(data);
-      fetchEcoTranzaksiyalar();
+      if (soat < 22) {
+        const data = await fetchEcopayTushum();
+        mfyIncomeReport();
+        drawAndSendTushum(data);
+        fetchEcoTranzaksiyalar();
+      }
       sendViloyatKunlikReja();
     } else if (date.getMinutes() % 10 === 0) {
       if (text == undefined) {

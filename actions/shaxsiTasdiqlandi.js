@@ -82,6 +82,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         `KOD: ${req.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
         { parse_mode: "HTML" }
       );
+      await ctx.deleteMessage();
       //   tizimga kiritgan nazoratchiga javob yo'llash
       await ctx.telegram.sendMessage(
         req.user.id,
@@ -103,6 +104,8 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         `KOD: ${req.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nBekor qilindi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
         { parse_mode: "HTML" }
       );
+
+      await ctx.deleteMessage();
     }
   } catch (error) {
     ctx.answerCbQuery("Xatolik kuzatildi");
