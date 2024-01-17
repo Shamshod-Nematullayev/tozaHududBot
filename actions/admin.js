@@ -19,15 +19,9 @@ const { Counter } = require("../models/Counter");
 const { Guvohnoma } = require("../models/Guvohnoma");
 const { MultiplyRequest } = require("../models/MultiplyRequest");
 const {
-  yangiAbonent,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/yangiAbonent");
-const {
   find_one_by_pinfil_from_mvd,
   find_address_by_pinfil_from_mvd,
 } = require("../api/mvd-pinfil");
-const {
-  changeAbonentDates,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");
 const {
   downloadAlertLetter,
 } = require("../middlewares/scene/adminActions/cleancity/dxsh/ogohlantirishXatiYuklabOlish");
