@@ -298,7 +298,7 @@ setInterval(async () => {
         drawAndSendTushum(data);
         fetchEcoTranzaksiyalar();
       }
-      sendViloyatKunlikReja();
+      // sendViloyatKunlikReja();
     } else if (date.getMinutes() % 10 === 0) {
       if (text == undefined) {
         sendViloyatKunlikReja("test", 5347896070);

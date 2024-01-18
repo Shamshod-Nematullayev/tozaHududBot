@@ -45,6 +45,7 @@ const ADMIN_ACTIONS = [
   "new_abonent",
   "shaxsi_tashdiqlandi_bildirish_xati",
   "user_to_inspektor",
+  "get_sud_material",
 ];
 
 // main required functions

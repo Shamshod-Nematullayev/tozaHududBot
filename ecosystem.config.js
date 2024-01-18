@@ -13,6 +13,8 @@ module.exports = {
         "*.xls",
         "*.xlsx",
         "uploads",
+        "/uploads",
+        "./uploads",
         "lib",
       ],
       env: {
