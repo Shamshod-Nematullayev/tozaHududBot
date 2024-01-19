@@ -1,9 +1,14 @@
 const isCancel = require("../../smallFunctions/isCancel");
 const { Scenes } = require("telegraf");
-const { keyboards } = require("../../../lib/keyboards");
+const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
 const { SudMaterial } = require("../../../models/SudMaterial");
 const fs = require("fs");
-const { sudMaterialImportExcel } = require("../../../constants");
+const {
+  sudMaterialImportExcel,
+  guvohnomaFileID,
+  shartnomaSSPFileID,
+  ishonchnomaFileID,
+} = require("../../../constants");
 const excelToJson = require("convert-excel-to-json");
 const { messages } = require("../../../lib/messages");
 const https = require("https");
@@ -11,6 +16,19 @@ const compressing = require("compressing");
 const { bot } = require("../../../core/bot");
 const rimraf = require("rimraf");
 const path = require("path");
+const { Abonent } = require("../../../models/Abonent");
+const { Mahalla } = require("../../../models/Mahalla");
+async function downloadFileToBaseDir(baseDirectory, filename, file_id) {
+  const fileTelegramPath = await bot.telegram.getFileLink(file_id);
+  const fileStream = fs.createWriteStream(baseDirectory + "/" + filename);
+  https.get(fileTelegramPath.href, (res) => {
+    res.pipe(fileStream);
+  });
+  fileStream.on("finish", (cb) => {
+    console.log(`${filename} yuklab olindi`);
+    return true;
+  });
+}
 
 async function arxivdanFaylOlish(
   ctx,
@@ -114,7 +132,44 @@ async function arxivdanFaylOlish(
             await ctx.reply(
               `${xujjatTuri} to'liq qabul qilindi. Endi ${keyingiXujjatTuri} larini kiriting`
             );
-          else await ctx.reply("Sudga yuborish uchun tayyor");
+          else {
+            pachka.items.forEach(async (item) => {
+              const abonent = await Abonent.findOne({ licshet: item.KOD });
+              const mfy = await Mahalla.findOne({ id: abonent.mahallas_id });
+              const ommaviy_shartnoma_file_name = `${ctx.wizard.state.baseDirectory}/ommaviy_shartnomalar/${mfy.id}.PDF`;
+              const mfyStream = fs.createWriteStream(
+                ommaviy_shartnoma_file_name
+              );
+              const fileOnTG = await bot.telegram.getFileLink(
+                mfy.ommaviy_shartnoma.file_id
+              );
+              https.get(fileOnTG.href, (res) => {
+                res.pipe(mfyStream);
+              });
+              mfyStream.on("finish", (cb) => {
+                console.log(mfy.name + " ommaviy shartnomasi yuklab olindi");
+              });
+            });
+            await downloadFileToBaseDir(
+              ctx.wizard.state.baseDirectory,
+              "GUVOHNOMA.PDF",
+              guvohnomaFileID
+            );
+            await downloadFileToBaseDir(
+              ctx.wizard.state.baseDirectory,
+              "SHARTNOMA.PDF",
+              shartnomaSSPFileID
+            );
+            await downloadFileToBaseDir(
+              ctx.wizard.state.baseDirectory,
+              "ISHONCHNOMA.PDF",
+              ishonchnomaFileID
+            );
+            await ctx.reply(
+              "Hamma ma'lumotlar tayyor, sudga yuboraymi?",
+              createInlineKeyboard([[["Xa", "xa"]], [["Keyinroq", "keyinroq"]]])
+            );
+          }
           ctx.wizard.next();
           // kiritilgan fil zip formatidami? va o'zi umuman faylmi? isDocument
         });
@@ -254,6 +309,25 @@ const getSudMaterial = new Scenes.WizardScene(
   },
   async (ctx) => {
     arxivdanFaylOlish(ctx, "forma_birlar", "FORMA_BIR_FILE_ID", "FORMA 1");
+  },
+  async (ctx) => {
+    if (ctx.callbackQuery) {
+      switch (ctx.callbackQuery.data) {
+        case "xa":
+          // Sudga yuborish aktlari
+          break;
+        case "yoq":
+          await SudMaterial.findByIdAndDelete(ctx.wizard.state.pachka_id);
+          rimraf(ctx.wizard.state.baseDirectory, []);
+          ctx.reply("Bekor qilindi");
+          break;
+      }
+    } else {
+      ctx.reply(
+        "Hamma ma'lumotlar tayyor, sudga yuboraymi?",
+        createInlineKeyboard([[["Xa", "xa"]], [["yo'q", "yoq"]]])
+      );
+    }
   }
 );
 

@@ -46,6 +46,7 @@ const ADMIN_ACTIONS = [
   "shaxsi_tashdiqlandi_bildirish_xati",
   "user_to_inspektor",
   "get_sud_material",
+  "ommaviy_shartnoma_biriktirish",
 ];
 
 // main required functions

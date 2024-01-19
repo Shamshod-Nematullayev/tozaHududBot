@@ -49,6 +49,9 @@ const {
 } = require("./scene/userScenes/updateAbonentDatesPinfil");
 const { aborotkaChiqorish } = require("./scene/adminActions/aborotkaChiqorish");
 const { getSudMaterial } = require("./scene/adminActions/getSudMaterials");
+const {
+  ommaviyShartnomaBiriktirish,
+} = require("./scene/adminActions/ommaviyShartnomaBiriktirish");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -81,6 +84,7 @@ const stage = new Scenes.Stage([
   updateAbonentDatesByPinfl,
   aborotkaChiqorish,
   getSudMaterial,
+  ommaviyShartnomaBiriktirish,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

@@ -17,6 +17,7 @@ const schema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  ommaviy_shartnoma: Object,
 });
 
 module.exports.Mahalla = mongoose.model("mahalla", schema);
