@@ -65,6 +65,7 @@ const addNotification = new Scenes.WizardScene(
             (mfy) => ctx.update.callback_query.data.split("_")[1] == mfy.id
           )[0]
         );
+        ctx.deleteMessage();
         ctx.reply(messages.isDone, Markup.keyboard(["tayyor"]).resize());
       }
     } catch (error) {
