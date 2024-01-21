@@ -67,8 +67,11 @@ const generateAlertLetter = new Scenes.WizardScene(
                 if (error) throw error;
                 ctx
                   .replyWithDocument({ source: "./lib/xatlar.PDF" })
-                  .then(async () => {
-                    await fs.unlink("./lib/xatlar.PDF", (err) =>
+                  .then(() => {
+                    fs.unlink("./lib/xatlar.PDF", (err) =>
+                      err ? console.log(err) : ""
+                    );
+                    fs.unlink("./alert_letter.xls", (err) =>
                       err ? console.log(err) : ""
                     );
                     ctx.scene.leave();
