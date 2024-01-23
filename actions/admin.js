@@ -28,6 +28,11 @@ const {
 const {
   changeAbonentDates,
 } = require("../middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");
+const {
+  sendMahallaKunlikTushum,
+  getMahallaKunlikTushum,
+  drawMahallaKunlikTushum,
+} = require("../intervals/mahallaKunlikTushum");
 
 // =====================================================================================
 const composer = new Composer();
@@ -250,6 +255,20 @@ composer.hears(/k_\w+/g, (ctx) => {
       );
     }
   );
+});
+
+const mahallaGroup = {
+  id: -1002104743021,
+  title: "Тоза Худуд МФЙ раислари Каттақўрғон гурухи",
+  type: "supergroup",
+};
+
+bot.hears("kunlik", (ctx) => {
+  const date = new Date();
+  getMahallaKunlikTushum(date).then(async (rows) => {
+    const imgPath = await drawMahallaKunlikTushum(rows, new Date());
+    sendMahallaKunlikTushum([1382670100, mahallaGroup.id], imgPath, ctx);
+  });
 });
 
 composer.hears("q", async (ctx) => {

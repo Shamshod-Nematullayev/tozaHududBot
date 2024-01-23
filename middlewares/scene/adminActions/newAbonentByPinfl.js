@@ -46,6 +46,7 @@ const new_abonent_by_pinfl_scene = new Scenes.WizardScene(
                   caption: `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`,
                 }
               );
+              // return;
               await ctx.reply(
                 "Mahallasini tanlang",
                 keyboards.lotin.mahallalar.oneTime()

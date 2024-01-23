@@ -1,5 +1,127 @@
+const {
+  find_one_by_pinfil_from_mvd,
+  find_address_by_pinfil_from_mvd,
+} = require("./mvd-pinfil");
+const pochta_harajati_belgilangan_summa = 17000;
+
 const sudApiDomen = "https://cabinetapi.sud.uz/api";
-async function sendToSud(doc_number, doc_date, qarz) {
+async function sendToSud({
+  doc_number,
+  doc_date,
+  qarz,
+  pinfl,
+  pochta_harajati,
+}) {
+  //   const customDates = await find_one_by_pinfil_from_mvd(pinfl);
+  //   const addressDates = await find_address_by_pinfil_from_mvd(pinfl);
+  //   if (!customDates.success) {
+  //     return customDates;
+  //   }
+  //   if (!addressDates.success) {
+  //     return addressDates;
+  //   }
+
+  let res_pochta_harajat;
+  if (pochta_harajati) {
+    res_pochta_harajat = await fetch(
+      "https://cabinetapi.sud.uz/api/cabinet/guide/find-by-receipt-number",
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+          "content-type": "application/json",
+          responsetype: "arraybuffer",
+          "sec-ch-ua":
+            '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-site",
+          "x-auth-token": "3bd3d280-3eb2-4611-b97c-61a9d2ca3a47",
+        },
+        referrer: "https://cabinet.sud.uz/",
+        body: '{"receipt_number":"' + pochta_harajati + '"}',
+        method: "POST",
+        mode: "cors",
+        credentials: "omit",
+      }
+    );
+    res_pochta_harajat = await res_pochta_harajat.json();
+    console.log(res_pochta_harajat);
+  }
+  let generate_invoce = await fetch(
+    "https://cabinetapi.sud.uz/api/cabinet/guide/generate-invoices",
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+        "content-type": "application/json",
+        responsetype: "arraybuffer",
+        "sec-ch-ua":
+          '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "x-auth-token": "3bd3d280-3eb2-4611-b97c-61a9d2ca3a47",
+      },
+      referrer: "https://cabinet.sud.uz/",
+      body:
+        '{"entity_id":"6d8fd30e-82fb-4eaf-8308-57703c1c7e4c","court_id":"d007c274-844f-49b9-b2c1-b514fc407c2f","entity_details":{},"invoices":[{"amount_type":"POST","amount":' +
+        Number(
+          pochta_harajati_belgilangan_summa - res_pochta_harajat.receipt.amount
+        ) +
+        "}]}",
+      method: "POST",
+      mode: "cors",
+      credentials: "omit",
+    }
+  );
+
+  generate_invoce = await generate_invoce.json();
+  console.log(generate_invoce);
+
+  return;
+  // Fuqoro rasmini Sud.uz bazasiga yuklash
+  const formData = new FormData();
+  const fileBlob = new Blob([customDates.photo], {
+    type: "application/octet-stream",
+  });
+
+  formData.append(
+    "file",
+    fileBlob,
+    `${customDates.details.surname_cyrillic} ${customDates.details.name_cyrillic}.jpeg`
+  );
+
+  // Append other necessary fields
+  formData.append("file_size", "388820");
+  formData.append("file_type", "7f5e9165-426c-4dfb-987d-b6be754fd28f");
+  formData.append("is_photo", "true");
+
+  const headers = new Headers({
+    "X-Auth-Token": "3bd3d280-3eb2-4611-b97c-61a9d2ca3a47",
+    file_name: `${customDates.details.surname_cyrillic} ${customDates.details.name_cyrillic}.jpeg`,
+    file_size: fileBlob.size.toString(),
+    file_type: `7f5e9165-426c-4dfb-987d-b6be754fd28f`,
+    is_photo: "true",
+    // Add other headers as needed
+  });
+
+  // Create the fetch request
+  let photo_res = await fetch(
+    "https://cabinetapi.sud.uz/api/cabinet/case/file/upload",
+    {
+      method: "POST",
+      headers,
+      body: formData,
+    }
+  );
+
+  photo_res = await photo_res.json();
+
   const [kun, oy, yil] = doc_date.split(".");
   const payload = {
     case: {
@@ -21,47 +143,15 @@ async function sendToSud(doc_number, doc_date, qarz) {
       {
         receipt: {
           type: "POST",
-          total: 16500,
+          total: res_pochta_harajat.receipt.amount,
           currency_id: "UZS",
           is_generated: false,
-          receipt_date: "2023-12-15T05:26:08.449Z",
-          receipt_number: "233494735062",
+          receipt_date: new Date(res_pochta_harajat.receipt.overdue),
+          receipt_number: pochta_harajati,
         },
-        right_hash: "hY/tp95HgU58TJpRIQDLMWM/Z4LLp2W2cTixw9ftpl8=",
+        right_hash: res_pochta_harajat.right_hash,
         responseModel: null,
-        receipt_response: {
-          court: "Фуқаролик ишлари бўйича Каттақўрғон туманлараро суди",
-          payer: '"Anvarjon biznes invest" MChJ',
-          amount: 16500,
-          issued: 1702617968449,
-          number: "233494735062",
-          balance: 16500,
-          courtId: 562,
-          overdue: 1705209968449,
-          payerId: 9752541,
-          purpose: null,
-          instance: null,
-          payerTin: "303421898",
-          courtType: "CIVIL",
-          isInFavor: true,
-          purposeId: null,
-          courtOwnId: 75,
-          forAccount: "401410860184017033232011002",
-          paidAmount: 16500,
-          description: "Почта харажатлари",
-          historyList: [],
-          payCategory: "Почта харажатлари",
-          decisionDate: null,
-          invoiceStatus: "PAID",
-          mustPayAmount: 0,
-          payCategoryId: 3,
-          payerPassport: null,
-          requestStatus: {
-            code: 200,
-            message: "Success",
-          },
-          claimCaseNumber: null,
-        },
+        receipt_response: res_pochta_harajat.receipt,
       },
       {
         responseModel: null,
@@ -156,7 +246,7 @@ async function sendToSud(doc_number, doc_date, qarz) {
       },
       {
         entity: {
-          pinfl: "32002713920030",
+          pinfl,
           tin: 0,
           not_citizen: true,
         },
@@ -170,77 +260,21 @@ async function sendToSud(doc_number, doc_date, qarz) {
           is_small_business: false,
           entity_type: "PERSON",
           citizenship: "UZB_CITIZEN",
-          photo_id: "23a906ad-c766-4fa3-a850-d2974c1caf19",
-          gender: "MALE",
-          address: "ДУРБЕШ ҚФЙ, КАДАН МФЙ, КАДАН ҚИШЛОҒИ,  uy:48",
-          details: {
-            division: "SAMARQAND VILOYATI KATTAQO‘RG‘ON TUMANI IIB",
-            division_id: 18215,
-            father_name: "НЕЪМАТ",
-            live_status: "1",
-            mother_name: "ТУРДИ",
-            nationality: "O‘ZBEK",
-            spouse_name: "ХУРШИДА",
-            birth_region: "SAMARQAND VILOYATI",
-            doc_end_date: "2024-04-30",
-            living_place: "DURBESH QISHLOQ KENGASHI",
-            mariage_date: "1991-09-07",
-            birth_country: "O‘ZBEKISTON",
-            living_region: "SAMARQAND VILOYATI",
-            living_street: "KADAN KISHLOGI",
-            name_cyrillic: "МИРАЛИ",
-            birth_district: "KATTAQO‘RG‘ON TUMANI",
-            father_surname: "МУХАММАДИЕВ",
-            living_country: "O‘ZBEKISTON",
-            mother_surname: "МАХМУДОВА",
-            nationality_id: 44,
-            spouse_surname: "ЧАҚҚОНОВА",
-            father_patronym: "XXX",
-            living_district: "KATTAQO‘RG‘ON TUMANI",
-            living_place_id: 1634,
-            mother_patronym: "XXX",
-            spouse_patronym: "ЭРДОШОВНА",
-            TemproaryAddress: null,
-            birth_country_id: 182,
-            living_region_id: 14,
-            living_street_id: 606000048,
-            surname_cyrillic: "МУХАММАДИЕВ",
-            birth_place_latin: "KATTAQO‘RG‘ON TUMANI",
-            father_birth_date: "1945-00-00",
-            marital_status_id: 2,
-            mother_birth_date: "1950-00-00",
-            patronym_cyrillic: "НЕЪМАТОВИЧ",
-            spouse_birth_date: "1974-01-23",
-            living_district_id: 1406,
-            PermanentRegistration: {
-              Region: {
-                Id: 14,
-                Value: "SAMARQAND VILOYATI",
-                IdValue: "(14) SAMARQAND VILOYATI",
-              },
-              Address: "ДУРБЕШ ҚФЙ, КАДАН МФЙ, КАДАН ҚИШЛОҒИ,  uy:48",
-              Country: "O‘ZBEKISTON",
-              Cadastre: "14:05:03:01:01:1129",
-              District: {
-                Id: 1406,
-                Value: "KATTAQO‘RG‘ON TUMANI",
-                IdValue: "(1406) KATTAQO‘RG‘ON TUMANI",
-              },
-              RegistrationDate: "1991-06-05T00:00:00",
-            },
-            mariage_rigistry_office_id: 1406,
-          },
-          last_name: "MUXAMMADIYEV",
-          region_id: "eb80d9ff-0d1a-543e-14cb-b3a429a96842",
-          birth_date: "1971-02-20",
-          country_id: "e17a4b5d-d1ec-44ae-bfd2-16c143389513",
-          first_name: "MIRALI",
-          district_id: "c16a182e-453d-465d-6127-cd3f2352f4f2",
-          middle_name: "NE’MATOVICH",
-          birth_region_id: "eb80d9ff-0d1a-543e-14cb-b3a429a96842",
-          passport_number: "5281872",
-          passport_serial: "AA",
-          birth_district_id: "c16a182e-453d-465d-6127-cd3f2352f4f2",
+          photo_id: photo_res.id,
+          gender: customDates.gender,
+          address: addressDates.address,
+          details: customDates.details,
+          last_name: customDates.last_name,
+          region_id: addressDates.region_id,
+          birth_date: customDates.birth_date,
+          country_id: customDates.country_id,
+          first_name: customDates.first_name,
+          district_id: customDates.district_id,
+          middle_name: customDates.middle_name,
+          birth_region_id: customDates.birth_date,
+          passport_number: customDates.passport_number,
+          passport_serial: customDates.passport_serial,
+          birth_district_id: customDates.birth_district_id,
         },
       },
     ],
@@ -267,5 +301,5 @@ async function sendToSud(doc_number, doc_date, qarz) {
     },
   };
 }
-
+// sendToSud({ pinfl: "33101706180044", pochta_harajati: "233494735062" });
 module.exports = { sendToSud };

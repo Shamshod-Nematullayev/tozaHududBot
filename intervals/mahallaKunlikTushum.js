@@ -4,8 +4,13 @@ const ejs = require("ejs");
 const nodeHtmlToImage = require("node-html-to-image");
 const { CleanCitySession } = require("../models/CleanCitySession");
 const { JSDOM } = require("jsdom");
-const { versions } = require("process");
 const { Mahalla } = require("../models/Mahalla");
+
+const mahallaGroup = {
+  id: -1002104743021,
+  title: "Тоза Худуд МФЙ раислари Каттақўрғон гурухи",
+  type: "supergroup",
+};
 
 const getMahallaKunlikTushum = async (date = new Date()) => {
   const session = await CleanCitySession.findOne({ type: "dxsh" });
@@ -197,7 +202,20 @@ const sendMahallaKunlikTushum = async (receivers = [], imgPath, ctx) => {
   });
 };
 
-getMahallaKunlikTushum(new Date()).then(async (rows) => {
-  const imgPath = await drawMahallaKunlikTushum(rows, new Date());
-  sendMahallaKunlikTushum([1382670100], imgPath);
-});
+setInterval(() => {
+  const date = new Date();
+  //   const soat = date.getHours();
+  const minut = date.getMinutes();
+  if (minut == 0) {
+    getMahallaKunlikTushum(date).then(async (rows) => {
+      const imgPath = await drawMahallaKunlikTushum(rows, new Date());
+      sendMahallaKunlikTushum([1382670100, mahallaGroup.id], imgPath);
+    });
+  }
+}, 1000 * 60);
+
+module.exports = {
+  getMahallaKunlikTushum,
+  drawMahallaKunlikTushum,
+  sendMahallaKunlikTushum,
+};
