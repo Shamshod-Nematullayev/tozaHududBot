@@ -12,6 +12,7 @@
   "dependencies": {
     "3": "^2.1.0",
     "axios": "^1.4.0",
+    "blob-util": "^2.0.2",
     "compressing": "^1.9.0",
     "convert-excel-to-json": "^1.7.0",
     "cors": "^2.8.5",
@@ -27,6 +28,7 @@
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^2.7.0",
     "node-html-to-image": "^3.3.0",
+    "pdf-merger-js": "^4.3.1",
     "rimraf": "^4.4.1",
     "telegraf": "^4.12.2",
     "telegraf-session-local": "^2.1.1",

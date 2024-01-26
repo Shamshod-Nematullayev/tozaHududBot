@@ -18,6 +18,8 @@ const rimraf = require("rimraf");
 const path = require("path");
 const { Abonent } = require("../../../models/Abonent");
 const { Mahalla } = require("../../../models/Mahalla");
+const PDFMerger = require("pdf-merger-js");
+const { sendToSud } = require("../../../api/sendToSud");
 async function downloadFileToBaseDir(baseDirectory, filename, file_id) {
   const fileTelegramPath = await bot.telegram.getFileLink(file_id);
   const fileStream = fs.createWriteStream(baseDirectory + "/" + filename);
@@ -315,6 +317,99 @@ const getSudMaterial = new Scenes.WizardScene(
       switch (ctx.callbackQuery.data) {
         case "xa":
           // Sudga yuborish aktlari
+          fs.mkdir(ctx.wizard.state.baseDirectory + "/shakl2", async (err) => {
+            if (err) console.log(err);
+
+            const pachka = await SudMaterial.findById(
+              ctx.wizard.state.pachka_id
+            );
+            for (let item of pachka.items) {
+              fs.mkdir(
+                ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD,
+                async (err) => {
+                  if (err) throw err;
+                  await fs.promises.copyFile(
+                    `${ctx.wizard.state.baseDirectory}/arizalar/${item.KOD}.PDF`,
+                    `${
+                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
+                    }/ariza.PDF`
+                  );
+                  await fs.promises.copyFile(
+                    `${ctx.wizard.state.baseDirectory}/forma_birlar/${item.KOD}.PDF`,
+                    `${
+                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
+                    }/forma_bir.PDF`
+                  );
+                  const abonent = await Abonent.findOne({
+                    licshet: String(item.KOD),
+                  });
+                  let merger = new PDFMerger();
+                  (async () => {
+                    await merger.add(
+                      `${ctx.wizard.state.baseDirectory}/forma_birlar/${item.KOD}.PDF`
+                    );
+                    await merger.add(
+                      `${ctx.wizard.state.baseDirectory}/ommaviy_shartnomalar/${abonent.mahallas_id}.PDF`
+                    );
+                    await merger.add(
+                      `${ctx.wizard.state.baseDirectory}/ogohlantirish_xatlari/${item.KOD}.PDF`
+                    );
+                    await merger.add(
+                      `${ctx.wizard.state.baseDirectory}/abonent_kartalar/${item.KOD}.PDF`
+                    );
+                    await merger.add(
+                      `${ctx.wizard.state.baseDirectory}/GUVOHNOMA.PDF`
+                    );
+                    await merger.add(
+                      `${ctx.wizard.state.baseDirectory}/ISHONCHNOMA.PDF`
+                    );
+                    await merger.add(
+                      `${ctx.wizard.state.baseDirectory}/SHARTNOMA.PDF`
+                    );
+
+                    // Set metadata
+                    await merger.setMetadata({
+                      producer: "oliy ong",
+                      author: "Shamshod Nematullayev",
+                      creator: "Toza Hudud bot",
+                      title: "Sudga yuborish ilovalar",
+                    });
+
+                    await merger.save(
+                      `${
+                        ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
+                      }/ilovalar.PDF`
+                    ); //save under given name and reset the internal document
+
+                    // Export the merged PDF as a nodejs Buffer
+                    // const mergedPdfBuffer = await merger.saveAsBuffer();
+                    // fs.writeSync('merged.pdf', mergedPdfBuffer);
+                  })();
+                  if (!abonent.shaxsi_tasdiqlandi.confirm) {
+                    throw `${item.KOD} shaxsi tasdiqlanmagan`;
+                  }
+                  sendToSud({
+                    doc_date: item.ARIZA_DATE,
+                    qarz: item.QARZ,
+                    pinfl: abonent.pinfl,
+                    doc_number: item.ARIZA_NUM,
+                    pochta_harajati: item.POCHTA_HARAJATI,
+                    ariza_dir: `${
+                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
+                    }/ariza.PDF`,
+                    forma_bir_dir: `${
+                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
+                    }/forma_bir.PDF`,
+                    ilovalar_dir: `${
+                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
+                    }/ilovalar.PDF`,
+                  });
+                  return;
+                }
+              );
+            }
+          });
+
           break;
         case "yoq":
           await SudMaterial.findByIdAndDelete(ctx.wizard.state.pachka_id);

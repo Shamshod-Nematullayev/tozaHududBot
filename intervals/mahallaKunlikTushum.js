@@ -64,7 +64,7 @@ const getMahallaKunlikTushum = async (date = new Date()) => {
     rows.forEach((row, i) => {
       res2Rows.forEach((dxsh1) => {
         if (row.id == dxsh1.id) {
-          rows[i].debit = dxsh1.debet_n;
+          rows[i].debit = dxsh1.debet_k;
         }
       });
     });
