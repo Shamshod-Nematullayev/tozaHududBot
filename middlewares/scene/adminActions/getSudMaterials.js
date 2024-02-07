@@ -415,6 +415,7 @@ const getSudMaterial = new Scenes.WizardScene(
           await SudMaterial.findByIdAndDelete(ctx.wizard.state.pachka_id);
           rimraf(ctx.wizard.state.baseDirectory, []);
           ctx.reply("Bekor qilindi");
+          ctx.scene.leave();
           break;
       }
     } else {

@@ -93,7 +93,7 @@ const yangiAbonent = async ({
       }.${
         date.getMonth() + 1 > 9
           ? date.getMonth() + 1
-          : "0" + date.getMonth() + 1
+          : "0" + (date.getMonth() + 1)
       }.${date.getFullYear()}&energy_licshet=&energy_coato=&phone=&home_phone=&email=&description=Added from telegram bot&passport_location=&passport_number=${passport_number}&brith_date=&passport_given_date=&passport_expire_date=&pinfl=${pinfl}`,
       method: "POST",
       mode: "cors",

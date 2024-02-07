@@ -8,6 +8,7 @@ const fs = require("fs");
 const ejs = require("ejs");
 const htmlPDF = require("html-pdf");
 const { kirillga } = require("../../smallFunctions/lotinKiril");
+const { INPUT_ALERT_LETTER_EXCEL } = require("../../../constants");
 
 const generateAlertLetter = new Scenes.WizardScene(
   "generate_alert_letter",
@@ -95,7 +96,7 @@ const generateAlertLetter = new Scenes.WizardScene(
 generateAlertLetter.enter((ctx) => {
   ctx.replyWithDocument(
     // Na'muna uchun ajtarilgan fayl id
-    process.env.INPUT_ALERT_LETTER_EXCEL,
+    INPUT_ALERT_LETTER_EXCEL,
     {
       caption: `Ogohlantirish xati namuna \n` + messages.enterExcelFile,
       reply_markup: keyboards[ctx.session.til].cancelBtn.resize().reply_markup,

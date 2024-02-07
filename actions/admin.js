@@ -52,6 +52,7 @@ const ADMIN_ACTIONS = [
   "user_to_inspektor",
   "get_sud_material",
   "ommaviy_shartnoma_biriktirish",
+  "generateProkuraturaSudAriza",
 ];
 
 // main required functions

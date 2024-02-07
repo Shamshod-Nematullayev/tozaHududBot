@@ -202,17 +202,17 @@ const sendMahallaKunlikTushum = async (receivers = [], imgPath, ctx) => {
   });
 };
 
-setInterval(() => {
-  const date = new Date();
-  //   const soat = date.getHours();
-  const minut = date.getMinutes();
-  if (minut == 0) {
-    getMahallaKunlikTushum(date).then(async (rows) => {
-      const imgPath = await drawMahallaKunlikTushum(rows, new Date());
-      sendMahallaKunlikTushum([1382670100, mahallaGroup.id], imgPath);
-    });
-  }
-}, 1000 * 60);
+// setInterval(() => {
+//   const date = new Date();
+//   //   const soat = date.getHours();
+//   const minut = date.getMinutes();
+//   if (minut == 0) {
+//     getMahallaKunlikTushum(date).then(async (rows) => {
+//       const imgPath = await drawMahallaKunlikTushum(rows, new Date());
+//       sendMahallaKunlikTushum([1382670100, mahallaGroup.id], imgPath);
+//     });
+//   }
+// }, 1000 * 60);
 
 module.exports = {
   getMahallaKunlikTushum,

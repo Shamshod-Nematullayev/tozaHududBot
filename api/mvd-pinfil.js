@@ -27,7 +27,6 @@ const find_one_by_pinfil_from_mvd = async (pinfil) => {
     }
   );
   const data = await res.json();
-  console.log(data.scp_data[0].entity_details);
   if (data.success === false) return data;
 
   if (data.statusCode > 400) {

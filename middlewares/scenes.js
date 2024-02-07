@@ -52,6 +52,9 @@ const { getSudMaterial } = require("./scene/adminActions/getSudMaterials");
 const {
   ommaviyShartnomaBiriktirish,
 } = require("./scene/adminActions/ommaviyShartnomaBiriktirish");
+const {
+  generateProkuraturaSudAriza,
+} = require("./scene/adminActions/generateProkraturaSudAriza");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -85,6 +88,7 @@ const stage = new Scenes.Stage([
   aborotkaChiqorish,
   getSudMaterial,
   ommaviyShartnomaBiriktirish,
+  generateProkuraturaSudAriza,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

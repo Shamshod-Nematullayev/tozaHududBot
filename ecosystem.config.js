@@ -11,6 +11,8 @@ module.exports = {
         "*.pdf",
         "*.PDF",
         "*.xls",
+        "*.html",
+        "*.htm",
         "*.xlsx",
         "uploads",
         "/uploads",
