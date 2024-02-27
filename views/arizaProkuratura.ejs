@@ -26,6 +26,13 @@
         size: 595.3pt 841.9pt;
         margin: 56.7pt 42.5pt 56.7pt 85.05pt;
       }
+      /* body {
+          padding: 0;
+          margin: 0;
+          margin-left: 2.5cm;
+          margin-top: 1.5cm;
+          margin-right: 1.5cm;
+        } */
     </style>
   </head>
 
@@ -157,7 +164,7 @@
               style="margin-left: -3.5pt; text-align: center"
             >
               <span lang="UZ-CYR" style="font-family: 'Cambria', serif"
-                >2024 йил «___» январь</span
+                >2024 йил «___» феврал</span
               >
             </p>
 
@@ -294,9 +301,7 @@
               <b
                 ><span lang="UZ-CYR" style="font-family: 'Cambria', serif"
                   >        Қарздор:
-                  <span style="color: red"
-                    ><%= row.FISH %> ( ЖШШИР: <%= row.PINFL %> )</span
-                  ></span
+                  <span><%= row.FISH %> ( ЖШШИР: <%= row.PINFL %> )</span></span
                 ></b
               >
             </p>
@@ -316,11 +321,7 @@
                 ></span
               ><span
                 lang="UZ-CYR"
-                style="
-                  font-size: 14pt;
-                  font-family: 'Cambria', serif;
-                  color: red;
-                "
+                style="font-size: 14pt; font-family: 'Cambria', serif"
               >
                 <%= row.KOD%></span
               >
@@ -359,9 +360,7 @@
                 ><span lang="UZ-CYR" style="font-family: 'Cambria', serif"
                   >  
                 </span></b
-              ><span
-                lang="UZ-CYR"
-                style="font-family: 'Cambria', serif; color: red"
+              ><span lang="UZ-CYR" style="font-family: 'Cambria', serif"
                 ><%= row.QARZ%> </span
               ><span lang="UZ-CYR" style="font-family: 'Cambria', serif"
                 >сўм</span
@@ -443,12 +442,10 @@
           style="font-size: 14pt; font-family: 'Cambria', serif"
           >Аниқланишича, ундирувчи – “ANVARJON BIZNES INVEST” МЧЖ Каттақўрғон
           туман филиали ва
-          <span style="color: red"
-            >“<%= row.MFY %>” МФЙ ўртасида 2019 йил 01 январда</span
-          >
+          <span>“<%= row.MFY %>” МФЙ ўртасида 2019 йил 01 январда</span>
           “Жисмоний шахсларга маиший чиқиндиларни тўплаш ва олиб чиқиш учун
           хизматлар кўрсатиш бўйича” оммавий шартнома тузилган бўлиб, қарздор
-          <b><span style="color: red"><%= row.FISH%></span></b>
+          <b><span><%= row.FISH%></span></b>
           мазкур шартномани тузиш тўғрисидаги оммавий таклиф (оферта)ни қабул
           қилган турар жой мулкдори ҳисобланади.</span
         >
@@ -470,11 +467,10 @@
           lang="UZ-CYR"
           style="font-size: 14pt; font-family: 'Cambria', serif"
           >Лекин, 25.01.2024 йил ҳолатига кўра
-          <b><span style="color: red"><%= row.FISH%></span></b>
+          <b><span><%= row.FISH%></span></b>
           шартномада кўрсатилган ҳизматлар учун Ундирувчидан
-          <b><span style="color: red"><%= row.QARZ%> </span></b
-          ><b><span style="color: red">сўм</span></b
-          ><span style="color: red"> </span>қарздор бўлиб қолган.</span
+          <b><span><%= row.QARZ%> </span></b><b><span>сўм</span></b
+          ><span> </span>қарздор бўлиб қолган.</span
         >
       </p>
 
@@ -506,11 +502,10 @@
           lang="UZ-CYR"
           style="font-size: 14pt; font-family: 'Cambria', serif"
           >Шу боис, Қарздор
-          <b><span style="color: red"><%= row.FISH%></span></b>
+          <b><span><%= row.FISH%></span></b>
           “ANVARJON BIZNES INVEST” МЧЖ Каттақўрғон туман филиали фойдасига
-          <b><span style="color: red"><%= row.QARZ%> </span></b
-          ><b><span style="color: red">сўм</span></b> қарздорликни ундириш лозим
-          бўлади.</span
+          <b><span><%= row.QARZ%> </span></b
+          ><b><span>сўм</span></b> қарздорликни ундириш лозим бўлади.</span
         >
       </p>
 
@@ -553,11 +548,11 @@
           lang="UZ-CYR"
           style="font-size: 14pt; font-family: 'Cambria', serif"
           >1. Қарздор
-          <b><span style="color: red"><%= row.FISH%></span></b>
+          <b><span><%= row.FISH%></span></b>
           “ANVARJON BIZNES INVEST” МЧЖ Каттақўрғон туман филиали фойдасига
-          <b><span style="color: red"><%= row.QARZ%> </span></b
-          ><b>сўм</b> қарздорликни Каттақўрғон тумани учун очилган МФО 01037,
-          ИНН: <a name="_Hlk157184236">303421898</a>, х/р
+          <b><span><%= row.QARZ%> </span></b><b>сўм</b> қарздорликни Каттақўрғон
+          тумани учун очилган МФО 01037, ИНН:
+          <a name="_Hlk157184236">303421898</a>, х/р
           22604000105565269040,“ОРИЕНТ ФИНАНСБАНК” ХАТБ Тошкент шаҳар филиали
           транзит хисоб рақамга ундиришингизни.</span
         >
@@ -641,19 +636,12 @@
             lang="UZ-CYR"
             style="font-size: 14pt; font-family: 'Cambria', serif"
             >адлия
-            маслаҳатчиси                                                       
+            маслаҳатчиси                                                                         
             Ш.С.Холмурзаев</span
           ></b
         >
       </p>
     </div>
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
     <br />
     <br />
     <br />

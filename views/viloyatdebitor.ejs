@@ -73,13 +73,13 @@
           <th style="width: 210px">Ҳудуд</th>
           <th style="width: 150px">
             <%= "01."+ (date.getMonth() > 8 ? date.getMonth() +1 :
-            "0"+date.getMonth() +1) + "."+date.getFullYear()+" " %>йил ҳолатига
+            "0"+(date.getMonth() +1)) + "."+date.getFullYear()+" " %>йил ҳолатига
             дебитор <i>(сўмда)</i>
           </th>
           <th style="width: 150px">
             <%= (date.getDate() > 8 ? date.getDate() : "0"+date.getDate() )
             +"."+ (date.getMonth() > 8 ? date.getMonth() +1 :
-            "0"+date.getMonth() +1) + "."+date.getFullYear()+" " %>йил <%=
+            "0"+(date.getMonth() +1)) + "."+date.getFullYear()+" " %>йил <%=
             date.getHours() %>:00 ҳолатига дебитор <i>(сўмда)</i>
           </th>
           <th>Ўсиши <br>(+/-) <br><i>(сўмда)</i></th>

@@ -46,7 +46,7 @@ const generateProkuraturaSudAriza = new Scenes.WizardScene(
                 MFY: sheet[i + 1].C,
                 STREET: sheet[i + 1].D,
                 QARZ: sheet[i + 1].E,
-                PINFIL: sheet[i + 1].F,
+                PINFL: sheet[i + 1].F,
               });
             }
 
@@ -66,7 +66,7 @@ const generateProkuraturaSudAriza = new Scenes.WizardScene(
                   ctx.replyWithDocument({ source: filePath });
                   console.log("Docx file created successfully");
                 });
-                // ctx.scene.leave();
+                ctx.scene.leave();
               }
             );
           });

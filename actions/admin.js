@@ -33,6 +33,14 @@ const {
   getMahallaKunlikTushum,
   drawMahallaKunlikTushum,
 } = require("../intervals/mahallaKunlikTushum");
+const { Abonent } = require("../models/Abonent");
+const fs = require("fs");
+const path = require("path");
+const xlsx = require("json-as-xlsx");
+const { Bildirishnoma } = require("../models/SudBildirishnoma");
+const {
+  importAlertLetter,
+} = require("../middlewares/scene/adminActions/cleancity/dxsh/importAlertLetter");
 
 // =====================================================================================
 const composer = new Composer();
@@ -272,11 +280,83 @@ bot.hears("kunlik", (ctx) => {
   });
 });
 
-composer.hears("q", async (ctx) => {
-  changeAbonentDates({
-    abonent_id: 7319892,
-    abo_data: { description: "test5" },
+composer.hears("export_abonents", async (ctx) => {
+  let abonents = await Abonent.find({}, { photo: 0 });
+  const content = [];
+  abonents = abonents.sort((a, b) => a.fio.localeCompare(b.fio));
+  abonents.forEach((abonent, i) => {
+    content.push({
+      tartib: i + 1,
+      licshet: abonent.licshet,
+      fio: abonent.fio,
+      street: abonent.mahalla_name,
+      kadastr_number: abonent.kadastr_number,
+      pinfl: abonent.pinfl,
+      confirm: abonent.shaxsi_tasdiqlandi?.confirm,
+    });
   });
+
+  const data = [
+    {
+      Sheet: "Abonents",
+      columns: [
+        { label: "№", value: "tartib" },
+        { label: "Лицевой", value: "licshet" },
+        { label: "ФИО--", value: "fio" },
+        { label: "Кўча", value: "street" },
+        { label: "Кадастр", value: "kadastr_number" },
+        { label: "ЖШШИР", value: "pinfl" },
+        { label: "Шахси тасдиқланди", value: "confirm" },
+      ],
+      content,
+    },
+  ];
+
+  const fileName = path.join(__dirname + "/../uploads/", "abonents");
+  let settings = {
+    fileName: fileName, // Name of the resulting spreadsheet
+    extraLength: 3, // A bigger number means that columns will be wider
+    writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
+    writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
+    // RTL: true, // Display the columns from right-to-left (the default value is false)
+  };
+  await xlsx(data, settings);
+  await ctx.replyWithDocument({ source: fileName + ".xlsx" });
+  // fs.unlink(fileName + ".xlsx", (err) => {
+  //   if (err) throw err;
+  // });
+});
+
+composer.hears("q", async (ctx) => {
+  const xatlar = await Bildirishnoma.find({ type: "sudga_chiqoring" });
+  const fileName = path.join(__dirname + "/../uploads/", "bildirish_xati bor");
+  let settings = {
+    fileName: fileName, // Name of the resulting spreadsheet
+    extraLength: 3, // A bigger number means that columns will be wider
+    writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
+    writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
+    // RTL: true, // Display the columns from right-to-left (the default value is false)
+  };
+  const content = [];
+  xatlar.forEach((xat) => {
+    xat.abonents.forEach((kod) => {
+      content.push({ licshet: kod });
+    });
+  });
+  const data = [
+    {
+      Sheet: "Abonents",
+      columns: [{ label: "Лицевой", value: "licshet" }],
+      content,
+    },
+  ];
+
+  await xlsx(data, settings);
+  await ctx.replyWithDocument({ source: fileName + ".xlsx" });
+});
+
+composer.hears("a", (ctx) => {
+  importAlertLetter();
 });
 
 bot.use(composer);

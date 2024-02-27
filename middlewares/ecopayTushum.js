@@ -291,7 +291,7 @@ setInterval(async () => {
       (soat == 22 && minut == 0) ||
       (soat == 23 && minut == 0)
     ) {
-      // drawDebitViloyat("toViloyat");
+      drawDebitViloyat("toViloyat");
       if (soat < 22) {
         const data = await fetchEcopayTushum();
         // mfyIncomeReport();
