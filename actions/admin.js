@@ -41,6 +41,10 @@ const { Bildirishnoma } = require("../models/SudBildirishnoma");
 const {
   importAlertLetter,
 } = require("../middlewares/scene/adminActions/cleancity/dxsh/importAlertLetter");
+const {
+  getAbonentCardHtml,
+} = require("../api/cleancity/dxsh/getAbonentCardHTML");
+const htmlPDF = require("html-pdf");
 
 // =====================================================================================
 const composer = new Composer();
@@ -353,6 +357,30 @@ composer.hears("q", async (ctx) => {
 
   await xlsx(data, settings);
   await ctx.replyWithDocument({ source: fileName + ".xlsx" });
+});
+
+composer.hears(/karta_/g, async (ctx) => {
+  const html = await getAbonentCardHtml(ctx.message.text.split("_")[1]);
+  htmlPDF
+    .create(html, {
+      format: "A4",
+      orientation: "portrait",
+    })
+    .toFile("./uploads/abonent_card.pdf", (err, res) => {
+      if (err) throw err;
+      ctx.replyWithDocument({ source: "./uploads/abonent_card.pdf" });
+      // .then(() => {
+      //   fs.unlink("./uploads/abonent_card.pdf", (err) =>
+      //     err ? console.log(err) : ""
+      //   );
+      // });
+    });
+});
+
+composer.hears("ExportAbonentCards", async (ctx) => {
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+
+  ctx.scene.enter("exportAbonentCards");
 });
 
 composer.hears("a", (ctx) => {

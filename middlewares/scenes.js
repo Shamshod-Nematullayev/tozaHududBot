@@ -55,6 +55,9 @@ const {
 const {
   generateProkuraturaSudAriza,
 } = require("./scene/adminActions/generateProkraturaSudAriza");
+const {
+  exportAbonentCards,
+} = require("./scene/adminActions/exportAbonentCardsZip");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -89,6 +92,7 @@ const stage = new Scenes.Stage([
   getSudMaterial,
   ommaviyShartnomaBiriktirish,
   generateProkuraturaSudAriza,
+  exportAbonentCards,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

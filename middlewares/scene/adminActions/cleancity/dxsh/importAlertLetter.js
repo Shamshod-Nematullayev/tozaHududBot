@@ -25,14 +25,21 @@ async function importAlertLetter() {
         if (element.textContent.trim() === "Суд огоҳлантириш") {
           // Found the element, do something with it
           toAlertLettersPage = element.href;
+          console.log(element.innerHTML);
         }
       });
       console.log(toAlertLettersPage);
       const res1 = await fetch(
-        `https://cleancity.uz/dashboard${toAlertLettersPage}`,
-        { Cookie: session.cookie }
+        `https://cleancity.uz/dashboard/${toAlertLettersPage}`,
+        { headers: { Cookie: session.cookie } }
       );
-      console.log(res1.url);
+      const res2 = await fetch(res1.url, {
+        headers: {
+          Cookie: session.cookie,
+        },
+      });
+      const res2Text = await res2.text();
+      console.log(res2Text.match(/dsmmf?xenc([^']+)==/g));
     }
   } catch (err) {
     console.log(err);

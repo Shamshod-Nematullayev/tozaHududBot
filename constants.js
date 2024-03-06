@@ -6,3 +6,4 @@ module.exports.INPUT_ALERT_LETTER_EXCEL = `BQACAgIAAxkBAAEBBO1ln40tc7RDwEZ50Kqdp
 module.exports.guvohnomaFileID = `BQACAgIAAxkBAAEBLvRlqkZQkkAgAWxnF4_neNNkvRbVIQACmTkAApzHWUn49o8y769mtTQE`;
 module.exports.ishonchnomaFileID = `BQACAgIAAxkBAAEBLvllqkdFUyZ0s2BNrB38BVWBRb37XAACnTkAApzHWUk2asxbBSPOXzQE`;
 module.exports.shartnomaSSPFileID = `BQACAgIAAxkBAAEBLwVlqkfRChxRq4hA2YGmQKsnocJq-wACdzwAAizGWEkPpZ9_-WRZDTQE`;
+module.exports.inputAbonentLicshet = `BQACAgIAAxkBAAEDm9ll6F9SmQ5HQCW4S0X-BxOuV6EkGgACb0IAAqFTSEtIB9fHlfO1aDQE`;

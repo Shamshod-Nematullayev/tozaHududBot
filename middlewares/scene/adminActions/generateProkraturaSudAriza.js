@@ -7,7 +7,6 @@ const {
 const { keyboards } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
 const ejs = require("ejs");
-const HTMLtoDOCX = require("html-to-docx");
 const fs = require("fs");
 const https = require("https");
 const excelToJson = require("convert-excel-to-json");
@@ -15,6 +14,17 @@ const path = require("path");
 
 const generateProkuraturaSudAriza = new Scenes.WizardScene(
   "generateProkuraturaSudAriza",
+  async (ctx) => {
+    console.log(ctx.message);
+    const [kun, oy] = ctx.message.text.split("-");
+    ctx.wizard.state.kun = kun;
+    ctx.wizard.state.oy = oy;
+    ctx.replyWithDocument(INPUT_ALERT_LETTER_EXCEL, {
+      caption: `Prokuratura tomonidan sudga yoziladigan arizalarini ma'lumotlarini na'munadagi jadvalga qo'yib menga yuboring!`,
+      reply_markup: keyboards.lotin.cancelBtn,
+    });
+    ctx.wizard.next();
+  },
   async (ctx) => {
     try {
       if (
@@ -52,7 +62,7 @@ const generateProkuraturaSudAriza = new Scenes.WizardScene(
 
             ejs.renderFile(
               path.join(__dirname, `../../../views/arizaProkuratura.ejs`),
-              { rows },
+              { rows, kun: ctx.wizard.state.kun, oy: ctx.wizard.state.oy },
               {},
               async (err, str) => {
                 if (err) console.log(err);
@@ -92,10 +102,7 @@ generateProkuraturaSudAriza.on("text", (ctx, next) => {
 });
 
 generateProkuraturaSudAriza.enter((ctx) => {
-  ctx.replyWithDocument(INPUT_ALERT_LETTER_EXCEL, {
-    caption: `Prokuratura tomonidan sudga yoziladigan arizalarini ma'lumotlarini na'munadagi jadvalga qo'yib menga yuboring!`,
-    reply_markup: keyboards.lotin.cancelBtn,
-  });
+  ctx.reply("Ariza uchun sana kiriting misol: 28-феврал");
 });
 
 module.exports = { generateProkuraturaSudAriza };

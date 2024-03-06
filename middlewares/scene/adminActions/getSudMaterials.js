@@ -212,9 +212,6 @@ const getSudMaterial = new Scenes.WizardScene(
         if (err) throw err;
       });
 
-      fs.mkdir(baseDirectory + "/forma_birlar", (err) => {
-        if (err) throw err;
-      });
       fs.mkdir(baseDirectory + "/ogohlantirish_xatlari", (err) => {
         if (err) throw err;
       });
@@ -310,9 +307,6 @@ const getSudMaterial = new Scenes.WizardScene(
     );
   },
   async (ctx) => {
-    arxivdanFaylOlish(ctx, "forma_birlar", "FORMA_BIR_FILE_ID", "FORMA 1");
-  },
-  async (ctx) => {
     if (ctx.callbackQuery) {
       switch (ctx.callbackQuery.data) {
         case "xa":
@@ -334,20 +328,11 @@ const getSudMaterial = new Scenes.WizardScene(
                       ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
                     }/ariza.PDF`
                   );
-                  await fs.promises.copyFile(
-                    `${ctx.wizard.state.baseDirectory}/forma_birlar/${item.KOD}.PDF`,
-                    `${
-                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
-                    }/forma_bir.PDF`
-                  );
                   const abonent = await Abonent.findOne({
                     licshet: String(item.KOD),
                   });
                   let merger = new PDFMerger();
                   (async () => {
-                    await merger.add(
-                      `${ctx.wizard.state.baseDirectory}/forma_birlar/${item.KOD}.PDF`
-                    );
                     await merger.add(
                       `${ctx.wizard.state.baseDirectory}/ommaviy_shartnomalar/${abonent.mahallas_id}.PDF`
                     );
@@ -356,15 +341,6 @@ const getSudMaterial = new Scenes.WizardScene(
                     );
                     await merger.add(
                       `${ctx.wizard.state.baseDirectory}/abonent_kartalar/${item.KOD}.PDF`
-                    );
-                    await merger.add(
-                      `${ctx.wizard.state.baseDirectory}/GUVOHNOMA.PDF`
-                    );
-                    await merger.add(
-                      `${ctx.wizard.state.baseDirectory}/ISHONCHNOMA.PDF`
-                    );
-                    await merger.add(
-                      `${ctx.wizard.state.baseDirectory}/SHARTNOMA.PDF`
                     );
 
                     // Set metadata
