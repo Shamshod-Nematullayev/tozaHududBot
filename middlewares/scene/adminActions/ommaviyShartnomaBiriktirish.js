@@ -1,12 +1,13 @@
-const { Scenes } = require("telegraf");
+const { Scenes, Markup } = require("telegraf");
 const { Mahalla } = require("../../../models/Mahalla");
-const { createInlineKeyboard } = require("../../../lib/keyboards");
+const { createInlineKeyboard, keyboards } = require("../../../lib/keyboards");
+const isCancel = require("../../smallFunctions/isCancel");
 
 const ommaviyShartnomaBiriktirish = new Scenes.WizardScene(
   "ommaviy_shartnoma_biriktirish",
   async (ctx) => {
     ctx.wizard.state.file_id = ctx.message.document.file_id;
-    ctx.wizard.state.filename = ctx.message.document.filename;
+    ctx.wizard.state.filename = ctx.message.document.file_name;
     const mahallalar = await Mahalla.find();
 
     // Create a sorted copy of mahallalar
@@ -16,10 +17,13 @@ const ommaviyShartnomaBiriktirish = new Scenes.WizardScene(
     const buttons = sortedMahallalar.map((mfy) => [
       Markup.button.callback(mfy.name, mfy.id),
     ]);
-    await ctx.reply("Mahallani tanlang", buttons);
+    await ctx.reply("Mahallani tanlang", {
+      reply_markup: Markup.inlineKeyboard(buttons).reply_markup,
+    });
     ctx.wizard.next();
   },
   async (ctx) => {
+    ctx.deleteMessage();
     const mahalla = await Mahalla.findOne({ id: ctx.callbackQuery.data });
     await mahalla.updateOne({
       $set: {
@@ -59,6 +63,13 @@ const ommaviyShartnomaBiriktirish = new Scenes.WizardScene(
     }
   }
 );
+
+ommaviyShartnomaBiriktirish.on("text", (ctx) => {
+  if (isCancel(ctx.message.text)) {
+    ctx.reply("Bekor qilindi");
+    return ctx.scene.leave();
+  }
+});
 ommaviyShartnomaBiriktirish.enter((ctx) =>
   ctx.reply("Shartnoma faylini yuboring. PDF formatida!")
 );
