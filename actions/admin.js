@@ -45,6 +45,9 @@ const {
   getAbonentCardHtml,
 } = require("../api/cleancity/dxsh/getAbonentCardHTML");
 const htmlPDF = require("html-pdf");
+const {
+  getLastAlertLetter,
+} = require("../api/cleancity/dxsh/getLastAlertLetter");
 
 // =====================================================================================
 const composer = new Composer();
@@ -382,9 +385,17 @@ composer.hears("ExportAbonentCards", async (ctx) => {
 
   ctx.scene.enter("exportAbonentCards");
 });
+composer.hears("ExportWarningLettersZip", async (ctx) => {
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+
+  ctx.scene.enter("exportWarningLettersZip");
+});
 
 composer.hears("a", (ctx) => {
   importAlertLetter();
+});
+composer.hears("b", async (ctx) => {
+  console.log(await getLastAlertLetter(105120701016));
 });
 
 bot.use(composer);

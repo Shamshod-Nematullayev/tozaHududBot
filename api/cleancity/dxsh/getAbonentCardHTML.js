@@ -1,4 +1,3 @@
-const { Scenes } = require("telegraf");
 const { Abonent } = require("../../../models/Abonent");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 

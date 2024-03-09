@@ -25,7 +25,6 @@ async function importAlertLetter() {
         if (element.textContent.trim() === "Суд огоҳлантириш") {
           // Found the element, do something with it
           toAlertLettersPage = element.href;
-          console.log(element.innerHTML);
         }
       });
       console.log(toAlertLettersPage);

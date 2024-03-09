@@ -15,7 +15,17 @@ const toSendDebitor = async (ctx) => {
     },
   });
   const startpage = new JSDOM(await res.text()).window.document;
-
+  if (
+    startpage.querySelector(
+      "#g_acccordion > div > div > ul > li:nth-child(1) > a"
+    ) == undefined
+  ) {
+    bot.telegram.sendMessage(
+      5347896070,
+      `Xukmdorim viloyat debitor reja tashlash bo'yicha Cookie va Xenc yo'li boy berildi`
+    );
+    return [];
+  }
   const dxsh1Url = startpage.querySelector(
     "#g_acccordion > div > div > ul > li:nth-child(1) > a"
   ).href;
@@ -47,6 +57,9 @@ const toSendDebitor = async (ctx) => {
 
 const drawDebitViloyat = async (sendingType) => {
   let rows = await toSendDebitor();
+  if (rows.length == 0) {
+    return;
+  }
   const date = new Date();
   let jamiDebitN = 0;
   let jamiDebitK = 0;

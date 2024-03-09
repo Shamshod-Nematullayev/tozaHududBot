@@ -58,6 +58,9 @@ const {
 const {
   exportAbonentCards,
 } = require("./scene/adminActions/exportAbonentCardsZip");
+const {
+  exportWarningLettersZip,
+} = require("./scene/adminActions/exportWarningLettersZip");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -93,6 +96,7 @@ const stage = new Scenes.Stage([
   ommaviyShartnomaBiriktirish,
   generateProkuraturaSudAriza,
   exportAbonentCards,
+  exportWarningLettersZip,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

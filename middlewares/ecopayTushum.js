@@ -303,6 +303,11 @@ setInterval(async () => {
       if (text == undefined) {
         sendViloyatKunlikReja("test", 5347896070);
       }
+      if (!text.match(/url:\s*'([^']+)'/g))
+        return bot.telegram.sendMessage(
+          5347896070,
+          `Xukmdorim viloyat kunlik reja tashlash bo'yicha Cookie va Xenc yo'li boy berildi`
+        );
       const res = await fetch(
         `${cc}/${text.match(/url:\s*'([^']+)'/g)[1].split("'")[1]}`,
         {
