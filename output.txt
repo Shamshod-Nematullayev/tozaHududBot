@@ -1,0 +1,2776 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+
+        
+            <meta name="description" content="Put your description here!" />
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+            
+                <!-- Mobile Meta -->
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+                <!-- Put favicon.ico and apple-touch-icon(s).png in the images folder -->
+                <link rel="shortcut icon" href="assets/images/favicon.png"/>
+
+                <link rel="stylesheet" href="assets/css/sansPro.css"/>
+                <link rel="stylesheet" href="assets/css/font_icons.css"/>
+                <link rel="stylesheet" href="assets/js/pnotify/pnotify.custom.css" type="text/css"/>
+                <!--assets/css/green_internal.css-->
+                <link rel="stylesheet" href="assets/css/default_internal.css?ver=3" type="text/css"/>
+
+                <link rel="stylesheet" type="text/css" href="assets/easyui/themes/metro/default/easyui.css?v=1"/>
+                <!--                assets/easyui/themes/metro/green/easyui.css-->
+                <link rel="stylesheet" type="text/css" href="assets/easyui/themes/icon.css"/>
+                <link rel="stylesheet" href="assets/css/header.css?ver=5" type="text/css"/>
+
+
+
+
+
+
+
+                <script type="text/javascript" src="assets/easyui/jquery.min.js" onclick="window.location.href='assets/easyui/jquery.min.js';return false;"></script>
+                <script type="text/javascript" src="assets/easyui/jquery.easyui.min.js" onclick="window.location.href='assets/easyui/jquery.easyui.min.js';return false;"></script>
+                <script type="text/javascript" src="assets/easyui/locale/locale_uk.js"></script>
+                <script type="text/javascript" src="assets/js/pnotify/pnotify.custom.js" onclick="window.location.href='assets/js/pnotify/pnotify.custom.js';return false;"></script>
+                <script type="text/javascript" src="assets/js/common.js?ver=3" onclick="window.location.href='assets/js/common.js?ver=3';return false;"></script>
+                <script type="text/javascript" src="assets/js/counter.js" onclick="window.location.href='assets/js/counter.js';return false;"></script>
+                <script type="text/javascript" src="assets/js/datagrid-groupview.js" onclick="window.location.href='assets/js/datagrid-groupview.js';return false;"></script>
+                <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
+                <!--<script src="assets/js/jscharts.js" type="text/javascript"></script>-->
+                <script src="assets/js/canvasjs.min_uk.js" type="text/javascript"></script>
+                <script src="assets/js/jquery.canvasjs.min_uk.js" type="text/javascript"></script>
+                <script type="text/javascript">var no_ajax_feedback=0;$(function(){if($("#feedbackform span.feedbackPanelINFO").text()!=""){var a=[];var b="";$("#feedbackform span.feedbackPanelINFO").each(function(d){var f=false;for(var e=0;e<a.length;e++){if(a[e]==$(this).text()){f=true;}}if(!f){b+=$(this).text()+"<br/>";a.push($(this).text());}});$.messager.alert("Маълумот",b,"info");}if($("#feedbackform span.feedbackPanelERROR").text()!=""){var b="";var c=[];$("#feedbackform span.feedbackPanelERROR").each(function(d){var f=false;for(var e=0;e<c.length;e++){if(c[e]==$(this).text()){f=true;}}if(!f){b+=(d+1)+". "+$(this).text()+"<br/>";c.push($(this).text());}});$.messager.alert("Хатолик",b,"error");}$(document).ready(function(){if($("#mv_span")[0].innerText=="1"){$("#mv_span")[0].innerText="MV";$("#mv_span")[0].classList.add("mv_span_class");}else{$("#mv_span")[0].classList.add("not_mv_span");}$(document).keypress(function(d){if(window.getSelection()!=""){if((d.keyCode==10)){var f=window.getSelection();if($.trim(f).length<10){alertmessage("Хабарда узоғи билан 10 та дан кам бўлмаган сўз киритинг","success");}else{$("#frmErrorReport").form("clear");$("#frmWindowErrorReport").dialog("open").dialog("setTitle","Янги");$("#selected_text").val(f);}}}});});$("body").keyup(function(d){var e=$(this).find(".easyui-dialog");if(d.keyCode==27){for(var k=0;k<e.length;k++){$(e[k]).dialog("close");}}if(d.keyCode==13){var e=$(this).find(".easyui-dialog");for(var k=0;k<e.length;k++){var h=$(e[k]).dialog("dialog");console.log("----obj: "+h);var o=$(h).attr("style").split(";");for(var g=0;g<o.length;g++){if(o[g]==="display: block"){console.log("----styles[j]: "+o[g]);var n=$(e[k]).dialog("window").find(".dialog-button")[0];var m=$(n).find("a.easyui-linkbutton");for(var f=0;f<m.length;f++){if($(m[f]).attr("button-index")=="0"){$(m[f]).click();break;}}}}}}});$("ul li a.active").focus();});</script>
+                <script type="text/javascript">var stack_;var clazz;var stack_topleft={dir1:"down",dir2:"right",push:"top"};var stack_topright={dir1:"down",dir2:"left",push:"top"};var stack_bottomleft={dir1:"right",dir2:"up",push:"top"};var stack_bottomright={dir1:"up",dir2:"left",firstpos1:15,firstpos2:15};var stack_bar_top={dir1:"down",dir2:"right",push:"top",spacing1:0,spacing2:0};var stack_bar_bottom={dir1:"up",dir2:"right",spacing1:0,spacing2:0};function alertmessage(c,b){var a="fa fa-";switch(b){case"success":a+="check";break;case"error":a+="times";break;}new PNotify({title:"CleanCity",text:c,type:b,shadow:true});}function alertmessage_by_position(c,b,a){if(a==="topleft"){stack_=stack_topleft;clazz="stack-topleft";}else{if(a==="topright"){stack_=stack_topright;clazz="stack-topright";}else{if(a==="bottomleft"){stack_=stack_bottomleft;clazz="stack-bottomleft";}else{stack_=stack_bottomright;clazz="stack-bottomright";}}}new PNotify({title:"CleanCity",text:c,type:b,shadow:true,addclass:clazz,stack:stack_});}function alertmessage_by_desktop(c,b,a){if(a==="top"){new PNotify({title:"CleanCity",text:c,type:b,shadow:true,addclass:"stack-bar-top",stack:stack_bar_top,width:"100%"});}else{new PNotify({title:"PayMobile",text:c,type:b,shadow:true,addclass:"stack-bar-bottom",stack:stack_bar_bottom,width:"100%"});}}function confirmer_pm(c,b,a){$("#confirmer #ok").focus();$("#confirmer #ok").unbind("click");$("#confirmer #ok").bind("click",function(){$("#cancel").click();});$("#confirmer #ok").bind("click",a);$("#confirmer #title").html(c);$("#confirmer #content").html(b);$("#view_confirmer").click();}function send_(){$("#frmErrorReport").form("submit",{url:"ds?xenc=lxIwS-S5tWqfZaoU9i74X9QhaIIrsOJ7bKvFvc400EFKzARXRK1V-jJcNSwgrywqI5qwslawvuCPU2Yo1RipzDeZQ7-28w37",onSubmit:function(){return $(this).form("validate");},success:function(result){var result=eval("("+result+")");if(result.success){$("#frmWindowErrorReport").dialog("close");alertmessage("Эътиборингиз учун рахмат. Сизнинг хабарингиз кўриб чиқилади ва хал қилинади.","success");}else{$.messager.alert("CleanCity",result.msg,"error");}}});}</script>
+
+                <script id="uz-furorprogress-cleancity-wicket-StaffHomePage-0">
+                    $(document).ready(function() {
+                        var b = $(".btn-small .l-btn");
+                        var t = "";
+                        var i;
+                        var l = $("#toolbarTableData > table tr:last");
+                        var h = l.height();
+                        if (h > 36) {
+                            l.addClass("btn-small");
+                            var b = $(".btn-small .l-btn");
+                            b.each(function() {
+                                $(this).attr("title", $(this).text());
+                            });
+                        }
+                    });
+
+                    $(document).ready(function() {
+                        var m = $("#g_acccordion .panel").size() - 1;
+                        var h = $("#g_acccordion").height();
+                        var d = 0;
+//                    alert("ishga tushdi");
+                        if (h <= 600 && m >= 6) {
+                            $("#g_acccordion").addClass("small_accordion");
+                            d = h - (m * 30) - 1;
+                            $(".small_accordion .accordion-body").css("height", d);
+//                            alert("funksiya ishga tushdi");
+                        }
+
+                        $(".page-loader").delay(500).fadeOut(400);
+                    });
+
+                    $(document).ajaxStart(function () {
+                        if (!no_ajax_feedback)
+                            $("body").addClass("app-loading");
+                    });
+
+                    $(document).ajaxStop(function () {
+                        $("body").removeClass("app-loading");
+                    });
+
+                </script>
+            
+        
+    
+        <script>$(function(){$("#par_user_status").combobox({formatter:stateFormatterCombo,onSelect:function(c,b){refreshTable();}});cur_date=new Date();sana=("01."+(cur_date.getMonth()+1<10?"0":"")+(cur_date.getMonth()+1)+"."+cur_date.getFullYear());$("#date1").datebox("setValue",sana);$("#date2").datebox("setValue",cur_date.toLocaleDateString());$("#par_companies_id").combogrid({panelWidth:280,name:"companies_id",idField:"id",textField:"name",sortName:"id",sortOrder:"asc",url:"ds?xenc=xKgtbzJNdSAaHLbCDDrO3yeX_LMaiBpgQ_h5uJkXTT4PwRqauYakn56tyx8e3OtqKEH9aRolQ92MmTmdD7tQCofCuaxl3XZg5bUiXR9sqIPwiLimgTjigg==",editable:true,fitColumns:true,mode:"remote",disable:true,columns:[[{field:"id",title:"ID",width:50,sortable:true,fixed:true},{field:"name",title:"Номи",width:100,sortable:true}]],onSelect:function(c,b){a(b);refreshTable();},onLoadSuccess:function(b){if(b.rows.length){$("#par_companies_id").combogrid("setValue",b.rows[0].id);a(b.rows[0]);refreshTable();}}});$("#par_user_status").combogrid({panelWidth:200,name:"par_user_status",idField:"id",textField:"name",sortName:"id",sortOrder:"asc",url:"ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMem50XlEJ_dXnhJK32R8C9ML8Ve3taXqhiqd1zndyuQki9KTmxjQLhzNR3Y_3kSWYm",editable:true,fitColumns:true,mode:"remote",disable:true,columns:[[{field:"id",title:"ID",width:50,sortable:true,fixed:true},{field:"name",title:"Номи",width:100,sortable:true}]],onSelect:function(c,b){refreshTable();},onLoadSuccess:function(b){if(b.rows.length){refreshTable();}}});$("#par_user_status").combogrid({icons:[{iconCls:"icon-clear",handler:function(b){$(b.data.target).combogrid("clear");$("#par_user_status").combogrid("setValue","");refreshTable();}}]});$("#par_user_status").combogrid("textbox").attr("placeholder","Cтатус");$("#par_file_types").combogrid({panelWidth:280,name:"companies_id",idField:"id",textField:"name",sortName:"id",sortOrder:"asc",url:"ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeOkBrUrxFzgqbSKVEIGsTLixD_Ipl9FegWK89vcTNAwJuDeUrP1bCYojo2vgneGax",editable:true,fitColumns:true,disable:true,columns:[[{field:"id",title:"ID",width:50,sortable:true,fixed:true},{field:"name",title:"Номи",width:100,sortable:true}]],onSelect:function(c,b){},onLoadSuccess:function(b){if(b.rows.length){$("#par_file_types").combogrid("setValue",b.rows[0].id);
+}}});function a(b){$(".company_name").text($("#par_companies_id").combogrid("grid").datagrid("getSelected").name);}$("#tableData").datagrid({nowrap:true,striped:true,collapsible:false,fit:true,pagination:true,pageSize:20,rownumbers:true,url:"ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeEBN3PB-sKH7YULoKr1Ppq5yEX74E9B6CzEEAPs1NVRK-Le4V5311DflmuP3lfVDA",sortName:"id",sortOrder:"desc",remoteSort:true,fitColumns:false,singleSelect:true,idField:"id",queryParams:getFiltrObject(),columns:[[{field:"id",title:"ID",width:60,sortable:true,fixed:true},{field:"companies_name",title:"Компания номи",width:200},{field:"abonent_fio",title:"ФИО",hidden:false,width:200},{field:"prescribed_cnt",title:"Яшовчилар сони",hidden:true},{field:"status_name",title:"Cтатус",width:130},{field:"sud_warning_date",title:"Огоҳлантриш санаси",width:100},{field:"sud_warning_amount",title:"Огоҳлантриш суммаси",width:100},{field:"debit_amount",title:"Салдо бошига қарз оралиги",width:100},{field:"created_users_name",title:"Яратилган фойдаланувчи",width:200},{field:"updated_users_name",title:"Ўзгарирган фойдаланувчи",width:200},{field:"updated_date",title:"Ўзгартиралган сана",width:100},{field:"created_date",title:"Яратиш санаси",hidden:true},{field:"licshet",title:"Лицевой",hidden:true},{field:"debit_date",title:"Салдо бошига қарз оралиги",hidden:true},{field:"remaining_debt_amount",title:"Қолди",hidden:true},{field:"payments_amount",title:"Тўловлар",hidden:true},{field:"address",title:"Манзил",hidden:true}]],toolbar:"#toolbarTableData",onLoadError:function(){$.messager.alert("CleanCity","HTTP хатолик","error");},onLoadSuccess:function(b){if(b.total){if(b.total==="-1"){$.messager.alert("CleanCity",b.msg,"error");}}},onClickRow:function(b,c){$("#clickToTimeLine").css("display","none");$("#user_card").css("visibility","unset");setCardInfo(c);}});$("#tableDataPayments").datagrid({nowrap:true,striped:true,collapsible:false,fit:true,pagination:false,pageSize:20,rownumbers:true,url:"ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeeFxRd56vzVv4RFaV2b4WuoyZOZ0Pu1AKh8K5rGXddmDltSJdH2yog_CIuKaBOOKC",sortName:"id",sortOrder:"desc",remoteSort:true,fitColumns:false,singleSelect:true,idField:"id",queryParams:{id:-1},columns:[[{field:"id",title:"ID",width:60,sortable:true,fixed:true},{field:"pay_state",title:"Статус",width:100,formatter:function(c,d,b){return c==1?"Ёниқ":"Ўчирилган";
+}},{field:"sud_process_amount",title:"Тўлов",width:100,formatter:function(c,d,b){return number_format(c,2,","," ");}},{field:"pay_date",title:"Тўлов санаси",width:100,fixed:true},{field:"description",title:"Тавсиф",width:120,fixed:true}]],toolbar:"#toolbarTableDataPayments",onLoadError:function(){$.messager.alert("CleanCity","HTTP хатолик","error");},onLoadSuccess:function(b){}});$("#tableDataFlows").datagrid({nowrap:true,striped:true,collapsible:false,fit:true,pagination:false,pageSize:20,rownumbers:true,url:"ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeD_1jB3tB9va73gSxQ5C3LJyTKHJiRV1bVX7oJmyTMFzuWUkdKqxy8--axrL8AiMR",sortName:"id",sortOrder:"desc",remoteSort:true,fitColumns:false,singleSelect:true,idField:"id",queryParams:{id:-1},columns:[[{field:"id",title:"ID",width:60,sortable:true,fixed:true},{field:"created_users_fio",title:"Ўзгарирган фойдаланувчи",width:120,fixed:true},{field:"statuse_name",title:"Статус",width:120,sortable:true,fixed:true},{field:"date_from",title:"Дан",width:100,fixed:true},{field:"date_to",title:"Гача",width:100,fixed:true},{field:"description",title:"Тавсиф",width:100,fixed:true}]],toolbar:"#toolbartableDataFlows",onLoadError:function(){$.messager.alert("CleanCity","HTTP хатолик","error");},onLoadSuccess:function(b){}});});</script>
+        <script type="text/javascript">
+            var url;
+            var url_state;
+            var url_create_user;
+            var url_change_user_data;
+
+            function setCardInfo(row) {
+                $('#fio').text(row.abonent_fio)
+                $('#sud_warning_file').text('Огоҳлантириш файили')
+                $('#sud_decision_court_file').text('Суд қарори файллари')
+                $('#send_to_court_file').text('Судга юбориш файллари')
+                $('#licshet').text(check_data(row.licshet))
+                $('#debit_amount').text(number_format(row.debit_amount, 2, ',', ' '))
+                $('#debit_date').text(check_data(row.debit_date))
+                $('#prescribed_cnt').text(check_data(row.prescribed_cnt))
+                $('#address').text(check_data(row.address))
+                $('#payments_amount').text(check_data(row.payments_amount))
+                $('#remaining_debt_amount').text(number_format(row.remaining_debt_amount, 2, ',', ' '))
+                if (row.sud_process_statuses_id == 2) {
+                    $('#send_to_court').css('display', 'block')
+                    $('#decision_court').css('display', 'none')
+                } else if (row.sud_process_statuses_id == 3) {
+                    $('#decision_court').css('display', 'block')
+                    $('#send_to_court').css('display', 'none')
+                }
+
+                var g = $('#par_file_types').combogrid('grid');
+                $('#par_file_types').combogrid('clear');
+                g.datagrid('load', {sud_process_statuses_id: row.sud_process_statuses_id});
+                $('#par_file_types').combogrid('enable');
+
+                document.getElementById('swf').innerHTML = ''
+                document.getElementById('sdcf').innerHTML = ''
+                document.getElementById('stcf').innerHTML = ''
+                refreshRowTables(row.id)
+                $.post('ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeOkBrUrxFzgrW0S2pwXwRLJyTKHJiRV1bVX7oJmyTMFw9AJnBHeQUzwhuQm8-tHwQ', {sud_processes_id: row.id}, function (result) {
+                    var res = JSON.parse(result)
+                    if (res.total > 0) {
+                        var file_array = res.rows;
+                        var swf = ''
+                        var sdcf = ''
+                        var stcf = ''
+                        file_array.forEach(obj => {
+                            if (obj.sud_resource_types_id == 1) {
+
+                                swf += '<div class="col-3" onclick="download_file(' + obj.resources_id + ')" style="display: flex;float: left;">' +
+                                    '<span style="border-radius: 50px;\n' +
+                                    '    padding: 10px;\n' +
+                                    '    background-color: #eee;\n' +
+                                    '    display: inline-block;\n' +
+                                    '    height: 50px;\n' +
+                                    '    width: 50px;\n' +
+                                    '    margin-right: 10px;">' +
+                                    '<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"\n' +
+                                    '\t viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;height: 30px;" xml:space="preserve">\n' +
+                                    '<g>\n' +
+                                    '\t<path d="M42.5,22h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,22,42.5,22z"/>\n' +
+                                    '\t<path d="M17.5,16h10c0.552,0,1-0.447,1-1s-0.448-1-1-1h-10c-0.552,0-1,0.447-1,1S16.948,16,17.5,16z"/>\n' +
+                                    '\t<path d="M42.5,30h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,30,42.5,30z"/>\n' +
+                                    '\t<path d="M42.5,38h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,38,42.5,38z"/>\n' +
+                                    '\t<path d="M42.5,46h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,46,42.5,46z"/>\n' +
+                                    '\t<path d="M38.914,0H6.5v60h47V14.586L38.914,0z M39.5,3.414L50.086,14H39.5V3.414z M8.5,58V2h29v14h14v42H8.5z"/>\n' +
+                                    '</g>\n' +
+                                    '</svg>\n' +
+                                    '</span>' +
+                                    '<a href="#" style="font-size: 22px;\n' +
+                                    '">Юклаб олиш</a></div>';
+                            } else if (obj.sud_resource_types_id == 2) {
+                                sdcf += '<div class="col-3" onclick="download_file(' + obj.resources_id + ')" style="    display: flex;float: left">' +
+                                    '<span style="border-radius: 50px;\n' +
+                                    '    padding: 10px;\n' +
+                                    '    background-color: #eee;\n' +
+                                    '    display: inline-block;\n' +
+                                    '    height: 50px;\n' +
+                                    '    width: 50px;\n' +
+                                    '    margin-right: 10px;">' +
+                                    '<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"\n' +
+                                    '\t viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;height: 30px;" xml:space="preserve">\n' +
+                                    '<g>\n' +
+                                    '\t<path d="M42.5,22h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,22,42.5,22z"/>\n' +
+                                    '\t<path d="M17.5,16h10c0.552,0,1-0.447,1-1s-0.448-1-1-1h-10c-0.552,0-1,0.447-1,1S16.948,16,17.5,16z"/>\n' +
+                                    '\t<path d="M42.5,30h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,30,42.5,30z"/>\n' +
+                                    '\t<path d="M42.5,38h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,38,42.5,38z"/>\n' +
+                                    '\t<path d="M42.5,46h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,46,42.5,46z"/>\n' +
+                                    '\t<path d="M38.914,0H6.5v60h47V14.586L38.914,0z M39.5,3.414L50.086,14H39.5V3.414z M8.5,58V2h29v14h14v42H8.5z"/>\n' +
+                                    '</g>\n' +
+                                    '</svg>\n' +
+                                    '</span>' +
+                                    '<a href="#" style="font-size: 22px;\n' +
+                                    '    color: #777;">Юклаб олиш</a>' +
+                                '</div> '
+                            } else if (obj.sud_resource_types_id == 3) {
+                                stcf+='<div class="col-3" onclick="download_file('+obj.resources_id+')" style="display: flex; float: left">' +
+                                        '<span style="border-radius: 50px;\n' +
+                                    '    padding: 10px;\n' +
+                                    '    background-color: #eee;\n' +
+                                    '    display: inline-block;\n' +
+                                    '    height: 50px;\n' +
+                                    '    width: 50px;\n' +
+                                    '    margin-right: 10px;">' +
+                                    '<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"\n' +
+                                    '\t viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;height: 30px;" xml:space="preserve">\n' +
+                                    '<g>\n' +
+                                    '\t<path d="M42.5,22h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,22,42.5,22z"/>\n' +
+                                    '\t<path d="M17.5,16h10c0.552,0,1-0.447,1-1s-0.448-1-1-1h-10c-0.552,0-1,0.447-1,1S16.948,16,17.5,16z"/>\n' +
+                                    '\t<path d="M42.5,30h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,30,42.5,30z"/>\n' +
+                                    '\t<path d="M42.5,38h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,38,42.5,38z"/>\n' +
+                                    '\t<path d="M42.5,46h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,46,42.5,46z"/>\n' +
+                                    '\t<path d="M38.914,0H6.5v60h47V14.586L38.914,0z M39.5,3.414L50.086,14H39.5V3.414z M8.5,58V2h29v14h14v42H8.5z"/>\n' +
+                                    '</g>\n' +
+                                    '</svg>\n' +
+                                    '</span>' +
+                                    '<a href="#" style="font-size: 22px;\n' +
+                                    '    color: #777;">Юклаб олиш</a>'+
+                                    '</div>'
+                            }
+                        })
+                        document.getElementById('swf').innerHTML = swf
+                        document.getElementById('sdcf').innerHTML = sdcf
+                        document.getElementById('stcf').innerHTML = stcf
+
+
+                    }
+
+                })
+            }
+
+            function refreshRowTables(id) {
+                console.log('refreshRowTables == > ', id)
+                let obj = {sud_processes_id: id}
+                $('#tableDataPayments').datagrid('load', obj);
+                $('#tableDataFlows').datagrid('load', obj);
+                console.log('obj == > ', obj)
+            }
+
+            function check_data(val) {
+                if (val == null || val == undefined || val == NaN) {
+                    return ''
+                } else return val
+            }
+
+            function add_file() {
+                var row = $('#tableData').datagrid('getSelected');
+                if (row) {
+                    $('#frmWindowAddFile').dialog('open').dialog('setTitle', 'Файл бириктириш')
+                } else {
+                    $.messager.alert('CleanCity', 'Илтимос, аввал элементни танланг', 'error');
+                }
+            }
+
+            function decision_court() {
+                var row = $('#tableData').datagrid('getSelected');
+                if (row) {
+                    $('#frmWindowDecisionCourtFile').dialog('open').dialog('setTitle', 'Суд қарорини киритиш')
+                } else {
+                    $.messager.alert('CleanCity', 'Илтимос, аввал элементни танланг', 'error');
+                }
+            }
+
+            function send_to_court() {
+                var row = $('#tableData').datagrid('getSelected');
+                if (row) {
+                    $('#frmWindowSendToCourtFile').dialog('open').dialog('setTitle', 'Судга юбориш')
+                } else {
+                    $.messager.alert('CleanCity', 'Илтимос, аввал элементни танланг', 'error');
+                }
+            }
+
+            function getFiltrObject() {
+                var JsonObj = {};
+                if ($('#date1').datebox('getValue') !== '') {
+                    JsonObj['date1'] = $('#date1').datebox('getValue');
+                }
+                if ($('#date2').datebox('getValue') !== '' && isDateFormat($('#date2').datebox('getValue'))) {
+                    JsonObj['date2'] = $('#date2').datebox('getValue');
+                }
+                if ($('#from_debit').val() !== '') {
+                    JsonObj['from_debit'] = $('#from_debit').val();
+                }
+                if ($('#to_debit').val() !== '') {
+                    JsonObj['to_debit'] = $('#to_debit').val();
+                }
+                if ($('#searchBox').searchbox('getValue') !== '') {
+                    JsonObj[$('#searchBox').searchbox('getName')] = $('#searchBox').searchbox('getValue');
+                }
+                if ($('#par_user_status').combogrid('getValue') !== '') {
+                    JsonObj['status'] = $('#par_user_status').combogrid('getValue');
+                }
+                if ($('#par_companies_id').combogrid('getValue') !== '') {
+                    JsonObj['system_companies_id'] = $('#par_companies_id').combogrid('getValue');
+                } else {
+                    JsonObj['system_companies_id'] = '-1';
+                }
+                return JsonObj;
+            }
+
+
+            function clear_parameters() {
+                var curDate = new Date();
+
+                var currentDate = curDate.getDate() + "." + ((('' + (curDate.getMonth() + 1)).length == 2) ? (curDate.getMonth() + 1) : ('0' + (curDate.getMonth() + 1))) + "." + curDate.getFullYear();
+                $('#date2').datebox('setValue', currentDate);
+                $('#date1').datebox('setValue', ("01." + (curDate.getMonth() + 1 < 10 ? "0" : "") + (curDate.getMonth() + 1) + "." + curDate.getFullYear()));
+
+            }
+
+            function refreshTable() {
+                var filtr = getFiltrObject();
+                $('#tableData').datagrid('load', filtr);
+            }
+
+            function change_state() {
+                var row = $('#tableData').datagrid('getSelected');
+                if (row) {
+                    url_state = 'ds?xenc=xKgtbzJNdSCBEfBQfDrhF-LexkeYuFwHBjtWhEj_06j28PKgXkdWTyxD_Ipl9Feg1mpJIhICXKwQXjnX9oWmXXrMtDgVjjaS&id=' + row.id;
+                    $('#frmState').form('load', row);
+                    $('#frmWindowState').dialog('open').dialog('setTitle', 'Статусни ўзгартириш');
+                } else {
+                    $.messager.alert('CleanCity', 'Илтимос, аввал элементни танланг', 'error');
+                }
+            }
+
+            function save_file() {
+                var row = $('#tableData').datagrid('getSelected');
+                $('#frmAddFile').form('submit', {
+                    url: 'dsmmf?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMefUeqQwz7BNo5EHiI8xtZBZyEX74E9B6CzEEAPs1NVRLacn6QVZHe-vlmuP3lfVDA&resource_types_id=15&id=' + row.id,
+                    onSubmit: function () {
+                        return $(this).form('validate');
+                    },
+                    success: function (result_) {
+                        var result = eval('(' + result_ + ')');
+                        if (result.success) {
+                            $('#frmWindowAddFile').dialog('close');
+                            $('#tableData').datagrid('reload');
+                        } else {
+                            $.messager.alert('CleanCity', result.msg, 'error');
+                        }
+                    }
+                });
+            }
+
+            function save_desined_file() {
+                var row = $('#tableData').datagrid('getSelected');
+                $('#frmCourtFile').form('submit', {
+                    url: 'dsmmf?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMe68FNR3UX9bq3m28jDMC1vixD_Ipl9Feg1mpJIhICXKwQXjnX9oWmXXrMtDgVjjaS&id=' + row.id,
+                    onSubmit: function () {
+                        return $(this).form('validate');
+                    },
+                    success: function (result_) {
+                        var result = eval('(' + result_ + ')');
+                        if (result.success) {
+                            $('#frmWindowDecisionCourtFile').dialog('close');
+                            $('#tableData').datagrid('reload');
+                        } else {
+                            $.messager.alert('CleanCity', result.msg, 'error');
+                        }
+                    }
+                });
+            }
+
+            function save_send_to_court() {
+                var row = $('#tableData').datagrid('getSelected');
+                $('#frmSendToFile').form('submit', {
+                    url: 'dsmmf?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeSQwzBoV9J6JdMFW-xmm_OYyZOZ0Pu1AKh8K5rGXddmDltSJdH2yog9o73p3hAzAF&id=' + row.id,
+                    onSubmit: function () {
+                        return $(this).form('validate');
+                    },
+                    success: function (result_) {
+                        var result = eval('(' + result_ + ')');
+                        if (result.success) {
+                            $('#frmWindowSendToCourtFile').dialog('close');
+                            $('#tableData').datagrid('reload');
+                        } else {
+                            $.messager.alert('CleanCity', result.msg, 'error');
+                        }
+                    }
+                });
+            }
+
+            function download_file(id) {
+                $('#downloadFile').attr('src', '/rsview?id=' + id)
+            }
+
+            function isNumberKey(evt) {
+                var charCode = (evt.which) ? evt.which : event.keyCode;
+                if (charCode > 31 && (charCode < 48 || charCode > 57))
+                    return false;
+                return true;
+            }
+
+            function search(value, name) {
+                refreshTable();
+            }
+        </script>
+    
+
+            <script type="text/javascript" id="uz-furorprogress-cleancity-wicket-StaffHeaderPanel-0">
+                function changePassword() {
+                    $('#ChngPsw').form('clear');
+                    $('#frmWindowChngPsw').dialog('open');
+                }
+                function save_chng() {
+                    $('#ChngPsw').submit();
+                }
+//                function VersionHistoryOpen() {
+//                    $('#dlgVersionHistory').dialog('open');
+//                }
+//                function VersionHistoryOpen() {
+//                    $('#dlgVersionHistory').dialog('open');
+//                }
+
+                $(document).ready(function() {
+                    $('#tema-trigger').click(function() {
+                        $(this).next('#tema-content').slideToggle();
+                        $(this).toggleClass('active');
+
+                        if ($(this).hasClass('active'))
+                            $(this).find('span').html('&#x25BC;');
+                        else
+                            $(this).find('span').html('&#x25BC;');
+                    });
+//                    $.ajax({url: 'ds?DAO=VersionsDAO&ACTION=GETLISTALLFORHISTORY', contentType: "application/json",
+//                        dataType: "json", success: function(result) {
+//                            if (result.rows) {
+//                                for (i = 0; i < result.rows.length; i++) {
+//                                    var row = result.rows[i];
+//                                    var name = "<span class=\"version_name\">" + row.version_name + "</span>";
+//                                    var date = "<span class=\"version_date\">" + row.created_date + "</span>";
+//                                    var notif = "<span class=\"version_notif\">new</span>";
+//                                    if (row.is_new !== 1) {
+//                                        notif = "";
+//                                    }
+//                                    var content = "<pre class=\"version_content\">" + row.content_name + "</pre>";
+//
+//                                    $('#versions').append("<div class=\"version\"><p>" + name + date + notif + "</p>" + content + "</div>");
+//                                }
+//                            }
+//                        }});
+//
+
+
+
+
+                });
+                $(document).mouseup(function(e)
+                {
+                    var container = $("#tema-content");
+
+                    if (!container.is(e.target) // if the target of the click isn't the container...
+                            && container.has(e.target).length === 0) // ... nor a descendant of the container
+                    {
+                        container.hide();
+                        $('#tema').removeClass('green');
+                    }
+                });
+
+
+            </script>
+            <style id="uz-furorprogress-cleancity-wicket-StaffHeaderPanel-1">
+                .notif_lbl.notif_danger {
+                    background: #dd4b39;
+                }
+                .notif_lbl {
+                    position: absolute;
+                    font-size: 9px;
+                    top: -5px;
+                    right: 6px;
+                    background: #000;
+                    line-height: 0.9;
+                    padding: 2px 3px;
+                    border-radius: 2px;
+                }
+                .notif_lbl_version.notif_danger {
+                    background: #dd4b39;
+                }
+                .notif_lbl_version {
+                    position: absolute;
+                    font-size: 9px;
+                    top: -6px;
+                    right: 3px;
+                    background: #000;
+                    line-height: 0.9;
+                    padding: 2px 3px;
+                    border-radius: 5px;
+                }
+
+                #tema-trigger {
+                    border-radius: 3px 0 0 3px;
+                }
+
+                #tema-trigger:hover,
+                #tema .active,
+                #signup a:hover {
+                    color:#999999;
+                }
+                #tema-trigger
+                {
+                    display: inline-block;
+                    display: inline;
+                    zoom: 1;
+                    height: 25px;
+                    line-height: 25px;
+                    font-weight: bold;
+                    padding: 0 8px;
+                    text-decoration: none;
+                    color: #FFFFFF;
+
+                }
+                /*                #dlgVersionHistory{
+                                    display: none;
+                                }*/
+                .bubble-arrow {
+                    border-color: transparent transparent #22282b transparent;
+                    border-style: solid;
+                    border-width: 10px;
+                    height:0;
+                    left: 10%;
+                    top: -8px;
+                    margin: -12px 0 0;
+                    overflow: hidden;
+                    position: absolute;
+                    width:0;
+                }
+                .additioal-class{
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) inset, 0 1px 0 rgba(255, 255, 255, .2);
+                    background: -webkit-gradient(linear, left top, left bottom, color-stop(1,rgba(17, 22, 24, .5)), color-stop(0, rgba(35, 39, 41, .5)));
+                    border-radius: 3px;
+                    color: lightgray;
+                }
+                .additioal-class:hover{
+                    border-radius: 3px;
+                }
+                .version{
+                    padding:5px 20px;
+                    margin:30px;
+                    border-left:3px solid #87CEFA;
+                }
+                .version:hover{
+                    border-left:3px solid #c07cd3;
+                }
+                .version_name{
+                    color: #00BFFF; 
+                    font-size: 17px; 
+                    margin-right: 3px;
+                    cursor:pointer;
+                }
+                .version_date{
+                    color: #20B2AA;
+                }
+                .version_notif{
+                    padding:2px 3px;
+                    border-radius:5px;
+                    background-color:#ADD8E6; 
+                    color: white;
+                    margin-left: 10px;
+                }
+                .version_content{
+                    font-family:'Verdana' !important;
+                    line-height: 0.8 !important;
+                    font-size:12px !important;
+                    padding: 0 10px !important;
+                    text-align: justify !important;
+                }
+
+                .user > div {
+                    display: block;
+                    text-align: left;
+                    line-height: 25px;
+                    font-size: 16px;
+                    margin-bottom: 15px;
+                }
+
+                .user > div > label {
+                    color: #777;
+                    display: block;
+                    text-align: left;
+                    line-height: 20px;
+                    font-size: 12px;
+                }
+
+                .user > div > i {
+                    float: left !important;
+                    margin-right: 5px;
+                    width: 15px;
+                    text-align: center;
+                    line-height: 25px;
+                }
+
+                .user span {
+                    display: block;
+                    border-bottom: 1px solid #ddd;
+                    margin-left: 25px;
+                }
+
+                .user-footer {
+                    display: block;
+                    background: #fbfbfb;
+                    border-top: 1px solid #eee;
+                    height: 60px;
+                    padding: 15px;
+                }
+                .user-footer a {
+                    line-height: normal;
+                    display: inline-block;
+                    border: 1px solid #ccc;
+                    background: #eee;
+                    color: #777;
+                    text-align: center;
+                    border-radius: 3px;
+                    font-size: 12px;
+                }
+                a.exit {
+                    float: right;
+                    padding: 5px 10px;
+                }
+                a.change-pass {
+                    float: left;
+                    margin: 0;
+                    padding: 5px 10px;
+                }
+                .profil:hover {
+                    background: #235784;
+                }
+
+            </style>
+            <style id="uz-furorprogress-cleancity-wicket-StaffHeaderPanel-2">
+                .marquee {
+                    margin: 0 auto;
+                    width: 1415px; 
+                    height: 30px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    box-sizing: border-box;
+                    position: relative;
+                    border-right: 4mm ridge rgb(191, 236, 140);
+                    border-left: 4mm ridge rgb(191, 236, 140);
+
+                    &:before, &:after {
+                        position: absolute;
+                    top: 0;
+                    width: 50px;
+                    height: 30px;
+                    content: "";
+                    z-index: 1;
+                }
+                &:before {
+                    left: 0;
+                    background: linear-gradient(to right, white 5%, transparent 100%);
+                }
+                &:after {
+                    right: 0;
+                    background: linear-gradient(to left, white 5%, transparent 100%);
+                }
+                }
+
+                .marquee__content {
+                    width: 300% !important;
+                    display: flex;
+                    line-height: 30px;
+                    animation: marquee 80s linear infinite forwards;
+                }
+
+                .marquee__content:hover {
+                    animation-play-state: paused;
+                    cursor: auto;
+                } 
+
+                .list-inline {
+                    display: flex;
+                    justify-content: space-around;
+                    width: 51.33%;
+
+                    /* reset list */
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    margin-left: 1000px;
+                }
+                @keyframes marquee {
+                    0% { transform: translateX(0); }
+                100% { transform: translateX(-66.6%); }
+                }
+            </style>
+        
+        <style id="uz-furorprogress-cleancity-wicket-StaffBottomHeader-0">
+            #abonent_requests {
+                color: white !important;
+                background: #ff0000;
+                border-radius: 50%;
+                margin-left: 5px;
+                padding: 0 4px;
+
+            }
+
+            #new_functions {
+                color: white !important;
+                background: #e68f59;
+                border-radius: 50%;
+                margin-left: 5px;
+                padding: 0 4px;
+
+            }
+
+            #warned_acts {
+                color: white !important;
+                background: #ff0000;
+                border-radius: 50%;
+                margin-left: 5px;
+                padding: 0 4px;
+            }
+
+            .custom_dispay_flex__sb_34 {
+                display: flex;
+            }
+
+            .custom_main_menu_fg_{
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .custom_main_menu_fg__ {
+                display: flex;
+                align-items: center;
+                overflow-x: auto;
+                overflow-y: visible;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+            }
+
+            .custom_main_menu_fg___inner {
+                width: fit-content;
+                word-break: keep-all;
+                flex-shrink: 0;
+                min-width: 100px;
+            }
+
+
+        </style>
+        
+            <script type="text/javascript">var const_interval="3000";var audio=new Audio("assets/sound/notify.mp3");$(function(){$("#toCardbutton").linkbutton("disable");$("#tableDataAbListBP").datagrid();});</script>
+            <script type="text/javascript">
+                function search_abonentBP() {
+                    var filtr_is_empty = true;
+                    $(function () {
+                        initAboGrid();
+                        initOrgGrid();
+                        $('#SearchTab').tabs('select', 0);
+                        $('#abo_fio').validatebox('readonly', true);
+
+                        $('#abo_mahallas_id').combogrid({
+                            panelWidth: 350,
+                            name: 'mahalla_id',
+                            idField: 'id',
+                            textField: 'name',
+                            url: 'ds?DAO=MahallasDAO&ACTION=GETLISTALL',
+                            editable: true,
+                            fitColumns: true,
+                            columns: [[
+                                {field: 'id', title: 'ID', width: 40, sortable: true},
+                                {field: 'name', title: 'Номи', width: 150, align: 'left'}
+
+                            ]],
+                            onSelect: function (rowIndex, rowData) {
+                                var g = $('#abo_streets_id').combogrid('grid');
+                                $('#abo_streets_id').combogrid('clear');
+                                g.datagrid('load', {mahallas_id: rowData.id});
+                                $('#abo_streets_id').combogrid('enable');
+                                $('#abo_fio').validatebox('readonly', false);
+                            }
+                        });
+                        $('#abo_streets_id').combogrid({
+                            panelWidth: 350,
+                            name: 'streets_id',
+                            idField: 'id',
+                            textField: 'name',
+                            url: 'ds?DAO=StreetsDAO&ACTION=GETLISTALL',
+                            editable: true,
+                            queryParams: {mahallas_id: -1},
+                            fitColumns: true,
+                            columns: [[
+                                {field: 'id', title: 'ID', width: 40, sortable: true},
+                                {field: 'name', title: 'Номи', width: 150, align: 'left'}
+                            ]]
+                        });
+
+                        $('#org_mahallas_id').combogrid({
+                            panelWidth: 350,
+                            name: 'mahalla_id',
+                            idField: 'id',
+                            textField: 'name',
+                            url: 'ds?DAO=MahallasDAO&ACTION=GETLISTALL',
+                            editable: true,
+                            fitColumns: true,
+                            columns: [[
+                                {field: 'id', title: 'ID', width: 40, sortable: true},
+                                {field: 'name', title: 'Номи', width: 150, sortable: true, align: 'left'}
+
+                            ]],
+                            onSelect: function (rowIndex, rowData) {
+                                var g = $('#org_streets_id').combogrid('grid');
+                                $('#org_streets_id').combogrid('clear');
+                                g.datagrid('load', {mahallas_id: rowData.id});
+                                $('#org_streets_id').combogrid('enable');
+                            }
+                        });
+                        $('#org_streets_id').combogrid({
+                            panelWidth: 350,
+                            name: 'streets_id',
+                            idField: 'id',
+                            textField: 'name',
+                            url: 'ds?DAO=StreetsDAO&ACTION=GETLISTALL',
+                            editable: true,
+                            queryParams: {mahallas_id: -1},
+                            fitColumns: true,
+                            columns: [[
+                                {field: 'id', title: 'ID', width: 40, sortable: true},
+                                {field: 'name', title: 'Номи', width: 150, sortable: true, align: 'left'}
+                            ]]
+                        });
+                        $('#abo_companies_id').combogrid({
+                            panelWidth: 380,
+                            panelHeight: 120,
+                            name: 'companies_id',
+                            idField: 'id',
+                            textField: 'name',
+                            sortName: 'id',
+                            sortOrder: 'asc',
+                            url: 'ds?xenc=xKgtbzJNdSAaHLbCDDrO3yeX_LMaiBpgQ_h5uJkXTT4PwRqauYakn56tyx8e3OtqKEH9aRolQ92MmTmdD7tQCofCuaxl3XZg5bUiXR9sqIMdzl3FsUvB1Q==',
+                            editable: true,
+                            fitColumns: true,
+                            mode: 'remote',
+                            disable: true,
+                            columns: [[
+                                {field: 'id', title: 'ID', width: 50, sortable: true, fixed: true},
+                                {field: 'name', title: 'Номи', width: 100, sortable: true},
+                                {field: 'licshet_fomat', title: 'Litsovoy format', width: 100, hidden: true}
+                            ]],
+                            onSelect: function (rowIndex, rowData) {
+                                var g = $('#abo_mahallas_id').combogrid('grid');
+                                $('#abo_mahallas_id').combogrid('clear');
+                                g.datagrid('load', {
+                                    system_companies_id: rowData.id,
+                                    mes: rowData.mes,
+                                    god: rowData.god
+                                });
+                                $('#abo_mahallas_id').combogrid('enable');
+
+                            }, onLoadSuccess: function (data) {
+                                if (data.total) {
+                                    if (data.total === 1) {
+                                        $('#abo_companies_id').combogrid('setValue', {id: data.rows[0].id});
+
+                                        var g = $('#abo_mahallas_id').combogrid('grid');
+                                        $('#abo_mahallas_id').combogrid('clear');
+                                        g.datagrid('load', {
+                                            system_companies_id: data.rows[0].id,
+                                            mes: data.rows[0].mes,
+                                            god: data.rows[0].god
+                                        });
+                                        $('#abo_mahallas_id').combogrid('enable');
+                                        var g = $('#org_mahallas_id').combogrid('grid');
+                                        $('#org_mahallas_id').combogrid('clear');
+                                        g.datagrid('load', {
+                                            system_companies_id: data.rows[0].id,
+                                            mes: data.rows[0].mes,
+                                            god: data.rows[0].god
+                                        });
+                                        $('#org_mahallas_id').combogrid('enable');
+
+                                    }
+                                }
+                            }
+                        });
+
+                    });
+                    clear_parametrsBP();
+                    $('#frmWindowSearchBP').dialog('open').dialog('setTitle', 'Абонентни излаш');
+                    $('#frmSearchAbo').form('clear');
+                    $('#frmSearchOrg').form('clear');
+                    $('#abo_licshet').focus();
+                    $('#org_licshet').focus();
+                }
+
+                function getFiltrObject_(param) {
+                    if (param === 1) {
+                        var JsonObj = {};
+                        return JsonObj;
+                    } else {
+                        var JsonObj = {};
+                        JsonObj['id'] = -1;
+                        return JsonObj;
+                    }
+
+                }
+
+                function initAboGrid() {
+                    var getDataGridRowCountBP;
+                    $('#tableDataAbListBP').datagrid({
+                        nowrap: true,
+                        striped: true,
+                        collapsible: false,
+                        fit: true,
+                        pagination: true,
+                        pageSize: 20,
+                        rownumbers: true,
+                        url: 'ds?xenc=fE4fu0_fbQKjeAULCOK9GzLG_WjClktRTnnNubvF-GssQ_yKZfRXoFivPb3EzQMCbg3lKz9WwmKG7WR6eQBh1w==',
+                        queryParams: {id: -1},
+                        sortName: 'licshet',
+                        sortOrder: 'asc',
+                        remoteSort: true,
+                        fitColumns: false,
+                        singleSelect: true,
+                        editIndex: -1,
+                        idField: 'id',
+                        columns: [[
+                            {field: 'id', title: 'ID', width: 60, fixed: true},
+                            {field: 'osv_id', title: 'ОСВ ID', hidden: true},
+                            {field: 'companies_id', title: 'ОСВ ID', hidden: true},
+                            {field: 'licshet', title: 'Лицевой', width: 100, sortable: true, align: 'left'},
+                            {field: 'fio', title: 'ФИО', width: 100, align: 'left'},
+                            {
+                                field: 'mahalla_name',
+                                title: 'Махалла',
+                                width: 100,
+                                sortable: false,
+                                align: 'left'
+                            },
+                            {
+                                field: 'streets_name',
+                                title: 'Кўча',
+                                width: 80,
+                                sortable: false,
+                                align: 'left'
+                            },
+                            {field: 'house', title: 'Уй', width: 30, sortable: false, align: 'left'},
+                            {field: 'flat', title: 'Кв', width: 30, sortable: false, align: 'left'},
+                            {field: 'ind', title: 'Индекс', width: 30, sortable: false, align: 'left'}
+                        ]],
+                        //                            toolbar: '#toolbarTableDataAbList',
+//                            rowStyler: function(index, row) {
+//                                if (row.enddate !== null) {
+//                                    return 'color:blue;font-weight:bold;';
+//                                }
+//                            },
+                        onLoadError: function () {
+                            $.messager.alert('Хатолик', 'HTTP хатолик', 'error');
+                        },
+                        onLoadSuccess: function (data) {
+                            if (data.total) {
+                                if (data.total === '-1') {
+                                    $.messager.alert('Хатолик', data.msg, 'error');
+                                }
+                                getDataGridRowCountBP = data.total;
+                            }
+                        },
+                        onSelect: function (rowIndex, rowData) {
+                            $('#toCardbutton').linkbutton('enable');
+                        },
+                        onDblClickRow: function (rowIndex, rowData) {
+                            var row = rowData;
+                            if (row.osv_id !== null) {
+                                $('#to_card_abo #id_abo').val(row.id);
+                                $('#to_card_abo #id_companies').val(row.companies_id);
+                                to_Card_Abo();
+                            } else {
+                                $.messager.show({title: 'Хатолик', msg: 'Ушбу абонент жорий даврда мавжуд эмас'});
+                            }
+                            $('#dlg-ab-listBP').dialog('close');
+                        }
+                    });
+
+
+                    var datagridloadBP = $('#tableDataAbListBP').datagrid().datagrid('getPanel').attr('tabindex', 0);
+                    datagridloadBP.bind('keydown', function (e) {
+                        switch (e.keyCode) {
+                            case 38:
+                                var dgBP = $('#tableDataAbListBP');
+                                var row = dgBP.datagrid('getSelected');
+                                if (row) {
+                                    var index = dgBP.datagrid('getRowIndex', row) - 1;
+                                    if (index >= 0) {
+                                        dgBP.datagrid('selectRow', index);
+                                    }
+                                } else {
+                                    var count = dgBP.datagrid('getRows').length;
+                                    if (count > 0) {
+                                        dgBP.datagrid('selectRow', count - 1);
+                                    }
+                                }
+                                break;
+                            case 40:
+
+                                var dgBP = $('#tableDataAbListBP');
+                                var row = dgBP.datagrid('getSelected');
+                                if (row) {
+                                    var index = dgBP.datagrid('getRowIndex', row) + 1;
+                                    if (index < getDataGridRowCountBP) {
+                                        dgBP.datagrid('selectRow', index);
+                                    }
+                                } else {
+                                    dgBP.datagrid('selectRow', getDataGridRowCountBP - 1);
+                                }
+                                break;
+                            case 13:
+                                var dgBP = $('#tableDataAbListBP');
+                                var row = dgBP.datagrid('getSelected');
+                                if (row.osv_id !== null) {
+                                    $('#id_abo').val(row.id);
+                                    $('#abo_licshet').val(row.licshet);
+                                    $('#old_abo_licshet').val(row.old_licshet);
+                                    $('#abo_abonents_id').val(row.id);
+                                    $('#abo_fio').val(row.fio);
+                                    $('#abo_mahallas_id').combogrid('setValue', row.mahalla_name);
+                                    $('#abo_streets_id').val(row.streets_name);
+                                    $('#abo_flat').val(row.flat);
+                                    $('#abo_house').val(row.house);
+                                    $('#abo_ind').val(row.ind);
+                                    $('#abo_inn').val(row.inn);
+                                    $('#osv_id').val(row.osv_id);
+                                }
+                                $('#dlg-ab-listBP').dialog('close');
+                                break;
+                        }
+                    });
+
+                    datagridloadBP.focus();
+
+                }
+
+                function initOrgGrid() {
+                    var getDataGridRowCountBP;
+                    $('#tableDataOrgListBP').datagrid({
+                        nowrap: true,
+                        striped: true,
+                        collapsible: false,
+                        fit: true,
+                        pagination: true,
+                        pageSize: 20,
+                        rownumbers: true,
+                        url: 'ds?xenc=tmRIpWRsZP0DrIYaBJTSNOLexkeYuFwHT8dYMc6ke2cdAMGklas3hr8Ve3taXqhiqd1zndyuQki9KTmxjQLhzOl_QJo794z5',
+                        queryParams: {id: -1},
+                        sortName: 'licshet',
+                        sortOrder: 'asc',
+                        remoteSort: true,
+                        fitColumns: false,
+                        singleSelect: true,
+                        editIndex: -1,
+                        idField: 'id',
+                        columns: [[
+                            {field: 'id', title: 'ID', width: 60, fixed: true},
+                            {field: 'org_osv_id', title: 'ОСВ ID', hidden: true},
+                            {field: 'licshet', title: 'Лицевой', width: 100, sortable: true, align: 'left'},
+                            {field: 'name', title: 'Номи', width: 100, align: 'left'},
+                            {
+                                field: 'mahalla_name',
+                                title: 'Махалла',
+                                width: 80,
+                                sortable: false,
+                                align: 'left'
+                            },
+                            {
+                                field: 'streets_name',
+                                title: 'Кўча',
+                                width: 80,
+                                sortable: false,
+                                align: 'left'
+                            },
+                            {field: 'house', title: 'Уй', width: 30, sortable: false, align: 'left'},
+                            {field: 'flat', title: 'Кв', width: 30, sortable: false, align: 'left'},
+                            {field: 'ind', title: 'Индекс', width: 30, sortable: false, align: 'left'}
+                        ]],
+                        //                            toolbar: '#toolbarTableDataAbList',
+//                            rowStyler: function(index, row) {
+//                                if (row.enddate !== null) {
+//                                    return 'color:blue;font-weight:bold;';
+//                                }
+//                            },
+                        onLoadError: function () {
+                            $.messager.alert('Хатолик', 'HTTP хатолик', 'error');
+                        },
+                        onLoadSuccess: function (data) {
+                            if (data.total) {
+                                if (data.total === '-1') {
+                                    $.messager.alert('Хатолик', data.msg, 'error');
+                                }
+                                getDataGridRowCountBP = data.total;
+                            }
+                        },
+                        onSelect: function (rowIndex, rowData) {
+                            $('#toCardbutton').linkbutton('enable');
+                        },
+                        onDblClickRow: function (rowIndex, rowData) {
+                            var row = rowData;
+                            if (row.org_osv_id !== null) {
+
+                                $('#to_card_org #id_org').val(row.id);
+                                to_Card_Org();
+                            } else {
+                                $.messager.show({title: 'Хатолик', msg: 'Ушбу абонент жорий даврда мавжуд эмас'});
+                            }
+                            $('#dlg-org-listBP').dialog('close');
+                        }
+                    });
+
+
+                    var datagridloadBP = $('#tableDataOrgListBP').datagrid().datagrid('getPanel').attr('tabindex', 0);
+                    datagridloadBP.bind('keydown', function (e) {
+                        switch (e.keyCode) {
+                            case 38:
+                                var dgBP = $('#tableDataOrgListBP');
+                                var row = dgBP.datagrid('getSelected');
+                                if (row) {
+                                    var index = dgBP.datagrid('getRowIndex', row) - 1;
+                                    if (index >= 0) {
+                                        dgBP.datagrid('selectRow', index);
+                                    }
+                                } else {
+                                    var count = dgBP.datagrid('getRows').length;
+                                    if (count > 0) {
+                                        dgBP.datagrid('selectRow', count - 1);
+                                    }
+                                }
+                                break;
+                            case 40:
+
+                                var dgBP = $('#tableDataOrgListBP');
+                                var row = dgBP.datagrid('getSelected');
+                                if (row) {
+                                    var index = dgBP.datagrid('getRowIndex', row) + 1;
+                                    if (index < getDataGridRowCountBP) {
+                                        dgBP.datagrid('selectRow', index);
+                                    }
+                                } else {
+                                    dgBP.datagrid('selectRow', getDataGridRowCountBP - 1);
+                                }
+                                break;
+                            case 13:
+                                var dgBP = $('#tableDataOrgListBP');
+                                var row = dgBP.datagrid('getSelected');
+                                if (row.org_osv_id !== null) {
+                                    $('#org_id').val(row.id);
+                                    $('#org_licshet').val(row.licshet);
+                                    $('#org_organizations_id').val(row.id);
+                                    $('#org_name').val(row.name);
+                                    $('#org_mahallas_id').combogrid('setValue', row.mahalla_name);
+                                    $('#org_streets_id').val(row.streets_name);
+                                    $('#org_flat').val(row.flat);
+                                    $('#org_house').val(row.house);
+                                    $('#org_ind').val(row.ind);
+                                    $('#org_inn').val(row.inn);
+                                }
+                                $('#dlg-org-listBP').dialog('close');
+                                break;
+                        }
+                    });
+
+                    datagridloadBP.focus();
+
+                }
+
+
+                function getAboSearchParams() {
+
+                    var JsonObj = {};
+
+                    if ($('#abo_companies_id').combogrid('getValue') !== '') {
+                        JsonObj['companies_id'] = $('#abo_companies_id').combogrid('getValue');
+                    }
+                    if ($('#abo_abonents_id').val() !== '') {
+                        JsonObj['abonents_id'] = $('#abo_abonents_id').val();
+                    }
+                    if ($('#abo_fio').val() !== '') {
+                        JsonObj['fio'] = $('#abo_fio').val();
+                    }
+                    if ($('#abo_licshet').val() !== '') {
+                        JsonObj['licshet'] = $('#abo_licshet').val();
+                    }
+                    if ($('#old_abo_licshet').val() !== '') {
+                        JsonObj['old_licshet'] = $('#old_abo_licshet').val();
+                    }
+                    if ($('#abo_mahallas_id').combogrid('getValue') !== '') {
+                        JsonObj['mahallas_id'] = $('#abo_mahallas_id').combogrid('getValue');
+                    }
+                    if ($('#abo_streets_id').combogrid('getValue') !== '') {
+                        JsonObj['streets_id'] = $('#abo_streets_id').combogrid('getValue');
+                    }
+                    if ($('#abo_flat').val() !== '') {
+                        JsonObj['flat'] = $('#abo_flat').val();
+                        filtr_is_empty = false;
+                        if ($('#par_flat_exact').is(':checked')) {
+                            JsonObj['flat_exact'] = $('#par_flat_exact').val();
+                        }
+                    }
+                    if ($('#abo_house').val() !== '') {
+                        JsonObj['house'] = $('#abo_house').val();
+                        filtr_is_empty = false;
+                        if ($('#par_house_exact').is(':checked')) {
+                            JsonObj['house_exact'] = $('#par_house_exact').val();
+                        }
+                    }
+                    if ($('#abo_ind').val() !== '') {
+                        JsonObj['ind'] = $('#abo_ind').val();
+                    }
+                    if ($('#abo_inn').val() !== '') {
+                        JsonObj['inn'] = $('#abo_inn').val();
+                    }
+                    JsonObj['module_name'] = 'StaffBottomHeader';
+                    JsonObj['page'] = 1;
+                    JsonObj['rows'] = 2;
+
+                    return JsonObj;
+                }
+
+                function getOrgSearchParams() {
+
+                    var JsonObj = {};
+
+                    if ($('#org_organization_id').val() !== '') {
+                        JsonObj['organization_id'] = $('#org_organization_id').val();
+                    }
+                    if ($('#org_name').val() !== '') {
+                        JsonObj['name'] = $('#org_name').val();
+                    }
+                    if ($('#org_licshet').val() !== '') {
+                        JsonObj['licshet'] = $('#org_licshet').val();
+                    }
+                    if ($('#org_mahallas_id').combogrid('getValue') !== '') {
+                        JsonObj['mahallas_id'] = $('#org_mahallas_id').combogrid('getValue');
+                    }
+                    if ($('#org_streets_id').combogrid('getValue') !== '') {
+                        JsonObj['streets_id'] = $('#org_streets_id').combogrid('getValue');
+                    }
+                    if ($('#org_flat').val() !== '') {
+                        JsonObj['flat'] = $('#org_flat').val();
+                    }
+                    if ($('#org_house').val() !== '') {
+                        JsonObj['house'] = $('#org_house').val();
+                    }
+                    if ($('#org_ind').val() !== '') {
+                        JsonObj['ind'] = $('#org_ind').val();
+                    }
+                    if ($('#org_inn').val() !== '') {
+                        JsonObj['inn'] = $('#org_inn').val();
+                    }
+                    return JsonObj;
+                }
+
+                function find_abonentBP() {
+
+                    if (JSON.stringify(getAboSearchParams()) !== '{}') {
+
+                        $.messager.progress({title: 'FurorProgress', msg: 'Бажарилмоқда...Илтимос кутинг'});
+                        $.post('ds?DAO=AbonentsDAO&ACTION=GETLISTALLABONENTS', getAboSearchParams(), function (result) {
+                            $.messager.progress('close');
+                            if (result.total === 1) {
+                                if (result.rows[0].id !== null) {
+                                    $('#to_card_abo #id_abo').val(result.rows[0].id);
+                                    $('#to_card_abo #id_companies').val(result.rows[0].companies_id);
+
+                                    to_Card_Abo();
+                                    $('#frmWindowSearchBP').dialog('close');
+                                } else {
+                                    $.messager.show({title: 'Хатолик', msg: 'Ушбу абонент жорий даврда мавжуд эмас'});
+                                }
+                            } else if (result.total > 1) {
+                                $('#tableDataAbListBP').datagrid('load', getAboSearchParams());
+                                $('#dlg-ab-listBP').dialog('open').dialog('setTitle', 'Aбонентлар');
+                                $('#frmWindowSearchBP').dialog('close');
+                            } else if (result.total === 0) {
+                                $.messager.show({title: 'Хатолик', msg: 'Абонент аниқланмади'});
+                            }
+                        }, 'json');
+                    } else {
+                        $.messager.progress('close');
+                        $.messager.show({title: 'Хатолик', msg: 'Бўш параметрлар'});
+                    }
+                }
+
+                function find_organizationBP() {
+
+                    if (JSON.stringify(getOrgSearchParams()) !== '{}') {
+
+                        $.messager.progress({title: 'FurorProgress', msg: 'Бажарилмоқда...Илтимос кутинг'});
+                        $.post('ds?DAO=OrganizationsDAO&ACTION=GETLISTALL', getOrgSearchParams(), function (result) {
+                            $.messager.progress('close');
+                            if (result.total === 1) {
+                                if (result.rows[0].id !== null) {
+                                    $('#to_card_org #id_org').val(result.rows[0].id);
+
+                                    to_Card_Org();
+                                    $('#frmWindowSearchBP').dialog('close');
+                                } else {
+                                    $.messager.show({title: 'Хатолик', msg: 'Ушбу абонент жорий даврда мавжуд эмас'});
+                                }
+                            } else if (result.total > 1) {
+                                $('#tableDataOrgListBP').datagrid('load', getOrgSearchParams());
+                                $('#dlg-org-listBP').dialog('open').dialog('setTitle', 'Aбонентлар');
+                                $('#frmWindowSearchBP').dialog('close');
+                            } else if (result.total === 0) {
+                                $.messager.show({title: 'Хатолик', msg: 'Ташкилот топилмади'});
+                            }
+                        }, 'json');
+                    } else {
+                        $.messager.progress('close');
+                        $.messager.show({title: 'Хатолик', msg: 'Бўш параметрлар'});
+                    }
+                }
+
+                function to_Card_Abo() {
+                    $('#to_card_abo').submit();
+                }
+
+                function to_Card_Org() {
+                    $('#to_card_org').submit();
+                }
+
+
+                function clear_parametrsBP() {
+                    $('#abonents_id_abo').val('');
+                    $('#abo_abonents_id').val('');
+                    $('#abo_fio').val('');
+                    $('#abo_licshet').val('');
+                    $('#old_abo_licshet').val('');
+                    $('#abo_flat').val('');
+                    $('#abo_house').val('');
+                    $('#abo_ind').val('');
+                    $('#abo_streets_id').val('');
+                    $('#abo_mahallas_id').combogrid('setValue', '');
+                }
+
+                function To_abonentCard() {
+                    var row = $('#tableDataAbListBP').datagrid('getSelected');
+                    if (row) {
+                        $('#to_card_abo #id_abo').val(row.id);
+                        $('#to_card_abo #id_companies').val(row.companies_id);
+                        to_Card_Abo();
+                    } else {
+                        $.messager.alert('CleanCity', 'Илтимос, аввал элементни танланг', 'error');
+                    }
+                    $('#dlg-ab-listBP').dialog('close');
+                }
+
+                function To_organizationCard() {
+                    var row = $('#tableDataOrgListBP').datagrid('getSelected');
+                    if (row) {
+                        $('#to_card_org #id_org').val(row.id);
+                        to_Card_Org();
+                    } else {
+                        $.messager.alert('CleanCity', 'Илтимос, аввал элементни танланг', 'error');
+                    }
+                    $('#dlg-org-listBP').dialog('close');
+                }
+
+                function find_BP() {
+                    var tab = $('#SearchTab').tabs('getSelected');
+                    var index = $('#SearchTab').tabs('getTabIndex', tab);
+                    if (index === 0) {
+                        find_abonentBP();
+                    } else {
+                        find_organizationBP();
+                    }
+                }
+
+                function getStatFirst() {
+                    getStat(function (res) {
+                        $('#abonent_requests').html(res);
+                    });
+                }
+
+
+                function checkStat() {
+
+                    if ($('#abonent_requests').length == 0)
+                        return;
+
+                    getStat(function (result) {
+                        if (result != $('#abonent_requests').html()) {
+                            audio.play();
+                        }
+                        $('#abonent_requests').html(result);
+
+                    });
+                }
+
+                function getStat(callback) {
+
+                    $.get('ds?xenc=fE4fu0_fbQIprXcHi4NHJsgPmcXq2KuhBa5u9IbVGK-_wOLJ05axUZq2gKlPs3h7LEP8imX0V6DWakkiEgJcrBBeOdf2haZdslJwjH46E_Q=&not_resolved=1', function (result_) {
+                        var result = eval('(' + result_ + ')');
+                        if ((result && result.total != -2 && result.total != -1) || result == 0) {
+                            callback(result);
+
+                            if (result == 0) {
+                                $('#abonent_requests_btn').removeClass("warning-alert")
+                            } else if (!$('#abonent_requests').hasClass("warning-alert")) {
+                                $('#abonent_requests_btn').addClass("warning-alert");
+                            }
+                        }
+                    })
+                }
+
+                function getWarnedActs(callback) {
+                    $.get('ds?xenc=Z31Qj75w-6Z_brILYFHKMDDsDsQJwJeW5U3fRKkRDJ6GPuLCbZAAejJcNSwgrywqI5qwslawvuCPU2Yo1RipzKv-MzDFys1N&not_resolved=1', function (result_) {
+                        var result = eval('(' + result_ + ')');
+                        if ((result && result.total != -2 && result.total != -1) || result == 0) {
+                            callback(result);
+
+                            if (result == 0) {
+                                $('#warned_acts_btn').removeClass("warning-alert")
+                            } else if (!$('#warned_acts_btn').hasClass("warning-alert")) {
+                                $('#warned_acts_btn').addClass("warning-alert");
+                            }
+                        }
+                    })
+                }
+
+                function getNews(callback) {
+
+                    $.get('ds?xenc=TErGUgPMQCfnF3TiBxWrcQWubvSG1RivaUGvuiiqAEs_FN3jDz4GqjhYFx9PLCzunJMocmJFXVtVfugmbJMwXD0AmcEd5BTPXg34WStsIyE=&status=1&functions_type_id=2', function (result_) {
+                        var result = eval('(' + result_ + ')');
+                        if ((result && result.total != -2 && result.total != -1) || result == 0) {
+                            callback(result);
+
+
+                        }
+                    })
+                }
+
+
+                $(document).ready(function () {
+                    if ($('#abonent_requests').length != 0) {
+                        getStatFirst();
+                        if (parseInt(const_interval))
+                            setInterval(checkStat, const_interval * 1000);
+                    }
+                });
+
+
+                $(document).ready(function () {
+                    if ($('#new_functions').length != 0) {
+                        getNews(function (res) {
+                            $('#new_functions').html(res);
+                        });
+                    }
+                });
+
+                $(document).ready(function () {
+                    debugger;
+                    if ($('#warned_acts').length != 0) {
+                        getWarnedActs(function (res) {
+                            $('#warned_acts').html(res);
+                        });
+                    }
+                });
+            </script>
+        
+    </head>
+    <body>
+    <div class="page-loader"><div class="inner-l"><span></span><span></span><span></span></div></div>
+    <div id="ajax_loading" class="loading-bar"></div>
+
+    <div class="easyui-layout" fit="true">
+            <div region="north" style="height:80px" id="id70">
+                <!--<div class="demo_ver" wicket:id="is_demo"></div>-->
+                
+            <div class="top-bar main-bg">
+                <div>
+
+                    <!--<div class="f-left"><img alt="" src="assets/images/logo-light.png" class="logo-light"/></div>-->
+
+                    <ul class="top-info f-left">
+                        <!--<li><a href="#" class="shape"><i class="fa fa-user"></i><span wicket:id="user_name"></span></a></li>-->
+                        <!--<li><span><i class="fa fa-tag"></i> <span wicket:id="user_type"></span></span></li>-->
+                        <!--<li><span><i class="fa fa-tag"></i> <span wicket:id="user_role"></span></span></li>-->
+                        <li><span><i class="fa fa-building-o"></i> <span>Компания: &quot;ANVARJON BIZNES INVEST&quot; MCHJ</span></span></li>
+                        <li><span><i class="fa fa-calendar-check-o"></i> <span>Жорий давр: 03.2024</span></span></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                    </ul>
+
+                    <ul class="f-right">
+                        <li style="margin-top: 7px; font-size: 14px;">
+                            
+                        </li>
+                        <li style="margin-top: 7px; font-size: 14px;">
+                            
+                        </li>
+                        <!--                        <li style="margin-top: 7px; font-size: 14px;">
+                                                    <a href="#" title="version_history" wicket:message="title:version_history" wicket:id="version_history" onclick="VersionHistoryOpen()"  >
+                                                        <i class="fa fa-history"></i>
+                                                        <span class="notif_lbl_version notif_danger" wicket:id="new_version"></span>
+                                                    </a>
+                                                </li>-->
+                        <!--                        <li class="notif_news">
+                                                    <a href="#" wicket:id ="notif_news">
+                                                        <i class="fa fa-newspaper-o" ></i>
+                                                        <div>
+                                                            <span wicket:id="not_readed_pubs">0</span>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                <li class="notif_confilict">
+                                                    <a href="#" wicket:id ="notif_confilicts">
+                                                        <i class="fa fa-bell-o" ></i>
+                                                        <div wicket:id="rounded_number">
+                                                            <span wicket:id="not_readed_label">0</span>
+                                                        </div>
+                                                    </a>
+                                                </li>-->
+                        <li class="language">
+                            <!--raleway-menu-->
+                            <a href="#" class="easyui-menubutton additioal-class" data-options="menu:'#mm2'">
+                                <div style="float: left; width: 13px;height: 13px; border-radius: 50%; margin: 5px 5px; background-color: #6a9835"></div>
+                                <!--<div style="float: left;margin: 12% 5px;width: 27%" wicket:id="cur_theme_img"></div>-->
+                                Teмa
+                            </a>
+                            <div id="mm2" style="width:130px;" class="raleway-menu-menu">
+                                <div>
+                                    <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-48*hVpcaIuiPe0*ZOw31YBvSh2z8YhTcJMFtKui0-dVqoQpSXOzImN" title="кўк">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div style="width: 16px;height: 16px; border-radius: 50%; margin-top: 2px; background-color: #25507d"></div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <span>кўк</span>
+                                            </div>
+                                        </div>
+
+                                    </a>
+                                </div><div>
+                                    <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-48*hVpcaIuiL04nR*ozmSnqAULMBxIh5dXxojW7V-zEixrJ0KRfot8" title="яшил">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div style="width: 16px;height: 16px; border-radius: 50%; margin-top: 2px; background-color: #186146"></div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <span>яшил</span>
+                                            </div>
+                                        </div>
+
+                                    </a>
+                                </div><div>
+                                    <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-48*hVpcaIuiApK7jZSoN9BjzGU**slfFRugfbLOCclNH-s0hsma4rZ" title="одатий" style="cursor: no-drop;font-weight: 500;pointer-events: none">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div style="width: 16px;height: 16px; border-radius: 50%; margin-top: 2px; background-color: #6a9835"></div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <span>одатий</span>
+                                            </div>
+                                        </div>
+
+                                    </a>
+                                </div><div>
+                                    <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-48*hVpcaIuiKMV5MvHctTWVOZBurnDAI*igy3ps8ncMY3tJWFMTI0Q" title="қизил">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div style="width: 16px;height: 16px; border-radius: 50%; margin-top: 2px; background-color: #901717"></div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <span>қизил</span>
+                                            </div>
+                                        </div>
+
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="language">
+                            <!--raleway-menu-->
+                            <a href="#" class="easyui-menubutton" data-options="menu:'#mm1'">УЗ</a>
+                            <div id="mm1" style="width:150px" class="raleway-menu-menu">
+                                <div>
+                                    <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-5iQrHYkvNUF1avRRGXc0M8Fo6o3K-1WDuOi*rz5MTe2Z1QGEddax33">
+                                        <span>O`zbekcha</span>
+                                    </a>
+                                </div><div>
+                                    <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-5iQrHYkvNUF20VyOmUtBH-J6DU51ViMKicCwN2JRLDzND9qOZc-SKc">
+                                        <span>Узбекча</span>
+                                    </a>
+                                </div><div>
+                                    <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-5iQrHYkvNUF6Rz-jvqptf4s8fblTG7NRhFkmmnbPcQ73vY5MYBZ5M7">
+                                        <span>Русский</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!--                        <li><a href="#" class="shape" onclick="changePassword();
+                                            return false;"><i class="fa fa-key"></i> <wicket:message key="Change password"/></a></li>
+                                                <li >
+                                                    <a href="#" class="shape" wicket:id="exit_link">
+                                                        <i class="fa fa-sign-out"></i><wicket:message key="Exit"/>
+                                                    </a>
+                                                </li>-->
+
+                        <li class="language">
+                            <!--raleway-menu-->
+                            <a href="#" class="easyui-menubutton" data-options="menu:'#mm5'">Профил ( dxsh24107 ) </a>
+                            <div id="mm5" style="width:325px; height: 230px; margin-top: 5px;" class="raleway-menu-menu">
+                                <ul>
+                                    <li class="user">
+                                        <div> 
+                                            <label>Логин: </label>
+                                            <i class="fa fa-user"></i>
+                                            <span>ФИШ: Жумаева Гулмира Таджиевана</span>
+                                        </div>
+                                        <div> 
+                                            <label>Роль:</label>
+                                            <i class="fa fa-suitcase"></i> 
+                                            <span>DXSH</span>
+                                        </div>
+                                    </li>
+                                    <li class="user-footer">
+                                        <a href="#" class="change-pass" onclick="changePassword();
+                    return false;"> <i class="fa fa-key"></i> Паролни ўзгартириш </a>
+                                        <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-6l*2GEyNXm3jEKrELaSBIo4k9Guv5adu13nM7j5AXwqQ" class="exit" onclick="return confirm(&#34;Тизимдан чиқасизми?&#34;)"><i class="fa fa-sign-out" aria-hidden="true"></i>Чиқиш</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+
+                </div>
+
+            </div>
+            
+
+            <!--// Version history//-->
+            <!--            <div id="dlgVersionHistory"  class="easyui-dialog" style="background-color:white;width:800px;height:800px;padding:10px 25px; background-image: url('assets/images/cream.png');" closed="true" 
+                             wicket:message="title:version_history" buttons="#dlgVersionHistory-buttons" modal="true">
+                            <div  style="width:23%; margin:10px auto;">
+                                <img src="assets/images/logo_color.png" >
+                            </div>
+                            <p  style="font-size:20px; margin:20px auto; text-align:center; color:#FF00FF; font-family:'Tahoma'"><wicket:message key="ver_history_header"/></p>
+            
+                            <div id="versions">
+            
+                            </div>
+                        </div>-->
+            <!--            <div id="dlgVersionHistory-buttons">
+                            <a href="#"  class="easyui-linkbutton"  onclick="javascript:$('#dlgVersionHistory').dialog('close');"><i class="fa fa-close"></i><wicket:message key="Close"/></a>
+                        </div>-->
+
+
+
+            
+    <form id="to_card_abo" method="post" action="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-6UDuqkRB9fUgYDeIeoqXv3RSaCbfEPI*WlyXW5cuP3lh5kjj1FEHoEeXqotLJANteWRVTO8zx6Hg"><div style="display:none"><input type="hidden" name="to_card_abo_hf_0" id="to_card_abo_hf_0" /></div>
+        <input type="hidden" id="id_abo" value="" name="id"/>
+        <input type="hidden" id="id_companies" value="" name="companies_id"/>
+    </form>
+    <form id="to_card_org" method="post" action="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-6UDuqkRB9fUgYDeIeoqXv3UUyqLaLA-baCDuiKURpwLBEAqJljCi1Om1pcc9XrB0SfCbgEL82e1w"><div style="display:none"><input type="hidden" name="to_card_org_hf_0" id="to_card_org_hf_0" /></div>
+        <input type="hidden" id="id_org" value="" name="id"/>
+    </form>
+    <div class="menu-in custom_main_menu_fg_">
+        <a class="logo f-left" href="home">
+            <img src="assets/images/logo_color.png"/>
+        </a>
+        <div class="f-right">
+            <div class="custom_main_menu_fg__" style="
+            text-align: right;
+            margin-top: 9px;
+            display: flex;
+            width: 100%!important;">
+
+                
+
+                <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-6UDuqkRB9fUvw0F*lp2vhzVm2RAHjfXx8CUoNNcsPDVu7YGnDrVXQ4q-UV5Sqm1yU" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true">
+                    <i class="fa fa-tasks" aria-hidden="true"></i><span>Янги функциялар<span
+                        id="new_functions"></span></span></a>
+
+                <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-6UDuqkRB9fUhk3egLU2b7nuiP0-KhnEMpBXWBe8IrcAcebHsCDWyrkN4BRmRYsZu*rKX7EnxHOkA" id="abonent_requests_btn" class="easyui-linkbutton raleway-menu-red warning-alert custom_main_menu_fg___inner" data-options="plain:true">
+                    <i class="fa fa-envelope-o"></i><span>Ҳал этилмаган мурожаатлар:</span><span
+                        id="abonent_requests">-</span></a>
+
+                
+
+                <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-6UDuqkRB9fUgYDeIeoqXv3-a*xxfBKOPm35REyZ76J1eb5VXT2QrRMJkwPCqJi-q8" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true">
+                    <i class="fa fa-arrow-circle-up"></i><span>Мурожаатнома жўнатиш</span></a>
+
+                <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-6UDuqkRB9fUgYDeIeoqXv3aEsNqoV5BKm8g75hfBdzg8F0fcO-9t8MXxYENoFy0eM" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true">
+                    <i class="fa fa-tachometer"></i><span>Ишчи ойнага</span></a>
+
+                <a href="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-6UDuqkRB9fUgYDeIeoqXv3AChkGSNje7ZVcJebW8ZBilEConu3R5LmZYdZtZ9SLgk" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true">
+                    <i class="fa fa-user"></i><span>Менинг картам</span></a>
+
+                <a href="#" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true" onclick="search_abonentBP();
+                        return false;"><i class="fa fa-search "></i><span>Абонентни излаш</span></a>
+
+            </div>
+        </div>
+    </div>
+
+    <!--// Abonents List//-->
+    <div id="dlg-ab-listBP" class="easyui-dialog" style="width:565px;height:440px;padding:10px 10px"
+         closed="true" buttons="#frm-buttondlglistAbo" modal="true">
+        <table id="tableDataAbListBP"></table>
+    </div>
+    <div id="frm-buttondlglistAbo">
+        <a id="toCardbutton" href="#" class="easyui-linkbutton pr-btn" onclick="To_abonentCard();
+                        return false;">
+            Картага ўтиш
+        </a>
+        <a href="#" class="easyui-linkbutton" onclick="javascript:$('#dlg-ab-listBP').dialog('close');
+                        return false;"><i class="fa fa-times"></i>
+            Ёпиш
+        </a>
+    </div>
+    <!--// Organizations List//-->
+    <div id="dlg-org-listBP" class="easyui-dialog" style="width:565px;height:440px;padding:10px 10px"
+         closed="true" buttons="#frm-buttondlglistOrg" modal="true">
+        <table id="tableDataOrgListBP"></table>
+    </div>
+    <div id="frm-buttondlglistOrg">
+        <a id="toCardbutton" href="#" class="easyui-linkbutton pr-btn" onclick="To_organizationCard();
+                        return false;">
+            Картага ўтиш
+        </a>
+        <a href="#" class="easyui-linkbutton" onclick="javascript:$('#dlg-org-listBP').dialog('close');
+                        return false;"><i class="fa fa-times"></i>
+            Ёпиш
+        </a>
+    </div>
+
+    <div id="frmWindowSearchBP" class="easyui-dialog" style="width:440px;height:510px;padding:0px 0px"
+         closed="true" buttons="#frm-buttonsBP" modal="true">
+        <div id="SearchTab" class="easyui-tabs">
+            <div title="Жисмоний шахслар" tabindex="0" style="padding: 0px 20px" data-options="iconCls:'icon-app-find-replace'">
+                <!--// Abpnents Form //-->
+                <form id="frmSearchAbo" method="post" novalidate>
+                    <input type="hidden" name="id"/><br/>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="parameter_label">
+                                        Корхона
+                                        : </label><br/>
+                                    <select id="abo_companies_id" style="width:100%;"
+                                            class="easyui-validatebox form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Абонент ID
+                                        :</label>
+                                    <div class="input-group">
+                                        <input name="abonents_id" id="abo_abonents_id"
+                                               class="easyui-validatebox form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Лицевой
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-calculator"></i></span>
+                                        <input name="licshet" id="abo_licshet" class="easyui-validatebox form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Эски Лицевой счет
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-calculator"></i></span>
+                                        <input name="oldlicshet" id="old_abo_licshet"
+                                               class="easyui-validatebox form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        ФИО
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                        <input name="fio" id="abo_fio" class="easyui-validatebox form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Махалла
+                                        :</label>
+                                    <div class="select-group">
+                                        <select name="mahalla_id" id="abo_mahallas_id"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Кўча
+                                        :</label>
+                                    <div class="select-group">
+                                        <select name="streets_name" id="abo_streets_id"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label>
+                                        Уй
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-building"></i></span>
+                                        <input name="house" id="abo_house" class="easyui-validatebox form-control"
+                                               pattern="^[ 0-9]+$"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <div class="input-group" style="padding-top: 10px; padding-left: -10px">
+                                        <input type="checkbox" name="par_house_exact" id="par_house_exact" value="0"
+                                               style="width: 16px; height: 25px"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <div class="input-group" style="padding-top: 10px; padding-left: -10px">
+                                        <input type="checkbox" name="par_flat_exact" id="par_flat_exact" value="0"
+                                               style="width: 16px; height: 25px"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label>
+                                        Кв
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-home"></i></span>
+                                        <input name="flat" id="abo_flat" class="easyui-validatebox form-control"
+                                               pattern="^[ 0-9]+$"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Индекс
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-indent"></i></span>
+                                        <input name="ind" id="abo_ind" class="easyui-validatebox form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        СТИР
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-inn"></i></span>
+                                        <input name="inn" id="abo_inn" class="easyui-validatebox form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div title="Юридик шаҳслар" tabindex="1" style="padding: 10px 20px" data-options="iconCls:'icon-app-find-replace'">
+                <!--// Organizations Form//-->
+                <form id="frmSearchOrg" method="post" novalidate>
+                    <input type="hidden" name="id"/><br/>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Ташкилот_ID
+                                        :</label>
+                                    <div class="input-group">
+                                        <input name="organization_id" id="org_organization_id"
+                                               class="easyui-validatebox form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Лицевой
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-calculator"></i></span>
+                                        <input name="licshet" id="org_licshet" class="easyui-validatebox form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>
+                                        Номи
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                        <input name="name" id="org_name" class="easyui-validatebox form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Махалла
+                                        :</label>
+                                    <div class="select-group">
+                                        <select name="mahallas_id" id="org_mahallas_id"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Кўча
+                                        :</label>
+                                    <div class="select-group">
+                                        <select name="streets_name" id="org_streets_id"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Уй
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-building"></i></span>
+                                        <input name="house" id="org_house" class="easyui-validatebox form-control"
+                                               pattern="^[ 0-9]+$"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Кв
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-home"></i></span>
+                                        <input name="flat" id="org_flat" class="easyui-validatebox form-control"
+                                               pattern="^[ 0-9]+$"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Индекс
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-indent"></i></span>
+                                        <input name="ind" id="org_ind" class="easyui-validatebox form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        СТИР
+                                        :</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-inn"></i></span>
+                                        <input name="inn" id="org_inn" class="easyui-validatebox form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="frm-buttonsBP">
+        <a href="#" class="easyui-linkbutton pr-btn" onclick="find_BP();
+                        return false;" button-index="0"><i class="fa fa-search" aria-hidden="true"></i>
+            Излаш
+        </a>
+        <a href="#" class="easyui-linkbutton" onclick="javascript:$('#frmWindowSearchBP').dialog('close');
+                        return false;"><i class="fa fa-times"></i>
+            Ёпиш
+        </a>
+    </div>
+
+
+            <div id="frmWindowChngPsw" class="easyui-dialog" style="width:350px;height:auto;padding:10px 20px" closed="true" buttons="#frmWindowChngPsw-buttons" modal="true" title="Паролни ўзгартириш">
+                <form method="post" novalidate="" id="ChngPsw" action="?x=uTrlSJrUwC3lYjuaCC-coACVfr5OqB3oWa8HL3xlp-6XRT6ZbmSP156ar1tPBWoVGFAJm-dKGkMj6Af7F98e8g"><div style="display:none"><input type="hidden" name="ChngPsw_hf_0" id="ChngPsw_hf_0" /></div>
+                    <span style="display:none;" id="feedbackform">
+  
+</span>
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Эски парол:</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                                        <input name="old_password" type="password" class="easyui-validatebox form-control" required="true" value="" id="old_password"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Янги парол:</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                                        <input name="new_password" type="password" class="easyui-validatebox form-control" required="true" value="" id="new_password"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Паролни қайта киритинг:</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                                        <input name="repeat_password" type="password" class="easyui-validatebox form-control" required="true" value="" id="repeat_password"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--                    <table>
+                                            <tr>
+                                                <td>
+                                                    <div class="fitem">
+                                                        <label><wicket:message key="Old Password"/>:</label><br>
+                                                            <input name="old_password" id="old_password" type="password" style="width: 195px;" required="true" wicket:id="old_password"/>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="fitem">
+                                                        <label><wicket:message key="New Password"/>:</label><br>
+                                                            <input name="new_password" id="new_password" type="password"  style="width: 195px;" required="true" wicket:id="new_password"/>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="fitem">
+                                                        <label><wicket:message key="Repeat Password"/>:</label><br>
+                                                            <input name="repeat_password" id="repeat_password" type="password" style="width: 195px;" required="true" wicket:id="repeat_password"/>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>-->
+                </form>
+            </div>
+            <div id="frmWindowChngPsw-buttons">
+                <a href="#" class="easyui-linkbutton pr-btn" onclick="save_chng();
+                    return false;" style="margin-left: 0px;"><i class="fa fa-floppy-o"></i>Сақлаш</a>
+                <a href="#" class="easyui-linkbutton" onclick="javascript:$('#frmWindowChngPsw').dialog('close');
+                    return false;"><i class="fa fa-times"></i>Ёпиш</a>
+            </div>
+        
+
+            </div>
+
+            <div id="g_acccordion" region="west" style="width: 300px;" title="Иш майдони" data-options="hideCollapsedContent:false,collapsed:true">
+                <div class="easyui-accordion" fit="true">
+                    <div title="Инструментлар" style="overflow:auto;padding:10px;" iconCls="fa fa-object-group" selected="true">
+                        <ul>
+                            <li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgRi5K2YeAHUlE6WBDAVRCy7ZqFAv6yJCpXZHuPtbct*J1E2ieKTHQ0w" class="ilmenu">
+                                    <span>Абонентлар</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKg3psm7PP3426kEC978wbqPrbPK60EvWvhMyoC8Nja2185mCjIM9qixA" class="ilmenu">
+                                    <span>Накд пул туловлар</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgPtOhfu*zbX8Ei10BbX76CMLhO79KaL9Vmti4jj5*LKfzSuOBNuhEnA" class="ilmenu">
+                                    <span>Яшовчилар сонини ўзгартириш актлари</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgawI3-UfPnVZmCT-Hk1qP9rYUbVOq5O4tTqaRjhsYJE4KhMr3lLeonA" class="ilmenu">
+                                    <span>Актлар</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgGMPt1O9ux*2sOgCwsi6EQ5urL0DAnRpVU*J-BcTytCil1TyIpp*1bA" class="ilmenu">
+                                    <span>Электрон туловлар</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgtS70F*ArV92gmu-E7apm2e*24e78l54woIOlP4zy1getDx*Yv9eziw" class="ilmenu">
+                                    <span>Мунис</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgiu7LXla1GW17rn5AId9sAYf87h8iugwNJfw4hGhdVvKWevMnleOqpA" class="ilmenu">
+                                    <span>ОНЛАЙН МУРОЖААТ</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgfg1OkFkTsS3nGcmCB6gWNEVLTVLzaPgQXUT3vRI1BKAbfL-bstIlXw" class="ilmenu">
+                                    <span>Квитанциялар бланкалари хисоби</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgdeTi0Nep-C5OlbMUA1LM6hUzhUhjh7x87mm21Rm0jwHJNvRjXor9pw" class="ilmenu">
+                                    <span>Корхона ходимлари</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgRi5K2YeAHUkZs3qfFOKz8oAHpQoo6ovR8v3qpGesOw0ypDTXwAf2kw" class="ilmenu">
+                                    <span>Музлатилган абонентлар модули</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgRi5K2YeAHUlx9IvQnkdpdzlK9zx4JxtQ*Pe315vhzN85DP4fW32l3A" class="ilmenu">
+                                    <span>Акт бланки</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgRi5K2YeAHUmhSzUWNx08dQ0CfO4MxUp9vdLR9COskdt8B4vr6Q8vlg" class="ilmenu">
+                                    <span>Инвентаризация актлари</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgRi5K2YeAHUnm7SqgV4E5UKSCZb5jD9kPHiaIhpHlomWFK*GP5rMeyw" class="ilmenu">
+                                    <span>Суд огоҳлантириш</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgRi5K2YeAHUn1OXryJG86TQrBbB3SzNbFoFSLuuWLa2stgqjtbE3WpQ" class="ilmenu">
+                                    <span>Музлатилган қарздорлик актлари</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxZODnoVc5BKgRi5K2YeAHUm9E9ZTg3hZWDdIbRszqNr09TusO44PzyS4BQh0PMyD2A" class="active">
+                                    <span>Суд жараёнлари</span>
+                                </a>
+                                
+                                
+                            </li>
+                        </ul>
+                    </div><div title="Умумий" style="overflow:auto;padding:10px;" iconCls="fa fa-suitcase">
+                        <ul>
+                            <li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxR2ASEb1avIwKwerYmJ-3mbiLPJXXqZGiLLOG0q4-zAvJST0RhKUyft5TUkfE62fJA" class="ilmenu">
+                                    <span>Дхш ўтказиб берилган маблағлар</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxR2ASEb1avIwZnUQANn*lDBlJgElms1zOYkzzLusE5nWjQE98sPC8vjRr1ZZyl3*0A" class="ilmenu">
+                                    <span>Hybrid pochta sozlamalari</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxR2ASEb1avIwIwn3*51Nm7bg*jZTlYie5*7f2vJhF4kwYBD5FBDrXzhk*E9T85E9BQ" class="ilmenu">
+                                    <span>Худудлар</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxR2ASEb1avIwiyggElwu4onTZ67nhA6IzUuFrmDU7x1khjZvJhiBUuAOflquHej-mQ" class="ilmenu">
+                                    <span>Квитанция берувчилар</span>
+                                </a>
+                                
+                                
+                            </li>
+                        </ul>
+                    </div><div title="1031 тартиби бўйича ишлаш" style="overflow:auto;padding:10px;" iconCls="fa fa-location-arrow">
+                        <ul>
+                            <li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxbtfiKiCYc3V3d4LTLBn9fR1oU2QUKaEvGt5HZY8of0TS-iTIiQVZ05nJNJ09MZp3A" class="ilmenu">
+                                    <span>Тўловлар рўйҳати билан ишлаш</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxbtfiKiCYc3V0w96S1TBVReUiDa12F-2TER5uyNwSPwpVOei7GcvmHnrCTuqQvMYiQ" class="ilmenu">
+                                    <span>Ташкилот ходимлари рўйхати билан ишлаш</span>
+                                </a>
+                                
+                                
+                            </li>
+                        </ul>
+                    </div><div title="География" style="overflow:auto;padding:10px;" iconCls="fa fa-globe">
+                        <ul>
+                            <li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxamdD3V2R7QA8*EIezcgbvJDS4DfkzrxbNfoUXlRdUIsjKs7Kk-wDZwWw9LsTi0vug" class="ilmenu">
+                                    <span>Махаллалар</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxamdD3V2R7QAlMBrkt0ddnlf5kbH9qJb4thjE0HDW7y*77CYjP-RzK0N70J6L4nu2w" class="ilmenu">
+                                    <span>Кучалар</span>
+                                </a>
+                                
+                                
+                            </li>
+                        </ul>
+                    </div><div title="Хисоботлар" style="overflow:auto;padding:10px;" iconCls="fa fa-pie-chart">
+                        <ul>
+                            <li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSolhr5KSdYTZoGyYdwjXXOAU*tUEzkUupqCw*aShxGJTZnFV4ArszmA" class="ilmenu">
+                                    <span>ДХЖ-1 хисоботи</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMS6UGc-RziIbyhlDrXg83CHOcsBB4e1KNHOH4IFFNtZC1Pf06-vsn6GQ" class="ilmenu">
+                                    <span>Ф-2 ДХЖ хисоботи</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMS2Tk3LRAE-qnM2bxROsHox2O-dj5tqDzSm1VhEJ-fp-pzBySywGVRDw" class="ilmenu">
+                                    <span>МФА-3. Мунис тўловлари хисоботи</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSeP40VT*H44v0aLGRW5dQxbaR9pxJlT6mpRB-dGXSY4al8A2PXGQ4aQ" class="ilmenu">
+                                    <span>Жами тушумлар таҳлили</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMS10B0Ar0fSGVP3oQhmnvJlig-siciDaL2mIxItOQQQRmA0sXKwM4wiA" class="ilmenu">
+                                    <span>Махаллалар кесимида карздорлар таҳлили</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSgLW3VQ0*m5TaBZyIDa1kRB4g8vT-ENHQ5h*EYib2PsDQEfWq6kHHXA" class="ilmenu">
+                                    <span>МУНИС туловлари</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSX3lCThZ3T4nwGPksicwzkPYEdCKXEPIL7cf3tlOEhDZygInOJl4*xw" class="ilmenu">
+                                    <span>Актлар ҳолати ҳисоботи</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMS5GZfySIiGvbHBZ*YKYiEC6QZqMdORkEPGbBKK6sOJBh7*v4kKH1YmQ" class="ilmenu">
+                                    <span>Ro&#039;yxatdagi abonentlar monitoringi</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSwPXUzcqs6V4l1rM1dqsdJwajYNq5hr6hV6BnMmrCUXmRJfWQ4H28-A" class="ilmenu">
+                                    <span>Эл.туловлар хисоботи</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSolhr5KSdYTZ3I-FucJiI-q56-Q*3*GvyKpdqTTxZyBaWmRHmXgiF4g" class="ilmenu">
+                                    <span>Тўлов қилмаган абонентлар</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSolhr5KSdYTZNozoXGk5ZXkhKLhH1wwS3gBoQS8Gou1KP9mKiQDHUeQ" class="ilmenu">
+                                    <span>ОНЛАЙН МУРОЖААТ ХИСОБОТИ</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSolhr5KSdYTZXSwholvAWgXlCer*IFAK20GESY3sD9jR8sDeL3Tpaag" class="ilmenu">
+                                    <span>Aҳоли сони бўйича ҳисобот</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSolhr5KSdYTabzMfGkLh5IVBs5VxmS5t-T40eO42dhh-mB4drfJZOVA" class="ilmenu">
+                                    <span>Қарздорлиги юкори булган абонентлар</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSolhr5KSdYTYliDSi4w5aq4NLtSADygGkIqFa2Jbp5G-EF7sFxKII2g" class="ilmenu">
+                                    <span>Карздорлиги юкори булган абонентлар тугрисида свод хисобот</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSolhr5KSdYTZiSod6g7chJIqF2hJNhSUaeG4iaZ7GVkBwrCEV-nFL3Q" class="ilmenu">
+                                    <span>ДҲШ Тушумлар ҳисоботи</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSolhr5KSdYTahYUviXkcpEo6kjWAEV5xVUlG1c5qI21UeGRk2YpXJlA" class="ilmenu">
+                                    <span>Суд жараёнлари холати кесимида хисобот</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxS7ik2FORHMSolhr5KSdYTaebFYmx9d78UtA7ipt7zkwq0bS13JnsrDVBrGoDaBY7Q" class="ilmenu">
+                                    <span>Суд жараёнлари холати буйича тахлил</span>
+                                </a>
+                                
+                                
+                            </li>
+                        </ul>
+                    </div><div title="Нотификациялар" style="overflow:auto;padding:10px;" iconCls="fa fa-bullhorn">
+                        <ul>
+                            <li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxW0LBhy4ltNs-UXPDlOYI9e9UOaSc-3iGdWpOq-mnDe5VD14l*e8F4Uvz7dbHoczAw" class="ilmenu">
+                                    <span>Нотификациялар</span>
+                                </a>
+                                
+                                
+                            </li><li class="ilmenu">
+                                <a href="?x=GL2L1*bjyxRBTfh9PQiPxW0LBhy4ltNsmgE3-qWRL8TUqnU-h9AeLL21agH27cyN2OYESYJVyOX29Y5AvL1hcg" class="ilmenu">
+                                    <span>Талаблар</span>
+                                </a>
+                                
+                                
+                            </li>
+                        </ul>
+                    </div>
+                    <!--                    <div>
+                                            <ul>
+                                                <li class="active">
+                                                    <a href="#" onclick="search_abonentBP();
+                                            return false;"><i class="fa fa-search"></i><span><wicket:message key="SearchAbonent"/></span></a>
+                                                </li>
+                                            </ul>
+                                        </div>-->
+                </div>
+            </div>
+            <div region="center">
+                <div class="easyui-layout" fit="true">
+                    <div region="north" border="false" class="header-north" style="height: 40px;">
+                        Суд жараёнлари
+                        <span id="mv_span">0</span>
+                    </div>
+                    <div region="center" border="false">
+                        
+    <div id="main_layout" class="easyui-layout" fit="true">
+        <div id="center" region="center" border="false">
+            <input type="hidden" id="old_mahallas_id"/>
+            <div class="easyui-layout" fit="true">
+                <div id="p" data-options="region:'west'" style="width:65%;">
+                    <table id="tableData"></table>
+
+                </div>
+                <div data-options="region:'center'">
+                    <div class="tabcontent" id="clickToTimeLine" style="margin-top: 150px">
+                        <h3 style="text-align: center"><span>Рўйхатдан бирини танланг</span></h3>
+                        <p style="text-align: center">
+                            <img src="assets/images/click.svg" style="width: 120px"/></p>
+                    </div>
+                    <div class="tabcontent card" style="visibility: hidden" id="user_card">
+                        <div class="abn_container">
+                            <div class="abn_info">
+                                <div class="abn_user_header">
+                                    <div class="abn_user_img">
+                                        <img src="assets/images/img_avatar.png"/>
+                                    </div>
+                                    <div class="abn_user_name">
+                                        <h2>
+                                            ФИО
+                                            : <span id="fio"></span>
+                                            <br>
+                                            Лицевой
+                                            : <span id="licshet"></span>
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div class="abn_user_content">
+                                    <ul class="abn_user_list">
+                                        <li>
+                                            <i class="fa fa-money text_green"></i>
+                                            <span>Қарздорлик суммаси</span>
+                                            <label><span id="debit_amount"></span></label>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-calendar text_ink"></i>
+                                            <span>Қарздорлик вақти</span>
+                                            <label><span id="debit_date"></span></label>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-users text_yellow"></i>
+                                            <span>Яшовчилар сони</span>
+                                            <label><span id="prescribed_cnt"></span></label>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-money text_red"></i>
+                                            <span>Қолди</span>
+                                            <label><span id="remaining_debt_amount"></span></label>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-credit-card text_green"></i>
+                                            <span>Amalga oshirilgan to`lov</span>
+                                            <label><span id="payments_amount"></span></label>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-road"></i>
+                                            <span>Манзил</span>
+                                            <label><span id="address"></span></label>
+                                        </li>
+                                        <li style="margin-bottom: 5px">
+                                            <i class="fa fa-list-alt"></i>
+                                            <span>Ҳаракатлар</span>
+                                            <label><a href="#" class="easyui-linkbutton fit-btn" onclick="decision_court();
+                                                        return false;" id="decision_court" style="display: none" title="Суд қарорини киритиш"><i
+                                                    class="fa fa-list-alt"></i>
+                                                Суд қарорини киритиш
+                                            </a>
+                                                <a href="#" class="easyui-linkbutton fit-btn" onclick="send_to_court();
+                                                        return false;" id="send_to_court" style="display: none" title="Судга юбориш"><i
+                                                        class="fa fa-bank"></i>
+                                                    Судга юбориш
+                                                </a></label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="easyui-tabs" fit="true" id="card_tabs">
+                                <div title="Файл" style="padding: 0 10px;">
+                                    <div style="display: block;padding: 10px 0 0 0;text-align: right;">
+                                        <a href="#" class="easyui-linkbutton fit-btn" style="max-width: 170px;" onclick="add_file();return false;" title="Файл бириктириш"><i class="fa fa-file"></i>
+                                            Файл бириктириш
+                                        </a>
+                                    </div>
+                                    <div id="abn_file_list" style="display: flex; flex-direction: column">
+                                        <div>
+                                            <p id="sud_warning_file"
+                                               style="font-size: 14px;color: #777;margin-top: 0"></p>
+                                            <div class="row" id="swf" style="padding:0 10px;cursor: pointer;">
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div style="float: left">
+                                            <p id="sud_decision_court_file" style="font-size: 14px;color: #777;"></p>
+                                            <div class="row" id="sdcf">
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div style="float: left">
+                                            <p id="send_to_court_file" style="font-size: 14px;color: #777;"></p>
+                                            <div class="row" id="stcf">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div title="Тўловлар">
+                                    <table id="tableDataPayments"></table>
+                                    <div id="toolbartableDataPayments" style="padding:5px;height:auto">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td align="left" colspan="2">
+                                                    <div class="custom-menu">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div title="Суд жараёни тарихи">
+                                    <table id="tableDataFlows"></table>
+                                    <div id="toolbartableDataFlows"
+                                         style="padding:5px;height:auto;display: none !important;">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td align="left" colspan="2">
+                                                    <div class="custom-menu">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="toolbarTableData" style="padding:5px;height:auto">
+                <div region="north" style="padding: 5px;" border="false">
+                    <div class="custom-menu" style="display: flex;align-items: flex-start;justify-content: space-between;">
+                        <div>
+                            <!--                                <a href="#" class="easyui-menubutton" data-options="menu:'#sud_mm1'"><wicket:message key="Actions"/></a>-->
+                            <div style="margin: 5px">
+                                <label class="parameter_label">
+                                    Корхона
+                                    : </label>
+                                <select id="par_companies_id" style="width:180px;"></select>
+
+                                <label>
+                                    Cтатус
+                                    :</label>
+                                <select class="easyui-combobox" id="par_user_status" editable="false"
+                                        style="width:200px;" panelHeight="140" formatter="stateFormatterCombo">
+                                </select>
+
+                                <label class="parameter_label">
+                                    Дан
+                                    : </label>
+                                <input id="date1" class="easyui-datebox"
+                                       data-options="formatter:date_formatter,parser:date_parser" style="width:120px;"/>
+                                <label class="parameter_label">
+                                    Гача
+                                    : </label>
+                                <input id="date2" class="easyui-datebox"
+                                       data-options="formatter:date_formatter,parser:date_parser" style="width:120px;"/>
+
+                            </div>
+                            <div  style="margin: 5px">
+
+                                <label class="parameter_label">
+                                    Дебиторлар
+                                </label>                                <label class="parameter_label">
+                                    Дан
+                                    : </label>
+                                <input id="from_debit" class="easyui-numberbox" data-options="min:1" style="width: 120px; text-align:right;border-radius: 4px;" onkeypress="return isNumberKey(event);" placeholder="Гача"/>
+
+                                <label class="parameter_label">
+                                    Гача
+                                    : </label>
+                                <input id="to_debit" class="easyui-numberbox" data-options="min:1" style="width: 120px; text-align:right;border-radius: 4px;" onkeypress="return isNumberKey(event);" placeholder="Гача"/>
+
+
+                                <a href="#" class="easyui-linkbutton icon-btn" data-options="plain:true" onclick="refreshTable();
+                        return false;" title="Янгилаш"><i class="fa fa-refresh"></i></a>
+                                <a href="#" class="easyui-linkbutton icon-btn" data-options="plain:true" onclick="clear_parameters();
+                        return false;" title="Тозалаш"><i class="fa fa-eraser"></i></a>
+                            </div>
+                        </div>
+                        <div>
+                            <input id="searchBox" class="easyui-searchbox" searcher="search" menu="#searchBoxMenu" style="width:300px;" prompt="Илтимос, қийматни киритинг"></input>
+                            <div id="searchBoxMenu" style="width:120px;">
+                                <div name="fio"><i class="fa fa-filter"></i>
+                                    ФИО
+                                </div>
+                                <div name="licshet"><i class="fa fa-filter"></i>
+                                    Лицевой
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="frmWindowAddFile" class="easyui-dialog" style="width:430px;height:auto;padding:10px 20px"
+         closed="true" buttons="#frmWindowAddFile-buttons" modal="true">
+        <form id="frmAddFile" method="post" enctype="multipart/form-data">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>
+                                Файл тури
+                                :</label><br/>
+                            <div class="input-group">
+                                <select id="par_file_types" name="file_type_id" style="width:320px;"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>
+                                Файл бириктириш
+                                :</label><br/>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-file"></i></span>
+                                <input class="easyui-filebox" id="file_bytes" name="file_bytes" style="width: 300px; height: 30px" buttonAlign="right" buttonHeight="30px" accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps" buttonText="Файлни танлаш"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>
+                                Изох
+                                :</label><br/>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-comments"></i></span>
+                                <textarea name="purpose" id="tsg_purpose"
+                                          class="easyui-validatebox form-control" required="true"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="frmWindowAddFile-buttons">
+        <a href="#" class="easyui-linkbutton pr-btn" onclick="save_file();
+                        return false;" button-index="0"><i class="fa fa-floppy-o"></i>
+            Сақлаш
+        </a>
+        <a href="#" class="easyui-linkbutton" onclick="javascript:$('#frmWindowAddFile').dialog('close');
+                        return false;">
+            Бекор қилиш
+        </a>
+    </div>
+
+    <div id="frmWindowDecisionCourtFile" class="easyui-dialog" style="width:430px;height:auto;padding:10px 20px"
+         closed="true" buttons="#frmWindowDecisionCourtFile-buttons" modal="true">
+        <form id="frmCourtFile" method="post" novalidate>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>
+                                Изох
+                                :</label><br/>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-comments"></i></span>
+                                <textarea name="purpose" id="court_purpose"
+                                          class="easyui-validatebox form-control" required="true"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="frmWindowDecisionCourtFile-buttons">
+        <a href="#" class="easyui-linkbutton pr-btn" onclick="save_desined_file();
+                        return false;" button-index="0"><i class="fa fa-floppy-o"></i>
+            Сақлаш
+        </a>
+        <a href="#" class="easyui-linkbutton" onclick="javascript:$('#frmWindowDecisionCourtFile').dialog('close');
+                        return false;">
+            Бекор қилиш
+        </a>
+    </div>
+    <div id="frmWindowSendToCourtFile" class="easyui-dialog" style="width:430px;height:auto;padding:10px 20px"
+         closed="true" buttons="#frmWindowSendToCourtFile-buttons" modal="true">
+        <form id="frmSendToFile" method="post" novalidate>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>
+                                Изох
+                                :</label><br/>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-comments"></i></span>
+                                <textarea name="purpose" id="send_to_court_purpose"
+                                          class="easyui-validatebox form-control" required="true"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="frmWindowSendToCourtFile-buttons">
+        <a href="#" class="easyui-linkbutton pr-btn" onclick="save_send_to_court();
+                        return false;" button-index="0"><i class="fa fa-floppy-o"></i>
+            Сақлаш
+        </a>
+        <a href="#" class="easyui-linkbutton" onclick="javascript:$('#frmWindowSendToCourtFile').dialog('close');
+                        return false;">
+            Бекор қилиш
+        </a>
+    </div>
+    <iframe id="downloadFile" src="" style="display:none; visibility:hidden;"></iframe>
+
+                    </div>
+                </div>
+            </div>
+            <div region="south" style="height: 30px; overflow: hidden; border-top: 0;">
+                
+            <div class="footer-bottom">
+                <div class="container">
+                    <div class="row">
+                        <!-- footer copyrights left cell -->
+                        <div class="copyrights t-center">© FurorProgress <b class="main-color">CleanCity</b> 2015-2023. Барча хуқуқлар ҳимояланган</div>
+                        <div >
+                            <wicket message:key="tell_us_about_error"></wicket>
+                        </div>
+                        <!-- footer social links right cell start -->
+                    </div>
+                </div>
+            </div>
+        
+            </div>
+        </div>
+
+        <div id="frmWindowErrorReport" class="easyui-dialog" style="width:auto;height:auto;padding:10px 20px"
+             closed="true" buttons="#frmWindowErrorReport-buttons" modal="true">
+            <h2>хабарда хатолик</h2>
+            <p>enter_whats_the_problem</p>
+            <form id="frmErrorReport" method="post" novalidate>
+                <input type="hidden" name="id">
+                    <table>
+                        <tr>
+                            <td>
+                                <div class="fitem">
+                                    <label>Танланган матн:</label><br>
+                                        <textarea id="selected_text" name="selected_text"  readonly cols='70' rows='10'></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="fitem">
+                                    <label>Сизнинг хабарингиз:</label><br>
+                                        <textarea id ="user_message" name="user_message" cols='70' rows='10'></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+            </form>
+        </div>
+
+        <div id="frmWindowErrorReport-buttons">
+            <a href="#" class="easyui-linkbutton save-btn" onclick="send_();
+                        return false;" id="save_btn" button-index="1"><i class="fa fa-hand-o-right"></i>Жўнатиш</a>
+            <a href="#" class="easyui-linkbutton" onclick="javascript:$('#frmWindowErrorReport').dialog('close');
+                        return false;"><i class="fa fa-times"></i>Ёпиш</a>
+        </div>
+    </body>
+</html>

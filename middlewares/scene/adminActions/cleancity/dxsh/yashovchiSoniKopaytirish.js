@@ -64,7 +64,6 @@ const yashovchiSoniKopaytirish = async (litsavoy, yashovchiSoni) => {
     const session = await CleanCitySession.findOne({ type: "dxsh" });
     let inrementLiversUrl = session.path.inrementLiversUrl;
     if (!inrementLiversUrl) {
-      console.log("url yo'q");
       inrementLiversUrl = await yashovchiSoniOshirishUrlTiklash(
         session,
         litsavoy
