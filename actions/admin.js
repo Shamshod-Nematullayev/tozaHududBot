@@ -23,8 +23,25 @@ const {
   find_address_by_pinfil_from_mvd,
 } = require("../api/mvd-pinfil");
 const {
-  downloadAlertLetter,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/ogohlantirishXatiYuklabOlish");
+  changeAbonentDates,
+} = require("../middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");
+const {
+  sendMahallaKunlikTushum,
+  getMahallaKunlikTushum,
+  drawMahallaKunlikTushum,
+} = require("../intervals/mahallaKunlikTushum");
+const { Abonent } = require("../models/Abonent");
+const fs = require("fs");
+const path = require("path");
+const xlsx = require("json-as-xlsx");
+const { Bildirishnoma } = require("../models/SudBildirishnoma");
+const {
+  importAlertLetter,
+} = require("../middlewares/scene/adminActions/cleancity/dxsh/importAlertLetter");
+const {
+  getAbonentCardHtml,
+} = require("../api/cleancity/dxsh/getAbonentCardHTML");
+const htmlPDF = require("html-pdf");
 
 // =====================================================================================
 const composer = new Composer();
@@ -42,7 +59,9 @@ const ADMIN_ACTIONS = [
   "new_abonent",
   "shaxsi_tashdiqlandi_bildirish_xati",
   "user_to_inspektor",
+  "get_sud_material",
   "ommaviy_shartnoma_biriktirish",
+  "generateProkuraturaSudAriza",
 ];
 
 // main required functions
@@ -248,8 +267,121 @@ composer.hears(/k_\w+/g, (ctx) => {
   );
 });
 
+const mahallaGroup = {
+  id: -1002104743021,
+  title: "Тоза Худуд МФЙ раислари Каттақўрғон гурухи",
+  type: "supergroup",
+};
+
+bot.hears("kunlik", (ctx) => {
+  const date = new Date();
+  getMahallaKunlikTushum(date).then(async (rows) => {
+    const imgPath = await drawMahallaKunlikTushum(rows, new Date());
+    sendMahallaKunlikTushum([1382670100, mahallaGroup.id], imgPath, ctx);
+  });
+});
+
+composer.hears("export_abonents", async (ctx) => {
+  let abonents = await Abonent.find({}, { photo: 0 });
+  const content = [];
+  abonents = abonents.sort((a, b) => a.fio.localeCompare(b.fio));
+  abonents.forEach((abonent, i) => {
+    content.push({
+      tartib: i + 1,
+      licshet: abonent.licshet,
+      fio: abonent.fio,
+      street: abonent.mahalla_name,
+      kadastr_number: abonent.kadastr_number,
+      pinfl: abonent.pinfl,
+      confirm: abonent.shaxsi_tasdiqlandi?.confirm,
+    });
+  });
+
+  const data = [
+    {
+      Sheet: "Abonents",
+      columns: [
+        { label: "№", value: "tartib" },
+        { label: "Лицевой", value: "licshet" },
+        { label: "ФИО--", value: "fio" },
+        { label: "Кўча", value: "street" },
+        { label: "Кадастр", value: "kadastr_number" },
+        { label: "ЖШШИР", value: "pinfl" },
+        { label: "Шахси тасдиқланди", value: "confirm" },
+      ],
+      content,
+    },
+  ];
+
+  const fileName = path.join(__dirname + "/../uploads/", "abonents");
+  let settings = {
+    fileName: fileName, // Name of the resulting spreadsheet
+    extraLength: 3, // A bigger number means that columns will be wider
+    writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
+    writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
+    // RTL: true, // Display the columns from right-to-left (the default value is false)
+  };
+  await xlsx(data, settings);
+  await ctx.replyWithDocument({ source: fileName + ".xlsx" });
+  // fs.unlink(fileName + ".xlsx", (err) => {
+  //   if (err) throw err;
+  // });
+});
+
 composer.hears("q", async (ctx) => {
-  downloadAlertLetter(13279105);
+  const xatlar = await Bildirishnoma.find({ type: "sudga_chiqoring" });
+  const fileName = path.join(__dirname + "/../uploads/", "bildirish_xati bor");
+  let settings = {
+    fileName: fileName, // Name of the resulting spreadsheet
+    extraLength: 3, // A bigger number means that columns will be wider
+    writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
+    writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
+    // RTL: true, // Display the columns from right-to-left (the default value is false)
+  };
+  const content = [];
+  xatlar.forEach((xat) => {
+    xat.abonents.forEach((kod) => {
+      content.push({ licshet: kod });
+    });
+  });
+  const data = [
+    {
+      Sheet: "Abonents",
+      columns: [{ label: "Лицевой", value: "licshet" }],
+      content,
+    },
+  ];
+
+  await xlsx(data, settings);
+  await ctx.replyWithDocument({ source: fileName + ".xlsx" });
+});
+
+composer.hears(/karta_/g, async (ctx) => {
+  const html = await getAbonentCardHtml(ctx.message.text.split("_")[1]);
+  htmlPDF
+    .create(html, {
+      format: "A4",
+      orientation: "portrait",
+    })
+    .toFile("./uploads/abonent_card.pdf", (err, res) => {
+      if (err) throw err;
+      ctx.replyWithDocument({ source: "./uploads/abonent_card.pdf" });
+      // .then(() => {
+      //   fs.unlink("./uploads/abonent_card.pdf", (err) =>
+      //     err ? console.log(err) : ""
+      //   );
+      // });
+    });
+});
+
+composer.hears("ExportAbonentCards", async (ctx) => {
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+
+  ctx.scene.enter("exportAbonentCards");
+});
+
+composer.hears("a", (ctx) => {
+  importAlertLetter();
 });
 
 bot.use(composer);

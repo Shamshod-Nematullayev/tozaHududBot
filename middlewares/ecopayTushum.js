@@ -291,14 +291,14 @@ setInterval(async () => {
       (soat == 22 && minut == 0) ||
       (soat == 23 && minut == 0)
     ) {
-      // drawDebitViloyat("toViloyat");
+      drawDebitViloyat("toViloyat");
       if (soat < 22) {
         const data = await fetchEcopayTushum();
-        mfyIncomeReport();
+        // mfyIncomeReport();
         drawAndSendTushum(data);
         fetchEcoTranzaksiyalar();
       }
-      sendViloyatKunlikReja();
+      // sendViloyatKunlikReja();
     } else if (date.getMinutes() % 10 === 0) {
       if (text == undefined) {
         sendViloyatKunlikReja("test", 5347896070);

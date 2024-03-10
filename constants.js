@@ -1,3 +1,9 @@
 module.exports.importPlanInspectorsFileId = `BQACAgIAAxkBAAJJ3GTDTwkUATMBRSBtldjVxJkoFJV1AAKTLgACJ8YhSkwaDIhEN-6-LwQ`;
 module.exports.importSudBuyruqlariExample = `BQACAgIAAxkBAAKQdGUqHGL5vpw6ZY9o91VTM7xcGkoBAALNNgACtXhRSVqQBQekLD9tMAQ`;
 module.exports.shaxsiTasdiqlandiBildirishXatiImportExcel = `BQACAgIAAxkBAALOymV8QzeLyK1a2X6K70HCl3zStGIFAALYOQAC25_hSzlqQPr8ds8MMwQ`;
+module.exports.sudMaterialImportExcel = `BQACAgIAAxkBAAEBJrllqKSAzmuW2Md12M4DRoJV8-UjkQAC40UAAv1PQUl15CChKnCccDQE`;
+module.exports.INPUT_ALERT_LETTER_EXCEL = `BQACAgIAAxkBAAEBBO1ln40tc7RDwEZ50KqdpV9m30oSsQACuiYAAr0TsUqK62wdnrlJvjQE`;
+module.exports.guvohnomaFileID = `BQACAgIAAxkBAAEBLvRlqkZQkkAgAWxnF4_neNNkvRbVIQACmTkAApzHWUn49o8y769mtTQE`;
+module.exports.ishonchnomaFileID = `BQACAgIAAxkBAAEBLvllqkdFUyZ0s2BNrB38BVWBRb37XAACnTkAApzHWUk2asxbBSPOXzQE`;
+module.exports.shartnomaSSPFileID = `BQACAgIAAxkBAAEBLwVlqkfRChxRq4hA2YGmQKsnocJq-wACdzwAAizGWEkPpZ9_-WRZDTQE`;
+module.exports.inputAbonentLicshet = `BQACAgIAAxkBAAEDm9ll6F9SmQ5HQCW4S0X-BxOuV6EkGgACb0IAAqFTSEtIB9fHlfO1aDQE`;

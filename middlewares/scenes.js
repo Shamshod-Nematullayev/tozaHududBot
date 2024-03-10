@@ -48,9 +48,16 @@ const {
   updateAbonentDatesByPinfl,
 } = require("./scene/userScenes/updateAbonentDatesPinfil");
 const { aborotkaChiqorish } = require("./scene/adminActions/aborotkaChiqorish");
+const { getSudMaterial } = require("./scene/adminActions/getSudMaterials");
 const {
   ommaviyShartnomaBiriktirish,
 } = require("./scene/adminActions/ommaviyShartnomaBiriktirish");
+const {
+  generateProkuraturaSudAriza,
+} = require("./scene/adminActions/generateProkraturaSudAriza");
+const {
+  exportAbonentCards,
+} = require("./scene/adminActions/exportAbonentCardsZip");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -82,7 +89,10 @@ const stage = new Scenes.Stage([
   userToInspektor,
   updateAbonentDatesByPinfl,
   aborotkaChiqorish,
+  getSudMaterial,
   ommaviyShartnomaBiriktirish,
+  generateProkuraturaSudAriza,
+  exportAbonentCards,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

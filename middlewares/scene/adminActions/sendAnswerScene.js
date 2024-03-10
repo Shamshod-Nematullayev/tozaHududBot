@@ -32,6 +32,8 @@ const sendAnswerScene = new Scenes.WizardScene(
         );
         // agar mvd bazasida ma'lumot topilmasa
         if (customDates.first_name == "" || customDates.success === false) {
+          ctx.reply(customDates.message);
+          return;
           await Abonent.findByIdAndUpdate(ctx.session.abonent_id, {
             $set: { isCancel: true },
           });

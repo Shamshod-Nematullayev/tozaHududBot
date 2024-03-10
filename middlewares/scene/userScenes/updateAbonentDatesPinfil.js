@@ -80,15 +80,27 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
     ctx.wizard.state.pinfl = ctx.message.text;
     ctx.wizard.state.customDates = customDates;
     // nazoratchiga tasdiqlash uchun yuborish
-    await ctx.replyWithHTML(
-      `<b>${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}</b> <i>${customDates.birth_date}</i>\n Siz shu kishini nazarda tutyapsizmi?`,
-      createInlineKeyboard([
-        [
-          ["Xa 👌", "yes"],
-          ["Yo'q 🙅‍♂️", "no"],
-        ],
-      ])
-    );
+    let filename = "./uploads/" + Date.now() + ".png";
+    if (!customDates.photo) {
+      filename = "./lib/personicon.png";
+    }
+    fs.writeFile(filename, customDates.photo, "base64", async (err) => {
+      if (err) throw err;
+      ctx.wizard.state.filename = filename;
+      await ctx.replyWithPhoto(
+        { source: filename },
+        {
+          caption: `<b>${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}</b> <i>${customDates.birth_date}</i>\n Siz shu kishini nazarda tutyapsizmi?`,
+          reply_markup: createInlineKeyboard([
+            [
+              ["Xa 👌", "yes"],
+              ["Yo'q 🙅‍♂️", "no"],
+            ],
+          ]).reply_markup,
+          parse_mode: "HTML",
+        }
+      );
+    });
     ctx.wizard.next();
   },
   async (ctx) => {
@@ -115,10 +127,11 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           inspector_id: ctx.wizard.state.inspector_id,
           licshet: ctx.wizard.state.abonent.licshet,
         });
-        let filename = "./uploads/" + Date.now() + ".png";
-        if (!customDates.photo) {
-          filename = "./lib/personicon.png";
-        }
+        // let filename = "./uploads/" + Date.now() + ".png";
+        // if (!customDates.photo) {
+        //   filename = "./lib/personicon.png";
+        // }
+        let filename = ctx.wizard.state.filename;
         fs.writeFile(filename, customDates.photo, "base64", async (err) => {
           if (err) throw err;
 
@@ -137,10 +150,11 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
             }
           );
           ctx.reply(
-            "Rahmat 😇\nMa'lumotlar tizim adminiga o'rganish uchun yuborildi.."
+            "Rahmat 😇\nMa'lumotlar tizim adminiga o'rganish uchun yuborildi..\n Yana kiritishni hohlaysizmi? 🙂",
+            createInlineKeyboard([[["Xa", "xa"]], [["Yo'q", "yoq"]]])
           );
 
-          ctx.scene.leave();
+          ctx.wizard.next();
         });
         break;
       case "no":
@@ -148,6 +162,29 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         ctx.reply("Bekor qilindi. Demak PINFL raqami noto'g'ri ekan");
         ctx.scene.leave();
         break;
+    }
+  },
+  (ctx) => {
+    try {
+      if (ctx.message?.text) {
+        ctx.reply("OK", keyboards.lotin.mainKeyboard.resize());
+        ctx.scene.leave();
+      }
+      if (ctx.callbackQuery?.data) ctx.deleteMessage();
+      switch (ctx.callbackQuery?.data) {
+        case "xa":
+          ctx.reply("Abonent shaxsiy raqamini kiriting!");
+          ctx.wizard.selectStep(0);
+          break;
+        case "yoq":
+          ctx.deleteMessage();
+          ctx.reply("OK", keyboards.lotin.mainKeyboard.resize());
+          ctx.scene.leave();
+          break;
+      }
+    } catch (error) {
+      console.log("updateAbonentDatesPnfl last scene");
+      throw error;
     }
   }
 );

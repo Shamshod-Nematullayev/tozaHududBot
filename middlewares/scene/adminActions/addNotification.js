@@ -1,5 +1,5 @@
 const { Scenes, Markup } = require("telegraf");
-const { keyboards } = require("../../../lib/keyboards");
+const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
 const { Bildirishnoma } = require("../../../models/SudBildirishnoma");
 const isCancel = require("../../smallFunctions/isCancel");
@@ -21,7 +21,8 @@ const addNotification = new Scenes.WizardScene(
     ctx.wizard.state.file_name = ctx.message.document.file_name;
 
     // Inspektorni tanlash tugmasi
-    const inspectors = require("../../../lib/nazoratchilar.json");
+    let inspectors = require("../../../lib/nazoratchilar.json");
+    inspectors = inspectors.sort((a, b) => a.name.localeCompare(b.name));
     const buttonsArray = [];
     inspectors.forEach((ins) => {
       buttonsArray.push([Markup.button.callback(ins.name, ins.id)]);
@@ -49,24 +50,22 @@ const addNotification = new Scenes.WizardScene(
       ctx.reply("Xatolik", keyboards[ctx.session.til].cancelBtn.resize());
     }
   },
-  (ctx) => {
+  async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
-      if (ctx.message && ctx.message.text == "tayyor") {
-        ctx.reply(
-          messages.enterDate,
-          keyboards[ctx.session.til].cancelBtn.resize()
-        );
-        return ctx.wizard.next();
-      } else {
-        const mahallalar = require("../../../lib/mahallalar.json");
-        ctx.wizard.state.mahallalar.push(
-          mahallalar.filter(
-            (mfy) => ctx.update.callback_query.data.split("_")[1] == mfy.id
-          )[0]
-        );
-        ctx.reply(messages.isDone, Markup.keyboard(["tayyor"]).resize());
-      }
+
+      const mahallalar = require("../../../lib/mahallalar.json");
+      ctx.wizard.state.mahallalar.push(
+        mahallalar.filter(
+          (mfy) => ctx.update.callback_query.data.split("_")[1] == mfy.id
+        )[0]
+      );
+      await ctx.deleteMessage();
+      await ctx.reply(
+        messages.enterDate,
+        keyboards[ctx.session.til].cancelBtn.resize()
+      );
+      return ctx.wizard.next();
     } catch (error) {
       ctx.reply("Xatolik");
       console.log(error);
@@ -108,8 +107,42 @@ const addNotification = new Scenes.WizardScene(
       doc_num,
     });
     await newDocument.save();
-    ctx.replyWithHTML(`✅\n№ <code>${doc_num}</code>`);
-    ctx.scene.leave();
+    await ctx.replyWithHTML(`✅\n№ <code>${doc_num}</code>`);
+    await ctx.reply(
+      "Muvaffaqqiyatli biriktirildi. Yana biriktiramizmi?",
+      createInlineKeyboard([[["Xa", "xa"]], [["Yo'q", "yoq"]]])
+    );
+    ctx.wizard.next();
+  },
+  async (ctx) => {
+    try {
+      if (ctx.message?.text) {
+        ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
+        ctx.scene.leave();
+      }
+      if (ctx.callbackQuery?.data) ctx.deleteMessage();
+      switch (ctx.callbackQuery?.data) {
+        case "xa":
+          const documents = await Bildirishnoma.find({
+            type: "sudga_chiqoring",
+          });
+          let doc_num = documents[documents.length - 1].doc_num + 1;
+          await ctx.replyWithHTML(
+            messages.enterNotificationFile + `\n<code>${doc_num}</code>`,
+            keyboards[ctx.session.til].cancelBtn.resize()
+          );
+          ctx.wizard.selectStep(0);
+          break;
+        case "yoq":
+          ctx.deleteMessage();
+          ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
+          ctx.scene.leave();
+          break;
+      }
+    } catch (error) {
+      console.error("add notification scene 3");
+      throw error;
+    }
   }
 );
 

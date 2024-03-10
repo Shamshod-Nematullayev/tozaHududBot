@@ -2,6 +2,12 @@ const { bot } = require("../core/bot");
 const { Mahalla } = require("../models/Mahalla");
 
 // bot.telegram.se
+bot.on("document", (ctx, next) => {
+  if (ctx.message.caption == "file_id") {
+    ctx.reply(ctx.message.document.file_id);
+  }
+  next();
+});
 bot.use(async (ctx, next) => {
   if (
     ctx.message &&
