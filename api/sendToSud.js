@@ -14,18 +14,15 @@ async function sendToSud({
   pinfl,
   pochta_harajati,
   ariza_dir,
-  forma_bir_dir,
   ilovalar_dir,
 }) {
-  const authToken = "c939f29e-b1f0-4689-bc05-5ee6aecd7f52";
+  const authToken = "a5a5fca7-3658-4192-88a4-fafe2acbc64b";
   async function uploadFileToSudUZ(filePath, fileName) {
     // Create form data
     const formDataForAriza = new FormData();
     formDataForAriza.append("file", fs.createReadStream(filePath));
 
-    // let file_data =
     // Make the fetch request
-
     const res = await fetch(
       "https://cabinetapi.sud.uz/api/cabinet/case/file/upload",
       {
@@ -52,22 +49,13 @@ async function sendToSud({
         return data;
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
         console.error("Error:", error.message);
       });
     return res.id;
   }
-  const customDates = await find_one_by_pinfil_from_mvd(pinfl);
-  const addressDates = await find_address_by_pinfil_from_mvd(pinfl);
-  if (!customDates.success) {
-    return customDates;
-  }
-  if (!addressDates.success) {
-    return addressDates;
-  }
 
-  let res_pochta_harajat;
-  if (pochta_harajati) {
+  async function checkPochtaXarajat(id) {
     res_pochta_harajat = await fetch(
       "https://cabinetapi.sud.uz/api/cabinet/guide/find-by-receipt-number",
       {
@@ -86,17 +74,39 @@ async function sendToSud({
           "x-auth-token": authToken,
         },
         referrer: "https://cabinet.sud.uz/",
-        body: '{"receipt_number":"' + pochta_harajati + '"}',
+        body: '{"receipt_number":"' + id + '"}',
         method: "POST",
         mode: "cors",
         credentials: "omit",
       }
     );
-    res_pochta_harajat = await res_pochta_harajat.json();
+    return await res_pochta_harajat.json();
+  }
+
+  const customDates = await find_one_by_pinfil_from_mvd(pinfl);
+  const addressDates = await find_address_by_pinfil_from_mvd(pinfl);
+  if (!customDates.success) {
+    return customDates;
+  }
+  if (!addressDates.success) {
+    return addressDates;
+  }
+
+  let res_pochta_harajat;
+
+  async function checkPochtaWithRetry(pochta_harajati) {
+    res_pochta_harajat = await checkPochtaXarajat(pochta_harajati);
+    if (res_pochta_harajat.statusCode >= 400) {
+      console.error(res_pochta_harajat.message, "Will retry after 1 minute.");
+      setTimeout(() => checkPochtaWithRetry(pochta_harajati), 60 * 1000);
+    }
+  }
+
+  if (pochta_harajati) {
+    await checkPochtaWithRetry(pochta_harajati);
   }
 
   const ariza_id = await uploadFileToSudUZ(ariza_dir, "ariza.PDF");
-  const forma_bir_id = await uploadFileToSudUZ(forma_bir_dir, "pasport.PDF");
   const ilovalar_id = await uploadFileToSudUZ(ilovalar_dir, "ilovalar.PDF");
 
   let generate_invoce = false;
@@ -166,7 +176,7 @@ async function sendToSud({
     `${customDates.first_name} ${customDates.last_name}.jpeg`
   );
   headers.set("file_size", fileBlob.size.toString());
-  headers.set("file_type", "7f5e9165-426c-4dfb-987d-b6be754fd28f");
+  headers.set("file_type", "49ecf5e0-c2dc-466f-9b6c-964327b1634b");
   headers.set("is_photo", "true");
 
   // Create the fetch request
@@ -187,6 +197,8 @@ async function sendToSud({
 
   const [kun, oy, yil] = doc_date.split(".");
   const pochta_harajati_data = Date.now(1702617968449);
+  // console.log({ addressDates: addressDates.details });
+  console.log(customDates);
   const payload = {
     case: {
       doc_date: `${yil}-${oy}-${parseInt(kun) - 1}T19:00:00.000Z`,
@@ -198,49 +210,32 @@ async function sendToSud({
       {
         is_main: true,
         category_id: "0f90cc41-8f8e-4431-8a3f-84655acc06a9",
-        fields_data: {},
         sub_category_id: "926f7cf8-3336-4002-90e5-38f665b1bcef",
+        fields_data: {},
         second_category_id: null,
       },
     ],
     receipts: [
       {
+        responseModel: null,
         receipt: {
-          type: "POST",
-          total: Number(res_pochta_harajat.receipt.amount),
           currency_id: "UZS",
-          is_generated: false,
-          receipt_date: `2023-12-15T05:26:08.449Z`,
+          type: "POST",
+          receipt_date: new Date(
+            res_pochta_harajat.receipt.issued
+          ).toISOString(),
           receipt_number: String(res_pochta_harajat.receipt.number),
+          total: Number(res_pochta_harajat.receipt.amount),
+          is_generated: false,
         },
-        right_hash: res_pochta_harajat.right_hash,
-        responseModel: null,
         receipt_response: res_pochta_harajat.receipt,
-      },
-      {
-        responseModel: null,
-        receipt: {
-          currency_id: "UZS",
-          type: "POST",
-          // receipt_date: `2023-12-15T05:26:08.449Z`,
-          receipt_number: String(generate_invoce[0].receipt.number),
-          total:
-            pochta_harajati_belgilangan_summa -
-            res_pochta_harajat.receipt.amount,
-          is_generated: true,
-        },
-        receipt_response: generate_invoce[0].receipt,
-        right_hash: generate_invoce[0].receipt.right_hash,
+        right_hash: res_pochta_harajat.right_hash,
       },
     ],
     case_documents: [
       {
         file_id: ariza_id,
         type_id: "543042fd-81f0-4c65-b398-d991cbe9f546",
-      },
-      {
-        file_id: forma_bir_id,
-        type_id: "0871a85b-1fc8-404c-9462-031e7dad2e19",
       },
       {
         file_id: ilovalar_id,
@@ -259,11 +254,52 @@ async function sendToSud({
         },
         entity_details: {
           is_small_business: false,
+          region_id: "eb80d9ff-0d1a-543e-14cb-b3a429a96842",
+          district_id: "c16a182e-453d-465d-6127-cd3f2352f4f2",
+          address: "BOLTABEK MFY JALAYER QISHLOG'I  ",
         },
       },
       {
         entity: {
-          pinfl,
+          pinfl: 0,
+          tin: "201214329",
+          not_citizen: true,
+        },
+        participant: {
+          type: "CLAIMANT",
+          is_main: false,
+          is_appellant: false,
+        },
+        entity_details: {
+          is_current: true,
+          entity_type: "ORGANIZATION",
+          citizenship: "UZB_CITIZEN",
+          short_name: '"SAMARQAND VILOYATI PROKURATURASI" ',
+          name: '"SAMARQAND VILOYATI PROKURATURASI" DAVLAT MUASSASASI',
+          director: "SAYIDKULOV DILMUROD BASTAMOVICH",
+          registry_date: "1995-08-29",
+          accountant_phone: "662330028",
+          accountant_name: "LUKMONOV JAXONGIR AKBAROVICH",
+          bank_account: "20203000100436095004",
+          email: null,
+          director_tin: "442959925",
+          director_pinfl: "30709733790019",
+          accountant_tin: "489652928",
+          registry_number: "1-к",
+          phone: "662330028",
+          bank_id: "f0afcffb-5cab-46ca-96d1-76dc28b22a8a",
+          address: "КУКСАРОЙ КУЧАСИ  4",
+          postcode: "140100",
+          ministry_stat_id: "16108ef7-f4ba-78fe-91ff-19170f3ba1fd",
+          ownership_type_id: "a4b4c86e-7be3-c217-3e26-b20f80341142",
+          organization_form_id: "32293d0b-3dfb-f3b0-8758-73886d6cb96b",
+          district_id: "c3bd78a9-3020-1515-1e8b-3dfd448c9039",
+          region_id: "eb80d9ff-0d1a-543e-14cb-b3a429a96842",
+        },
+      },
+      {
+        entity: {
+          pinfl: String(pinfl),
           tin: 0,
           not_citizen: true,
         },
@@ -278,20 +314,23 @@ async function sendToSud({
           entity_type: "PERSON",
           citizenship: "UZB_CITIZEN",
           photo_id: photo_res.id,
-          gender: customDates.gender,
-          address: addressDates.address,
-          details: customDates.details,
-          last_name: customDates.last_name,
-          region_id: addressDates.region_id,
-          birth_date: customDates.birth_date,
+          details: {
+            ...customDates.details,
+            PermanentRegistration: addressDates.details.PermanentRegistration,
+          },
           country_id: customDates.country_id,
-          first_name: customDates.first_name,
-          district_id: customDates.district_id,
-          middle_name: customDates.middle_name,
-          birth_region_id: customDates.birth_date,
-          passport_number: customDates.passport_number,
           passport_serial: customDates.passport_serial,
+          passport_number: customDates.passport_number,
+          last_name: customDates.last_name,
+          middle_name: customDates.middle_name,
+          first_name: customDates.first_name,
+          birth_date: customDates.birth_date,
+          gender: customDates.gender,
+          birth_region_id: customDates.birth_date,
           birth_district_id: customDates.birth_district_id,
+          region_id: addressDates.region_id,
+          district_id: customDates.district_id,
+          address: addressDates.address,
         },
       },
     ],
@@ -343,6 +382,7 @@ async function sendToSud({
     }
   );
   res = await res.json();
+  fs.writeFile("./text.txt", JSON.stringify(payload), "utf-8", (err) => {});
   console.log(res);
 }
 // sendToSud({ pinfl: "33101706180044", pochta_harajati: "233494735062" });

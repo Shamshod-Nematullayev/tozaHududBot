@@ -39,7 +39,7 @@ const schema = new Schema(
     phone: String,
     pinfl: Number,
     passport_number: String,
-    photo: String,
+    // photo: String,
     prescribed_cnt: Number,
     shaxsi_tasdiqlandi: {
       type: Object,

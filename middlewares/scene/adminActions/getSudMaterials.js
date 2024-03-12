@@ -138,6 +138,9 @@ async function arxivdanFaylOlish(
             pachka.items.forEach(async (item) => {
               const abonent = await Abonent.findOne({ licshet: item.KOD });
               const mfy = await Mahalla.findOne({ id: abonent.mahallas_id });
+              if (!mfy.ommaviy_shartnoma) {
+                return ctx.reply(`${mfy.name} ommaviy shartnomasi bazada yo'q`);
+              }
               const ommaviy_shartnoma_file_name = `${ctx.wizard.state.baseDirectory}/ommaviy_shartnomalar/${mfy.id}.PDF`;
               const mfyStream = fs.createWriteStream(
                 ommaviy_shartnoma_file_name
@@ -196,26 +199,43 @@ const getSudMaterial = new Scenes.WizardScene(
       ctx.wizard.state.baseDirectory = baseDirectory;
 
       // Create subdirectories
-      fs.mkdir(baseDirectory, (err) => {
-        if (err) throw err;
-      });
+      const directories = [
+        "/arizalar",
+        "/abonent_kartalar",
+        "/ommaviy_shartnomalar",
+        "/ogohlantirish_xatlari",
+      ];
 
-      fs.mkdir(baseDirectory + "/arizalar", (err) => {
-        if (err) throw err;
-      });
+      // Function to create directories
+      function createDirectories(baseDirectory, directories) {
+        fs.mkdir(baseDirectory, (err) => {
+          if (err) {
+            console.error(
+              `Error creating to basedir ${baseDirectory}${directory}:`,
+              err
+            );
+          } else {
+            console.log(`Directory ${baseDirectory} created successfully.`);
+          }
+        });
+        directories.forEach((directory) => {
+          fs.mkdir(baseDirectory + directory, (err) => {
+            if (err) {
+              console.error(
+                `Error creating ${baseDirectory}${directory}:`,
+                err
+              );
+            } else {
+              console.log(
+                `Directory ${baseDirectory}${directory} created successfully.`
+              );
+            }
+          });
+        });
+      }
+      createDirectories(baseDirectory, directories);
 
-      fs.mkdir(baseDirectory + "/abonent_kartalar", (err) => {
-        if (err) throw err;
-      });
-
-      fs.mkdir(baseDirectory + "/ommaviy_shartnomalar", (err) => {
-        if (err) throw err;
-      });
-
-      fs.mkdir(baseDirectory + "/ogohlantirish_xatlari", (err) => {
-        if (err) throw err;
-      });
-      ctx.replyWithDocument(sudMaterialImportExcel, {
+      await ctx.replyWithDocument(sudMaterialImportExcel, {
         caption: `Sudga yuborish uchun xujjatlari tayyor abonentlar ro'yxatini na'munadagi jadvalga joylashtirib tashlab bering`,
       });
       ctx.wizard.next();
@@ -259,6 +279,10 @@ const getSudMaterial = new Scenes.WizardScene(
             await SudMaterial.findByIdAndUpdate(ctx.wizard.state.pachka_id, {
               $set: { items: rows },
             });
+            await ctx.telegram.deleteMessage(
+              ctx.chat.id,
+              waiterMessage.message_id
+            );
             ctx.reply(
               "Endi arizalarni scaner qilingan variantini zip arxivlangan holda menga yuboring. Fayllarni ajratib olishim uchun fayl nomini abonent lischet kodi bilan nomlang!"
             );
@@ -302,8 +326,7 @@ const getSudMaterial = new Scenes.WizardScene(
       ctx,
       "abonent_kartalar",
       "ABONENT_KARTA_FILE_ID",
-      "ABONENT KARTA",
-      "FORMA 1"
+      "ABONENT KARTA"
     );
   },
   async (ctx) => {
@@ -321,7 +344,7 @@ const getSudMaterial = new Scenes.WizardScene(
               fs.mkdir(
                 ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD,
                 async (err) => {
-                  if (err) throw err;
+                  if (err && err.code != "EEXIST") throw err;
                   await fs.promises.copyFile(
                     `${ctx.wizard.state.baseDirectory}/arizalar/${item.KOD}.PDF`,
                     `${
@@ -373,9 +396,6 @@ const getSudMaterial = new Scenes.WizardScene(
                     ariza_dir: `${
                       ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
                     }/ariza.PDF`,
-                    forma_bir_dir: `${
-                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
-                    }/forma_bir.PDF`,
                     ilovalar_dir: `${
                       ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
                     }/ilovalar.PDF`,
