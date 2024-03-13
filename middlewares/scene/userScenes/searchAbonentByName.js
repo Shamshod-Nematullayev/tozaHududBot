@@ -22,7 +22,8 @@ const searchAbonentbyName = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
+      if ((ctx.message && isCancel(ctx.message.text)) || !ctx.message)
+        return ctx.scene.leave();
       ctx.scene.state.FISH = ctx.message.text;
       // const abonentsJSON = require("../../../lib/abonents.json");
       // const abonents = abonentsJSON[Object.keys(abonentsJSON)[0]];

@@ -267,6 +267,7 @@ const getSudMaterial = new Scenes.WizardScene(
 
             const sheet = xls[Object.keys(xls)[0]];
             const rows = [];
+            console.log(sheet);
             for (let i = 0; i < sheet.length - 1; i++) {
               rows.push({
                 KOD: sheet[i + 1].A,

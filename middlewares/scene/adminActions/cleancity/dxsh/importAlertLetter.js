@@ -1,48 +1,107 @@
-const { CleanCitySession } = require("../../../../../models/CleanCitySession");
-const { JSDOM } = require("jsdom");
-const cc = `https://cleancity.uz/`;
+const { Scenes } = require("telegraf");
+const fs = require("fs");
+const https = require("https");
+const excelToJson = require("convert-excel-to-json");
+const {
+  INPUT_ALERT_LETTER_TO_BILLING_EXCEL,
+} = require("../../../../../constants");
+const isCancel = require("../../../../smallFunctions/isCancel");
+const { keyboards } = require("../../../../../lib/keyboards");
 
-async function importAlertLetter() {
-  //   let obj = {
-  //     abonent_id,
-  //     file_name,
-  //     alert_summ,
-  //     alert_date,
-  //   };
-  try {
-    const session = await CleanCitySession.findOne({ type: "dxsh" });
-    if (session.path.enterAlertLetterPath) {
-    } else {
-      const startpage = await fetch(cc + "startpage", {
-        headers: { Cookie: session.cookie },
-      });
-      const startpageText = await startpage.text();
-      const startpageDoc = new JSDOM(startpageText).window.document;
-      const elements = startpageDoc.querySelectorAll("a");
-      let toAlertLettersPage = "";
-      elements.forEach(function (element) {
-        // Check if the text content matches "hello world"
-        if (element.textContent.trim() === "Суд огоҳлантириш") {
-          // Found the element, do something with it
-          toAlertLettersPage = element.href;
-        }
-      });
-      console.log(toAlertLettersPage);
-      const res1 = await fetch(
-        `https://cleancity.uz/dashboard/${toAlertLettersPage}`,
-        { headers: { Cookie: session.cookie } }
+const importAlertLetters = new Scenes.WizardScene(
+  "importAlertLetters",
+  async (ctx) => {
+    try {
+      if (!ctx.message.document)
+        return ctx.reply(
+          "Siz fayl kiritmadingiz",
+          keyboards.lotin.cancelBtn.resize()
+        );
+      if (
+        ctx.message.document.mime_type !== "application/vnd.ms-excel" &&
+        ctx.message.document.mime_type !==
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      ) {
+        return ctx.reply(
+          "Siz excel fayl kiritmadingiz",
+          keyboards.lotin.cancelBtn.resize()
+        );
+      }
+
+      const xlsxTelegram = await ctx.telegram.getFileLink(
+        ctx.message.document.file_id
       );
-      const res2 = await fetch(res1.url, {
-        headers: {
-          Cookie: session.cookie,
-        },
+      const filenameXLSX = `./importAlertLetters${Date.now()}.xlsx`;
+      const writeStream = fs.createWriteStream(filenameXLSX);
+      https.get(xlsxTelegram.href, (res) => {
+        res.pipe(writeStream);
+        writeStream.on("finish", async (cb) => {
+          const rows = excelToJson({
+            sourceFile: filenameXLSX,
+          });
+          const sheet = rows[Object.keys(rows)[0]];
+          sheet.shift();
+          await ctx.reply(
+            `Qabul qilindi. Endi ro'yxatdagi abonentlarning ogohlantirish xatlari fayllarini menga arxiv shaklida yuboring. Fayllarni ajratib olishim uchun ularni shaxsiy hisob raqami bilan nomlangz`
+          );
+          ctx.wizard.next();
+        });
       });
-      const res2Text = await res2.text();
-      console.log(res2Text.match(/dsmmf?xenc([^']+)==/g));
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
     }
-  } catch (err) {
-    console.log(err);
-  }
-}
+  },
+  async (res) => {
+    try {
+      if (!ctx.message.document)
+        return ctx.reply(
+          "Siz fayl kiritmadingiz",
+          keyboards.lotin.cancelBtn.resize()
+        );
+      if (ctx.message.document.mime_type !== "application/zip")
+        return ctx.reply(
+          "Siz zip arxiv faylini kiritmadingiz",
+          keyboards.lotin.cancelBtn.resize()
+        );
 
-module.exports = { importAlertLetter };
+      const dirname = "./uploads/process" + Date.now();
+      fs.mkdir(dirname, (err) => {
+        if (err) throw err;
+      });
+      const zipFileTelegramPath = await ctx.telegram.getFileLink(
+        ctx.message.document.file_id
+      );
+      const filename = `./uploads/process${Date.now()}.zip`;
+      const zipFileStream = fs.createWriteStream(filename);
+      https.get(zipFileTelegramPath.href, (res) => {
+        res.pipe(zipFileStream);
+      });
+      zipFileStream.on("finish", async (cb) => {
+        await compressing.zip.uncompress(filename, dirname);
+        fs.readdir(dirname, async (err, files) => {
+          if (err) throw err;
+        });
+      });
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+);
+
+importAlertLetters.on("text", (ctx, next) => {
+  if (isCancel(ctx.message.text)) {
+    ctx.reply("Bekor qilindi");
+    return ctx.scene.leave();
+  } else next();
+});
+
+importAlertLetters.enter((ctx) => {
+  ctx.replyWithDocument(INPUT_ALERT_LETTER_TO_BILLING_EXCEL, {
+    caption:
+      "Kerakli ma'lumotlarni mazkur excel jadvalga joylashtirib menga yuboring. 200 dona dan ko'p kiritmaslik tavsiya e'tiladi.",
+  });
+});
+
+module.exports = { importAlertLetters };

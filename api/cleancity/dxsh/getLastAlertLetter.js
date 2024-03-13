@@ -109,7 +109,6 @@ async function getLastAlertLetter(kod) {
           Cookie: session.cookie,
         },
       });
-      console.log(res1.url);
 
       const res2Text = await res2.text();
       let findSudProccessPath = res2Text.match(

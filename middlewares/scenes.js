@@ -61,6 +61,9 @@ const {
 const {
   exportWarningLettersZip,
 } = require("./scene/adminActions/exportWarningLettersZip");
+const {
+  importAlertLetters,
+} = require("./scene/adminActions/cleancity/dxsh/importAlertLetter");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -97,6 +100,7 @@ const stage = new Scenes.Stage([
   generateProkuraturaSudAriza,
   exportAbonentCards,
   exportWarningLettersZip,
+  importAlertLetters,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

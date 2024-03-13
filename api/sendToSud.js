@@ -5,6 +5,7 @@ const {
 const pochta_harajati_belgilangan_summa = 17000;
 const fs = require("fs");
 const blobUtil = require("blob-util");
+const path = require("path");
 
 const sudApiDomen = "https://cabinetapi.sud.uz/api";
 async function sendToSud({
@@ -28,12 +29,22 @@ async function sendToSud({
       {
         method: "POST",
         headers: {
-          "X-Auth-Token": authToken,
+          "x-Auth-Token": authToken,
           file_name: fileName,
           file_size: fs.statSync(filePath).size.toString(),
+          accept: "application/json, text/plain, */*",
+          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+          "content-type": "application/octet-stream",
           file_type: "46e58bdd-d861-44fd-8168-9522719fa999",
           mime_type: "application/pdf",
-          is_photo: "false",
+          responsetype: "arraybuffer",
+          "sec-ch-ua":
+            '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-site",
         },
         body: formDataForAriza,
       }
@@ -184,8 +195,26 @@ async function sendToSud({
     "https://cabinetapi.sud.uz/api/cabinet/case/file/upload",
     {
       method: "POST",
-      headers,
-      body: formData,
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+        "content-type": "application/octet-stream",
+        file_name:
+          "%D0%A3%D0%9B%D0%A3%D2%92%D0%91%D0%95%D0%9A%20%D0%96%D0%A3%D0%A0%D0%90%D0%95%D0%92.jpeg",
+        file_size: `${fileBlob.size.toString()}`,
+        file_type: "7f5e9165-426c-4dfb-987d-b6be754fd28f",
+        is_photo: "true",
+        responsetype: "arraybuffer",
+        "sec-ch-ua":
+          '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "x-auth-token": "49ecf5e0-c2dc-466f-9b6c-964327b1634b",
+      },
+      body: customDates.photo,
     }
   );
 
@@ -198,7 +227,7 @@ async function sendToSud({
   const [kun, oy, yil] = doc_date.split(".");
   const pochta_harajati_data = Date.now(1702617968449);
   // console.log({ addressDates: addressDates.details });
-  console.log(customDates);
+  console.log({ photo_res });
   const payload = {
     case: {
       doc_date: `${yil}-${oy}-${parseInt(kun) - 1}T19:00:00.000Z`,
@@ -326,7 +355,7 @@ async function sendToSud({
           first_name: customDates.first_name,
           birth_date: customDates.birth_date,
           gender: customDates.gender,
-          birth_region_id: customDates.birth_date,
+          birth_region_id: customDates.birth_region_id,
           birth_district_id: customDates.birth_district_id,
           region_id: addressDates.region_id,
           district_id: customDates.district_id,

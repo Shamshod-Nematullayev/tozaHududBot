@@ -333,7 +333,7 @@ const importIncomeScene = new Scenes.WizardScene(
 );
 
 importIncomeScene.enter((ctx) => {
-  ctx.reply(messages.enterIncomeReport, keyboards.cancelBtn.resize());
+  ctx.reply(messages.enterIncomeReport, keyboards.lotin.cancelBtn.resize());
 });
 
 importIncomeScene.leave((ctx) => {

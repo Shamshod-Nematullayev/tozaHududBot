@@ -48,6 +48,9 @@ const htmlPDF = require("html-pdf");
 const {
   getLastAlertLetter,
 } = require("../api/cleancity/dxsh/getLastAlertLetter");
+const {
+  enterWarningLetterToBilling,
+} = require("../api/cleancity/dxsh/enterWarningLetterToBilling");
 
 // =====================================================================================
 const composer = new Composer();
@@ -380,6 +383,11 @@ composer.hears(/karta_/g, async (ctx) => {
     });
 });
 
+composer.hears("OGOHLANTIRISH XATLARI IMPORT", async (ctx) => {
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+
+  ctx.scene.enter("importAlertLetters");
+});
 composer.hears("ExportAbonentCards", async (ctx) => {
   if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 
@@ -395,7 +403,15 @@ composer.hears("a", (ctx) => {
   importAlertLetter();
 });
 composer.hears("b", async (ctx) => {
-  console.log(await getLastAlertLetter(105120701016));
+  console.log(
+    await enterWarningLetterToBilling({
+      lischet: "105120380070",
+      qarzdorlik: 217464,
+      comment: "Test 1",
+      sana: "07.03.2024",
+      file_path: "./380070.PDF",
+    })
+  );
 });
 
 bot.use(composer);
