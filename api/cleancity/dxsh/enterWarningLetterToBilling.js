@@ -3,6 +3,7 @@ const request = require("request");
 const cc = "https://cleancity.uz/";
 const { JSDOM } = require("jsdom");
 const fs = require("fs");
+const path = require("path");
 // const FormData = require("form-data");
 
 async function enterWarningLetterToBilling({
@@ -41,6 +42,7 @@ async function enterWarningLetterToBilling({
         resource_types_id: "15",
         amount: qarzdorlik,
         warning_date: sana,
+        purpose: comment,
         file_bytes: {
           value: fs.createReadStream(file_path),
           options: {
@@ -50,9 +52,11 @@ async function enterWarningLetterToBilling({
         },
       },
     };
-    request(options, function (error, response) {
-      if (error) throw new Error(error);
-      console.log(response.body);
+    return new Promise((resolve, reject) => {
+      request(options, function (error, response) {
+        if (error) reject(error);
+        resolve(JSON.parse(response.body));
+      });
     });
   } else {
     const startpage = await fetch(cc + "startpage", {
@@ -81,10 +85,12 @@ async function enterWarningLetterToBilling({
     });
     const res2Text = await res2.text();
     let findSudProccessPath = res2Text.match(/dsmmf\?xenc=([^']+)==/g);
+    if (!findSudProccessPath)
+      return { success: false, message: "Session has expired" };
     await session.updateOne({
       $set: { "path.enterWarningLetterToBilling": findSudProccessPath[0] },
     });
-    enterWarningLetterToBilling(arguments);
+    return enterWarningLetterToBilling(arguments);
   }
 }
 

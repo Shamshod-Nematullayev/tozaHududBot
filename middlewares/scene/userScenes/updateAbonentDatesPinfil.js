@@ -21,6 +21,11 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
     }
     ctx.wizard.state.inspector_id = inspektor._id;
     ctx.wizard.state.inspector_name = inspektor.name;
+    if (!ctx.message)
+      return ctx.reply(
+        "Kutilagan ma'lumot kiritilmadi",
+        keyboards.lotin.cancelBtn.resize()
+      );
     if (ctx.message && isCancel(ctx.message.text)) {
       ctx.reply("Bekor qilindi");
       return ctx.scene.leave();

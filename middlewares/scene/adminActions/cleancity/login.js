@@ -60,10 +60,14 @@ const loginCleanCityScene = new Scenes.WizardScene(
       );
       captchaImg.body.pipe(
         fs.createWriteStream("./captcha.png").on("finish", () => {
-          ctx.replyWithPhoto(
-            { source: "./captcha.png" },
-            { caption: "Rasmdagi belgilarni kiriting" }
-          );
+          ctx
+            .replyWithPhoto(
+              { source: "./captcha.png" },
+              { caption: "Rasmdagi belgilarni kiriting" }
+            )
+            .then(() => {
+              fs.unlink("./captcha.png");
+            });
           ctx.wizard.next();
         })
       );
@@ -111,13 +115,17 @@ const loginCleanCityScene = new Scenes.WizardScene(
         );
         captchaImg.body.pipe(
           fs.createWriteStream("./captcha.png").on("finish", () => {
-            return ctx.replyWithPhoto(
-              { source: "./captcha.png" },
-              {
-                caption: resDoc.querySelector(".feedbackPanelERROR")
-                  .textContent,
-              }
-            );
+            return ctx
+              .replyWithPhoto(
+                { source: "./captcha.png" },
+                {
+                  caption: resDoc.querySelector(".feedbackPanelERROR")
+                    .textContent,
+                }
+              )
+              .then(() => {
+                fs.unlink("./captcha.png");
+              });
           })
         );
       }

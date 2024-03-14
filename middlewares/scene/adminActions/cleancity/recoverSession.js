@@ -48,13 +48,17 @@ const recoverCleanCitySession = new Scenes.WizardScene(
         );
         captchaImg.body.pipe(
           fs.createWriteStream("./captcha.png").on("finish", () => {
-            return ctx.replyWithPhoto(
-              { source: "./captcha.png" },
-              {
-                caption: resDoc.querySelector(".feedbackPanelERROR")
-                  .textContent,
-              }
-            );
+            return ctx
+              .replyWithPhoto(
+                { source: "./captcha.png" },
+                {
+                  caption: resDoc.querySelector(".feedbackPanelERROR")
+                    .textContent,
+                }
+              )
+              .then(() => {
+                fs.unlink("./captcha.png");
+              });
           })
         );
       }

@@ -150,26 +150,26 @@ async function arxivdanFaylOlish(
               );
               https.get(fileOnTG.href, (res) => {
                 res.pipe(mfyStream);
-              });
-              mfyStream.on("finish", (cb) => {
-                console.log(mfy.name + " ommaviy shartnomasi yuklab olindi");
+                mfyStream.on("finish", (cb) => {
+                  console.log(mfy.name + " ommaviy shartnomasi yuklab olindi");
+                });
               });
             });
-            await downloadFileToBaseDir(
-              ctx.wizard.state.baseDirectory,
-              "GUVOHNOMA.PDF",
-              guvohnomaFileID
-            );
-            await downloadFileToBaseDir(
-              ctx.wizard.state.baseDirectory,
-              "SHARTNOMA.PDF",
-              shartnomaSSPFileID
-            );
-            await downloadFileToBaseDir(
-              ctx.wizard.state.baseDirectory,
-              "ISHONCHNOMA.PDF",
-              ishonchnomaFileID
-            );
+            // await downloadFileToBaseDir(
+            //   ctx.wizard.state.baseDirectory,
+            //   "GUVOHNOMA.PDF",
+            //   guvohnomaFileID
+            // );
+            // await downloadFileToBaseDir(
+            //   ctx.wizard.state.baseDirectory,
+            //   "SHARTNOMA.PDF",
+            //   shartnomaSSPFileID
+            // );
+            // await downloadFileToBaseDir(
+            //   ctx.wizard.state.baseDirectory,
+            //   "ISHONCHNOMA.PDF",
+            //   ishonchnomaFileID
+            // );
             await ctx.reply(
               "Hamma ma'lumotlar tayyor, sudga yuboraymi?",
               createInlineKeyboard([[["Xa", "xa"]], [["Keyinroq", "keyinroq"]]])
