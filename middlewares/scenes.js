@@ -64,6 +64,9 @@ const {
 const {
   importAlertLetters,
 } = require("./scene/adminActions/cleancity/dxsh/importAlertLetter");
+const {
+  pochtaHarajatiniTekshirishScene,
+} = require("./scene/adminActions/pochtaHarajatlariniTekshirish");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -101,6 +104,7 @@ const stage = new Scenes.Stage([
   exportAbonentCards,
   exportWarningLettersZip,
   importAlertLetters,
+  pochtaHarajatiniTekshirishScene,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

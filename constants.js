@@ -8,3 +8,4 @@ module.exports.guvohnomaFileID = `BQACAgIAAxkBAAEBLvRlqkZQkkAgAWxnF4_neNNkvRbVIQ
 module.exports.ishonchnomaFileID = `BQACAgIAAxkBAAEBLvllqkdFUyZ0s2BNrB38BVWBRb37XAACnTkAApzHWUk2asxbBSPOXzQE`;
 module.exports.shartnomaSSPFileID = `BQACAgIAAxkBAAEBLwVlqkfRChxRq4hA2YGmQKsnocJq-wACdzwAAizGWEkPpZ9_-WRZDTQE`;
 module.exports.inputAbonentLicshet = `BQACAgIAAxkBAAEDm9ll6F9SmQ5HQCW4S0X-BxOuV6EkGgACb0IAAqFTSEtIB9fHlfO1aDQE`;
+module.exports.pochtaHarajatlariTekshirishInputExcelShablon = `BQACAgIAAxkBAAED4Wpl-YyHr_4xajjXZa9MTvh1-dj8RAAClz0AAr1M0UvDetJFMVvbOzQE`;

@@ -399,6 +399,10 @@ composer.hears("ExportWarningLettersZip", async (ctx) => {
   ctx.scene.enter("exportWarningLettersZip");
 });
 
+composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
+  ctx.scene.enter("pochtaHarajatiniTekshirishScene")
+);
+
 composer.hears("a", (ctx) => {
   importAlertLetter();
 });
