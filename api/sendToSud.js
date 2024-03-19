@@ -6,6 +6,7 @@ const pochta_harajati_belgilangan_summa = 17000;
 const fs = require("fs");
 const blobUtil = require("blob-util");
 const path = require("path");
+const request = require("request");
 
 const sudApiDomen = "https://cabinetapi.sud.uz/api";
 async function sendToSud({
@@ -17,53 +18,94 @@ async function sendToSud({
   ariza_dir,
   ilovalar_dir,
 }) {
-  const authToken = "a5a5fca7-3658-4192-88a4-fafe2acbc64b";
+  const authToken = "fe9e6cf7-e76e-44fd-8a25-4018c7f9b13c";
   async function uploadFileToSudUZ(filePath, fileName) {
     // Create form data
     const formDataForAriza = new FormData();
     formDataForAriza.append("file", fs.createReadStream(filePath));
 
-    // Make the fetch request
-    const res = await fetch(
-      "https://cabinetapi.sud.uz/api/cabinet/case/file/upload",
-      {
-        method: "POST",
-        headers: {
-          "x-Auth-Token": authToken,
-          file_name: fileName,
-          file_size: fs.statSync(filePath).size.toString(),
-          accept: "application/json, text/plain, */*",
-          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
-          "content-type": "application/octet-stream",
-          file_type: "46e58bdd-d861-44fd-8168-9522719fa999",
-          mime_type: "application/pdf",
-          responsetype: "arraybuffer",
-          "sec-ch-ua":
-            '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"Windows"',
-          "sec-fetch-dest": "empty",
-          "sec-fetch-mode": "cors",
-          "sec-fetch-site": "same-site",
+    let options = {
+      method: "POST",
+      url: `https://cabinetapi.sud.uz/api/cabinet/case/file/upload`,
+      headers: {
+        "x-Auth-Token": authToken,
+        file_name: fileName,
+        file_size: fs.statSync(filePath).size.toString(),
+        accept: "application/json, text/plain, */*",
+        "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+        "content-type": "multipart/form-data",
+        file_type: "46e58bdd-d861-44fd-8168-9522719fa999",
+        mime_type: "application/pdf",
+        responsetype: "arraybuffer",
+        "sec-ch-ua":
+          '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+      },
+      formData: {
+        file: {
+          value: fs.createReadStream(filePath),
+          options: {
+            filename: "ariza" + ".PDF",
+            contentType: "application/pdf",
+          },
         },
-        body: formDataForAriza,
-      }
-    )
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Upload successful:", data);
-        return data;
-      })
-      .catch((error) => {
-        console.error(error);
-        console.error("Error:", error.message);
+      },
+    };
+    const send = new Promise((resolve, reject) => {
+      request(options, function (error, response) {
+        // if (error) reject(error);
+        resolve(JSON.parse(response.body));
       });
-    return res.id;
+    });
+
+    // Make the fetch request
+    // const res = await fetch(
+    //   "https://cabinetapi.sud.uz/api/cabinet/case/file/upload",
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "x-Auth-Token": authToken,
+    //       file_name: fileName,
+    //       file_size: fs.statSync(filePath).size.toString(),
+    //       accept: "application/json, text/plain, */*",
+    //       "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+    //       "content-type": "application/octet-stream",
+    //       file_type: "46e58bdd-d861-44fd-8168-9522719fa999",
+    //       mime_type: "application/pdf",
+    //       responsetype: "arraybuffer",
+    //       "sec-ch-ua":
+    //         '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+    //       "sec-ch-ua-mobile": "?0",
+    //       "sec-ch-ua-platform": '"Windows"',
+    //       "sec-fetch-dest": "empty",
+    //       "sec-fetch-mode": "cors",
+    //       "sec-fetch-site": "same-site",
+    //     },
+    //     body: formDataForAriza,
+    //   }
+    // )
+    //   .then(async (response) => {
+    //     if (!response.ok) {
+    //       throw new Error(`HTTP error! Status: ${response.status}`);
+    //     }
+    //     return response.json();
+    //   })
+    //   .then((data) => {
+    //     console.log("Upload successful:", data);
+    //     return data;
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //     console.error("Error:", error.message);
+    //   });
+    return send.then((res) => {
+      console.log({ res });
+      return res.id;
+    });
   }
 
   async function checkPochtaXarajat(id) {
@@ -97,10 +139,12 @@ async function sendToSud({
   const customDates = await find_one_by_pinfil_from_mvd(pinfl);
   const addressDates = await find_address_by_pinfil_from_mvd(pinfl);
   if (!customDates.success) {
+    console.error(customDates);
     return customDates;
   }
   if (!addressDates.success) {
-    return addressDates;
+    console.error(addressDates);
+    addressDates;
   }
 
   let res_pochta_harajat;
@@ -108,56 +152,67 @@ async function sendToSud({
   async function checkPochtaWithRetry(pochta_harajati) {
     res_pochta_harajat = await checkPochtaXarajat(pochta_harajati);
     if (res_pochta_harajat.statusCode >= 400) {
+      console.log(pochta_harajati, pinfl);
       console.error(res_pochta_harajat.message, "Will retry after 1 minute.");
-      setTimeout(() => checkPochtaWithRetry(pochta_harajati), 60 * 1000);
+      // setTimeout(() => checkPochtaWithRetry(pochta_harajati), 60 * 1000);
     }
   }
 
   if (pochta_harajati) {
     await checkPochtaWithRetry(pochta_harajati);
   }
+  console.log({ res_pochta_harajat });
+  if (res_pochta_harajat.statusCode >= 400) {
+    return {
+      failed: true,
+      message:
+        pochta_harajati +
+        " - raqamli pochta harajatida muammo bo'ldi. " +
+        res_pochta_harajat.message,
+    };
+  }
 
   const ariza_id = await uploadFileToSudUZ(ariza_dir, "ariza.PDF");
   const ilovalar_id = await uploadFileToSudUZ(ilovalar_dir, "ilovalar.PDF");
 
   let generate_invoce = false;
-  if (
-    pochta_harajati_belgilangan_summa - res_pochta_harajat.receipt.amount >
-    0
-  ) {
-    generate_invoce = await fetch(
-      "https://cabinetapi.sud.uz/api/cabinet/guide/generate-invoices",
-      {
-        headers: {
-          accept: "application/json, text/plain, */*",
-          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
-          "content-type": "application/json",
-          responsetype: "arraybuffer",
-          "sec-ch-ua":
-            '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"Windows"',
-          "sec-fetch-dest": "empty",
-          "sec-fetch-mode": "cors",
-          "sec-fetch-site": "same-site",
-          "x-auth-token": authToken,
-        },
-        referrer: "https://cabinet.sud.uz/",
-        body:
-          '{"entity_id":"6d8fd30e-82fb-4eaf-8308-57703c1c7e4c","court_id":"d007c274-844f-49b9-b2c1-b514fc407c2f","entity_details":{},"invoices":[{"amount_type":"POST","amount":' +
-          Number(
-            pochta_harajati_belgilangan_summa -
-              res_pochta_harajat.receipt.amount
-          ) +
-          "}]}",
-        method: "POST",
-        mode: "cors",
-        credentials: "omit",
-      }
-    );
+  // if (
+  //   pochta_harajati_belgilangan_summa - res_pochta_harajat.receipt.amount >
+  //   0
+  // ) {
+  //   generate_invoce = await fetch(
+  //     "https://cabinetapi.sud.uz/api/cabinet/guide/generate-invoices",
+  //     {
+  //       headers: {
+  //         accept: "application/json, text/plain, */*",
+  //         "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+  //         "content-type": "application/json",
+  //         responsetype: "arraybuffer",
+  //         "sec-ch-ua":
+  //           '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+  //         "sec-ch-ua-mobile": "?0",
+  //         "sec-ch-ua-platform": '"Windows"',
+  //         "sec-fetch-dest": "empty",
+  //         "sec-fetch-mode": "cors",
+  //         "sec-fetch-site": "same-site",
+  //         "x-auth-token": authToken,
+  //       },
+  //       referrer: "https://cabinet.sud.uz/",
+  //       body:
+  //         '{"entity_id":"6d8fd30e-82fb-4eaf-8308-57703c1c7e4c","court_id":"d007c274-844f-49b9-b2c1-b514fc407c2f","entity_details":{},"invoices":[{"amount_type":"POST","amount":' +
+  //         Number(
+  //           pochta_harajati_belgilangan_summa -
+  //             res_pochta_harajat.receipt.amount
+  //         ) +
+  //         "}]}",
+  //       method: "POST",
+  //       mode: "cors",
+  //       credentials: "omit",
+  //     }
+  //   );
 
-    generate_invoce = await generate_invoce.json();
-  }
+  //   generate_invoce = await generate_invoce.json();
+  // }
   // Fuqoro rasmini Sud.uz bazasiga yuklash
   const formData = new FormData();
   const fileBuffer = Buffer.from(customDates.photo, "base64");
@@ -182,10 +237,7 @@ async function sendToSud({
 
   let headers = new Headers();
   headers.set("X-Auth-Token", authToken);
-  headers.set(
-    "file_name",
-    `${customDates.first_name} ${customDates.last_name}.jpeg`
-  );
+  headers.set("file_name", `photo.jpeg`);
   headers.set("file_size", fileBlob.size.toString());
   headers.set("file_type", "49ecf5e0-c2dc-466f-9b6c-964327b1634b");
   headers.set("is_photo", "true");
@@ -220,17 +272,19 @@ async function sendToSud({
 
   photo_res = await photo_res.json();
 
-  const date = new Date();
-  const currentDate = new Date();
-  const isoDateString = currentDate.toISOString().replace(/\.\d+Z$/, "Z");
-
   const [kun, oy, yil] = doc_date.split(".");
-  const pochta_harajati_data = Date.now(1702617968449);
   // console.log({ addressDates: addressDates.details });
   console.log({ photo_res });
+  function formatNumber(number) {
+    if (number < 10) {
+      return "0" + number;
+    } else {
+      return number;
+    }
+  }
   const payload = {
     case: {
-      doc_date: `${yil}-${oy}-${parseInt(kun) - 1}T19:00:00.000Z`,
+      doc_date: `${yil}-${formatNumber(oy)}-${parseInt(kun) - 1}T19:00:00.000Z`,
       doc_number: doc_number,
       court_id: "d007c274-844f-49b9-b2c1-b514fc407c2f",
       duty_reason_id: "b4c87d9e-1f9e-4e9f-94f5-0b21840d57b1",
@@ -345,7 +399,7 @@ async function sendToSud({
           photo_id: photo_res.id,
           details: {
             ...customDates.details,
-            PermanentRegistration: addressDates.details.PermanentRegistration,
+            PermanentRegistration: addressDates.details?.PermanentRegistration,
           },
           country_id: customDates.country_id,
           passport_serial: customDates.passport_serial,
@@ -413,6 +467,6 @@ async function sendToSud({
   res = await res.json();
   fs.writeFile("./text.txt", JSON.stringify(payload), "utf-8", (err) => {});
   console.log(res);
+  return res;
 }
-// sendToSud({ pinfl: "33101706180044", pochta_harajati: "233494735062" });
 module.exports = { sendToSud };

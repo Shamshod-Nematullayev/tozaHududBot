@@ -118,9 +118,8 @@ const addNotification = new Scenes.WizardScene(
     try {
       if (ctx.message?.text) {
         ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
-        ctx.scene.leave();
+        return ctx.scene.leave();
       }
-      if (ctx.callbackQuery?.data) ctx.deleteMessage();
       switch (ctx.callbackQuery?.data) {
         case "xa":
           const documents = await Bildirishnoma.find({

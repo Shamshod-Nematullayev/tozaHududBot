@@ -1,0 +1,884 @@
+{
+  "_id": {
+    "$oid": "65f3e6c15ed23b71178d2b7f"
+  },
+  "name": "Mubina",
+  "items": [
+    {
+      "KOD": 105120360445,
+      "QARZ": 780580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "22.2.2024",
+      "POCHTA_HARAJATI": 240738762132
+    },
+    {
+      "KOD": 105120420072,
+      "QARZ": 671464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "22.2.2024",
+      "POCHTA_HARAJATI": 240732704591
+    },
+    {
+      "KOD": 105120420160,
+      "QARZ": 692464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "22.2.2024",
+      "POCHTA_HARAJATI": 240731594523
+    },
+    {
+      "KOD": 105120520256,
+      "QARZ": 861696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "22.2.2024",
+      "POCHTA_HARAJATI": 240732963674
+    },
+    {
+      "KOD": 105120420092,
+      "QARZ": 762196,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "22.2.2024",
+      "POCHTA_HARAJATI": 240734611197
+    },
+    {
+      "KOD": 105120640444,
+      "QARZ": 1096444,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "22.2.2024",
+      "POCHTA_HARAJATI": 240730499787
+    },
+    {
+      "KOD": 105120420077,
+      "QARZ": 533464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "22.2.2024",
+      "POCHTA_HARAJATI": 240736430792
+    },
+    {
+      "KOD": 105120640396,
+      "QARZ": 414380,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "23.2.2024",
+      "POCHTA_HARAJATI": 240736891936
+    },
+    {
+      "KOD": 105120490347,
+      "QARZ": 291432,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "23.2.2024",
+      "POCHTA_HARAJATI": 240733901678
+    },
+    {
+      "KOD": 105120490335,
+      "QARZ": 482864,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "23.2.2024",
+      "POCHTA_HARAJATI": 240731168215
+    },
+    {
+      "KOD": 105120490328,
+      "QARZ": 578580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "23.2.2024",
+      "POCHTA_HARAJATI": 240735326876
+    },
+    {
+      "KOD": 105120450256,
+      "QARZ": 446296,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "23.2.2024",
+      "POCHTA_HARAJATI": 240739563909
+    },
+    {
+      "KOD": 105120450575,
+      "QARZ": 481932,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "23.2.2024",
+      "POCHTA_HARAJATI": 240730750481
+    },
+    {
+      "KOD": 105120420122,
+      "QARZ": 304464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "23.2.2024",
+      "POCHTA_HARAJATI": 240736907739
+    },
+    {
+      "KOD": 105120450257,
+      "QARZ": 291848,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "23.2.2024",
+      "POCHTA_HARAJATI": 240730714560
+    },
+    {
+      "KOD": 105070230312,
+      "QARZ": 494464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "23.2.2024",
+      "POCHTA_HARAJATI": 240734554487
+    },
+    {
+      "KOD": 105120550232,
+      "QARZ": 594464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "23.2.2024",
+      "POCHTA_HARAJATI": 240734996578
+    },
+    {
+      "KOD": 105120490223,
+      "QARZ": 582864,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "23.2.2024",
+      "POCHTA_HARAJATI": 240737450778
+    },
+    {
+      "KOD": 105120440015,
+      "QARZ": 248338,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240737469260
+    },
+    {
+      "KOD": 105120800477,
+      "QARZ": 339080,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240730969330
+    },
+    {
+      "KOD": 105120500085,
+      "QARZ": 308580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240735360626
+    },
+    {
+      "KOD": 105120280677,
+      "QARZ": 437864,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240739702754
+    },
+    {
+      "KOD": 105070191100,
+      "QARZ": 464464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240731316297
+    },
+    {
+      "KOD": 105120500507,
+      "QARZ": 273931,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240738077325
+    },
+    {
+      "KOD": 105120460043,
+      "QARZ": 332232,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240738324209
+    },
+    {
+      "KOD": 105120320504,
+      "QARZ": 279648,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240734127748
+    },
+    {
+      "KOD": 105120520413,
+      "QARZ": 287232,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240735002514
+    },
+    {
+      "KOD": 105120500514,
+      "QARZ": 488580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240739144800
+    },
+    {
+      "KOD": 105120520181,
+      "QARZ": 287232,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240739225024
+    },
+    {
+      "KOD": 105120190219,
+      "QARZ": 326464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240735364204
+    },
+    {
+      "KOD": 105120590089,
+      "QARZ": 291696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240737187403
+    },
+    {
+      "KOD": 105120500156,
+      "QARZ": 293580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240731048034
+    },
+    {
+      "KOD": 105120520163,
+      "QARZ": 508857,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240732184740
+    },
+    {
+      "KOD": 105120370104,
+      "QARZ": 368080,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240734543567
+    },
+    {
+      "KOD": 105120370556,
+      "QARZ": 219464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240737844241
+    },
+    {
+      "KOD": 105120460480,
+      "QARZ": 360880,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240738212128
+    },
+    {
+      "KOD": 105120420507,
+      "QARZ": 268780,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240737478434
+    },
+    {
+      "KOD": 105120570060,
+      "QARZ": 343348,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240732551012
+    },
+    {
+      "KOD": 105120740142,
+      "QARZ": 453580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240739323172
+    },
+    {
+      "KOD": 105120320069,
+      "QARZ": 269648,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240738269170
+    },
+    {
+      "KOD": 105120800393,
+      "QARZ": 351264,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "24.2.2024",
+      "POCHTA_HARAJATI": 240737257704
+    },
+    {
+      "KOD": 105120440499,
+      "QARZ": 370812,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "26.2.2024",
+      "POCHTA_HARAJATI": 240731377376
+    },
+    {
+      "KOD": 105120540109,
+      "QARZ": 584464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "26.2.2024",
+      "POCHTA_HARAJATI": 240730729020
+    },
+    {
+      "KOD": 105070220280,
+      "QARZ": 352696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "26.2.2024",
+      "POCHTA_HARAJATI": 240734013151
+    },
+    {
+      "KOD": 105120540335,
+      "QARZ": 640580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "26.2.2024",
+      "POCHTA_HARAJATI": 240732713039
+    },
+    {
+      "KOD": 105120220132,
+      "QARZ": 354464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "26.2.2024",
+      "POCHTA_HARAJATI": 240734575173
+    },
+    {
+      "KOD": 105120430301,
+      "QARZ": 508696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "26.2.2024",
+      "POCHTA_HARAJATI": 240731404932
+    },
+    {
+      "KOD": 105120330375,
+      "QARZ": 754196,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "26.2.2024",
+      "POCHTA_HARAJATI": 240734172048
+    },
+    {
+      "KOD": 105120280618,
+      "QARZ": 322864,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "26.2.2024",
+      "POCHTA_HARAJATI": 240732492934
+    },
+    {
+      "KOD": 105120280501,
+      "QARZ": 452864,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "26.2.2024",
+      "POCHTA_HARAJATI": 240731710006
+    },
+    {
+      "KOD": 105120280652,
+      "QARZ": 342864,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "26.2.2024",
+      "POCHTA_HARAJATI": 240732154725
+    },
+    {
+      "KOD": 105120440473,
+      "QARZ": 472464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "28.2.2024",
+      "POCHTA_HARAJATI": 240730617217
+    },
+    {
+      "KOD": 105120350413,
+      "QARZ": 873696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733233470
+    },
+    {
+      "KOD": 105120770535,
+      "QARZ": 278012,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733382887
+    },
+    {
+      "KOD": 105120580159,
+      "QARZ": 504464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733804208
+    },
+    {
+      "KOD": 105120330759,
+      "QARZ": 505512,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240734333947
+    },
+    {
+      "KOD": 105120500050,
+      "QARZ": 328580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240734464819
+    },
+    {
+      "KOD": 105120220194,
+      "QARZ": 474464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240739688570
+    },
+    {
+      "KOD": 105120330204,
+      "QARZ": 341232,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240738891598
+    },
+    {
+      "KOD": 105120500297,
+      "QARZ": 603580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240738897599
+    },
+    {
+      "KOD": 105120330047,
+      "QARZ": 492928,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240739778176
+    },
+    {
+      "KOD": 105120330433,
+      "QARZ": 853080,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733861654
+    },
+    {
+      "KOD": 105120701171,
+      "QARZ": 395096,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240738996713
+    },
+    {
+      "KOD": 105120440593,
+      "QARZ": 333696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240735888066
+    },
+    {
+      "KOD": 105120440588,
+      "QARZ": 276232,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730648269
+    },
+    {
+      "KOD": 105120440751,
+      "QARZ": 286232,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240738969762
+    },
+    {
+      "KOD": 105120480036,
+      "QARZ": 432864,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240734851765
+    },
+    {
+      "KOD": 105120450289,
+      "QARZ": 498348,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240734252268
+    },
+    {
+      "KOD": 105120450440,
+      "QARZ": 479807,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240731538093
+    },
+    {
+      "KOD": 105120450026,
+      "QARZ": 286232,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733468297
+    },
+    {
+      "KOD": 105120450264,
+      "QARZ": 967928,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240738259057
+    },
+    {
+      "KOD": 105120700771,
+      "QARZ": 670644,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240735281389
+    },
+    {
+      "KOD": 105120701149,
+      "QARZ": 447096,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240739735855
+    },
+    {
+      "KOD": 105120700988,
+      "QARZ": 372580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240736759759
+    },
+    {
+      "KOD": 105120700856,
+      "QARZ": 372580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730879600
+    },
+    {
+      "KOD": 105120450627,
+      "QARZ": 206212,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240736294868
+    },
+    {
+      "KOD": 105120450551,
+      "QARZ": 392464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730798716
+    },
+    {
+      "KOD": 105070230193,
+      "QARZ": 376696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240734975565
+    },
+    {
+      "KOD": 105120450276,
+      "QARZ": 280580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240735621479
+    },
+    {
+      "KOD": 105120450439,
+      "QARZ": 490680,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240732842593
+    },
+    {
+      "KOD": 105120450384,
+      "QARZ": 688812,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733871984
+    },
+    {
+      "KOD": 105120450470,
+      "QARZ": 753696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240732729969
+    },
+    {
+      "KOD": 105120701221,
+      "QARZ": 390864,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240734829771
+    },
+    {
+      "KOD": 105120701159,
+      "QARZ": 329180,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240732867028
+    },
+    {
+      "KOD": 105120700799,
+      "QARZ": 511780,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240739404556
+    },
+    {
+      "KOD": 105120700671,
+      "QARZ": 447096,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730358255
+    },
+    {
+      "KOD": 105120540421,
+      "QARZ": 761696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240732520280
+    },
+    {
+      "KOD": 105120240424,
+      "QARZ": 319080,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240739610673
+    },
+    {
+      "KOD": 105120420158,
+      "QARZ": 274464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733174987
+    },
+    {
+      "KOD": 105120751041,
+      "QARZ": 298064,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733088517
+    },
+    {
+      "KOD": 105120450504,
+      "QARZ": 271348,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730666055
+    },
+    {
+      "KOD": 105120450281,
+      "QARZ": 288696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240736232655
+    },
+    {
+      "KOD": 105120450586,
+      "QARZ": 364464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733367697
+    },
+    {
+      "KOD": 105120450564,
+      "QARZ": 692464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730565751
+    },
+    {
+      "KOD": 105120450397,
+      "QARZ": 664464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730824513
+    },
+    {
+      "KOD": 105120420234,
+      "QARZ": 235080,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240732566452
+    },
+    {
+      "KOD": 105120420486,
+      "QARZ": 348348,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240737862781
+    },
+    {
+      "KOD": 105120480292,
+      "QARZ": 392148,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733757843
+    },
+    {
+      "KOD": 105120450364,
+      "QARZ": 543680,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240735344588
+    },
+    {
+      "KOD": 105120450651,
+      "QARZ": 621696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240738813908
+    },
+    {
+      "KOD": 105120450635,
+      "QARZ": 396696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240739539770
+    },
+    {
+      "KOD": 105120450473,
+      "QARZ": 556800,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240735067464
+    },
+    {
+      "KOD": 105120450365,
+      "QARZ": 326232,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240739942052
+    },
+    {
+      "KOD": 105120450366,
+      "QARZ": 741128,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240732909808
+    },
+    {
+      "KOD": 105120450255,
+      "QARZ": 424464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240732153990
+    },
+    {
+      "KOD": 105120440011,
+      "QARZ": 211348,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240737903076
+    },
+    {
+      "KOD": 105120630206,
+      "QARZ": 219464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240739242361
+    },
+    {
+      "KOD": 105120800244,
+      "QARZ": 341080,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240736410210
+    },
+    {
+      "KOD": 105120640357,
+      "QARZ": 1126444,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240732264310
+    },
+    {
+      "KOD": 105120440372,
+      "QARZ": 996696,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730249304
+    },
+    {
+      "KOD": 105120410237,
+      "QARZ": 692464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240731420804
+    },
+    {
+      "KOD": 105120220104,
+      "QARZ": 668080,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240737373263
+    },
+    {
+      "KOD": 105120440032,
+      "QARZ": 445580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240734291119
+    },
+    {
+      "KOD": 105070220233,
+      "QARZ": 404464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730733180
+    },
+    {
+      "KOD": 105120440893,
+      "QARZ": 274464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240731542703
+    },
+    {
+      "KOD": 105120280464,
+      "QARZ": 623580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733116222
+    },
+    {
+      "KOD": 105120540191,
+      "QARZ": 618580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240732735400
+    },
+    {
+      "KOD": 105120460396,
+      "QARZ": 565580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240733010242
+    },
+    {
+      "KOD": 105120420147,
+      "QARZ": 533964,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240739700702
+    },
+    {
+      "KOD": 105120460063,
+      "QARZ": 383017,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240731747204
+    },
+    {
+      "KOD": 105120430115,
+      "QARZ": 307464,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240731377220
+    },
+    {
+      "KOD": 105120240351,
+      "QARZ": 351264,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730177243
+    },
+    {
+      "KOD": 105120240131,
+      "QARZ": 338580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730197903
+    },
+    {
+      "KOD": 105120240387,
+      "QARZ": 320864,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730543579
+    },
+    {
+      "KOD": 105120240530,
+      "QARZ": 286580,
+      "ARIZA_NUM": null,
+      "ARIZA_DATE": "29.2.2024",
+      "POCHTA_HARAJATI": 240730678816
+    }
+  ],
+  "__v": 0
+}

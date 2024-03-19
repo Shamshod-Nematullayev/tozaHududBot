@@ -70,6 +70,10 @@ const find_address_by_pinfil_from_mvd = async (pinfil) => {
   if (data.statusCode == 500) {
     return data;
   }
+  if (data.result == 0)
+    return {
+      success: false,
+    };
   return { ...data.data[0].entity_details, success: true };
 };
 

@@ -130,7 +130,7 @@ async function arxivdanFaylOlish(
             );
           }
           // hammasi to'g'ri bajarilganida
-          if (keyingiXujjatTuri)
+          if (!keyingiXujjatTuri)
             await ctx.reply(
               `${xujjatTuri} to'liq qabul qilindi. Endi ${keyingiXujjatTuri} larini kiriting`
             );
@@ -267,7 +267,6 @@ const getSudMaterial = new Scenes.WizardScene(
 
             const sheet = xls[Object.keys(xls)[0]];
             const rows = [];
-            console.log(sheet);
             for (let i = 0; i < sheet.length - 1; i++) {
               rows.push({
                 KOD: sheet[i + 1].A,
@@ -304,32 +303,32 @@ const getSudMaterial = new Scenes.WizardScene(
       ctx.reply("xatolik kuzatildi", keyboards.lotin.cancelBtn.resize());
     }
   },
-  async (ctx) => {
-    arxivdanFaylOlish(
-      ctx,
-      "arizalar",
-      "ARIZA_FILE_ID",
-      "SSP ARIZA",
-      "OGOHLANTIRISH XATI"
-    );
-  },
-  async (ctx) => {
-    arxivdanFaylOlish(
-      ctx,
-      "ogohlantirish_xatlari",
-      "OGOHLANTIRISH_XATI_FILE_ID",
-      "OGOHLANTIRISH XATI",
-      "ABONENT KARTA"
-    );
-  },
-  async (ctx) => {
-    arxivdanFaylOlish(
-      ctx,
-      "abonent_kartalar",
-      "ABONENT_KARTA_FILE_ID",
-      "ABONENT KARTA"
-    );
-  },
+  // async (ctx) => {
+  //   arxivdanFaylOlish(
+  //     ctx,
+  //     "arizalar",
+  //     "ARIZA_FILE_ID",
+  //     "SSP ARIZA",
+  //     "OGOHLANTIRISH XATI"
+  //   );
+  // },
+  // async (ctx) => {
+  //   arxivdanFaylOlish(
+  //     ctx,
+  //     "ogohlantirish_xatlari",
+  //     "OGOHLANTIRISH_XATI_FILE_ID",
+  //     "OGOHLANTIRISH XATI",
+  //     "ABONENT KARTA"
+  //   );
+  // },
+  // async (ctx) => {
+  //   arxivdanFaylOlish(
+  //     ctx,
+  //     "abonent_kartalar",
+  //     "ABONENT_KARTA_FILE_ID",
+  //     "ABONENT KARTA"
+  //   );
+  // },
   async (ctx) => {
     if (ctx.callbackQuery) {
       switch (ctx.callbackQuery.data) {
@@ -341,7 +340,22 @@ const getSudMaterial = new Scenes.WizardScene(
             const pachka = await SudMaterial.findById(
               ctx.wizard.state.pachka_id
             );
-            for (let item of pachka.items) {
+            const newItems = pachka.items;
+            // for (let item of pachka.items) {
+            let counter = 0;
+            const errors = [];
+            function sudgaKiritish() {
+              if (counter == pachka.items.length) {
+                if (errors.length > 0) {
+                  let errMessage = ``;
+                  errors.forEach((error) => {
+                    errMessage += error;
+                  });
+                  ctx.reply(errMessage);
+                }
+                return;
+              }
+              let item = pachka.items[counter];
               fs.mkdir(
                 ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD,
                 async (err) => {
@@ -388,23 +402,41 @@ const getSudMaterial = new Scenes.WizardScene(
                   if (!abonent.shaxsi_tasdiqlandi.confirm) {
                     throw `${item.KOD} shaxsi tasdiqlanmagan`;
                   }
-                  sendToSud({
-                    doc_date: item.ARIZA_DATE,
-                    qarz: item.QARZ,
-                    pinfl: abonent.pinfl,
-                    doc_number: item.ARIZA_NUM,
-                    pochta_harajati: item.POCHTA_HARAJATI,
-                    ariza_dir: `${
-                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
-                    }/ariza.PDF`,
-                    ilovalar_dir: `${
-                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
-                    }/ilovalar.PDF`,
-                  });
-                  return;
+                  const indexToUpdate = newItems.findIndex(
+                    (a) => a.KOD == item.KOD
+                  );
+                  if (!item.sud_case_id || item.sud_case_id == null) {
+                    console.log(item, counter);
+                    const response = await sendToSud({
+                      doc_date: item.ARIZA_DATE,
+                      qarz: item.QARZ,
+                      pinfl: abonent.pinfl,
+                      doc_number: item.ARIZA_NUM,
+                      pochta_harajati: item.POCHTA_HARAJATI,
+                      ariza_dir: `${
+                        ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
+                      }/ariza.PDF`,
+                      ilovalar_dir: `${
+                        ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
+                      }/ilovalar.PDF`,
+                    });
+                    if (response.failed) {
+                      errors.push(response.message);
+                    }
+                    if (indexToUpdate !== -1) {
+                      newItems[indexToUpdate].sud_case_id = response.case_id;
+                    }
+                    await pachka.updateOne({ $set: { items: newItems } });
+                    counter++;
+                    sudgaKiritish();
+                    return;
+                  }
+                  counter++;
+                  sudgaKiritish();
                 }
               );
             }
+            sudgaKiritish();
           });
 
           break;

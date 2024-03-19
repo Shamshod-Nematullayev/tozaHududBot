@@ -86,8 +86,8 @@ const importAlertLetters = new Scenes.WizardScene(
     }
   },
   async (ctx) => {
+    return ctx.wizard.next();
     try {
-      return ctx.wizard.next();
       if (!ctx.message) return;
       if (!ctx.message.document)
         return ctx.reply(
@@ -216,20 +216,33 @@ const importAlertLetters = new Scenes.WizardScene(
         ctx.wizard.state.pachka_id
       );
 
-      pachka.elements.forEach(async (item) => {
+      let counter = 0;
+      const errors = [];
+      async function uploadToBilling() {
+        if (counter == pachka.elements.length) return;
+        const item = pachka.elements[counter];
         const res = await enterWarningLetterToBilling({
           lischet: item.lischet,
           qarzdorlik: item.qarzdorlik,
           comment: item.comment,
           sana: `${item.date.kun}.${item.date.oy}.${item.date.yil}`,
-          file_path: `./uploads/${pachka._id}/${item.lischet}.pdf`,
+          file_path: `./uploads/ogohlantirishlar/${item.lischet}.PDF`,
         });
+
         console.log(res);
-        if (res.success)
+        counter++;
+        if (res.success) {
           ctx.replyWithHTML(
             `<code>${item.lischet}</code> ogohlantirish xati kiritildi`
           );
-      });
+        } else {
+          errors.push(res);
+        }
+        await uploadToBilling();
+        return;
+      }
+      await uploadToBilling();
+      console.log(errors);
     } catch (err) {
       console.error(err, new Error("Xatolik kuzatildi"));
     }
