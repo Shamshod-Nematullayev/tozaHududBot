@@ -9,6 +9,8 @@ const aborotkaChiqorish = new Scenes.WizardScene(
   "draw_abarotka",
   async (ctx) => {
     try {
+      // ctx.scene.leave();
+      // return;
       const [keyword, id] = ctx.callbackQuery.data.split("_");
       if (keyword === "mahalla") {
         ctx.wizard.state.mfy_id = parseInt(id);

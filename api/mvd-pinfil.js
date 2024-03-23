@@ -65,12 +65,15 @@ const find_address_by_pinfil_from_mvd = async (pinfil) => {
     }
   );
   const data = await res.json();
-  console.log(data.data[0].entity_details);
   if (data.success === false) return data;
 
   if (data.statusCode == 500) {
     return data;
   }
+  if (data.result == 0)
+    return {
+      success: false,
+    };
   return { ...data.data[0].entity_details, success: true };
 };
 

@@ -130,7 +130,7 @@ async function arxivdanFaylOlish(
             );
           }
           // hammasi to'g'ri bajarilganida
-          if (keyingiXujjatTuri)
+          if (!keyingiXujjatTuri)
             await ctx.reply(
               `${xujjatTuri} to'liq qabul qilindi. Endi ${keyingiXujjatTuri} larini kiriting`
             );
@@ -138,6 +138,9 @@ async function arxivdanFaylOlish(
             pachka.items.forEach(async (item) => {
               const abonent = await Abonent.findOne({ licshet: item.KOD });
               const mfy = await Mahalla.findOne({ id: abonent.mahallas_id });
+              if (!mfy.ommaviy_shartnoma) {
+                return ctx.reply(`${mfy.name} ommaviy shartnomasi bazada yo'q`);
+              }
               const ommaviy_shartnoma_file_name = `${ctx.wizard.state.baseDirectory}/ommaviy_shartnomalar/${mfy.id}.PDF`;
               const mfyStream = fs.createWriteStream(
                 ommaviy_shartnoma_file_name
@@ -147,26 +150,26 @@ async function arxivdanFaylOlish(
               );
               https.get(fileOnTG.href, (res) => {
                 res.pipe(mfyStream);
-              });
-              mfyStream.on("finish", (cb) => {
-                console.log(mfy.name + " ommaviy shartnomasi yuklab olindi");
+                mfyStream.on("finish", (cb) => {
+                  console.log(mfy.name + " ommaviy shartnomasi yuklab olindi");
+                });
               });
             });
-            await downloadFileToBaseDir(
-              ctx.wizard.state.baseDirectory,
-              "GUVOHNOMA.PDF",
-              guvohnomaFileID
-            );
-            await downloadFileToBaseDir(
-              ctx.wizard.state.baseDirectory,
-              "SHARTNOMA.PDF",
-              shartnomaSSPFileID
-            );
-            await downloadFileToBaseDir(
-              ctx.wizard.state.baseDirectory,
-              "ISHONCHNOMA.PDF",
-              ishonchnomaFileID
-            );
+            // await downloadFileToBaseDir(
+            //   ctx.wizard.state.baseDirectory,
+            //   "GUVOHNOMA.PDF",
+            //   guvohnomaFileID
+            // );
+            // await downloadFileToBaseDir(
+            //   ctx.wizard.state.baseDirectory,
+            //   "SHARTNOMA.PDF",
+            //   shartnomaSSPFileID
+            // );
+            // await downloadFileToBaseDir(
+            //   ctx.wizard.state.baseDirectory,
+            //   "ISHONCHNOMA.PDF",
+            //   ishonchnomaFileID
+            // );
             await ctx.reply(
               "Hamma ma'lumotlar tayyor, sudga yuboraymi?",
               createInlineKeyboard([[["Xa", "xa"]], [["Keyinroq", "keyinroq"]]])
@@ -196,26 +199,43 @@ const getSudMaterial = new Scenes.WizardScene(
       ctx.wizard.state.baseDirectory = baseDirectory;
 
       // Create subdirectories
-      fs.mkdir(baseDirectory, (err) => {
-        if (err) throw err;
-      });
+      const directories = [
+        "/arizalar",
+        "/abonent_kartalar",
+        "/ommaviy_shartnomalar",
+        "/ogohlantirish_xatlari",
+      ];
 
-      fs.mkdir(baseDirectory + "/arizalar", (err) => {
-        if (err) throw err;
-      });
+      // Function to create directories
+      function createDirectories(baseDirectory, directories) {
+        fs.mkdir(baseDirectory, (err) => {
+          if (err) {
+            console.error(
+              `Error creating to basedir ${baseDirectory}${directory}:`,
+              err
+            );
+          } else {
+            console.log(`Directory ${baseDirectory} created successfully.`);
+          }
+        });
+        directories.forEach((directory) => {
+          fs.mkdir(baseDirectory + directory, (err) => {
+            if (err) {
+              console.error(
+                `Error creating ${baseDirectory}${directory}:`,
+                err
+              );
+            } else {
+              console.log(
+                `Directory ${baseDirectory}${directory} created successfully.`
+              );
+            }
+          });
+        });
+      }
+      createDirectories(baseDirectory, directories);
 
-      fs.mkdir(baseDirectory + "/abonent_kartalar", (err) => {
-        if (err) throw err;
-      });
-
-      fs.mkdir(baseDirectory + "/ommaviy_shartnomalar", (err) => {
-        if (err) throw err;
-      });
-
-      fs.mkdir(baseDirectory + "/ogohlantirish_xatlari", (err) => {
-        if (err) throw err;
-      });
-      ctx.replyWithDocument(sudMaterialImportExcel, {
+      await ctx.replyWithDocument(sudMaterialImportExcel, {
         caption: `Sudga yuborish uchun xujjatlari tayyor abonentlar ro'yxatini na'munadagi jadvalga joylashtirib tashlab bering`,
       });
       ctx.wizard.next();
@@ -259,6 +279,10 @@ const getSudMaterial = new Scenes.WizardScene(
             await SudMaterial.findByIdAndUpdate(ctx.wizard.state.pachka_id, {
               $set: { items: rows },
             });
+            await ctx.telegram.deleteMessage(
+              ctx.chat.id,
+              waiterMessage.message_id
+            );
             ctx.reply(
               "Endi arizalarni scaner qilingan variantini zip arxivlangan holda menga yuboring. Fayllarni ajratib olishim uchun fayl nomini abonent lischet kodi bilan nomlang!"
             );
@@ -279,33 +303,32 @@ const getSudMaterial = new Scenes.WizardScene(
       ctx.reply("xatolik kuzatildi", keyboards.lotin.cancelBtn.resize());
     }
   },
-  async (ctx) => {
-    arxivdanFaylOlish(
-      ctx,
-      "arizalar",
-      "ARIZA_FILE_ID",
-      "SSP ARIZA",
-      "OGOHLANTIRISH XATI"
-    );
-  },
-  async (ctx) => {
-    arxivdanFaylOlish(
-      ctx,
-      "ogohlantirish_xatlari",
-      "OGOHLANTIRISH_XATI_FILE_ID",
-      "OGOHLANTIRISH XATI",
-      "ABONENT KARTA"
-    );
-  },
-  async (ctx) => {
-    arxivdanFaylOlish(
-      ctx,
-      "abonent_kartalar",
-      "ABONENT_KARTA_FILE_ID",
-      "ABONENT KARTA",
-      "FORMA 1"
-    );
-  },
+  // async (ctx) => {
+  //   arxivdanFaylOlish(
+  //     ctx,
+  //     "arizalar",
+  //     "ARIZA_FILE_ID",
+  //     "SSP ARIZA",
+  //     "OGOHLANTIRISH XATI"
+  //   );
+  // },
+  // async (ctx) => {
+  //   arxivdanFaylOlish(
+  //     ctx,
+  //     "ogohlantirish_xatlari",
+  //     "OGOHLANTIRISH_XATI_FILE_ID",
+  //     "OGOHLANTIRISH XATI",
+  //     "ABONENT KARTA"
+  //   );
+  // },
+  // async (ctx) => {
+  //   arxivdanFaylOlish(
+  //     ctx,
+  //     "abonent_kartalar",
+  //     "ABONENT_KARTA_FILE_ID",
+  //     "ABONENT KARTA"
+  //   );
+  // },
   async (ctx) => {
     if (ctx.callbackQuery) {
       switch (ctx.callbackQuery.data) {
@@ -317,11 +340,26 @@ const getSudMaterial = new Scenes.WizardScene(
             const pachka = await SudMaterial.findById(
               ctx.wizard.state.pachka_id
             );
-            for (let item of pachka.items) {
+            const newItems = pachka.items;
+            // for (let item of pachka.items) {
+            let counter = 0;
+            const errors = [];
+            function sudgaKiritish() {
+              if (counter == pachka.items.length) {
+                if (errors.length > 0) {
+                  let errMessage = ``;
+                  errors.forEach((error) => {
+                    errMessage += error;
+                  });
+                  ctx.reply(errMessage);
+                }
+                return;
+              }
+              let item = pachka.items[counter];
               fs.mkdir(
                 ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD,
                 async (err) => {
-                  if (err) throw err;
+                  if (err && err.code != "EEXIST") throw err;
                   await fs.promises.copyFile(
                     `${ctx.wizard.state.baseDirectory}/arizalar/${item.KOD}.PDF`,
                     `${
@@ -364,26 +402,41 @@ const getSudMaterial = new Scenes.WizardScene(
                   if (!abonent.shaxsi_tasdiqlandi.confirm) {
                     throw `${item.KOD} shaxsi tasdiqlanmagan`;
                   }
-                  sendToSud({
-                    doc_date: item.ARIZA_DATE,
-                    qarz: item.QARZ,
-                    pinfl: abonent.pinfl,
-                    doc_number: item.ARIZA_NUM,
-                    pochta_harajati: item.POCHTA_HARAJATI,
-                    ariza_dir: `${
-                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
-                    }/ariza.PDF`,
-                    forma_bir_dir: `${
-                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
-                    }/forma_bir.PDF`,
-                    ilovalar_dir: `${
-                      ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
-                    }/ilovalar.PDF`,
-                  });
-                  return;
+                  const indexToUpdate = newItems.findIndex(
+                    (a) => a.KOD == item.KOD
+                  );
+                  if (!item.sud_case_id || item.sud_case_id == null) {
+                    console.log(item, counter);
+                    const response = await sendToSud({
+                      doc_date: item.ARIZA_DATE,
+                      qarz: item.QARZ,
+                      pinfl: abonent.pinfl,
+                      doc_number: item.ARIZA_NUM,
+                      pochta_harajati: item.POCHTA_HARAJATI,
+                      ariza_dir: `${
+                        ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
+                      }/ariza.PDF`,
+                      ilovalar_dir: `${
+                        ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
+                      }/ilovalar.PDF`,
+                    });
+                    if (response.failed) {
+                      errors.push(response.message);
+                    }
+                    if (indexToUpdate !== -1) {
+                      newItems[indexToUpdate].sud_case_id = response.case_id;
+                    }
+                    await pachka.updateOne({ $set: { items: newItems } });
+                    counter++;
+                    sudgaKiritish();
+                    return;
+                  }
+                  counter++;
+                  sudgaKiritish();
                 }
               );
             }
+            sudgaKiritish();
           });
 
           break;

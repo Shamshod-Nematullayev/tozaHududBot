@@ -13,7 +13,6 @@ const schema = new mongoose.Schema({
     type: Number,
   },
   biriktirilganNazoratchi: Object,
-  ommaviy_shartnoma: Object,
   groups: {
     type: Array,
     default: [],

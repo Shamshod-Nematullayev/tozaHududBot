@@ -82,11 +82,6 @@ const connectPhoneNumber = new Scenes.WizardScene(
   }
 );
 
-connectPhoneNumber.on("text", (ctx, next) => {
-  console.log("sdf");
-  next();
-});
-
 connectPhoneNumber.enter((ctx) => {
   ctx.reply(
     `Abonent listavoy kodini kiriting`,
