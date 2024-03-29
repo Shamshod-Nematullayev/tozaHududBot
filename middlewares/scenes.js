@@ -67,6 +67,9 @@ const {
 const {
   pochtaHarajatiniTekshirishScene,
 } = require("./scene/adminActions/pochtaHarajatlariniTekshirish");
+const {
+  new_abonent_request_by_pinfl_scene,
+} = require("./scene/userScenes/newAbonentRequestByPinfl");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -105,6 +108,7 @@ const stage = new Scenes.Stage([
   exportWarningLettersZip,
   importAlertLetters,
   pochtaHarajatiniTekshirishScene,
+  new_abonent_request_by_pinfl_scene,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

@@ -66,19 +66,6 @@ const new_abonent_by_pinfl_scene = new Scenes.WizardScene(
           await ctx.reply(
             `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
           );
-          return;
-          await ctx.reply(
-            "Mahallasini tanlang",
-            keyboards.lotin.mahallalar.oneTime()
-          );
-          ctx.wizard.state.customDates = {
-            fullname: kirillga(
-              `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
-            ),
-            pinfl: ctx.message.text,
-            ...customDates,
-          };
-          ctx.wizard.next();
         }
       }
     } catch (error) {
@@ -174,10 +161,10 @@ const new_abonent_by_pinfl_scene = new Scenes.WizardScene(
         ctx.reply(`Yangi abonent qo'shildi <code>${abonent.litschet}</code>`, {
           parse_mode: "HTML",
         });
+        ctx.scene.leave();
       } else {
-        ctx.reply(abonent.msg);
+        ctx.reply(abonent.msg, keyboards.lotin.cancelBtn.resize());
       }
-      ctx.scene.leave();
     } catch (error) {
       console.log(error);
     }

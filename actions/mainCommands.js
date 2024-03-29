@@ -15,7 +15,7 @@ function qaysiMahalla(id) {
   return res;
 }
 composer.hears(["👤Yangi abonent ochish", "👤Янги абонент"], (ctx) => {
-  ctx.scene.enter("NEW_ABONENT");
+  ctx.scene.enter("new_abonent_request");
 });
 composer.hears(["🔎Izlash", "🔎Излаш"], (ctx) => {
   ctx.reply(messages.izlashUsuliTanlash, keyboards[ctx.session.til].searchType);

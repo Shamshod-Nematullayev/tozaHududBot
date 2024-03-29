@@ -64,6 +64,7 @@ const yangiAbonent = async ({
       body: `mahallas_id=${mfy_id}&companies_id=1144`,
     });
     availableKOD = await availableKOD.json();
+    console.log({ availableKOD });
     // return;
     let finalResponse = await fetch("https://cleancity.uz/" + new_abonent_url, {
       headers: {
@@ -102,14 +103,14 @@ const yangiAbonent = async ({
 
     const final = await finalResponse.json();
     console.log({ final });
-    // if (final.success) {
-    //   await session.updateOne({
-    //     $set: {
-    //       "path.new_abonent_url": new_abonent_url,
-    //       "path.get_litschet_url": get_litschet_url,
-    //     },
-    //   });
-    // }
+    if (final.success) {
+      await session.updateOne({
+        $set: {
+          "path.new_abonent_url": new_abonent_url,
+          "path.get_litschet_url": get_litschet_url,
+        },
+      });
+    }
     return {
       litschet: availableKOD.value,
       ...final,
