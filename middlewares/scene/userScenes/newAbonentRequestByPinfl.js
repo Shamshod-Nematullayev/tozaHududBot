@@ -3,12 +3,11 @@ const { find_one_by_pinfil_from_mvd } = require("../../../api/mvd-pinfil");
 const fs = require("fs");
 const isCancel = require("../../smallFunctions/isCancel");
 const isPinfl = require("../../smallFunctions/isPinfl");
-const { keyboards } = require("../../../lib/keyboards");
-const { messages } = require("../../../lib/messages");
-const { log } = require("console");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const { kirillga } = require("../../smallFunctions/lotinKiril");
-const { yangiAbonent } = require("./cleancity/yangiAbonent");
+const { yangiAbonent } = require("../adminActions/cleancity/dxsh/yangiAbonent");
+const { keyboards } = require("../../../lib/keyboards");
+const { messages } = require("../../../lib/messages");
 const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {
@@ -29,8 +28,11 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         );
       } else {
         const customDates = await find_one_by_pinfil_from_mvd(ctx.message.text);
-        if (customDates.first_name == "" || customDates.success === false) {
-          return ctx.reply("Ushbu fuqoroga tegishli ma'lumotlar topilmadi");
+        if (!customDates.success) {
+          return ctx.reply(
+            customDates.message,
+            keyboards.lotin.cancelBtn.resize()
+          );
         }
         let filename = "fuqoro" + Date.now() + ".png";
         if (customDates.photo != null) {
@@ -85,6 +87,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           body: `mahallas_id=${data.split("_")[1]}`,
         });
         streets = await streets.json();
+        // if(streets.msg === "Session has expired") return
         streets = streets.rows;
         let keyboardsArray = [];
         for (let i = 0; i < streets.length; i++) {
@@ -151,6 +154,9 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
 
       if (abonent.success) {
         ctx.reply(`Yangi abonent qo'shildi <code>${abonent.litschet}</code>`);
+        ctx.scene.leave();
+      } else {
+        ctx.reply(abonent.msg);
       }
     } catch (error) {
       console.log(error);
@@ -158,7 +164,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   }
 );
 new_abonent_request_by_pinfl_scene.leave((ctx) =>
-  ctx.reply("Bekor qilindi", keyboards.lotin.adminKeyboard.resize())
+  ctx.reply("Bekor qilindi", keyboards.lotin.mainKeyboard.resize())
 );
 new_abonent_request_by_pinfl_scene.enter(enterFunc);
 

@@ -467,6 +467,9 @@ async function sendToSud({
   res = await res.json();
   fs.writeFile("./text.txt", JSON.stringify(payload), "utf-8", (err) => {});
   console.log(res);
-  return res;
+  return {
+    ...res,
+    FISH: `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`,
+  };
 }
 module.exports = { sendToSud };

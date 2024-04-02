@@ -35,24 +35,36 @@ const exportAbonentCards = new Scenes.WizardScene(
           const sheet = xls[Object.keys(xls)[0]];
           const dirname = `./uploads/kartalar${Date.now()}`;
           try {
-            const pdfPromises = sheet.map(async (item) => {
+            // const pdfPromises = sheet.map(async (item) => {
+            let counter = 0;
+            let errors = [];
+            async function download() {
+              if (counter == sheet.length) return;
+              const item = sheet[counter];
               const html = await getAbonentCardHtml(item.A);
-              return new Promise((resolve, reject) => {
-                htmlPDF
-                  .create(html, { format: "A4", orientation: "portrait" })
-                  .toFile(dirname + "/" + item.A + ".pdf", (err, res) => {
-                    if (err) {
-                      reject(err);
-                    } else {
-                      resolve(res);
-                    }
-                  });
-              });
-            });
+              // let promis =  new Promise((resolve, reject) => {
+              htmlPDF
+                .create(html, { format: "A4", orientation: "portrait" })
+                .toFile(dirname + "/" + item.A + ".pdf", async (err, res) => {
+                  if (err) {
+                    // reject(err);
+                    errors.push(err);
+                  } else {
+                    ctx.reply(item.A + " boldi");
+                    counter++;
+                    await download();
+                    // resolve(res);
+                  }
+                });
+              // });
+              // await Promise.
+            }
+            await download();
+            // });
 
-            await Promise.all(pdfPromises);
-            await compresser.zip.compressDir(dirname, dirname + ".zip");
-            ctx.replyWithDocument({ source: dirname + ".zip" });
+            // await Promise.all(pdfPromises);
+            // await compresser.zip.compressDir(dirname, dirname + ".zip");
+            // ctx.replyWithDocument({ source: dirname + ".zip" });
             ctx.scene.leave();
           } catch (error) {
             console.error("Error:", error);

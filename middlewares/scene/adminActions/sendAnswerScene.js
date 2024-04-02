@@ -127,6 +127,7 @@ const sendAnswerScene = new Scenes.WizardScene(
             process.env.CHANNEL,
             abonent.messageIdChannel
           );
+          // await ctx.deleteMessage(abonen t.messageIdChannel);
           ctx.scene.leave();
         } else {
           ctx.reply(yaratilganAbonent.msg);

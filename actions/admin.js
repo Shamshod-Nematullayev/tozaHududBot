@@ -233,6 +233,7 @@ composer.action(/done_\w+/g, async (ctx) => {
         process.env.CHANNEL,
         ctx.callbackQuery.message.message_id
       );
+      await ctx.deleteMessage(ctx.callbackQuery.message.message_id);
     }
   } catch (error) {
     console.log(error);

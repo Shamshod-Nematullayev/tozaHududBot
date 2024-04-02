@@ -15,7 +15,7 @@ function qaysiMahalla(id) {
   return res;
 }
 composer.hears(["👤Yangi abonent ochish", "👤Янги абонент"], (ctx) => {
-  ctx.scene.enter("NEW_ABONENT");
+  ctx.scene.enter("new_abonent_request");
 });
 composer.hears(["🔎Izlash", "🔎Излаш"], (ctx) => {
   ctx.reply(messages.izlashUsuliTanlash, keyboards[ctx.session.til].searchType);
@@ -23,9 +23,6 @@ composer.hears(["🔎Izlash", "🔎Излаш"], (ctx) => {
 composer.action("searchByID", (ctx) => {
   ctx.scene.enter("searchByID");
 });
-// composer.action("searchByFISH", (ctx) => {
-//   ctx.reply("Bu funksiya hali to'liq ishlab chiqilmadi");
-// });
 
 composer.hears(
   ["👥Mening abonentlarim", "👥Менинг абонентларим"],

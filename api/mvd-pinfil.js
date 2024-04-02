@@ -26,7 +26,17 @@ const find_one_by_pinfil_from_mvd = async (pinfil) => {
       credentials: "omit",
     }
   );
-  const data = await res.json();
+
+  let data = {};
+  let res2 = res;
+  try {
+    data = await res.json();
+  } catch (error) {
+    return {
+      success: false,
+      message: "Hozirda baza ishlamayapti, keyinroq boshqatdan urinib ko'ring",
+    };
+  }
   if (data.success === false) return data;
 
   if (data.statusCode > 400) {

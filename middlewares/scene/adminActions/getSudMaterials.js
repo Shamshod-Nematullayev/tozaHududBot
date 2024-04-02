@@ -340,6 +340,35 @@ const getSudMaterial = new Scenes.WizardScene(
             const pachka = await SudMaterial.findById(
               ctx.wizard.state.pachka_id
             );
+            let count = 0;
+            // pachka.items.forEach(async (item) => {
+            async function downloadOmmaviy() {
+              if (count == pachka.items.length) return;
+
+              const item = pachka.items[count];
+              const abonent = await Abonent.findOne({ licshet: item.KOD });
+              const mfy = await Mahalla.findOne({ id: abonent.mahallas_id });
+              if (!mfy.ommaviy_shartnoma) {
+                return ctx.reply(`${mfy.name} ommaviy shartnomasi bazada yo'q`);
+              }
+              const ommaviy_shartnoma_file_name = `${ctx.wizard.state.baseDirectory}/ommaviy_shartnomalar/${mfy.id}.PDF`;
+              const mfyStream = fs.createWriteStream(
+                ommaviy_shartnoma_file_name
+              );
+              const fileOnTG = await bot.telegram.getFileLink(
+                mfy.ommaviy_shartnoma.file_id
+              );
+              https.get(fileOnTG.href, (res) => {
+                res.pipe(mfyStream);
+                mfyStream.on("finish", async (cb) => {
+                  console.log(mfy.name + " ommaviy shartnomasi yuklab olindi");
+                  count++;
+                  await downloadOmmaviy();
+                });
+              });
+            }
+            // await downloadOmmaviy();
+            // });
             const newItems = pachka.items;
             // for (let item of pachka.items) {
             let counter = 0;
@@ -370,35 +399,43 @@ const getSudMaterial = new Scenes.WizardScene(
                     licshet: String(item.KOD),
                   });
                   let merger = new PDFMerger();
-                  (async () => {
-                    await merger.add(
-                      `${ctx.wizard.state.baseDirectory}/ommaviy_shartnomalar/${abonent.mahallas_id}.PDF`
-                    );
-                    await merger.add(
-                      `${ctx.wizard.state.baseDirectory}/ogohlantirish_xatlari/${item.KOD}.PDF`
-                    );
-                    await merger.add(
-                      `${ctx.wizard.state.baseDirectory}/abonent_kartalar/${item.KOD}.PDF`
-                    );
+                  let isError = false;
+                  const convert = async () => {
+                    try {
+                      await merger.add(
+                        `${ctx.wizard.state.baseDirectory}/ommaviy_shartnomalar/${abonent.mahallas_id}.PDF`
+                      );
+                      await merger.add(
+                        `${ctx.wizard.state.baseDirectory}/ogohlantirish_xatlari/${item.KOD}.PDF`
+                      );
+                      await merger.add(
+                        `${ctx.wizard.state.baseDirectory}/abonent_kartalar/${item.KOD}.PDF`
+                      );
 
-                    // Set metadata
-                    await merger.setMetadata({
-                      producer: "oliy ong",
-                      author: "Shamshod Nematullayev",
-                      creator: "Toza Hudud bot",
-                      title: "Sudga yuborish ilovalar",
-                    });
+                      // Set metadata
+                      await merger.setMetadata({
+                        producer: "oliy ong",
+                        author: "Shamshod Nematullayev",
+                        creator: "Toza Hudud bot",
+                        title: "Sudga yuborish ilovalar",
+                      });
 
-                    await merger.save(
-                      `${
-                        ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
-                      }/ilovalar.PDF`
-                    ); //save under given name and reset the internal document
-
-                    // Export the merged PDF as a nodejs Buffer
-                    // const mergedPdfBuffer = await merger.saveAsBuffer();
-                    // fs.writeSync('merged.pdf', mergedPdfBuffer);
-                  })();
+                      await merger.save(
+                        `${
+                          ctx.wizard.state.baseDirectory + "/shakl2/" + item.KOD
+                        }/ilovalar.PDF`
+                      );
+                    } catch (error) {
+                      isError = true;
+                      console.error(error);
+                    } //save under given name and reset the internal document
+                  };
+                  await convert();
+                  if (isError) {
+                    counter++;
+                    sudgaKiritish();
+                    return;
+                  }
                   if (!abonent.shaxsi_tasdiqlandi.confirm) {
                     throw `${item.KOD} shaxsi tasdiqlanmagan`;
                   }
@@ -425,8 +462,12 @@ const getSudMaterial = new Scenes.WizardScene(
                     }
                     if (indexToUpdate !== -1) {
                       newItems[indexToUpdate].sud_case_id = response.case_id;
+                      newItems[indexToUpdate].FISH = response.FISH;
                     }
                     await pachka.updateOne({ $set: { items: newItems } });
+                    ctx.reply(`<code>${item.KOD}</code> kiritildi`, {
+                      parse_mode: "HTML",
+                    });
                     counter++;
                     sudgaKiritish();
                     return;
