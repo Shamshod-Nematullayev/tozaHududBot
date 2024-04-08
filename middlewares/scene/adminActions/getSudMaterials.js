@@ -402,15 +402,27 @@ const getSudMaterial = new Scenes.WizardScene(
                   let isError = false;
                   const convert = async () => {
                     try {
-                      await merger.add(
-                        `${ctx.wizard.state.baseDirectory}/ommaviy_shartnomalar/${abonent.mahallas_id}.PDF`
-                      );
-                      await merger.add(
-                        `${ctx.wizard.state.baseDirectory}/ogohlantirish_xatlari/${item.KOD}.PDF`
-                      );
-                      await merger.add(
-                        `${ctx.wizard.state.baseDirectory}/abonent_kartalar/${item.KOD}.PDF`
-                      );
+                      await merger
+                        .add(
+                          `${ctx.wizard.state.baseDirectory}/ommaviy_shartnomalar/${abonent.mahallas_id}.PDF`
+                        )
+                        .catch((err) => {
+                          console.log("ommaviy_shartnomalar", item.KOD);
+                        });
+                      await merger
+                        .add(
+                          `${ctx.wizard.state.baseDirectory}/ogohlantirish_xatlari/${item.KOD}.PDF`
+                        )
+                        .catch((err) => {
+                          console.log("ogohlantirish_xatlari");
+                        });
+                      await merger
+                        .add(
+                          `${ctx.wizard.state.baseDirectory}/abonent_kartalar/${item.KOD}.PDF`
+                        )
+                        .catch((err) => {
+                          console.log("abonent_kartalar");
+                        });
 
                       // Set metadata
                       await merger.setMetadata({
@@ -428,6 +440,7 @@ const getSudMaterial = new Scenes.WizardScene(
                     } catch (error) {
                       isError = true;
                       console.error(error);
+                      console.error(item);
                     } //save under given name and reset the internal document
                   };
                   await convert();

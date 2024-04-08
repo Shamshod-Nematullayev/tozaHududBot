@@ -70,6 +70,9 @@ const {
 const {
   new_abonent_request_by_pinfl_scene,
 } = require("./scene/userScenes/newAbonentRequestByPinfl");
+const {
+  sudBuyruqlariYaratish,
+} = require("./scene/adminActions/sud/sudBuyruqlariYaratish");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
@@ -109,6 +112,7 @@ const stage = new Scenes.Stage([
   importAlertLetters,
   pochtaHarajatiniTekshirishScene,
   new_abonent_request_by_pinfl_scene,
+  sudBuyruqlariYaratish,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

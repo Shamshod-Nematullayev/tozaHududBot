@@ -74,17 +74,21 @@ const find_address_by_pinfil_from_mvd = async (pinfil) => {
       credentials: "omit",
     }
   );
-  const data = await res.json();
-  if (data.success === false) return data;
+  try {
+    const data = await res.json();
+    if (data.success === false) return data;
 
-  if (data.statusCode == 500) {
-    return data;
+    if (data.statusCode == 500) {
+      return data;
+    }
+    if (data.result == 0)
+      return {
+        success: false,
+      };
+    return { ...data.data[0].entity_details, success: true };
+  } catch (error) {
+    return find_address_by_pinfil_from_mvd(pinfil);
   }
-  if (data.result == 0)
-    return {
-      success: false,
-    };
-  return { ...data.data[0].entity_details, success: true };
 };
 
 // TESTING

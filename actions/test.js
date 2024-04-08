@@ -1,212 +1,66 @@
+// bismillah
+
+const cc = `https://cleancity.uz/`;
+const { JSDOM } = require("jsdom");
+
+const { CleanCitySession } = require("../models/CleanCitySession");
 const { SudMaterial } = require("../models/SudMaterial");
-const fs = require("fs");
-const {
-  Document,
-  TextRun,
-  Packer,
-  Paragraph,
-  PageBreak,
-  LevelFormat,
-  AlignmentType,
-} = require("docx");
-const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 
-// Documents contain sections, you can have multiple sections per document, go here to learn more about sections
-// This simple example will only contain one section
-// small function for text
-function toTitleCase(str) {
-  return str.toLowerCase().replace(/\b\w/g, function (char) {
-    return char.toUpperCase();
+async function enterMaterialTOBilling(file_path, kod) {
+  const session = await CleanCitySession.findOne({ type: "dxsh" });
+  if (session.path.saveFileLink && session.path.findSudProccessPath) {
+    return;
+  }
+  const startpage = await fetch(cc + "startpage", {
+    headers: { Cookie: session.cookie },
   });
-}
-function createNewSudBuyruq({
-  licshet,
-  sud_ijro_raqami,
-  sana,
-  sudya_name,
-  javobgar_name,
-  mfy_name,
-  javobgar_tugilgan_sanasi,
-  pinfl,
-  passport_seriya,
-  qarzdorlik,
-}) {
-  const doc = new Document({
-    numbering: {
-      config: [
-        {
-          reference: "my-numbering",
-          levels: [
-            {
-              level: 0,
-              format: LevelFormat.DECIMAL,
-              text: "%1.",
-              alignment: AlignmentType.START,
-              style: {
-                paragraph: {
-                  indent: { left: 600, hanging: 350 },
-                },
-                run: {
-                  font: "Cambria",
-                  size: 28,
-                },
-              },
-            },
-          ],
-        },
-      ],
+  const startpageText = await startpage.text();
+  const startpageDoc = new JSDOM(startpageText).window.document;
+  const elements = startpageDoc.querySelectorAll("a");
+  let toSudActionsPage = "";
+  elements.forEach(function (element) {
+    // Check if the text content matches "hello world"
+    if (element.textContent.trim() === "Суд жараёнлари") {
+      // Found the element, do something with it
+      toSudActionsPage = element.href;
+    }
+  });
+  const res1 = await fetch(
+    `https://cleancity.uz/dashboard/${toSudActionsPage}`,
+    { headers: { Cookie: session.cookie } }
+  );
+  const res2 = await fetch(res1.url, {
+    headers: {
+      Cookie: session.cookie,
     },
-    sections: [
-      {
-        properties: {},
-        children: [
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: "СУД  БУЙРУҒИ",
-                bold: true,
-                font: "Cambria",
-                size: 28,
-              }),
-            ],
-            alignment: "center",
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: sud_ijro_raqami,
-                font: "Cambria",
-                size: 28,
-              }),
-            ],
-            alignment: "right",
-          }),
-          new Paragraph({
-            children: [], // Just newline without text
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `        ${sana} йилда фуқаролик ишлари бўйича Каттақўрғон туманлараро судининг судяси ${kirillga(
-                  toTitleCase(sudya_name)
-                )}, аризачи Каттақўрғон прокурори  “Анваржон Бизнес Инвест” МЧЖ манфаатини кўзлаб қарздор ${kirillga(
-                  toTitleCase(javobgar_name)
-                )}дан дебитор қарздорликни ундириш ҳақида суд буйруғини чиқариш тўғрисидаги аризасини кўриб чиқиб, Ўзбекистон Республикаси ФПК 171-моддаси б-банди ва 172- моддаларини қўллаб,`,
-                font: "Cambria",
-                size: 28,
-              }),
-            ],
-            alignment: "both",
-          }),
-          new Paragraph({
-            children: [], // Just newline without text
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: "БУЮРАМАН:",
-                bold: true,
-                font: "Cambria",
-                size: 28,
-              }),
-            ],
-            alignment: "center",
-          }),
-          new Paragraph({
-            children: [], // Just newline without text
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `        Қарздор, Каттақўрғон тумани, “${mfy_name}” МФЙда яшовчи (${javobgar_tugilgan_sanasi} йилда туғилган, фуқаролик паспорт маълумотлари ${passport_seriya}, ЖШШИР: ${pinfl}, лицавой: ${licshet}, иш жойи номаълум) ${javobgar_name}дан ундирувчи “Анваржон Бизнес Инвест” МЧЖнинг фойдасига маиший чиқиндиларни олиб чиқиш учун жами ${qarzdorlik.toLocaleString(
-                  "en-US"
-                )} сўм ва 17.000 сўм олдиндан тўланган почта харажати ундирилсин.`,
-                font: "Cambria",
-                size: 28,
-              }),
-            ],
-            alignment: "both",
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `Қарздор ${javobgar_name}дан асосий қарз ${qarzdorlik.toLocaleString(
-                  "en-US"
-                )} сўм Банк: “Ориент Финанс банк” АТБ (МФО:01037, ИНН:303421898, Х/Р:22604000105565269040) га ундирилсин`,
-                font: "Cambria",
-                size: 28,
-              }),
-            ],
-            numbering: {
-              reference: "my-numbering",
-              level: 0,
-            },
-            alignment: "both",
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `Қарздор ${javobgar_name}дан почта ҳаражати 17.000 сўм (МФО 01097, Х/Р:20208000900611603001, ИНН:303421898)га ундирилсин.`,
-                font: "Cambria",
-                size: 28,
-              }),
-            ],
-            numbering: {
-              reference: "my-numbering",
-              level: 0,
-            },
-            alignment: "both",
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `Қарздор ${javobgar_name}дан давлат фойдасига 340.000 сўм миқдорида давлат божи ундирилсин.`,
-                font: "Cambria",
-                size: 28,
-              }),
-            ],
-            numbering: {
-              reference: "my-numbering",
-              level: 0,
-            },
-            alignment: "both",
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `        Суд буйруғининг кўчирма нусхасини олган кундан эътиборан ўн кунлик муддат ичида қарздор арз қилинган талабга қарши ўз эътирозларини буйруқни чиқарган судга юборишга ҳақли.`,
-                font: "Cambria",
-                size: 28,
-              }),
-            ],
-            alignment: "both",
-          }),
-          new Paragraph({ children: [] }),
-          new Paragraph({ children: [] }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `Суд раиси                                                                                ${kirillga(
-                  toTitleCase(sudya_name)
-                )}`,
-                bold: true,
-                font: "Cambria",
-                size: 28,
-              }),
-            ],
-            alignment: "center",
-          }),
-        ],
+  });
+  const res2Text = await res2.text();
+  let findSudProccessPath = res2Text.match(
+    /rownumbers:true,url:"ds\?xenc=([^']+)VDA"/g
+  );
+  findSudProccessPath = findSudProccessPath[0].split('"')[1];
+  let saveFileLink = res2Text.match(/dsmmf\?xenc=([^']+)id='/g);
+  saveFileLink = saveFileLink[0].split("'")[0];
+  console.log(saveFileLink);
+  await CleanCitySession.updateOne(
+    { type: "dxsh" },
+    {
+      $set: {
+        "path.findSudProccessPath": findSudProccessPath,
+        "path.saveFileLink": saveFileLink,
       },
-    ],
-  });
-
-  // Used to export the file into a .docx file
-  return Packer.toBuffer(doc).then((buffer) => {
-    fs.writeFileSync("./uploads/sudBuyruqlari/" + licshet + ".docx", buffer);
-    console.log(licshet, "done");
-    return { success: true };
-  });
+    }
+  );
+  return await enterMaterialTOBilling(file_path, kod);
 }
 
-// Done! A file called 'My Document.docx' will be in your file system.
+enterMaterialTOBilling();
+
+// ariza va ilovalarni billing bazasiga yuklaydigan dastur.
+async function importSudMaterialsToBilling(pachka_id) {
+  try {
+    const pachka = await SudMaterial.findById(pachka_id);
+  } catch (error) {
+    console.error(error);
+  }
+}

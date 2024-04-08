@@ -71,6 +71,7 @@ const ADMIN_ACTIONS = [
   "get_sud_material",
   "ommaviy_shartnoma_biriktirish",
   "generateProkuraturaSudAriza",
+  "sudBuyruqlariYaratish",
 ];
 
 // main required functions
@@ -302,6 +303,7 @@ composer.hears("export_abonents", async (ctx) => {
       fio: abonent.fio,
       street: abonent.mahalla_name,
       kadastr_number: abonent.kadastr_number,
+      passport: abonent.passport_number,
       pinfl: abonent.pinfl,
       confirm: abonent.shaxsi_tasdiqlandi?.confirm,
     });
@@ -316,6 +318,7 @@ composer.hears("export_abonents", async (ctx) => {
         { label: "ФИО--", value: "fio" },
         { label: "Кўча", value: "street" },
         { label: "Кадастр", value: "kadastr_number" },
+        { label: "ПАССПОРТ", value: "passport" },
         { label: "ЖШШИР", value: "pinfl" },
         { label: "Шахси тасдиқланди", value: "confirm" },
       ],

@@ -136,7 +136,9 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         // if (!customDates.photo) {
         //   filename = "./lib/personicon.png";
         // }
+        console.log(customDates);
         let filename = ctx.wizard.state.filename;
+        return;
         fs.writeFile(filename, customDates.photo, "base64", async (err) => {
           if (err) throw err;
 
