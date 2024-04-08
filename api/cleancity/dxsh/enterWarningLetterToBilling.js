@@ -55,7 +55,6 @@ async function enterWarningLetterToBilling({
     return new Promise((resolve, reject) => {
       request(options, function (error, response) {
         if (error) reject(error);
-        console.log(response);
         resolve(JSON.parse(response.body));
       });
     });
