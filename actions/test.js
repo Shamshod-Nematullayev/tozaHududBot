@@ -97,7 +97,12 @@ async function importSudMaterialsToBilling(pachka_id) {
         return new Promise((resolve, reject) => {
           request(options, function (error, response) {
             if (error) reject(error);
-            resolve(JSON.parse(response.body));
+            let obj = JSON.parse(response.body);
+            resolve({
+              ...obj,
+              success: true,
+              proccess_id: findedProcesses.rows[0].id,
+            });
           });
         });
       }
@@ -110,7 +115,10 @@ async function importSudMaterialsToBilling(pachka_id) {
       let toSudActionsPage = "";
       elements.forEach(function (element) {
         // Check if the text content matches "hello world"
-        if (element.textContent.trim() === "Суд жараёнлари") {
+        if (
+          element.textContent.trim() === "Суд жараёнлари" ||
+          element.textContent.trim() === "Sud jarayonlari"
+        ) {
           // Found the element, do something with it
           toSudActionsPage = element.href;
         }
@@ -125,19 +133,26 @@ async function importSudMaterialsToBilling(pachka_id) {
         },
       });
       const res2Text = await res2.text();
+      fs.writeFileSync(
+        "./text.txt",
+        res2Text,
+        { encoding: "utf-8" },
+        (err) => {}
+      );
       let findSudProccessPath = res2Text.match(
         /rownumbers:true,url:"ds\?xenc=([^']+)VDA"/g
       );
       findSudProccessPath = findSudProccessPath[0].split('"')[1];
       let saveFileLink = res2Text.match(/dsmmf\?xenc=([^']+)id='/g);
       saveFileLink = saveFileLink[0].split("'")[0];
+      let sendToSud = res2Text.match(/dsmmf\?xenc=([^']+)id='/g);
       await CleanCitySession.updateOne(
         { type: "dxsh" },
         {
           $set: {
             "path.findSudProccessPath": findSudProccessPath,
             "path.saveFileLink": saveFileLink,
-            "path.save_send_to_court": saveFileLink[2].split("'")[0],
+            "path.save_send_to_court": sendToSud[2].split("'")[0],
           },
         }
       );
@@ -145,10 +160,100 @@ async function importSudMaterialsToBilling(pachka_id) {
     }
     const pachka = await SudMaterial.findById(pachka_id);
     let counter = 0;
-    if (counter === pachka.items.length)
-      return { success: true, msg: "Proccess tugadi" };
-    const item = pachka.items[counter];
+
+    async function upload() {
+      if (counter === pachka.items.length)
+        return { success: true, msg: "Proccess tugadi" };
+      const item = pachka.items[counter];
+      const res1 = await enterMaterialTOBilling(
+        `./uploads/${pachka_id}/shakl2/${item.KOD}/ariza.PDF`,
+        item.KOD,
+        "ARIZA"
+      );
+      const res2 = await enterMaterialTOBilling(
+        `./uploads/${pachka_id}/shakl2/${item.KOD}/ilovalar.PDF`,
+        item.KOD,
+        "ILOVALAR"
+      );
+
+      // if (res1.success && res2.success) {
+      const session = await CleanCitySession.findOne({ type: "dxsh" });
+      const res3 = await fetch(
+        `https://cleancity.uz/${
+          session.path.save_send_to_court + res2.proccess_id
+        }`,
+        { headers: { Cookie: session.cookie } }
+      );
+      const newItems = pachka.items;
+      const indexToUpdate = pachka.items.findIndex((a) => a.KOD == item.KOD);
+      if (indexToUpdate !== -1) {
+        newItems[indexToUpdate].savedOnBilling = true;
+      }
+      console.log(item.KOD, "Bajarildi");
+
+      await pachka.updateOne({ $set: { items: newItems } });
+      counter++;
+      await upload();
+      // }
+    }
+    await upload();
   } catch (error) {
     console.error(error);
   }
 }
+
+importSudMaterialsToBilling("6605277d25c788d7a4e00968");
+
+async function sendToSudMaterial(pachka_id) {
+  const pachka = await SudMaterial.findById(pachka_id);
+  let counter = 140;
+  let newItems = pachka.items;
+  async function update() {
+    if (counter == 150)
+      return await pachka.updateOne({ $set: { items: newItems } });
+
+    const item = pachka.items[counter];
+    const indexToUpdate = newItems.findIndex((a) => a.KOD == item.KOD);
+    fetch(
+      "https://cabinetapi.sud.uz/api/cabinet/case/send-to-court/" +
+        item.sud_case_id,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+          "content-type": "application/json",
+          responsetype: "arraybuffer",
+          "sec-ch-ua":
+            '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-site",
+          "x-auth-token": "932320c7-303c-41e8-b4ad-9c1a41f270d9",
+        },
+        referrer: "https://cabinet.sud.uz/",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        body: "{}",
+        method: "PUT",
+        mode: "cors",
+        credentials: "omit",
+      }
+    ).then(async (res) => {
+      const data = await res.json().catch((err) => {
+        console.log(err);
+      });
+      console.log(item.KOD, data);
+      if (indexToUpdate !== -1 && data.id) {
+        newItems[indexToUpdate].sended = true;
+      } else {
+        newItems[indexToUpdate].sended = data.message;
+      }
+
+      counter++;
+      return await update();
+    });
+  }
+  // update();
+}
+// sendToSudMaterial("6613a5d45aded63aa13c09d9");

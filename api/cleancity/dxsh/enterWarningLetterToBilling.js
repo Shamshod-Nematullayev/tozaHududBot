@@ -69,7 +69,10 @@ async function enterWarningLetterToBilling({
     elements.forEach(function (element) {
       // Check if the text content matches "hello world"
 
-      if (element.textContent.trim() === "Суд огоҳлантириш") {
+      if (
+        element.textContent.trim() === "Суд огоҳлантириш" ||
+        element.textContent.trim() === "Sud ogohlantirish"
+      ) {
         // Found the element, do something with it
         warningLettersPage = element.href;
       }

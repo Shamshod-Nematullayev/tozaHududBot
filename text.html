@@ -44,7 +44,7 @@
                 <script src="assets/js/canvasjs.min_uk.js" type="text/javascript"></script>
                 <script src="assets/js/jquery.canvasjs.min_uk.js" type="text/javascript"></script>
                 <script type="text/javascript">var no_ajax_feedback=0;$(function(){if($("#feedbackform span.feedbackPanelINFO").text()!=""){var a=[];var b="";$("#feedbackform span.feedbackPanelINFO").each(function(d){var f=false;for(var e=0;e<a.length;e++){if(a[e]==$(this).text()){f=true;}}if(!f){b+=$(this).text()+"<br/>";a.push($(this).text());}});$.messager.alert("Маълумот",b,"info");}if($("#feedbackform span.feedbackPanelERROR").text()!=""){var b="";var c=[];$("#feedbackform span.feedbackPanelERROR").each(function(d){var f=false;for(var e=0;e<c.length;e++){if(c[e]==$(this).text()){f=true;}}if(!f){b+=(d+1)+". "+$(this).text()+"<br/>";c.push($(this).text());}});$.messager.alert("Хатолик",b,"error");}$(document).ready(function(){if($("#mv_span")[0].innerText=="1"){$("#mv_span")[0].innerText="MV";$("#mv_span")[0].classList.add("mv_span_class");}else{$("#mv_span")[0].classList.add("not_mv_span");}$(document).keypress(function(d){if(window.getSelection()!=""){if((d.keyCode==10)){var f=window.getSelection();if($.trim(f).length<10){alertmessage("Хабарда узоғи билан 10 та дан кам бўлмаган сўз киритинг","success");}else{$("#frmErrorReport").form("clear");$("#frmWindowErrorReport").dialog("open").dialog("setTitle","Янги");$("#selected_text").val(f);}}}});});$("body").keyup(function(d){var e=$(this).find(".easyui-dialog");if(d.keyCode==27){for(var k=0;k<e.length;k++){$(e[k]).dialog("close");}}if(d.keyCode==13){var e=$(this).find(".easyui-dialog");for(var k=0;k<e.length;k++){var h=$(e[k]).dialog("dialog");console.log("----obj: "+h);var o=$(h).attr("style").split(";");for(var g=0;g<o.length;g++){if(o[g]==="display: block"){console.log("----styles[j]: "+o[g]);var n=$(e[k]).dialog("window").find(".dialog-button")[0];var m=$(n).find("a.easyui-linkbutton");for(var f=0;f<m.length;f++){if($(m[f]).attr("button-index")=="0"){$(m[f]).click();break;}}}}}}});$("ul li a.active").focus();});</script>
-                <script type="text/javascript">var stack_;var clazz;var stack_topleft={dir1:"down",dir2:"right",push:"top"};var stack_topright={dir1:"down",dir2:"left",push:"top"};var stack_bottomleft={dir1:"right",dir2:"up",push:"top"};var stack_bottomright={dir1:"up",dir2:"left",firstpos1:15,firstpos2:15};var stack_bar_top={dir1:"down",dir2:"right",push:"top",spacing1:0,spacing2:0};var stack_bar_bottom={dir1:"up",dir2:"right",spacing1:0,spacing2:0};function alertmessage(c,b){var a="fa fa-";switch(b){case"success":a+="check";break;case"error":a+="times";break;}new PNotify({title:"CleanCity",text:c,type:b,shadow:true});}function alertmessage_by_position(c,b,a){if(a==="topleft"){stack_=stack_topleft;clazz="stack-topleft";}else{if(a==="topright"){stack_=stack_topright;clazz="stack-topright";}else{if(a==="bottomleft"){stack_=stack_bottomleft;clazz="stack-bottomleft";}else{stack_=stack_bottomright;clazz="stack-bottomright";}}}new PNotify({title:"CleanCity",text:c,type:b,shadow:true,addclass:clazz,stack:stack_});}function alertmessage_by_desktop(c,b,a){if(a==="top"){new PNotify({title:"CleanCity",text:c,type:b,shadow:true,addclass:"stack-bar-top",stack:stack_bar_top,width:"100%"});}else{new PNotify({title:"PayMobile",text:c,type:b,shadow:true,addclass:"stack-bar-bottom",stack:stack_bar_bottom,width:"100%"});}}function confirmer_pm(c,b,a){$("#confirmer #ok").focus();$("#confirmer #ok").unbind("click");$("#confirmer #ok").bind("click",function(){$("#cancel").click();});$("#confirmer #ok").bind("click",a);$("#confirmer #title").html(c);$("#confirmer #content").html(b);$("#view_confirmer").click();}function send_(){$("#frmErrorReport").form("submit",{url:"ds?xenc=lxIwS-S5tWqfZaoU9i74X9QhaIIrsOJ7bKvFvc400EFKzARXRK1V-jJcNSwgrywqI5qwslawvuCNdpoinO1JkLkpsO1vSfjR",onSubmit:function(){return $(this).form("validate");},success:function(result){var result=eval("("+result+")");if(result.success){$("#frmWindowErrorReport").dialog("close");alertmessage("Эътиборингиз учун рахмат. Сизнинг хабарингиз кўриб чиқилади ва хал қилинади.","success");}else{$.messager.alert("CleanCity",result.msg,"error");}}});}</script>
+                <script type="text/javascript">var stack_;var clazz;var stack_topleft={dir1:"down",dir2:"right",push:"top"};var stack_topright={dir1:"down",dir2:"left",push:"top"};var stack_bottomleft={dir1:"right",dir2:"up",push:"top"};var stack_bottomright={dir1:"up",dir2:"left",firstpos1:15,firstpos2:15};var stack_bar_top={dir1:"down",dir2:"right",push:"top",spacing1:0,spacing2:0};var stack_bar_bottom={dir1:"up",dir2:"right",spacing1:0,spacing2:0};function alertmessage(c,b){var a="fa fa-";switch(b){case"success":a+="check";break;case"error":a+="times";break;}new PNotify({title:"CleanCity",text:c,type:b,shadow:true});}function alertmessage_by_position(c,b,a){if(a==="topleft"){stack_=stack_topleft;clazz="stack-topleft";}else{if(a==="topright"){stack_=stack_topright;clazz="stack-topright";}else{if(a==="bottomleft"){stack_=stack_bottomleft;clazz="stack-bottomleft";}else{stack_=stack_bottomright;clazz="stack-bottomright";}}}new PNotify({title:"CleanCity",text:c,type:b,shadow:true,addclass:clazz,stack:stack_});}function alertmessage_by_desktop(c,b,a){if(a==="top"){new PNotify({title:"CleanCity",text:c,type:b,shadow:true,addclass:"stack-bar-top",stack:stack_bar_top,width:"100%"});}else{new PNotify({title:"PayMobile",text:c,type:b,shadow:true,addclass:"stack-bar-bottom",stack:stack_bar_bottom,width:"100%"});}}function confirmer_pm(c,b,a){$("#confirmer #ok").focus();$("#confirmer #ok").unbind("click");$("#confirmer #ok").bind("click",function(){$("#cancel").click();});$("#confirmer #ok").bind("click",a);$("#confirmer #title").html(c);$("#confirmer #content").html(b);$("#view_confirmer").click();}function send_(){$("#frmErrorReport").form("submit",{url:"ds?xenc=lxIwS-S5tWqfZaoU9i74X9QhaIIrsOJ7bKvFvc400EFKzARXRK1V-jJcNSwgrywqI5qwslawvuBrkOCx2iPZZCH9-Atxhdk4",onSubmit:function(){return $(this).form("validate");},success:function(result){var result=eval("("+result+")");if(result.success){$("#frmWindowErrorReport").dialog("close");alertmessage("Эътиборингиз учун рахмат. Сизнинг хабарингиз кўриб чиқилади ва хал қилинади.","success");}else{$.messager.alert("CleanCity",result.msg,"error");}}});}</script>
 
                 <script id="uz-furorprogress-cleancity-wicket-modules-AbonentCardModule-0">
                     $(document).ready(function() {
@@ -90,304 +90,29 @@
             
         
     
-        <script>$(function(){$("#par_user_status").combobox({formatter:stateFormatterCombo,onSelect:function(c,b){refreshTable();}});cur_date=new Date();sana=("01."+(cur_date.getMonth()+1<10?"0":"")+(cur_date.getMonth()+1)+"."+cur_date.getFullYear());$("#date1").datebox("setValue",sana);$("#date2").datebox("setValue",cur_date.toLocaleDateString());$("#par_companies_id").combogrid({panelWidth:280,name:"companies_id",idField:"id",textField:"name",sortName:"id",sortOrder:"asc",url:"ds?xenc=xKgtbzJNdSAaHLbCDDrO3yeX_LMaiBpgQ_h5uJkXTT4PwRqauYakn56tyx8e3OtqKEH9aRolQ92MmTmdD7tQCofCuaxl3XZgA54F8sC37CXP2WMrwvPWgQ==",editable:true,fitColumns:true,mode:"remote",disable:true,columns:[[{field:"id",title:"ID",width:50,sortable:true,fixed:true},{field:"name",title:"Номи",width:100,sortable:true}]],onSelect:function(c,b){a(b);refreshTable();},onLoadSuccess:function(b){if(b.rows.length){$("#par_companies_id").combogrid("setValue",b.rows[0].id);a(b.rows[0]);refreshTable();}}});$("#par_user_status").combogrid({panelWidth:200,name:"par_user_status",idField:"id",textField:"name",sortName:"id",sortOrder:"asc",url:"ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMem50XlEJ_dXnhJK32R8C9ML8Ve3taXqhiMfcD_BIMifWBqB-BzvWPfoRFMb2GJBhU",editable:true,fitColumns:true,mode:"remote",disable:true,columns:[[{field:"id",title:"ID",width:50,sortable:true,fixed:true},{field:"name",title:"Номи",width:100,sortable:true}]],onSelect:function(c,b){refreshTable();},onLoadSuccess:function(b){if(b.rows.length){refreshTable();}}});$("#par_user_status").combogrid({icons:[{iconCls:"icon-clear",handler:function(b){$(b.data.target).combogrid("clear");$("#par_user_status").combogrid("setValue","");refreshTable();}}]});$("#par_user_status").combogrid("textbox").attr("placeholder","Cтатус");$("#par_file_types").combogrid({panelWidth:280,name:"companies_id",idField:"id",textField:"name",sortName:"id",sortOrder:"asc",url:"ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeOkBrUrxFzgqbSKVEIGsTLixD_Ipl9FegWK89vcTNAwKUSFWAW-xx_H0sgXBCotDF",editable:true,fitColumns:true,disable:true,columns:[[{field:"id",title:"ID",width:50,sortable:true,fixed:true},{field:"name",title:"Номи",width:100,sortable:true}]],onSelect:function(c,b){},onLoadSuccess:function(b){if(b.rows.length){$("#par_file_types").combogrid("setValue",b.rows[0].id);
-}}});function a(b){$(".company_name").text($("#par_companies_id").combogrid("grid").datagrid("getSelected").name);}$("#tableData").datagrid({nowrap:true,striped:true,collapsible:false,fit:true,pagination:true,pageSize:20,rownumbers:true,url:"ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeEBN3PB-sKH7YULoKr1Ppq5yEX74E9B6CTCuT46FHrAPBCa27lxaz6PlmuP3lfVDA",sortName:"id",sortOrder:"desc",remoteSort:true,fitColumns:false,singleSelect:true,idField:"id",queryParams:getFiltrObject(),columns:[[{field:"id",title:"ID",width:60,sortable:true,fixed:true},{field:"companies_name",title:"Компания номи",width:200},{field:"abonent_fio",title:"ФИО",hidden:false,width:200},{field:"prescribed_cnt",title:"Яшовчилар сони",hidden:true},{field:"status_name",title:"Cтатус",width:130},{field:"sud_warning_date",title:"Огоҳлантриш санаси",width:100},{field:"sud_warning_amount",title:"Огоҳлантриш суммаси",width:100},{field:"debit_amount",title:"Салдо бошига қарз оралиги",width:100},{field:"created_users_name",title:"Яратилган фойдаланувчи",width:200},{field:"updated_users_name",title:"Ўзгарирган фойдаланувчи",width:200},{field:"updated_date",title:"Ўзгартиралган сана",width:100},{field:"created_date",title:"Яратиш санаси",hidden:true},{field:"licshet",title:"Лицевой",hidden:true},{field:"debit_date",title:"Салдо бошига қарз оралиги",hidden:true},{field:"remaining_debt_amount",title:"Қолди",hidden:true},{field:"payments_amount",title:"Тўловлар",hidden:true},{field:"address",title:"Манзил",hidden:true}]],toolbar:"#toolbarTableData",onLoadError:function(){$.messager.alert("CleanCity","HTTP хатолик","error");},onLoadSuccess:function(b){if(b.total){if(b.total==="-1"){$.messager.alert("CleanCity",b.msg,"error");}}},onClickRow:function(b,c){$("#clickToTimeLine").css("display","none");$("#user_card").css("visibility","unset");setCardInfo(c);}});$("#tableDataPayments").datagrid({nowrap:true,striped:true,collapsible:false,fit:true,pagination:false,pageSize:20,rownumbers:true,url:"ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeeFxRd56vzVv4RFaV2b4WuoyZOZ0Pu1AKh8K5rGXddmADngXywLfsJUa6Vbm6tcSX",sortName:"id",sortOrder:"desc",remoteSort:true,fitColumns:false,singleSelect:true,idField:"id",queryParams:{id:-1},columns:[[{field:"id",title:"ID",width:60,sortable:true,fixed:true},{field:"pay_state",title:"Статус",width:100,formatter:function(c,d,b){return c==1?"Ёниқ":"Ўчирилган";
-}},{field:"sud_process_amount",title:"Тўлов",width:100,formatter:function(c,d,b){return number_format(c,2,","," ");}},{field:"pay_date",title:"Тўлов санаси",width:100,fixed:true},{field:"description",title:"Тавсиф",width:120,fixed:true}]],toolbar:"#toolbarTableDataPayments",onLoadError:function(){$.messager.alert("CleanCity","HTTP хатолик","error");},onLoadSuccess:function(b){}});$("#tableDataFlows").datagrid({nowrap:true,striped:true,collapsible:false,fit:true,pagination:false,pageSize:20,rownumbers:true,url:"ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeD_1jB3tB9va73gSxQ5C3LJyTKHJiRV1bVfTW9_bl9NLTe7cpvZMDG8DB2hWwXdXf",sortName:"id",sortOrder:"desc",remoteSort:true,fitColumns:false,singleSelect:true,idField:"id",queryParams:{id:-1},columns:[[{field:"id",title:"ID",width:60,sortable:true,fixed:true},{field:"created_users_fio",title:"Ўзгарирган фойдаланувчи",width:120,fixed:true},{field:"statuse_name",title:"Статус",width:120,sortable:true,fixed:true},{field:"date_from",title:"Дан",width:100,fixed:true},{field:"date_to",title:"Гача",width:100,fixed:true},{field:"description",title:"Тавсиф",width:100,fixed:true}]],toolbar:"#toolbartableDataFlows",onLoadError:function(){$.messager.alert("CleanCity","HTTP хатолик","error");},onLoadSuccess:function(b){}});});</script>
-        <script type="text/javascript">
-            var url;
-            var url_state;
-            var url_create_user;
-            var url_change_user_data;
-
-            function setCardInfo(row) {
-                $('#fio').text(row.abonent_fio)
-                $('#sud_warning_file').text('Огоҳлантириш файили')
-                $('#sud_decision_court_file').text('Суд қарори файллари')
-                $('#send_to_court_file').text('Судга юбориш файллари')
-                $('#licshet').text(check_data(row.licshet))
-                $('#debit_amount').text(number_format(row.debit_amount, 2, ',', ' '))
-                $('#debit_date').text(check_data(row.debit_date))
-                $('#prescribed_cnt').text(check_data(row.prescribed_cnt))
-                $('#address').text(check_data(row.address))
-                $('#payments_amount').text(check_data(row.payments_amount))
-                $('#remaining_debt_amount').text(number_format(row.remaining_debt_amount, 2, ',', ' '))
-                if (row.sud_process_statuses_id == 2) {
-                    $('#send_to_court').css('display', 'block')
-                    $('#decision_court').css('display', 'none')
-                } else if (row.sud_process_statuses_id == 3) {
-                    $('#decision_court').css('display', 'block')
-                    $('#send_to_court').css('display', 'none')
-                }
-
-                var g = $('#par_file_types').combogrid('grid');
-                $('#par_file_types').combogrid('clear');
-                g.datagrid('load', {sud_process_statuses_id: row.sud_process_statuses_id});
-                $('#par_file_types').combogrid('enable');
-
-                document.getElementById('swf').innerHTML = ''
-                document.getElementById('sdcf').innerHTML = ''
-                document.getElementById('stcf').innerHTML = ''
-                refreshRowTables(row.id)
-                $.post('ds?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeOkBrUrxFzgrW0S2pwXwRLJyTKHJiRV1bVfTW9_bl9NJwG9QXcFSCiu-axrL8AiMR', {sud_processes_id: row.id}, function (result) {
-                    var res = JSON.parse(result)
-                    if (res.total > 0) {
-                        var file_array = res.rows;
-                        var swf = ''
-                        var sdcf = ''
-                        var stcf = ''
-                        file_array.forEach(obj => {
-                            if (obj.sud_resource_types_id == 1) {
-
-                                swf += '<div class="col-3" onclick="download_file(' + obj.resources_id + ')" style="display: flex;float: left;">' +
-                                    '<span style="border-radius: 50px;\n' +
-                                    '    padding: 10px;\n' +
-                                    '    background-color: #eee;\n' +
-                                    '    display: inline-block;\n' +
-                                    '    height: 50px;\n' +
-                                    '    width: 50px;\n' +
-                                    '    margin-right: 10px;">' +
-                                    '<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"\n' +
-                                    '\t viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;height: 30px;" xml:space="preserve">\n' +
-                                    '<g>\n' +
-                                    '\t<path d="M42.5,22h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,22,42.5,22z"/>\n' +
-                                    '\t<path d="M17.5,16h10c0.552,0,1-0.447,1-1s-0.448-1-1-1h-10c-0.552,0-1,0.447-1,1S16.948,16,17.5,16z"/>\n' +
-                                    '\t<path d="M42.5,30h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,30,42.5,30z"/>\n' +
-                                    '\t<path d="M42.5,38h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,38,42.5,38z"/>\n' +
-                                    '\t<path d="M42.5,46h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,46,42.5,46z"/>\n' +
-                                    '\t<path d="M38.914,0H6.5v60h47V14.586L38.914,0z M39.5,3.414L50.086,14H39.5V3.414z M8.5,58V2h29v14h14v42H8.5z"/>\n' +
-                                    '</g>\n' +
-                                    '</svg>\n' +
-                                    '</span>' +
-                                    '<a href="#" style="font-size: 22px;\n' +
-                                    '">Юклаб олиш</a></div>';
-                            } else if (obj.sud_resource_types_id == 2) {
-                                sdcf += '<div class="col-3" onclick="download_file(' + obj.resources_id + ')" style="    display: flex;float: left">' +
-                                    '<span style="border-radius: 50px;\n' +
-                                    '    padding: 10px;\n' +
-                                    '    background-color: #eee;\n' +
-                                    '    display: inline-block;\n' +
-                                    '    height: 50px;\n' +
-                                    '    width: 50px;\n' +
-                                    '    margin-right: 10px;">' +
-                                    '<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"\n' +
-                                    '\t viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;height: 30px;" xml:space="preserve">\n' +
-                                    '<g>\n' +
-                                    '\t<path d="M42.5,22h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,22,42.5,22z"/>\n' +
-                                    '\t<path d="M17.5,16h10c0.552,0,1-0.447,1-1s-0.448-1-1-1h-10c-0.552,0-1,0.447-1,1S16.948,16,17.5,16z"/>\n' +
-                                    '\t<path d="M42.5,30h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,30,42.5,30z"/>\n' +
-                                    '\t<path d="M42.5,38h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,38,42.5,38z"/>\n' +
-                                    '\t<path d="M42.5,46h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,46,42.5,46z"/>\n' +
-                                    '\t<path d="M38.914,0H6.5v60h47V14.586L38.914,0z M39.5,3.414L50.086,14H39.5V3.414z M8.5,58V2h29v14h14v42H8.5z"/>\n' +
-                                    '</g>\n' +
-                                    '</svg>\n' +
-                                    '</span>' +
-                                    '<a href="#" style="font-size: 22px;\n' +
-                                    '    color: #777;">Юклаб олиш</a>' +
-                                '</div> '
-                            } else if (obj.sud_resource_types_id == 3) {
-                                stcf+='<div class="col-3" onclick="download_file('+obj.resources_id+')" style="display: flex; float: left">' +
-                                        '<span style="border-radius: 50px;\n' +
-                                    '    padding: 10px;\n' +
-                                    '    background-color: #eee;\n' +
-                                    '    display: inline-block;\n' +
-                                    '    height: 50px;\n' +
-                                    '    width: 50px;\n' +
-                                    '    margin-right: 10px;">' +
-                                    '<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"\n' +
-                                    '\t viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;height: 30px;" xml:space="preserve">\n' +
-                                    '<g>\n' +
-                                    '\t<path d="M42.5,22h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,22,42.5,22z"/>\n' +
-                                    '\t<path d="M17.5,16h10c0.552,0,1-0.447,1-1s-0.448-1-1-1h-10c-0.552,0-1,0.447-1,1S16.948,16,17.5,16z"/>\n' +
-                                    '\t<path d="M42.5,30h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,30,42.5,30z"/>\n' +
-                                    '\t<path d="M42.5,38h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,38,42.5,38z"/>\n' +
-                                    '\t<path d="M42.5,46h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S43.052,46,42.5,46z"/>\n' +
-                                    '\t<path d="M38.914,0H6.5v60h47V14.586L38.914,0z M39.5,3.414L50.086,14H39.5V3.414z M8.5,58V2h29v14h14v42H8.5z"/>\n' +
-                                    '</g>\n' +
-                                    '</svg>\n' +
-                                    '</span>' +
-                                    '<a href="#" style="font-size: 22px;\n' +
-                                    '    color: #777;">Юклаб олиш</a>'+
-                                    '</div>'
-                            }
-                        })
-                        document.getElementById('swf').innerHTML = swf
-                        document.getElementById('sdcf').innerHTML = sdcf
-                        document.getElementById('stcf').innerHTML = stcf
-
-
+            
+                <script type="text/javascript">$(function(){$("#filtr_types2").combobox("disable",true);var f=new Date();var d=((f.getDate()<10?"0":"")+(f.getDate())+"."+(f.getMonth()+1<10?"0":"")+(f.getMonth()+1)+"."+f.getFullYear());var b=f.getDate();if("0"!=="0"){var g="<h3>ОГОХЛАНТИРИШ</h3> <br><p> Сизга шуни хабар қиламизки #period# йил ҳолатига,   #contract_number#-сонли шартномага асосан «Clean City» хизматидан фойдаланиш бўйича <br> <span>#amount#</span> сўм   қардорлигингиз мавжуд. Юкоридаги карздорликни тулаб куйишингизни илтимос киламиз. </p>";var c=g.replace("#period#","01-Апрель 2024").replace("#contract_number#","18").replace("#amount#","0.00");$("#debt_text").html(c);if("1144"!==2){$("#frmWindowForSaldo").dialog("open").dialog("setTitle","Хурматли фойдаланувчи");}else{$("#frmWindowForSaldo").dialog("close").dialog("setTitle","Хурматли фойдаланувчи");}}var a=(f.getFullYear()*12+f.getMonth()+1);a=a-(parseInt("2024")*12+parseInt("4"));if(a!==0){if("3"==="1"){var g="<h3>ОГОХЛАНТИРИШ</h3><p>сизга шуни малум қиламизки, <span>#cur_date#</span>ҳолатига кўра сизнинг <span>#company_nomi#</span> корхонангиз жорий давр бўйича <span>#diff_mes#</span> oy-u <span>#diff_day#</span>кун орқада қоляпти.</p>";var e=g.replace("#diff_mes#",a);e=e.replace("#diff_day#",b);e=e.replace("#cur_date#",d);e=e.replace("#company_nomi#","\"ANVARJON BIZNES INVEST\" MCHJ");$("#period_text").html(e);$("#frmWindowForPeriod").dialog("open").dialog("setTitle","Хурматли фойдаланувчи");}}else{$("#frmWindowForPeriod").dialog("close").dialog("setTitle","Хурматли фойдаланувчи");}drawFirstChart(1);$("#filtr_types2").combobox({onSelect:function(j,i){var h=$("#filtr_types2").combobox("getValue");drawFirstChart(h);}});drawSecondChart(2);$("#filtr_types").combobox({onSelect:function(j,i){var h=$("#filtr_types").combobox("getValue");drawSecondChart(h);}});drawThirdChart(1);$("#filtr_types3").combobox({onSelect:function(j,i){var h=$("#filtr_types3").combobox("getValue");drawThirdChart(h);}});drawChartFourth(1);$("#filtr_types4").combobox({onSelect:function(j,i){var h=$("#filtr_types4").combobox("getValue");drawChartFourth(h);}});});</script>
+                <script type="text/javascript">function drawFirstChart(a){var b=[];var c=[];$.post("ds?xenc=qlx4E8t_aDqNaw_bMRmbTvum2tY4Sd3Edujkx2kkhiozjb-ATzH7uSxD_Ipl9FeguluHxhwgYKrsjCU6bQpydKdGOQxvQDDe&filtr_types="+a,function(d){if(d.total>0){for(var e=0;e<d.total;e++){b.push({label:d.rows[e].period,y:d.rows[e].payments*1});c.push({label:d.rows[e].period,y:d.rows[e].org_payments*1});}initAndDrawFirstChart(b,a);}},"json");}function initAndDrawFirstChart(c,f){var b=new Date();var e=b.toLocaleDateString().split(".");var g=parseInt(f==="1"?e[0]:e[1]);var a=parseInt(f==="1"?5:1);var d=new CanvasJS.Chart("graph1",{title:{text:""},axisX:{labelWrap:true,interval:1,tickLength:1},toolTip:{shared:true,content:function(j){var h;var i;i="<span style = 'color:DodgerBlue; '><strong>Давр - "+(j.entries[0].dataPoint.label)+" </strong></span><br/>";h="<span style= 'color:"+j.entries[0].dataSeries.color+"'> "+j.entries[0].dataSeries.name+"</span>: <strong>"+number_format(j.entries[0].dataPoint.y,0,","," ")+"</strong>  (минг сўм)<br/> ";return(i.concat(h));}},axisY:{lineColor:"#4F81BC",tickColor:"#4F81BC",labelFontColor:"#4F81BC",titleFontColor:"#4F81BC",lineThickness:2},axisY2:{lineColor:"#C0504E",tickColor:"#C0504E",labelFontColor:"#C0504E",titleFontColor:"#C0504E",lineThickness:2},animationEnabled:true,data:[{type:"spline",name:"Абонентлардан тушумлар",dataPoints:c}],legend:{cursor:"pointer",itemclick:function(h){if(typeof(h.dataSeries.visible)==="undefined"||h.dataSeries.visible){h.dataSeries.visible=false;}else{h.dataSeries.visible=true;}d.render();}}});d.render();}function drawSecondChart(b){var a=[];$.post("ds?xenc=qlx4E8t_aDqNaw_bMRmbTvum2tY4Sd3ELGtcZX1vkKRuijW0kQ-das98F_41MFfFNKFF8r_ULJO_FXt7Wl6oYjH3A_wSDIn1-I-OR4ccOfqPtv_fIRjWzw==&filtr_types="+b,function(c){if(c.total>0){for(var d=0;d<c.total;d++){a.push({y:c.rows[d].payments*1,label:c.rows[d].name});}initAndDrawSecondChart(a,b);}},"json");}function initAndDrawSecondChart(b,a){CanvasJS.addColorSet("greenShades",["#2980b9","#27ae60","#16a085","#f1c40f","#e74c3c","#3498db","#d35400","#9b59b6","#c0392b"]);var c=new CanvasJS.Chart("graph2",{colorSet:"greenShades",theme:"theme4",animationEnabled:true,axisX:{labelWrap:true,interval:1,tickLength:1},data:[{type:"bar",axisYType:"secondary",indexLabelPlacement:"inside",indexLabelFontColor:"black",indexLabelFontWeight:300,indexLabelFontFamily:"Verdana",indexLabelFontSize:15,toolTipContent:"{label} - {y}",dataPoints:b}]});
+c.render();}function drawThirdChart(a){$.post("ds?xenc=qlx4E8t_aDqNaw_bMRmbTvum2tY4Sd3EfmDo9tHuxCeEKmxlyGwkx8qurGRSQVdKNJaDVptYrKe_FXt7Wl6oYjH3A_wSDIn1-I-OR4ccOfqPtv_fIRjWzw==&filter_types="+a,function(b){if(b.success){var c=new CanvasJS.Chart("graph3",{animationEnabled:true,toolTip:{shared:true,content:function(g){var d;var f;f="<span style = 'color:rgba(93, 165, 169, 0.89);'><strong>Каналлар бўйича</strong></span><br/>";d="<span style= 'color:"+g.entries[0].dataSeries.color+"'> "+g.entries[0].dataPoint.label+"("+g.entries[0].dataSeries.name+")</span>: <strong>"+number_format(g.entries[0].dataPoint.y,0,","," ")+"</strong>  (минг сўм)<br/> ";return(f.concat(d));}},axisY:{interlacedColor:"#F8F1E4"},data:[{type:"column",name:"Аҳоли",dataPoints:[{label:"МУНИС",y:(b.row.munis)*1},{label:"Элек.тўловлар",y:(b.row.epayments)*1},{label:"Мобил",y:(b.row.mobile)*1},{label:"Веб",y:(b.row.web)*1},{label:"1031 tolovlari",y:(b.row.pays1031)*1}]}]});c.render();}},"json");}function drawChartFourth(a){$.post("ds?xenc=qlx4E8t_aDqNaw_bMRmbTvum2tY4Sd3Ek1OuquX3gB722iqvV_RnkWfe0D8irGNfvxV7e1peqGIx9wP8EgyJ9fiPjkeHHDn6j7b_3yEY1s8=",{filtr_types:a},function(c){if(c.total>0){var b=[];for(var d=0;d<c.total;d++){b.push({y:c.rows[d].amount*1,legendText:c.rows[d].name,label:c.rows[d].name+": "+number_format(c.rows[d].amount,0,","," ")});}initFourthChart(b);}},"json");}function initFourthChart(b){var a=new CanvasJS.Chart("graph4",{animationEnabled:true,legend:{fontSize:12,itemMaxWidth:160,verticalAlign:"center",horizontalAlign:"right",itemWrap:false},data:[{type:"pie",indexLabelFontSize:12,indexLabelFontColor:"MistyRose",indexLabelLineColor:"darkgrey",indexLabelPlacement:"inside",showInLegend:true,indexLabel:"#percent%",startAngle:-20,legendText:"{legendText}",toolTipContent:"{label}",dataPoints:b}]});a.render();}</script>
+                <style id="uz-furorprogress-cleancity-wicket-StaffHomePage-0">
+                    .pp span{
+                        color:red;
+                        font-size: 24px;
+                    }
+                    h3{
+                        text-align: center;
+                        font-size: 34px;
+                        color: #FF9800;
+                    }
+                    .pp{
+                        text-align: justify;
+                        color:black;
+                        font-size: 24px;
                     }
 
-                })
-            }
-
-            function refreshRowTables(id) {
-                console.log('refreshRowTables == > ', id)
-                let obj = {sud_processes_id: id}
-                $('#tableDataPayments').datagrid('load', obj);
-                $('#tableDataFlows').datagrid('load', obj);
-                console.log('obj == > ', obj)
-            }
-
-            function check_data(val) {
-                if (val == null || val == undefined || val == NaN) {
-                    return ''
-                } else return val
-            }
-
-            function add_file() {
-                var row = $('#tableData').datagrid('getSelected');
-                if (row) {
-                    $('#frmWindowAddFile').dialog('open').dialog('setTitle', 'Файл бириктириш')
-                } else {
-                    $.messager.alert('CleanCity', 'Илтимос, аввал элементни танланг', 'error');
-                }
-            }
-
-            function decision_court() {
-                var row = $('#tableData').datagrid('getSelected');
-                if (row) {
-                    $('#frmWindowDecisionCourtFile').dialog('open').dialog('setTitle', 'Суд қарорини киритиш')
-                } else {
-                    $.messager.alert('CleanCity', 'Илтимос, аввал элементни танланг', 'error');
-                }
-            }
-
-            function send_to_court() {
-                var row = $('#tableData').datagrid('getSelected');
-                if (row) {
-                    $('#frmWindowSendToCourtFile').dialog('open').dialog('setTitle', 'Судга юбориш')
-                } else {
-                    $.messager.alert('CleanCity', 'Илтимос, аввал элементни танланг', 'error');
-                }
-            }
-
-            function getFiltrObject() {
-                var JsonObj = {};
-                if ($('#date1').datebox('getValue') !== '') {
-                    JsonObj['date1'] = $('#date1').datebox('getValue');
-                }
-                if ($('#date2').datebox('getValue') !== '' && isDateFormat($('#date2').datebox('getValue'))) {
-                    JsonObj['date2'] = $('#date2').datebox('getValue');
-                }
-                if ($('#from_debit').val() !== '') {
-                    JsonObj['from_debit'] = $('#from_debit').val();
-                }
-                if ($('#to_debit').val() !== '') {
-                    JsonObj['to_debit'] = $('#to_debit').val();
-                }
-                if ($('#searchBox').searchbox('getValue') !== '') {
-                    JsonObj[$('#searchBox').searchbox('getName')] = $('#searchBox').searchbox('getValue');
-                }
-                if ($('#par_user_status').combogrid('getValue') !== '') {
-                    JsonObj['status'] = $('#par_user_status').combogrid('getValue');
-                }
-                if ($('#par_companies_id').combogrid('getValue') !== '') {
-                    JsonObj['system_companies_id'] = $('#par_companies_id').combogrid('getValue');
-                } else {
-                    JsonObj['system_companies_id'] = '-1';
-                }
-                return JsonObj;
-            }
-
-
-            function clear_parameters() {
-                var curDate = new Date();
-
-                var currentDate = curDate.getDate() + "." + ((('' + (curDate.getMonth() + 1)).length == 2) ? (curDate.getMonth() + 1) : ('0' + (curDate.getMonth() + 1))) + "." + curDate.getFullYear();
-                $('#date2').datebox('setValue', currentDate);
-                $('#date1').datebox('setValue', ("01." + (curDate.getMonth() + 1 < 10 ? "0" : "") + (curDate.getMonth() + 1) + "." + curDate.getFullYear()));
-
-            }
-
-            function refreshTable() {
-                var filtr = getFiltrObject();
-                $('#tableData').datagrid('load', filtr);
-            }
-
-            function change_state() {
-                var row = $('#tableData').datagrid('getSelected');
-                if (row) {
-                    url_state = 'ds?xenc=xKgtbzJNdSCBEfBQfDrhF-LexkeYuFwHBjtWhEj_06j28PKgXkdWTyxD_Ipl9Feg1mpJIhICXKx7tmbpJztyKT0TVIR-S9My&id=' + row.id;
-                    $('#frmState').form('load', row);
-                    $('#frmWindowState').dialog('open').dialog('setTitle', 'Статусни ўзгартириш');
-                } else {
-                    $.messager.alert('CleanCity', 'Илтимос, аввал элементни танланг', 'error');
-                }
-            }
-
-            function save_file() {
-                var row = $('#tableData').datagrid('getSelected');
-                $('#frmAddFile').form('submit', {
-                    url: 'dsmmf?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMefUeqQwz7BNo5EHiI8xtZBZyEX74E9B6CTCuT46FHrAOGEXW3FM7wjPlmuP3lfVDA&resource_types_id=15&id=' + row.id,
-                    onSubmit: function () {
-                        return $(this).form('validate');
-                    },
-                    success: function (result_) {
-                        var result = eval('(' + result_ + ')');
-                        if (result.success) {
-                            $('#frmWindowAddFile').dialog('close');
-                            $('#tableData').datagrid('reload');
-                        } else {
-                            $.messager.alert('CleanCity', result.msg, 'error');
-                        }
-                    }
-                });
-            }
-
-            function save_desined_file() {
-                var row = $('#tableData').datagrid('getSelected');
-                $('#frmCourtFile').form('submit', {
-                    url: 'dsmmf?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMe68FNR3UX9bq3m28jDMC1vixD_Ipl9Feg1mpJIhICXKx7tmbpJztyKevq97F7YeOT&id=' + row.id,
-                    onSubmit: function () {
-                        return $(this).form('validate');
-                    },
-                    success: function (result_) {
-                        var result = eval('(' + result_ + ')');
-                        if (result.success) {
-                            $('#frmWindowDecisionCourtFile').dialog('close');
-                            $('#tableData').datagrid('reload');
-                        } else {
-                            $.messager.alert('CleanCity', result.msg, 'error');
-                        }
-                    }
-                });
-            }
-
-            function save_send_to_court() {
-                var row = $('#tableData').datagrid('getSelected');
-                $('#frmSendToFile').form('submit', {
-                    url: 'dsmmf?xenc=Fo7vapGrJgpuZHLWjKLWxL8YHGGq8tMeSQwzBoV9J6JdMFW-xmm_OYyZOZ0Pu1AKh8K5rGXddmADngXywLfsJVurCW1ZiNeb&id=' + row.id,
-                    onSubmit: function () {
-                        return $(this).form('validate');
-                    },
-                    success: function (result_) {
-                        var result = eval('(' + result_ + ')');
-                        if (result.success) {
-                            $('#frmWindowSendToCourtFile').dialog('close');
-                            $('#tableData').datagrid('reload');
-                        } else {
-                            $.messager.alert('CleanCity', result.msg, 'error');
-                        }
-                    }
-                });
-            }
-
-            function download_file(id) {
-                $('#downloadFile').attr('src', '/rsview?id=' + id)
-            }
-
-            function isNumberKey(evt) {
-                var charCode = (evt.which) ? evt.which : event.keyCode;
-                if (charCode > 31 && (charCode < 48 || charCode > 57))
-                    return false;
-                return true;
-            }
-
-            function search(value, name) {
-                refreshTable();
-            }
-        </script>
-    
+                </style>
+            
+        
 
             <script type="text/javascript" id="uz-furorprogress-cleancity-wicket-StaffHeaderPanel-0">
                 function changePassword() {
@@ -824,7 +549,7 @@
                             textField: 'name',
                             sortName: 'id',
                             sortOrder: 'asc',
-                            url: 'ds?xenc=xKgtbzJNdSAaHLbCDDrO3yeX_LMaiBpgQ_h5uJkXTT4PwRqauYakn56tyx8e3OtqKEH9aRolQ92MmTmdD7tQCofCuaxl3XZgA54F8sC37CXUtJwe7jFw3Q==',
+                            url: 'ds?xenc=xKgtbzJNdSAaHLbCDDrO3yeX_LMaiBpgQ_h5uJkXTT4PwRqauYakn56tyx8e3OtqKEH9aRolQ92MmTmdD7tQCofCuaxl3XZgjNgUeSFdWtsHO41SN_KHtA==',
                             editable: true,
                             fitColumns: true,
                             mode: 'remote',
@@ -902,7 +627,7 @@
                         pagination: true,
                         pageSize: 20,
                         rownumbers: true,
-                        url: 'ds?xenc=fE4fu0_fbQKjeAULCOK9GzLG_WjClktRTnnNubvF-GssQ_yKZfRXoFivPb3EzQMClEhVgFvscfx6H5tW6r4sVw==',
+                        url: 'ds?xenc=fE4fu0_fbQKjeAULCOK9GzLG_WjClktRTnnNubvF-GssQ_yKZfRXoFivPb3EzQMCHuDZowmedEACAH2sfXCAHQ==',
                         queryParams: {id: -1},
                         sortName: 'licshet',
                         sortOrder: 'asc',
@@ -1036,7 +761,7 @@
                         pagination: true,
                         pageSize: 20,
                         rownumbers: true,
-                        url: 'ds?xenc=tmRIpWRsZP0DrIYaBJTSNOLexkeYuFwHT8dYMc6ke2cdAMGklas3hr8Ve3taXqhiMfcD_BIMifX1oER-_1_9ejLWb50UbHnO',
+                        url: 'ds?xenc=tmRIpWRsZP0DrIYaBJTSNOLexkeYuFwHT8dYMc6ke2cdAMGklas3hr8Ve3taXqhiMfcD_BIMifX4j45Hhxw5-kwwNtqDEmWb',
                         queryParams: {id: -1},
                         sortName: 'licshet',
                         sortOrder: 'asc',
@@ -1383,7 +1108,7 @@
 
                 function getStat(callback) {
 
-                    $.get('ds?xenc=fE4fu0_fbQIprXcHi4NHJsgPmcXq2KuhBa5u9IbVGK-_wOLJ05axUZq2gKlPs3h7LEP8imX0V6DWakkiEgJcrHu2ZuknO3IpULzrvonDmWA=&not_resolved=1', function (result_) {
+                    $.get('ds?xenc=fE4fu0_fbQIprXcHi4NHJsgPmcXq2KuhBa5u9IbVGK-_wOLJ05axUZq2gKlPs3h7LEP8imX0V6DWakkiEgJcrNh1GmsQN_6maWbYgLWRKxs=&not_resolved=1', function (result_) {
                         var result = eval('(' + result_ + ')');
                         if ((result && result.total != -2 && result.total != -1) || result == 0) {
                             callback(result);
@@ -1398,7 +1123,7 @@
                 }
 
                 function getWarnedActs(callback) {
-                    $.get('ds?xenc=Z31Qj75w-6Z_brILYFHKMDDsDsQJwJeW5U3fRKkRDJ6GPuLCbZAAejJcNSwgrywqI5qwslawvuCNdpoinO1JkNuKnmCuTeA7&not_resolved=1', function (result_) {
+                    $.get('ds?xenc=Z31Qj75w-6Z_brILYFHKMDDsDsQJwJeW5U3fRKkRDJ6GPuLCbZAAejJcNSwgrywqI5qwslawvuBrkOCx2iPZZIreGvkhAP-c&not_resolved=1', function (result_) {
                         var result = eval('(' + result_ + ')');
                         if ((result && result.total != -2 && result.total != -1) || result == 0) {
                             callback(result);
@@ -1414,7 +1139,7 @@
 
                 function getNews(callback) {
 
-                    $.get('ds?xenc=TErGUgPMQCfnF3TiBxWrcQWubvSG1RivaUGvuiiqAEs_FN3jDz4GqjhYFx9PLCzunJMocmJFXVtV9Nb39uX00rvtUSpiOhlDl7EaAUH_r0Y=&status=1&functions_type_id=2', function (result_) {
+                    $.get('ds?xenc=TErGUgPMQCfnF3TiBxWrcQWubvSG1RivaUGvuiiqAEs_FN3jDz4GqjhYFx9PLCzunJMocmJFXVtV9Nb39uX00sn1LfobWdn-75rGsvwCIxE=&status=1&functions_type_id=2', function (result_) {
                         var result = eval('(' + result_ + ')');
                         if ((result && result.total != -2 && result.total != -1) || result == 0) {
                             callback(result);
@@ -1458,7 +1183,7 @@
     <div id="ajax_loading" class="loading-bar"></div>
 
     <div class="easyui-layout" fit="true">
-            <div region="north" style="height:80px" id="id22">
+            <div region="north" style="height:80px" id="ida">
                 <!--<div class="demo_ver" wicket:id="is_demo"></div>-->
                 
             <div class="top-bar main-bg">
@@ -1515,7 +1240,7 @@
                             </a>
                             <div id="mm2" style="width:130px;" class="raleway-menu-menu">
                                 <div>
-                                    <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4Ayxv3*lWz9ehubd1FxzkztYlKm0ShX-zXZfgz1M0WqoCB4qQ7XoczVccI" title="кўк" style="cursor: no-drop;font-weight: 500;pointer-events: none">
+                                    <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhEbWLV8UiovKcekSggC5ofZi-DRJBFswTe4G*yikU-hRcQEU4VlH-bP" title="кўк" style="cursor: no-drop;font-weight: 500;pointer-events: none">
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div style="width: 16px;height: 16px; border-radius: 50%; margin-top: 2px; background-color: #25507d"></div>
@@ -1527,7 +1252,7 @@
 
                                     </a>
                                 </div><div>
-                                    <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxuC**GXLi6ZJvNBrq6E-pdl01fwlgEuhBOBnD2G36PoEjRSdZ2iH03i" title="яшил">
+                                    <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhHHjjFveKKw8AMCOPujk9yrINeN-TI2vWoNu8laMLuzkV5feAYHOkj3" title="яшил">
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div style="width: 16px;height: 16px; border-radius: 50%; margin-top: 2px; background-color: #186146"></div>
@@ -1539,7 +1264,7 @@
 
                                     </a>
                                 </div><div>
-                                    <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxvPlQFz0qEUKUq-kIjalB6GvNxTHsPuD5W72N2q5vUsipEXpLyzOlz0" title="одатий">
+                                    <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhFGZziVwHmrumS9U-sI-5NaKR1NAgNMfGKO-1kPt6SgvHrQz1-jAESH" title="одатий">
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div style="width: 16px;height: 16px; border-radius: 50%; margin-top: 2px; background-color: #6a9835"></div>
@@ -1551,7 +1276,7 @@
 
                                     </a>
                                 </div><div>
-                                    <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxstklfWtYDu2draG4nqhuLf1c9fz09P9SPyfuiO0wg5S5P-No1nAhrX" title="қизил">
+                                    <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhGqe-pY*c*kHuHEOkydzzBAQEBByGgtdlQrqtOAXmtndAQZRnlJJMv3" title="қизил">
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div style="width: 16px;height: 16px; border-radius: 50%; margin-top: 2px; background-color: #901717"></div>
@@ -1571,15 +1296,15 @@
                             <a href="#" class="easyui-menubutton" data-options="menu:'#mm1'">УЗ</a>
                             <div id="mm1" style="width:150px" class="raleway-menu-menu">
                                 <div>
-                                    <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxvbPmxICr11EjVgwt9WBrNF7Z307N00kl-KpKEQgfSjQCh24DNdN61A">
+                                    <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhE-xq3uEXPds2j477b*SvstlGIskheGz-tGT1h7bCCOSZjv8M09BTXI">
                                         <span>O`zbekcha</span>
                                     </a>
                                 </div><div>
-                                    <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxvbPmxICr11Eg6A912v4lJ4dUk25pHDFUopLWwyG99AhALPuocwuYJg">
+                                    <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhE-xq3uEXPds*JSjIwZBSFJN6Ca9mhaZ5CBqxxjwA1rNs-x7GOQsPMH">
                                         <span>Узбекча</span>
                                     </a>
                                 </div><div>
-                                    <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxvbPmxICr11EqJxKqG8vywr9bU79iHoU0cNV6xeIE6WsofFnuDDDDeM">
+                                    <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhE-xq3uEXPds9Z3QHUlWtBZeD6HIFQHK16S4hJDDRVwp3J8binhzYdY">
                                         <span>Русский</span>
                                     </a>
                                 </div>
@@ -1614,7 +1339,7 @@
                                     <li class="user-footer">
                                         <a href="#" class="change-pass" onclick="changePassword();
                     return false;"> <i class="fa fa-key"></i> Паролни ўзгартириш </a>
-                                        <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4Ayxuz5Nj02ecf2dYNBMaBUITh5kAOeTmKsF5rjsg3ecR9xQ" class="exit" onclick="return confirm(&#34;Тизимдан чиқасизми?&#34;)"><i class="fa fa-sign-out" aria-hidden="true"></i>Чиқиш</a>
+                                        <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhEVFC65d4epwuspdl1JU*hOOdVJoPrZkKDoruxlrxG-IQ" class="exit" onclick="return confirm(&#34;Тизимдан чиқасизми?&#34;)"><i class="fa fa-sign-out" aria-hidden="true"></i>Чиқиш</a>
                                     </li>
                                 </ul>
                             </div>
@@ -1645,16 +1370,16 @@
 
 
             
-    <form id="to_card_abo" method="post" action="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxsCCV6rDqaH*Kvzt*kCqE1M68RIg04yG1NDWAGcfGlY6uMB579bWlqnxsX2PYkN-*3Rrb61Px68OQ"><div style="display:none"><input type="hidden" name="to_card_abo_hf_0" id="to_card_abo_hf_0" /></div>
+    <form id="to_card_abo" method="post" action="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhFljVuJN4V-llQMp9u2Q9wGuy59qqEAndDSzKpd5zwehLNLZ*g1UCeV5V4o6RGMzd6teQXAcbox0g"><div style="display:none"><input type="hidden" name="to_card_abo_hf_0" id="to_card_abo_hf_0" /></div>
         <input type="hidden" id="id_abo" value="" name="id"/>
         <input type="hidden" id="id_companies" value="" name="companies_id"/>
     </form>
-    <form id="to_card_org" method="post" action="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxsCCV6rDqaH*Kvzt*kCqE1M-GOXFU*EZtXgqV2cpMKqfNudkrVx-8gR51ZwEqzNG89FdU3Y-FCCIA"><div style="display:none"><input type="hidden" name="to_card_org_hf_0" id="to_card_org_hf_0" /></div>
+    <form id="to_card_org" method="post" action="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhFljVuJN4V-llQMp9u2Q9wGcY1SML*EIfxgrzR2VtkHIX5Jgvv*myrBjOoZLeFqhZzKBuyzmQS8JA"><div style="display:none"><input type="hidden" name="to_card_org_hf_0" id="to_card_org_hf_0" /></div>
         <input type="hidden" id="id_org" value="" name="id"/>
     </form>
     <div class="menu-in custom_main_menu_fg_">
-        <a class="logo f-left" href="home">
-            <img src="assets/images/logo_color.png"/>
+        <a class="logo f-left" href="../home">
+            <img src="../assets/images/logo_color.png"/>
         </a>
         <div class="f-right">
             <div class="custom_main_menu_fg__" style="
@@ -1665,23 +1390,22 @@
 
                 
 
-                <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxsCCV6rDqaH*OIQPHn235B8Y2e2NZBQgSE1vqcI6EO9l6x1p-jTvkophYxSlma2vlM" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true">
+                <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhFljVuJN4V-luJnTyH08h2JO5CVVtQSknGRS8pdg4oEhW1XLlDBy2F32muXRVoITeE" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true">
                     <i class="fa fa-tasks" aria-hidden="true"></i><span>Янги функциялар<span
                         id="new_functions"></span></span></a>
 
-                <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxsCCV6rDqaH*L7ceeZ3*2R2sk5SZMr0L*6cbi23z1RsyPR7pWsP-uajN9IoMgJnHjdpvupHEBZ7sg" id="abonent_requests_btn" class="easyui-linkbutton raleway-menu-red warning-alert custom_main_menu_fg___inner" data-options="plain:true">
+                <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhFljVuJN4V-lqJfFLRvt1Ju1G7m6bqpcxj7O6ZD*riXMbHrNQhmt-be8R1oz0xRQxWHhZAWBZPRnQ" id="abonent_requests_btn" class="easyui-linkbutton raleway-menu-red warning-alert custom_main_menu_fg___inner" data-options="plain:true">
                     <i class="fa fa-envelope-o"></i><span>Ҳал этилмаган мурожаатлар:</span><span
                         id="abonent_requests">-</span></a>
 
                 
 
-                <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxsCCV6rDqaH*Kvzt*kCqE1MmhaLZSvvoXXWFVQvfwzGAK9PJnd3SpOmq4H25YvLWwo" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true">
+                <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhFljVuJN4V-llQMp9u2Q9wGWOIpAN7w0loB6CGrB4TPvDcI*O6NXKKiqQzSJys-aLQ" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true">
                     <i class="fa fa-arrow-circle-up"></i><span>Мурожаатнома жўнатиш</span></a>
 
-                <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxsCCV6rDqaH*Kvzt*kCqE1MzLEdI-FTKm*DqXnn4ltYvgTknMNm0mVul2tU8rzfNM0" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true">
-                    <i class="fa fa-tachometer"></i><span>Ишчи ойнага</span></a>
+                
 
-                <a href="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4AyxsCCV6rDqaH*Kvzt*kCqE1M4vc70JlEy3S8Mayw4HV*GePi*UZp7fFNUaGgnGjCdXI" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true">
+                <a href="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhFljVuJN4V-llQMp9u2Q9wGAp9AuuH497-Yz91iJDLH1Dd*eaFUU2ygMYmhb6DjlZU" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true">
                     <i class="fa fa-user"></i><span>Менинг картам</span></a>
 
                 <a href="#" class="easyui-linkbutton raleway-menu-red custom_main_menu_fg___inner" data-options="plain:true" onclick="search_abonentBP();
@@ -2013,7 +1737,7 @@
 
 
             <div id="frmWindowChngPsw" class="easyui-dialog" style="width:350px;height:auto;padding:10px 20px" closed="true" buttons="#frmWindowChngPsw-buttons" modal="true" title="Паролни ўзгартириш">
-                <form method="post" novalidate="" id="ChngPsw" action="?x=N-Oi-N*6ujAmwH5wPE-w0fB-WFGCUOK1jKNIl*4Ayxv8pag1q1kKB4xAAeecvBCaoFpQPpRTmqPJxGocsNyzxA"><div style="display:none"><input type="hidden" name="ChngPsw_hf_0" id="ChngPsw_hf_0" /></div>
+                <form method="post" novalidate="" id="ChngPsw" action="../?x=qG9FenSUHrs6ONQ4I-cFS9EXK7KIuJPRlWP*rQYobhH*0WeWOCAV-Vo0aFYQCnZ1adKMYWt3W50LHUnj5RgS1Q"><div style="display:none"><input type="hidden" name="ChngPsw_hf_0" id="ChngPsw_hf_0" /></div>
                     <span style="display:none;" id="feedbackform">
   
 </span>
@@ -2094,94 +1818,94 @@
 
             <div id="g_acccordion" region="west" style="width: 300px;" title="Иш майдони" data-options="hideCollapsedContent:false,collapsed:true">
                 <div class="easyui-accordion" fit="true">
-                    <div title="Инструментлар" style="overflow:auto;padding:10px;" iconCls="fa fa-object-group" selected="true">
+                    <div title="Инструментлар" style="overflow:auto;padding:10px;" iconCls="fa fa-object-group">
                         <ul>
                             <li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkd-Dq13fUWffGx*inbrzsrZcXXkW7RrFDFiOTwh8bnxdBnUkuH53bFNw" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKUBfWEoh0eXxCDKn4Gq810extilnI0lAHJZ823DlivflkWLSrtWuzTVA" class="ilmenu">
                                     <span>Абонентлар</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdcliWshfxT25q1tCKg6onTD3yGOtoOXoEx7SCcau-7Zj5ecqWGWZ*0A" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKU0tjw8yDjGrzii*xf7*qm81RnjCkNrPHshMLFvzaMlCdvgx4r1eEweQ" class="ilmenu">
                                     <span>Накд пул туловлар</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdiSkdap03N79f8ARFWSadBpRXD6Y4I7GVMwEXFBm00*HPDzNs7Q4wqw" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKUFfj*URhW1Wde88H6BGCxy86lwf9ztIZnIA2jnVrLHaYn-ntpN5hBew" class="ilmenu">
                                     <span>Яшовчилар сонини ўзгартириш актлари</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdVNhikgBTm7Gf4wb7CKBQ0P6*AN7hlaS663BUqDsWOS2QlPGSB7C75A" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKU2Tbb8bfUduNZOQicoZYh2r9wCMjZEcZzM47M7gwcKhFryObhKtnsLQ" class="ilmenu">
                                     <span>Актлар</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdTJAtqGR065orLjfNNyCrRYokwDfECXFkH9l62vNvxQ0bZ-yqUFXO5A" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKUfbCph1qRruItGByeiGgv4w7CHncTe8xUUZF6XgVrxcXOnTL9MGmFAw" class="ilmenu">
                                     <span>Электрон туловлар</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdcKcajR8qVWKkGT9KB-DqobxxhVszi96nagiz3BOyn0HWeDOHFm9G4Q" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKUwqGSnKN3ZK6qjVXb0QbwqYFTu8x9l9rBXqsnYAv3Hl5EViu9t-8v6g" class="ilmenu">
                                     <span>Мунис</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdCONmzcl92JE1Omsi4DpDL9hHZjHLOCGOlVC37I0sgIzIGvKbV25oUg" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKUP5X5*-YS2WBIuoLcnfhZFhajl5TiJTtMmF8LNShxSFOwGZq*yizj3g" class="ilmenu">
                                     <span>ОНЛАЙН МУРОЖААТ</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkda4UCdN6H4KxlsT61nj0iJ2y6F3Z*qI*BcXKXXj*A39-wirXKKuMjyA" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKUU6qm1GiyiZsjdNghLMTlNvUwSH7q4d5cB4i*n2EU818F*HiVqR0SXg" class="ilmenu">
                                     <span>Квитанциялар бланкалари хисоби</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdJVyuxQHvnqak0Gd9syf73-jJaindibWqg7VnuVF216wWObi0jx868w" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKUy1-lc1ddPvRSIuLYOwR7guYbQoo755S-OZDbfWJpKHEJcE5qbXs7Xw" class="ilmenu">
                                     <span>Корхона ходимлари</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdxgAqHAxHEyYzaEaNyewZSWJraxhV0hkuc6bVqWeL4LUaVEI65FMdCA" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKU1LOWDnpUXZAAv3plkvA2YDRYletuJZxTgoAtOyr4idOKkjIG3FoIeA" class="ilmenu">
                                     <span>Музлатилган абонентлар модули</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdPxtcuJdLzcFOyzvqGEg4o7XjkvHBBTWaN10OFtump-lb9lgNE*SWZg" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKUDLeJOByr8Nn7vUW03DMA8ztVBfPlunmxAVlRD1e0Xo-FB3w7dryNEQ" class="ilmenu">
                                     <span>Акт бланки</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdS3nY8CJ-VYON4cfUWsTrNYNIOVg-G6pTLCsss6j1fPWCK2bcd1TSFA" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKUcxRPrksorsVzBBZzs8qnqhKzGPSwgyyYxYfEERpw-DODb5ucBY*Oeg" class="ilmenu">
                                     <span>Инвентаризация актлари</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdfU6WkG*7NGf*bITBDjoBgxgi2QUmnaM9tT-6M6Hg6dVvuDBmYt7t8g" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKU-RdaBYxkrmRu0oWPM0L1dDhUmW3YPx372DqtVwKDPdUVNqc4olK8uQ" class="ilmenu">
                                     <span>Суд огоҳлантириш</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdaVe94bVuf76twIaH2cztGe*F7AG9Te6tORETeTYmbZMihuWj7po4Ag" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKU*wmIohhLuRANnj9H5jAAaIUngGnLNqef8vumOK6X8Fg37aDPkIQOWg" class="ilmenu">
                                     <span>Музлатилган қарздорлик актлари</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuU2*m*CPQrkdYOa-hAnRBPya5q3LwSSPUqWt6kIBcazYfECVJs3tYf-LiEEqbBv28g" class="active">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQi7Y0aROQlKUPyemfCL2f-wxkK1M8ClDESYOhtgg3JUTsk7N0IRBYFUAAUa7KkJg1w" class="ilmenu">
                                     <span>Суд жараёнлари</span>
                                 </a>
                                 
@@ -2191,25 +1915,25 @@
                     </div><div title="Умумий" style="overflow:auto;padding:10px;" iconCls="fa fa-suitcase">
                         <ul>
                             <li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuXSa78EocceNRrYRBf*FPTFdR-dtu9jkPSf2etaHQQsNbWgPcjv7hq5WqYvTRPiTVg" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQkT*hM2c5TB21kp0lq*tfOFAIRKZTXrlyuWQNLu5ZAtsnwBoeTZqWwX*r8ubFi0*Nw" class="ilmenu">
                                     <span>Дхш ўтказиб берилган маблағлар</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuXSa78EocceNHQ1Px5qsMEMsSkQ6uwJQS1yaw2Y-MVJ4lRFQK6bqqX8NUfZX9ahAzw" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQkT*hM2c5TB2ppLaSgcuC9eH7BLfSfyg1IoXnUuetuaDgteePYSuZ12PGTadMZN-5A" class="ilmenu">
                                     <span>Hybrid pochta sozlamalari</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuXSa78EocceNLP0UAo8inam7krQTwHZqoLbSiBvcd7LOzvGJlpL3gI7jasv8GwVzSg" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQkT*hM2c5TB276NdwLQTTjlnzVuZv7vZJctYOjdK*uTOIV2tL5s5kICAMcSWcmzHMg" class="ilmenu">
                                     <span>Худудлар</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuXSa78EocceNWh6riFaMsaQtPBkJwGdDiQK9o9fhOM*w*8lkO-82uJ6e30BVC*2X5A" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQkT*hM2c5TB2gwqHk5b3mmYFuS8-7nlOo4bDXIZp14TT6Hu03PqOdG8lsr*YcCEYHQ" class="ilmenu">
                                     <span>Квитанция берувчилар</span>
                                 </a>
                                 
@@ -2219,13 +1943,13 @@
                     </div><div title="1031 тартиби бўйича ишлаш" style="overflow:auto;padding:10px;" iconCls="fa fa-location-arrow">
                         <ul>
                             <li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuayHU4ZfDFuHIgoNSv6Eawy0c09aQSI1zPNmuvctCQE13gKh0erlEta8lA4Ak7*52g" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQpwLS1lxj7M0whfz0XlkhlnnFXAhtAXaL37FzZoptBvg5Qro8xronkbgECu-nmrqsQ" class="ilmenu">
                                     <span>Тўловлар рўйҳати билан ишлаш</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuayHU4ZfDFuHN5r2QD1-PUsF-TVaMK-Lihcr6qYsYwmeOPJHLRVoI5tWAzSfr63UPg" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQpwLS1lxj7M0YFdnuHqS*u0HN9d*-xcCOUa8ZmGRXiwcSM2k6l10TKQG15An-JUmIg" class="ilmenu">
                                     <span>Ташкилот ходимлари рўйхати билан ишлаш</span>
                                 </a>
                                 
@@ -2235,13 +1959,13 @@
                     </div><div title="География" style="overflow:auto;padding:10px;" iconCls="fa fa-globe">
                         <ul>
                             <li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuayqbRnxJVYhCHQjfd45MpG3sBbUq6rN0Qwsn3p6ASYTpVUWH8frNBnQp9X5tBkaWQ" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQnO*snokkvykvvWcphRlzrFtt-8fzsxuJejGX2EzkhXOndjlYHeCG847UAtGysTzVg" class="ilmenu">
                                     <span>Махаллалар</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuayqbRnxJVYhch8v01eiqEycbFNXTyCg2nOMuy18AO18APOM78RXXtzMM4CZY-GBQA" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQnO*snokkvykO1mMX*OkwRXinaBKtAoBAUXEyKjLqcmi6j-myQmuHK0X0LQLApJOcQ" class="ilmenu">
                                     <span>Кучалар</span>
                                 </a>
                                 
@@ -2251,55 +1975,55 @@
                     </div><div title="Хисоботлар" style="overflow:auto;padding:10px;" iconCls="fa fa-pie-chart">
                         <ul>
                             <li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsueWJD0qs8GEL48aqa*8K5jWuLdwW9XA2hmIIowNg3rQcOhF2OQVQjUi8GItzP0W1xA" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQjDq*Xqxg6ZTiYo813DRdZhqGSX2ZV3D35l4hlYIasE8vWIjhYaH1aXWiWnnN2uGKw" class="ilmenu">
                                     <span>ДХЖ-1 хисоботи</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsueWJD0qs8GELtCTWZcqD44nHMlu4jGcu9nw7g*JnzOzbC0TX7TWP5UCqAyBUMwbSWQ" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQjDq*Xqxg6ZTSZkVuOCJ2NbAdOZcATv0vET0jBSSsjbgdu2PoeJ7-q8ZUCU5cTqxgQ" class="ilmenu">
                                     <span>Ф-2 ДХЖ хисоботи</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsueWJD0qs8GELYjagnF3rXKpRB2Y7FrDZ0DT58t5s07WYeW*yoirU*Ct1rZUTq8uO1A" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQjDq*Xqxg6ZTgfDfSuky1CtPopZ3rBXSN61Ba7vXcLOi3EQjTT9-EpdgFoz96sahQg" class="ilmenu">
                                     <span>МФА-3. Мунис тўловлари хисоботи</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsueWJD0qs8GEL0aMG6cr3PQS4TFpIbla58cTXXIz3aUoA2D-p*L4Za0GKtGI0L1V5Jg" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQjDq*Xqxg6ZTUq86vm7OvZ1m9h4YCejv6mWHtUq5WSHVG3Gb61YqRureZrDMdFNvmw" class="ilmenu">
                                     <span>Махаллалар кесимида карздорлар таҳлили</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsueWJD0qs8GELJx32jfgQ3cal5i70tNvcOe7nEBA*7aucJWxyihYWwTjgTZpoIZShCw" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQjDq*Xqxg6ZTXXpu5aOsqaLiEnLJB7NkChSGDY0SQZsnv0Q0jVHtvX7LH8ToZ9MXjw" class="ilmenu">
                                     <span>МУНИС туловлари</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsueWJD0qs8GELFuH4qLvtbPDYC5m2sAyQR8y7m2sk4gE8WMrufeA4QhYRHpvNL8ETsA" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQjDq*Xqxg6ZTzdtXm5oyW1rZIvVCz3Xr3eSMlznos4KLmbZiagUzb9*aEOfIy25t3A" class="ilmenu">
                                     <span>Ro&#039;yxatdagi abonentlar monitoringi</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsueWJD0qs8GELJpcaA4ZQo*14vH0pRYdTvfJzxzAXUnDpztu52zEL7HscKoE-SNTgNA" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQjDq*Xqxg6ZTBfThHP0*RQdSXZd7vRjGU6Q5ACOoaF8ZeyxvHYd9dFVli2Jyv4HGyA" class="ilmenu">
                                     <span>Актлар ҳолати ҳисоботи</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsueWJD0qs8GELWb1VH3DgPzbd0KFPJGcIr2btF9WooTj-WNlPxaNAytE0uI9MqwTfDw" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQjDq*Xqxg6ZTj4FBAPUMLZzhQwOrXFKz3C-daZGNXks5MnCZpGMB6Q3S1LfZ3n*YYA" class="ilmenu">
                                     <span>Эл.туловлар хисоботи</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsueWJD0qs8GELyO2rutwec1xpugVBwkYj9QFnC10IPeWY-uXsNIAz4AVq-KwWRo6Q-A" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQjDq*Xqxg6ZTsLcyt3I5ZXWGQvSib-xjXXkF4XC1tPgYn7KnaBCB44TTnDjDjWdlVg" class="ilmenu">
                                     <span>ДҲШ Тушумлар ҳисоботи</span>
                                 </a>
                                 
@@ -2309,13 +2033,13 @@
                     </div><div title="Нотификациялар" style="overflow:auto;padding:10px;" iconCls="fa fa-bullhorn">
                         <ul>
                             <li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuaR0LX*M6QJy53xWu5H1gzmeIh50BL4XFos8cf-geKCbNKDUazCYOQ1R7sQgoBQ2Ww" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQjI-RywhXnGvGaaXV5GF5CJf1uSXNdLz2bz9s5c3IvVBHmgvzgHzAgUzbpxpSdXEYA" class="ilmenu">
                                     <span>Нотификациялар</span>
                                 </a>
                                 
                                 
                             </li><li class="ilmenu">
-                                <a href="?x=2UnwZwyGzeWHLkAXbFjsuaR0LX*M6QJyLFWYk68phS9Jt0e5g73HC4kQ--k6ESd7PSpr8SnVPqPvfP8hZ2E5Cg" class="ilmenu">
+                                <a href="../?x=L448UDjqRy8pgxv4M*fKQjI-RywhXnGvKCulTOG1y-yffD52Jz6yq5325UTX8lr9fPiUFx4e9mo7-rccWGhU2A" class="ilmenu">
                                     <span>Талаблар</span>
                                 </a>
                                 
@@ -2336,340 +2060,99 @@
             <div region="center">
                 <div class="easyui-layout" fit="true">
                     <div region="north" border="false" class="header-north" style="height: 40px;">
-                        Суд жараёнлари
+                        Бош сахифа
                         <span id="mv_span">0</span>
                     </div>
                     <div region="center" border="false">
                         
-    <div id="main_layout" class="easyui-layout" fit="true">
-        <div id="center" region="center" border="false">
-            <input type="hidden" id="old_mahallas_id"/>
-            <div class="easyui-layout" fit="true">
-                <div id="p" data-options="region:'west'" style="width:65%;">
-                    <table id="tableData"></table>
-
-                </div>
-                <div data-options="region:'center'">
-                    <div class="tabcontent" id="clickToTimeLine" style="margin-top: 150px">
-                        <h3 style="text-align: center"><span>Рўйхатдан бирини танланг</span></h3>
-                        <p style="text-align: center">
-                            <img src="assets/images/click.svg" style="width: 120px"/></p>
-                    </div>
-                    <div class="tabcontent card" style="visibility: hidden" id="user_card">
-                        <div class="abn_container">
-                            <div class="abn_info">
-                                <div class="abn_user_header">
-                                    <div class="abn_user_img">
-                                        <img src="assets/images/img_avatar.png"/>
-                                    </div>
-                                    <div class="abn_user_name">
-                                        <h2>
-                                            ФИО
-                                            : <span id="fio"></span>
-                                            <br>
-                                            Лицевой
-                                            : <span id="licshet"></span>
-                                        </h2>
-                                    </div>
-                                </div>
-                                <div class="abn_user_content">
-                                    <ul class="abn_user_list">
-                                        <li>
-                                            <i class="fa fa-money text_green"></i>
-                                            <span>Қарздорлик суммаси</span>
-                                            <label><span id="debit_amount"></span></label>
-                                        </li>
-                                        <li>
-                                            <i class="fa fa-calendar text_ink"></i>
-                                            <span>Қарздорлик вақти</span>
-                                            <label><span id="debit_date"></span></label>
-                                        </li>
-                                        <li>
-                                            <i class="fa fa-users text_yellow"></i>
-                                            <span>Яшовчилар сони</span>
-                                            <label><span id="prescribed_cnt"></span></label>
-                                        </li>
-                                        <li>
-                                            <i class="fa fa-money text_red"></i>
-                                            <span>Қолди</span>
-                                            <label><span id="remaining_debt_amount"></span></label>
-                                        </li>
-                                        <li>
-                                            <i class="fa fa-credit-card text_green"></i>
-                                            <span>Amalga oshirilgan to`lov</span>
-                                            <label><span id="payments_amount"></span></label>
-                                        </li>
-                                        <li>
-                                            <i class="fa fa-road"></i>
-                                            <span>Манзил</span>
-                                            <label><span id="address"></span></label>
-                                        </li>
-                                        <li style="margin-bottom: 5px">
-                                            <i class="fa fa-list-alt"></i>
-                                            <span>Ҳаракатлар</span>
-                                            <label><a href="#" class="easyui-linkbutton fit-btn" onclick="decision_court();
-                                                        return false;" id="decision_court" style="display: none" title="Суд қарорини киритиш"><i
-                                                    class="fa fa-list-alt"></i>
-                                                Суд қарорини киритиш
-                                            </a>
-                                                <a href="#" class="easyui-linkbutton fit-btn" onclick="send_to_court();
-                                                        return false;" id="send_to_court" style="display: none" title="Судга юбориш"><i
-                                                        class="fa fa-bank"></i>
-                                                    Судга юбориш
-                                                </a></label>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="easyui-tabs" fit="true" id="card_tabs">
-                                <div title="Файл" style="padding: 0 10px;">
-                                    <div style="display: block;padding: 10px 0 0 0;text-align: right;">
-                                        <a href="#" class="easyui-linkbutton fit-btn" style="max-width: 170px;" onclick="add_file();return false;" title="Файл бириктириш"><i class="fa fa-file"></i>
-                                            Файл бириктириш
-                                        </a>
-                                    </div>
-                                    <div id="abn_file_list" style="display: flex; flex-direction: column">
-                                        <div>
-                                            <p id="sud_warning_file"
-                                               style="font-size: 14px;color: #777;margin-top: 0"></p>
-                                            <div class="row" id="swf" style="padding:0 10px;cursor: pointer;">
-                                            </div>
-                                        </div>
-                                        <br />
-                                        <div style="float: left">
-                                            <p id="sud_decision_court_file" style="font-size: 14px;color: #777;"></p>
-                                            <div class="row" id="sdcf">
-                                            </div>
-                                        </div>
-                                        <br />
-                                        <div style="float: left">
-                                            <p id="send_to_court_file" style="font-size: 14px;color: #777;"></p>
-                                            <div class="row" id="stcf">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div title="Тўловлар">
-                                    <table id="tableDataPayments"></table>
-                                    <div id="toolbartableDataPayments" style="padding:5px;height:auto">
-                                        <table style="width: 100%;">
-                                            <tr>
-                                                <td align="left" colspan="2">
-                                                    <div class="custom-menu">
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div title="Суд жараёни тарихи">
-                                    <table id="tableDataFlows"></table>
-                                    <div id="toolbartableDataFlows"
-                                         style="padding:5px;height:auto;display: none !important;">
-                                        <table style="width: 100%;">
-                                            <tr>
-                                                <td align="left" colspan="2">
-                                                    <div class="custom-menu">
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="toolbarTableData" style="padding:5px;height:auto">
-                <div region="north" style="padding: 5px;" border="false">
-                    <div class="custom-menu" style="display: flex;align-items: flex-start;justify-content: space-between;">
-                        <div>
-                            <!--                                <a href="#" class="easyui-menubutton" data-options="menu:'#sud_mm1'"><wicket:message key="Actions"/></a>-->
-                            <div style="margin: 5px">
-                                <label class="parameter_label">
-                                    Корхона
-                                    : </label>
-                                <select id="par_companies_id" style="width:180px;"></select>
-
-                                <label>
-                                    Cтатус
-                                    :</label>
-                                <select class="easyui-combobox" id="par_user_status" editable="false"
-                                        style="width:200px;" panelHeight="140" formatter="stateFormatterCombo">
+            <div class="staf-dashboard">
+                <div class="staf-row">
+                    <div class="staf-cell staf-cell-left">
+                        <div class="staf-box">
+                            <div class="staf-box-header blue">
+                                <!--<span class="chart-title"><wicket:message key="postup_munis"/></span>-->            
+                                <span class="chart-title">Тушумлар(млн сўм)</span>            
+                                <select class="easyui-combobox" id="filtr_types2" editable="false"  style="width:140px;" required="true" panelHeight="150">
+                                    <option value="1" selected>Кунлик</option>
+                                    <option value="2" >Соатлик</option>
                                 </select>
-
-                                <label class="parameter_label">
-                                    Дан
-                                    : </label>
-                                <input id="date1" class="easyui-datebox"
-                                       data-options="formatter:date_formatter,parser:date_parser" style="width:120px;"/>
-                                <label class="parameter_label">
-                                    Гача
-                                    : </label>
-                                <input id="date2" class="easyui-datebox"
-                                       data-options="formatter:date_formatter,parser:date_parser" style="width:120px;"/>
-
                             </div>
-                            <div  style="margin: 5px">
-
-                                <label class="parameter_label">
-                                    Дебиторлар
-                                </label>                                <label class="parameter_label">
-                                    Дан
-                                    : </label>
-                                <input id="from_debit" class="easyui-numberbox" data-options="min:1" style="width: 120px; text-align:right;border-radius: 4px;" onkeypress="return isNumberKey(event);" placeholder="Гача"/>
-
-                                <label class="parameter_label">
-                                    Гача
-                                    : </label>
-                                <input id="to_debit" class="easyui-numberbox" data-options="min:1" style="width: 120px; text-align:right;border-radius: 4px;" onkeypress="return isNumberKey(event);" placeholder="Гача"/>
-
-
-                                <a href="#" class="easyui-linkbutton icon-btn" data-options="plain:true" onclick="refreshTable();
-                        return false;" title="Янгилаш"><i class="fa fa-refresh"></i></a>
-                                <a href="#" class="easyui-linkbutton icon-btn" data-options="plain:true" onclick="clear_parameters();
-                        return false;" title="Тозалаш"><i class="fa fa-eraser"></i></a>
+                            <div class="staf-box-content">
+                                <div id="graph1" style="height: 100%;">Loading graph...</div>
                             </div>
                         </div>
-                        <div>
-                            <input id="searchBox" class="easyui-searchbox" searcher="search" menu="#searchBoxMenu" style="width:300px;" prompt="Илтимос, қийматни киритинг"></input>
-                            <div id="searchBoxMenu" style="width:120px;">
-                                <div name="fio"><i class="fa fa-filter"></i>
-                                    ФИО
-                                </div>
-                                <div name="licshet"><i class="fa fa-filter"></i>
-                                    Лицевой
-                                </div>
+                    </div>
+                    <div class="staf-cell staf-cell-right">
+                        <div class="staf-box">
+                            <div class="staf-box-header pink">
+                                <span class="chart-title" style="font-size: 14px;">
+                                    Инспекторлар/Ташкилотлар бўйича тушум(минг сўм)
+                                </span>
+                                <select class="easyui-combobox" id="filtr_types" editable="false"  style="width:140px;" required="true" panelHeight="150">
+                                    <option value="1" selected>Шу бугун</option>
+                                    <option value="2" >Шу ой</option>
+                                </select>
+                            </div>
+                            <div class="staf-box-content">
+                                <div id="graph2" style="height: 100%;">Loading graph...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="staf-row">
+                    <div class="staf-cell staf-cell-left">
+                        <div class="staf-box ">
+                            <div class="staf-box-header orange">
+                                <span class="chart-title" style="font-size: 14px;">
+                                    Каналлар бўйича тушумлар(минг сўм)
+                                </span>
+                                <select class="easyui-combobox" id="filtr_types3" editable="false"  style="width:140px;" panelHeight="150">
+                                    <option value="1" selected>Шу бугун</option>
+                                    <option value="2" >Шу ой</option>
+                                </select>
+                            </div>
+                            <div class="staf-box-content">
+                                <div id="graph3" style="height: 100%;">Loading graph...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="staf-cell staf-cell-right">
+                        <div class="staf-box">
+                            <div class="staf-box-header green">
+                                <span class="chart-title" style="font-size: 14px;">
+                                    Махаллалар/Ташкилотлар кесимида - жорий давр(минг сўм)
+                                </span>
+                                <select class="easyui-combobox" id="filtr_types4" editable="false"  style="width:140px;" panelHeight="150">
+                                    <option value="1" selected>Дебиторлик</option>
+                                    <option value="2">Тушумлар</option>
+                                    <option value="3">Хисобланди</option>
+                                </select>
+                            </div>
+                            <div class="staf-box-content">
+                                <div id="graph4" style="height: 100%;">Loading graph...</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div id="frmWindowAddFile" class="easyui-dialog" style="width:430px;height:auto;padding:10px 20px"
-         closed="true" buttons="#frmWindowAddFile-buttons" modal="true">
-        <form id="frmAddFile" method="post" enctype="multipart/form-data">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>
-                                Файл тури
-                                :</label><br/>
-                            <div class="input-group">
-                                <select id="par_file_types" name="file_type_id" style="width:320px;"></select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>
-                                Файл бириктириш
-                                :</label><br/>
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-file"></i></span>
-                                <input class="easyui-filebox" id="file_bytes" name="file_bytes" style="width: 300px; height: 30px" buttonAlign="right" buttonHeight="30px" accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps" buttonText="Файлни танлаш"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>
-                                Изох
-                                :</label><br/>
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-comments"></i></span>
-                                <textarea name="purpose" id="tsg_purpose"
-                                          class="easyui-validatebox form-control" required="true"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div id="frmWindowForSaldo" class="easyui-dialog" style="width:600px;height:500px;padding:10px 20px"
+                 closed="true" buttons="#frmWindowForSaldo-buttons" modal="true">
+                <form>
+                    <span id="debt_text"></span>
+                </form>
             </div>
-        </form>
-    </div>
-    <div id="frmWindowAddFile-buttons">
-        <a href="#" class="easyui-linkbutton pr-btn" onclick="save_file();
-                        return false;" button-index="0"><i class="fa fa-floppy-o"></i>
-            Сақлаш
-        </a>
-        <a href="#" class="easyui-linkbutton" onclick="javascript:$('#frmWindowAddFile').dialog('close');
-                        return false;">
-            Бекор қилиш
-        </a>
-    </div>
-
-    <div id="frmWindowDecisionCourtFile" class="easyui-dialog" style="width:430px;height:auto;padding:10px 20px"
-         closed="true" buttons="#frmWindowDecisionCourtFile-buttons" modal="true">
-        <form id="frmCourtFile" method="post" novalidate>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>
-                                Изох
-                                :</label><br/>
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-comments"></i></span>
-                                <textarea name="purpose" id="court_purpose"
-                                          class="easyui-validatebox form-control" required="true"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div id="frmWindowForPeriod" class="easyui-dialog" style="width:600px;height:400px;padding:10px 20px"
+                 closed="true" buttons="#frmWindowForPeriod-buttons" modal="true">
+                <form>
+                    <span id="period_text" class="pp"></span>
+                </form>
             </div>
-        </form>
-    </div>
-    <div id="frmWindowDecisionCourtFile-buttons">
-        <a href="#" class="easyui-linkbutton pr-btn" onclick="save_desined_file();
-                        return false;" button-index="0"><i class="fa fa-floppy-o"></i>
-            Сақлаш
-        </a>
-        <a href="#" class="easyui-linkbutton" onclick="javascript:$('#frmWindowDecisionCourtFile').dialog('close');
-                        return false;">
-            Бекор қилиш
-        </a>
-    </div>
-    <div id="frmWindowSendToCourtFile" class="easyui-dialog" style="width:430px;height:auto;padding:10px 20px"
-         closed="true" buttons="#frmWindowSendToCourtFile-buttons" modal="true">
-        <form id="frmSendToFile" method="post" novalidate>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>
-                                Изох
-                                :</label><br/>
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-comments"></i></span>
-                                <textarea name="purpose" id="send_to_court_purpose"
-                                          class="easyui-validatebox form-control" required="true"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div id="frmWindowForPeriod-buttons">
+                <a href="#" class="easyui-linkbutton pr-btn" onclick="javascript:$('#frmWindowForPeriod').dialog('close');
+                        return false;"><i class="fa fa-check-square-o"></i>ОК</a>
             </div>
-        </form>
-    </div>
-    <div id="frmWindowSendToCourtFile-buttons">
-        <a href="#" class="easyui-linkbutton pr-btn" onclick="save_send_to_court();
-                        return false;" button-index="0"><i class="fa fa-floppy-o"></i>
-            Сақлаш
-        </a>
-        <a href="#" class="easyui-linkbutton" onclick="javascript:$('#frmWindowSendToCourtFile').dialog('close');
-                        return false;">
-            Бекор қилиш
-        </a>
-    </div>
-    <iframe id="downloadFile" src="" style="display:none; visibility:hidden;"></iframe>
-
+        
                     </div>
                 </div>
             </div>
