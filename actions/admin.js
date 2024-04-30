@@ -39,18 +39,15 @@ const path = require("path");
 const xlsx = require("json-as-xlsx");
 const { Bildirishnoma } = require("../models/SudBildirishnoma");
 const {
-  importAlertLetter,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/importAlertLetter");
-const {
   getAbonentCardHtml,
 } = require("../api/cleancity/dxsh/getAbonentCardHTML");
 const htmlPDF = require("html-pdf");
 const {
-  getLastAlertLetter,
-} = require("../api/cleancity/dxsh/getLastAlertLetter");
-const {
   enterWarningLetterToBilling,
 } = require("../api/cleancity/dxsh/enterWarningLetterToBilling");
+const {
+  enterYashovchiSoniAkt,
+} = require("../api/cleancity/dxsh/enterYashovchiSoniAkt");
 
 // =====================================================================================
 const composer = new Composer();
@@ -105,12 +102,6 @@ composer.hears(["👨‍💻 Ish maydoni", "👨‍💻 Иш майдони"], a
   if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 
   ctx.reply(messages.chooseMenu, keyboards[ctx.session.til].adminWorkSpace);
-});
-
-composer.hears(["Тушумни ташлаш", "Tushumni tashlash"], async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-
-  ctx.scene.enter("import_income_report");
 });
 
 composer.action("CHARGE_VILOYAT_LOGIN", async (ctx) => {
@@ -301,6 +292,7 @@ composer.hears("export_abonents", async (ctx) => {
       tartib: i + 1,
       licshet: abonent.licshet,
       fio: abonent.fio,
+      fio2: `${abonent.last_name} ${abonent.first_name} ${abonent.middle_name}`,
       street: abonent.mahalla_name,
       kadastr_number: abonent.kadastr_number,
       passport: abonent.passport_number,
@@ -316,6 +308,7 @@ composer.hears("export_abonents", async (ctx) => {
         { label: "№", value: "tartib" },
         { label: "Лицевой", value: "licshet" },
         { label: "ФИО--", value: "fio" },
+        { label: "ФИО--2", value: "fio2" },
         { label: "Кўча", value: "street" },
         { label: "Кадастр", value: "kadastr_number" },
         { label: "ПАССПОРТ", value: "passport" },
@@ -328,28 +321,22 @@ composer.hears("export_abonents", async (ctx) => {
 
   const fileName = path.join(__dirname + "/../uploads/", "abonents");
   let settings = {
-    fileName: fileName, // Name of the resulting spreadsheet
-    extraLength: 3, // A bigger number means that columns will be wider
-    writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
-    writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
-    // RTL: true, // Display the columns from right-to-left (the default value is false)
+    fileName: fileName,
+    extraLength: 3,
+    writeMode: "writeFile",
+    writeOptions: {},
   };
   await xlsx(data, settings);
   await ctx.replyWithDocument({ source: fileName + ".xlsx" });
-  // fs.unlink(fileName + ".xlsx", (err) => {
-  //   if (err) throw err;
-  // });
 });
 
 composer.hears("q", async (ctx) => {
   const xatlar = await Bildirishnoma.find({ type: "sudga_chiqoring" });
   const fileName = path.join(__dirname + "/../uploads/", "bildirish_xati bor");
   let settings = {
-    fileName: fileName, // Name of the resulting spreadsheet
-    extraLength: 3, // A bigger number means that columns will be wider
-    writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
-    writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
-    // RTL: true, // Display the columns from right-to-left (the default value is false)
+    fileName: fileName,
+    writeMode: "writeFile",
+    writeOptions: {},
   };
   const content = [];
   xatlar.forEach((xat) => {
@@ -407,19 +394,9 @@ composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
   ctx.scene.enter("pochtaHarajatiniTekshirishScene")
 );
 
-composer.hears("a", (ctx) => {
-  importAlertLetter();
-});
 composer.hears("b", async (ctx) => {
-  console.log(
-    await enterWarningLetterToBilling({
-      lischet: "105120380070",
-      qarzdorlik: 217464,
-      comment: "Test 1",
-      sana: "07.03.2024",
-      file_path: "./380070.PDF",
-    })
-  );
+  // ctx.scene.enter("vaqtinchalikFunc");
+  enterYashovchiSoniAkt();
 });
 
 bot.use(composer);

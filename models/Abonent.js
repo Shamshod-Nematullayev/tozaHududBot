@@ -10,6 +10,15 @@ const schema = new Schema(
       type: String,
       required: true,
     },
+    last_name: {
+      type: String,
+    },
+    first_name: {
+      type: String,
+    },
+    middle_name: {
+      type: String,
+    },
     licshet: {
       type: String,
       max: 12,

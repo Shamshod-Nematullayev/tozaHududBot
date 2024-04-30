@@ -35,27 +35,28 @@ composer.hears(
         abonents.forEach((elem, i) => {
           str += `${i + 1}. ${qaysiMahalla(elem.data.MFY_ID)}  ${
             elem.isCancel
-              ? "<strike>" + elem.data.FISH + "</strike>"
-              : "<b>" + elem.data.FISH + "</b>"
-          }: <code>${elem.kod}</code>\n`;
+              ? "*" + elem.data.FISH + "*"
+              : "*" + elem.data.FISH + "*"
+          }: \`${elem.kod}\`\n`;
           if (i % 50 == 0) {
-            ctx.reply(str, { parse_mode: "HTML" });
+            ctx.reply(str, { parse_mode: "Markdown" });
             counter++;
             str = "";
           }
         });
         if ((counter - 1) % 50 !== 0) {
-          ctx.reply(str, { parse_mode: "HTML" });
+          ctx.reply(str, { parse_mode: "Markdown" });
         }
       } else {
         abonents.forEach((elem, i) => {
-          str += `${i + 1}. ${qaysiMahalla(elem.data.MFY_ID)}  ${
-            elem.isCancel
-              ? "<strike>" + elem.data.FISH + "</strike>"
-              : "<b>" + elem.data.FISH + "</b>"
-          }: <code>${elem.kod}</code>\n`;
+          const mahallaName = qaysiMahalla(elem.data.MFY_ID);
+          const fishName = elem.isCancel
+            ? `*${elem.data.FISH}*`
+            : `*${elem.data.FISH}*`;
+          const kodValue = `\`${elem.kod}\``;
+          str += `${i + 1}. ${mahallaName} ${fishName}: ${kodValue}\n`;
         });
-        ctx.reply(str, { parse_mode: "HTML" });
+        ctx.replyWithMarkdownV2(str);
       }
     } else {
       ctx.reply(messages.noAbonent);

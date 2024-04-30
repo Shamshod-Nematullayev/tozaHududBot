@@ -9,6 +9,9 @@ bot.on("document", (ctx, next) => {
   next();
 });
 bot.use(async (ctx, next) => {
+  if (!ctx.session.messages_for_delete?.length) {
+    ctx.session.messages_for_delete = [];
+  }
   if (
     ctx.message &&
     ctx.message.text === process.env.ADD_TG_GROUP_TOKEN &&

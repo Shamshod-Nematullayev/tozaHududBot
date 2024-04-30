@@ -8,6 +8,8 @@ const { kirillga } = require("../../smallFunctions/lotinKiril");
 const { yangiAbonent } = require("../adminActions/cleancity/dxsh/yangiAbonent");
 const { keyboards } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
+const { Abonent } = require("../../../models/Abonent");
+const { Nazoratchi } = require("../../../models/Nazoratchi");
 const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {
@@ -17,6 +19,14 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   "new_abonent_request",
   async (ctx) => {
     try {
+      const inspektor = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
+      if (!inspektor) {
+        ctx.reply(
+          "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!"
+        );
+        return ctx.scene.leave();
+      }
+      ctx.wizard.state.inspektor = inspektor;
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (!isPinfl(ctx.message.text)) {
         ctx.replyWithPhoto(
@@ -27,6 +37,15 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           }
         );
       } else {
+        const abonent = await Abonent.findOne({
+          pinfl: parseInt(ctx.message.text),
+        });
+        if (abonent) {
+          return ctx.reply(
+            `Ushbu abonentga ${abonent.licshet} hisob raqami ochilgan`
+          );
+        }
+
         const customDates = await find_one_by_pinfil_from_mvd(ctx.message.text);
         if (!customDates.success) {
           return ctx.reply(
@@ -35,16 +54,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           );
         }
         let filename = "fuqoro" + Date.now() + ".png";
-        if (customDates.photo != null) {
-          fs.writeFile(
-            "custom.png",
-            customDates.photo,
-            "base64",
-            async (err) => {
-              if (err) throw err;
-            }
-          );
-        }
+
         await ctx.reply(
           `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
         );
@@ -153,7 +163,15 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       });
 
       if (abonent.success) {
-        ctx.reply(`Yangi abonent qo'shildi <code>${abonent.litschet}</code>`);
+        ctx.replyWithHTML(
+          `Yangi abonent qo'shildi <code>${abonent.litschet}</code>`
+        );
+        // await Abonent.create({user: ctx.from, data: })
+        await ctx.telegram.sendMessage(
+          process.env.NAZORATCHILAR_GURUPPASI,
+          `${ctx.wizard.state.inspektor.name} тизимга янги абонент киритди 👍 <code>${abonent.litschet}</code>`,
+          { parse_mode: "HTML" }
+        );
         ctx.scene.leave();
       } else {
         ctx.reply(abonent.msg);

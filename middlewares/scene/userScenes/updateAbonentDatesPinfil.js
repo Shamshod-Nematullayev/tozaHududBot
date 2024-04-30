@@ -182,7 +182,6 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           ctx.wizard.selectStep(0);
           break;
         case "yoq":
-          ctx.deleteMessage();
           ctx.reply("OK", keyboards.lotin.mainKeyboard.resize());
           ctx.scene.leave();
           break;

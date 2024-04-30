@@ -165,7 +165,7 @@ async function changeAbonentDates({
       .getAttribute("action");
 
     await session.updateOne({ $set: { "path.toCardAboUrl": toCardAboUrl } });
-    changeAbonentDates(arguments[0]);
+    return await changeAbonentDates(arguments[0]);
   }
 }
 

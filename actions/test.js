@@ -202,17 +202,22 @@ async function importSudMaterialsToBilling(pachka_id) {
   }
 }
 
-importSudMaterialsToBilling("6605277d25c788d7a4e00968");
+// importSudMaterialsToBilling("66277fa736703c72089efc6a");
 
 async function sendToSudMaterial(pachka_id) {
   const pachka = await SudMaterial.findById(pachka_id);
-  let counter = 140;
+  let counter = 0;
   let newItems = pachka.items;
   async function update() {
-    if (counter == 150)
+    if (counter == 200)
       return await pachka.updateOne({ $set: { items: newItems } });
 
     const item = pachka.items[counter];
+
+    if (item.sended) {
+      counter++;
+      return await update();
+    }
     const indexToUpdate = newItems.findIndex((a) => a.KOD == item.KOD);
     fetch(
       "https://cabinetapi.sud.uz/api/cabinet/case/send-to-court/" +
@@ -249,11 +254,12 @@ async function sendToSudMaterial(pachka_id) {
       } else {
         newItems[indexToUpdate].sended = data.message;
       }
-
+      console.log(newItems[indexToUpdate]);
       counter++;
+      await pachka.updateOne({ $set: { items: newItems } });
       return await update();
     });
   }
-  // update();
+  await update();
 }
-// sendToSudMaterial("6613a5d45aded63aa13c09d9");
+// sendToSudMaterial("66277fa736703c72089efc6a");

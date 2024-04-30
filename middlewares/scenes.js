@@ -5,7 +5,6 @@ const newAbonentScene = require("./scene/userScenes/newAbonentScene");
 const newAdminScene = require("./scene/userScenes/newAdminScene");
 const findAbonentScene = require("./scene/userScenes/findAbonentById");
 const sendAnswerScene = require("./scene/adminActions/sendAnswerScene");
-const importIncomeScene = require("./scene/adminActions/importIncome");
 const { fuqoroRasmiScene } = require("./scene/userScenes/fuqoroRasmiScene");
 const { showAbonentPic } = require("./scene/adminActions/showAbonentPic");
 const { addNotification } = require("./scene/adminActions/addNotification");
@@ -73,13 +72,15 @@ const {
 const {
   sudBuyruqlariYaratish,
 } = require("./scene/adminActions/sud/sudBuyruqlariYaratish");
+const {
+  vaqtinchalikFunc,
+} = require("./scene/adminActions/vaqtinchalikFunksiya");
 
 const stage = new Scenes.Stage([
   newAbonentScene,
   newAdminScene,
   sendAnswerScene,
   findAbonentScene,
-  importIncomeScene,
   fuqoroRasmiScene,
   showAbonentPic,
   addNotification,
@@ -113,6 +114,7 @@ const stage = new Scenes.Stage([
   pochtaHarajatiniTekshirishScene,
   new_abonent_request_by_pinfl_scene,
   sudBuyruqlariYaratish,
+  vaqtinchalikFunc,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

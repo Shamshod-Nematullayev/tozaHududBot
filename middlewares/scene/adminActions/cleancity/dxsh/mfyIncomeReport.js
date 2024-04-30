@@ -46,7 +46,10 @@ const mfyIncomeReport = async (ctx = false) => {
         ) &&
         ctx
       ) {
-        await ctx.reply(`Faol sessiyalar mavjud emas qaytadan login qiling`);
+        const msg = await ctx.reply(
+          `Faol sessiyalar mavjud emas qaytadan login qiling`
+        );
+        ctx.session.messages_for_delete.push(msg.message_id);
         // session yaratish sahnasi va callback function shu joyida tugab yangi sahna boshlanadi
         ctx.session.session_type = "dxsh";
         await ctx.scene.enter("recover_clean_city_session");
