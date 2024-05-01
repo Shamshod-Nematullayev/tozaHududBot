@@ -396,7 +396,16 @@ composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
 
 composer.hears("b", async (ctx) => {
   // ctx.scene.enter("vaqtinchalikFunc");
-  enterYashovchiSoniAkt();
+  console.log(
+    await enterYashovchiSoniAkt({
+      licshet: "105120500123",
+      akt_number: 1,
+      comment: "TEST 3",
+      filepath: "./file.pdf",
+      prescribed_cnt: 10,
+      stack_prescribed_akts_id: 7191,
+    })
+  );
 });
 
 bot.use(composer);

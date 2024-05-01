@@ -1,8 +1,29 @@
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const { JSDOM } = require("jsdom");
 const { Abonent } = require("../../../models/Abonent");
+const request = require("request");
 const cc = `https://cleancity.uz/`;
+const fs = require("fs");
 
+function getCurrentDate() {
+  // Create a new Date object
+  var currentDate = new Date();
+
+  // Get the day, month, and year
+  var day = currentDate.getDate(); // Returns the day of the month (1-31)
+  var month = currentDate.getMonth() + 1; // Returns the month (0-11), so we add 1 to get 1-12
+  var year = currentDate.getFullYear(); // Returns the year (four digits)
+
+  // Format day and month to have leading zeros if needed
+  day = day < 10 ? "0" + day : day;
+  month = month < 10 ? "0" + month : month;
+
+  // Format the date string in the desired format
+  var formattedDate = day + "." + month + "." + year;
+
+  // Return the formatted date
+  return formattedDate;
+}
 async function enterYashovchiSoniAkt({
   licshet,
   prescribed_cnt,
@@ -13,7 +34,10 @@ async function enterYashovchiSoniAkt({
 }) {
   try {
     const session = await CleanCitySession.findOne({ type: "dxsh" });
-    if (!session.path.enterYashovchiSoniAkt) {
+    if (
+      !session.path.enterYashovchiSoniAkt ||
+      !session.path.confirmYashovchiSoniAkt
+    ) {
       const startpage = await fetch(cc + "startpage", {
         headers: { Cookie: session.cookie },
       });
@@ -47,15 +71,19 @@ async function enterYashovchiSoniAkt({
       let enterYashovchiSoniAktPath = res2Text
         .match(/dsm\?xenc=([^']+)'/g)[0]
         .split("'")[0];
+      let confirmYashovchiSoniAktPath = res2Text
+        .match(/post\('ds\?xenc([^']+)'/g)[1]
+        .split("'")[1];
       if (!enterYashovchiSoniAktPath)
         return { success: false, message: "Session has expired" };
 
       await session.updateOne({
         $set: {
           "path.enterYashovchiSoniAkt": enterYashovchiSoniAktPath,
+          "path.confirmYashovchiSoniAkt": confirmYashovchiSoniAktPath,
         },
       });
-      return await enterYashovchiSoniAkt(arguments);
+      return await enterYashovchiSoniAkt(arguments[0]);
     } else {
       const date = new Date();
       const abonent = await Abonent.findOne({ licshet });
@@ -86,16 +114,24 @@ async function enterYashovchiSoniAkt({
           resource_types_id: 20,
           stack_prescribed_akts_id,
           akt_number,
-          //   akt_date: ,
+          akt_date: getCurrentDate(),
+          prescribed_cnt,
+          purpose: comment,
           file_bytes: {
-            value: fs.createReadStream(file_path),
+            value: fs.createReadStream(filepath),
             options: {
-              filename: lischet + ".PDF",
+              filename: licshet + ".PDF",
               contentType: "application/pdf",
             },
           },
         },
       };
+      return new Promise((resolve, reject) => {
+        request(options, function (error, response) {
+          if (error) reject(error);
+          resolve(JSON.parse(response.body));
+        });
+      });
     }
   } catch (err) {
     console.error(new Error(err));
