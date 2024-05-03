@@ -24,20 +24,21 @@ function getCurrentDate() {
   // Return the formatted date
   return formattedDate;
 }
-async function enterYashovchiSoniAkt({
+async function enterQaytaHisobAkt({
   licshet,
-  prescribed_cnt,
+  amount,
   comment,
   filepath,
-  stack_prescribed_akts_id,
+  stack_akts_id,
   akt_number,
 }) {
   try {
     const session = await CleanCitySession.findOne({ type: "dxsh" });
     if (
-      !session.path.enterYashovchiSoniAkt ||
-      !session.path.confirmYashovchiSoniAkt ||
-      !session.path.getYashovchiSoniAktlar
+      !session.path.searchQaytaHisobAkt ||
+      !session.path.enterQaytaHisobAkt ||
+      !session.path.confirmQaytaHisobAkt ||
+      !session.path.getQaytaHisobAktlar
     ) {
       const startpage = await fetch(cc + "startpage", {
         headers: { Cookie: session.cookie },
@@ -45,22 +46,20 @@ async function enterYashovchiSoniAkt({
       const startpageText = await startpage.text();
       const startpageDoc = new JSDOM(startpageText).window.document;
       const elements = startpageDoc.querySelectorAll("a");
-      let yashovchiSoniAktlarPage = "";
+      let qaytaHisobAktlarPage = "";
       elements.forEach(function (element) {
         // Check if the text content matches "hello world"
 
         if (
-          element.textContent.trim() ===
-            "Яшовчилар сонини ўзгартириш актлари" ||
-          element.textContent.trim() ===
-            "Yashovchilar sonini o`zgartirish aktlari"
+          element.textContent.trim() === "Актлар" ||
+          element.textContent.trim() === "Aktlar"
         ) {
           // Found the element, do something with it
-          yashovchiSoniAktlarPage = element.href;
+          qaytaHisobAktlarPage = element.href;
         }
       });
       const res1 = await fetch(
-        `https://cleancity.uz/dashboard/${yashovchiSoniAktlarPage}`,
+        `https://cleancity.uz/dashboard/${qaytaHisobAktlarPage}`,
         { headers: { Cookie: session.cookie } }
       );
       const res2 = await fetch(res1.url, {
@@ -68,34 +67,63 @@ async function enterYashovchiSoniAkt({
           Cookie: session.cookie,
         },
       });
+      //   Shu joyiga linklarni topish vazifasi yoziladi
       const res2Text = await res2.text();
-      let enterYashovchiSoniAktPath = res2Text
-        .match(/dsm\?xenc=([^']+)'/g)[0]
+      let searchQaytaHisobAkt = res2Text
+        .match(/post\('ds\?xenc([^']+)'/g)[6]
+        .split("'")[1];
+      let enterQaytaHisobAktPath = res2Text
+        .match(/dsm\?xenc=([^']+)'/g)[1]
         .split("'")[0];
-      let confirmYashovchiSoniAktPath = res2Text
+      let getQaytaHisobAktlar = res2Text
+        .match(/url:\s*'([^']*)'/g)[4]
+        .split("'")[1];
+      let confirmQaytaHisobAktPath = res2Text
         .match(/post\('ds\?xenc([^']+)'/g)[1]
         .split("'")[1];
-      let getYashovchiSoniAktlar = res2Text
-        .match(/url:\s*'([^']*)'/g)[3]
-        .split("'")[1];
 
-      if (!enterYashovchiSoniAktPath)
+      if (!enterQaytaHisobAktPath)
         return { success: false, message: "Session has expired" };
 
       await session.updateOne({
         $set: {
-          "path.enterYashovchiSoniAkt": enterYashovchiSoniAktPath,
-          "path.confirmYashovchiSoniAkt": confirmYashovchiSoniAktPath,
-          "path.getYashovchiSoniAktlar": getYashovchiSoniAktlar,
+          "path.searchQaytaHisobAkt": searchQaytaHisobAkt,
+          "path.enterQaytaHisobAkt": enterQaytaHisobAktPath,
+          "path.confirmQaytaHisobAkt": confirmQaytaHisobAktPath,
+          "path.getQaytaHisobAktlar": getQaytaHisobAktlar,
         },
       });
-      return await enterYashovchiSoniAkt(arguments[0]);
+      return await enterQaytaHisobAkt(arguments[0]);
     } else {
-      const date = new Date();
       const abonent = await Abonent.findOne({ licshet });
+      let findedAbonents = await fetch(cc + session.path.searchQaytaHisobAkt, {
+        headers: {
+          accept: "application/json, text/javascript, */*; q=0.01",
+          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+          "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+          "sec-ch-ua":
+            '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
+          "x-requested-with": "XMLHttpRequest",
+          Cookie: session.cookie,
+        },
+        referrerPolicy: "strict-origin-when-cross-origin",
+        body:
+          "page=1&rows=20&sort=id&order=asc&licshet=" +
+          licshet +
+          "&module_name=AktWorkersModule",
+        method: "POST",
+        mode: "cors",
+        credentials: "include",
+      });
+      findedAbonents = (await findedAbonents.json()).rows[0];
       let options = {
         method: "POST",
-        url: `https://cleancity.uz/` + session.path.enterYashovchiSoniAkt,
+        url: cc + session.path.enterQaytaHisobAkt,
         headers: {
           accept:
             "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -115,13 +143,15 @@ async function enterYashovchiSoniAkt({
         },
         formData: {
           abonents_id: abonent.id,
-          mes: date.getMonth() + 1,
-          god: date.getFullYear(),
-          resource_types_id: 20,
-          stack_prescribed_akts_id,
+          osv_id: findedAbonents.osv_id,
+          resource_types_id: 12,
+          stack_akts_id,
+          saldo_k: findedAbonents.saldo_k,
+          phone: "",
           akt_number,
+          akt_types_id: amount >= 0 ? 2 : 1,
           akt_date: getCurrentDate(),
-          prescribed_cnt,
+          amount: Math.abs(amount),
           purpose: comment,
           file_bytes: {
             value: fs.createReadStream(filepath),
@@ -138,10 +168,11 @@ async function enterYashovchiSoniAkt({
           resolve(JSON.parse(response.body));
         });
       });
+      console.log(entering);
       if (!entering.success) {
         return { success: false, msg: "Malumot kiritishda xatolik" };
       }
-      const res = await fetch(cc + session.path.getYashovchiSoniAktlar, {
+      const res = await fetch(cc + session.path.getQaytaHisobAktlar, {
         method: "POST",
         headers: {
           Cookie: session.cookie,
@@ -159,14 +190,15 @@ async function enterYashovchiSoniAkt({
         },
         body:
           "stack_akts_id=" +
-          stack_prescribed_akts_id +
+          stack_akts_id +
           "&page=1&rows=20&sort=id&order=desc",
       });
       const rows = (await res.json()).rows;
       const akt = rows.find(function (obj) {
         return obj.licshet == licshet && obj.akt_number == akt_number;
       });
-      const result = await fetch(cc + session.path.confirmYashovchiSoniAkt, {
+      console.log(akt);
+      const result = await fetch(cc + session.path.confirmQaytaHisobAkt, {
         headers: {
           accept: "application/json, text/javascript, */*; q=0.01",
           "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
@@ -194,4 +226,4 @@ async function enterYashovchiSoniAkt({
   }
 }
 
-module.exports = { enterYashovchiSoniAkt };
+module.exports = { enterQaytaHisobAkt };

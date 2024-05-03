@@ -48,6 +48,9 @@ const {
 const {
   enterYashovchiSoniAkt,
 } = require("../api/cleancity/dxsh/enterYashovchiSoniAkt");
+const {
+  enterQaytaHisobAkt,
+} = require("../api/cleancity/dxsh/enterQaytaHisobAkt");
 
 // =====================================================================================
 const composer = new Composer();
@@ -396,16 +399,17 @@ composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
 
 composer.hears("b", async (ctx) => {
   // ctx.scene.enter("vaqtinchalikFunc");
-  console.log(
-    await enterYashovchiSoniAkt({
-      licshet: "105120500123",
-      akt_number: 1,
-      comment: "TEST 3",
-      filepath: "./file.pdf",
-      prescribed_cnt: 10,
-      stack_prescribed_akts_id: 7191,
-    })
-  );
+  // console
+  //   .log
+  // await enterQaytaHisobAkt({
+  //   licshet: "105120500123",
+  //   akt_number: 1,
+  //   amount: 10,
+  //   comment: "test 1",
+  //   filepath: "./file.pdf",
+  //   stack_akts_id: 4434970,
+  // })
+  // ();
 });
 
 bot.use(composer);
