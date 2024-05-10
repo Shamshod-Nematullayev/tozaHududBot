@@ -109,64 +109,68 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
     ctx.wizard.next();
   },
   async (ctx) => {
-    const customDates = ctx.wizard.state.customDates;
-    if (ctx.message?.text)
-      return await ctx.replyWithHTML(
-        `<b>${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}</b> <i>${customDates.birth_date}</i>\n Siz shu kishini nazarda tutyapsizmi?`,
-        createInlineKeyboard([
-          [
-            ["Xa 👌", "yes"],
-            ["Yo'q 🙅‍♂️", "no"],
-          ],
-        ])
-      );
-    switch (ctx.callbackQuery?.data) {
-      case "yes":
-        ctx.deleteMessage();
-        const req = await CustomDataRequest.create({
-          user: ctx.from,
-          data: {
-            ...ctx.wizard.state.customDates,
-            pinfl: ctx.wizard.state.pinfl,
-          },
-          inspector_id: ctx.wizard.state.inspector_id,
-          licshet: ctx.wizard.state.abonent.licshet,
-        });
-        // let filename = "./uploads/" + Date.now() + ".png";
-        // if (!customDates.photo) {
-        //   filename = "./lib/personicon.png";
-        // }
-        let filename = ctx.wizard.state.filename;
-        fs.writeFile(filename, customDates.photo, "base64", async (err) => {
-          if (err) throw err;
+    try {
+      const customDates = ctx.wizard.state.customDates;
+      if (ctx.message?.text)
+        return await ctx.replyWithHTML(
+          `<b>${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}</b> <i>${customDates.birth_date}</i>\n Siz shu kishini nazarda tutyapsizmi?`,
+          createInlineKeyboard([
+            [
+              ["Xa 👌", "yes"],
+              ["Yo'q 🙅‍♂️", "no"],
+            ],
+          ])
+        );
+      switch (ctx.callbackQuery?.data) {
+        case "yes":
+          ctx.deleteMessage();
+          const req = await CustomDataRequest.create({
+            user: ctx.from,
+            data: {
+              ...ctx.wizard.state.customDates,
+              pinfl: ctx.wizard.state.pinfl,
+            },
+            inspector_id: ctx.wizard.state.inspector_id,
+            licshet: ctx.wizard.state.abonent.licshet,
+          });
+          // let filename = "./uploads/" + Date.now() + ".png";
+          // if (!customDates.photo) {
+          //   filename = "./lib/personicon.png";
+          // }
+          let filename = ctx.wizard.state.filename;
+          fs.writeFile(filename, customDates.photo, "base64", async (err) => {
+            if (err) throw err;
 
-          await ctx.telegram.sendPhoto(
-            process.env.CHANNEL_ID_SHAXSI_TASDIQLANDI,
-            { source: filename },
-            {
-              caption: `KOD: ${ctx.wizard.state.abonent.licshet}\nPasport: ${customDates.last_name} ${customDates.first_name} ${customDates.middle_name} ${customDates.birth_date}\nBilling: ${ctx.wizard.state.abonent.fio}\nInspector: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
-              reply_markup: createInlineKeyboard([
-                [
-                  ["✅✅", "shaxsitasdiqlandi_" + req._id + "_true"],
-                  ["🙅‍♂️🙅‍♂️", "shaxsitasdiqlandi_" + req._id + "_false"],
-                ],
-              ]).oneTime().reply_markup,
-              parse_mode: "HTML",
-            }
-          );
-          ctx.reply(
-            "Rahmat 😇\nMa'lumotlar tizim adminiga o'rganish uchun yuborildi..\n Yana kiritishni hohlaysizmi? 🙂",
-            createInlineKeyboard([[["Xa", "xa"]], [["Yo'q", "yoq"]]])
-          );
+            await ctx.telegram.sendPhoto(
+              process.env.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+              { source: filename },
+              {
+                caption: `KOD: ${ctx.wizard.state.abonent.licshet}\nPasport: ${customDates.last_name} ${customDates.first_name} ${customDates.middle_name} ${customDates.birth_date}\nBilling: ${ctx.wizard.state.abonent.fio}\nInspector: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+                reply_markup: createInlineKeyboard([
+                  [
+                    ["✅✅", "shaxsitasdiqlandi_" + req._id + "_true"],
+                    ["🙅‍♂️🙅‍♂️", "shaxsitasdiqlandi_" + req._id + "_false"],
+                  ],
+                ]).oneTime().reply_markup,
+                parse_mode: "HTML",
+              }
+            );
+            ctx.reply(
+              "Rahmat 😇\nMa'lumotlar tizim adminiga o'rganish uchun yuborildi..\n Yana kiritishni hohlaysizmi? 🙂",
+              createInlineKeyboard([[["Xa", "xa"]], [["Yo'q", "yoq"]]])
+            );
 
-          ctx.wizard.next();
-        });
-        break;
-      case "no":
-        ctx.deleteMessage();
-        ctx.reply("Bekor qilindi. Demak PINFL raqami noto'g'ri ekan");
-        ctx.scene.leave();
-        break;
+            ctx.wizard.next();
+          });
+          break;
+        case "no":
+          ctx.deleteMessage();
+          ctx.reply("Bekor qilindi. Demak PINFL raqami noto'g'ri ekan");
+          ctx.scene.leave();
+          break;
+      }
+    } catch (error) {
+      console.error(error);
     }
   },
   (ctx) => {

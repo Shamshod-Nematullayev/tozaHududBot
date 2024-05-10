@@ -51,6 +51,7 @@ const {
 const {
   enterQaytaHisobAkt,
 } = require("../api/cleancity/dxsh/enterQaytaHisobAkt");
+const { getAbonentDXJ } = require("../api/cleancity/dxsh/getAbonentDXJ");
 
 // =====================================================================================
 const composer = new Composer();
@@ -246,6 +247,7 @@ composer.hears(/mvd_\w+/g, (ctx) => {
   //     console.log(res);
   //   }
   // );
+  console.log("here");
   find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1]))
     .then((res) => {
       console.log(res);
@@ -398,6 +400,7 @@ composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
 );
 
 composer.hears("b", async (ctx) => {
+  console.log(await getAbonentDXJ({ licshet: "105120500123" }));
   // ctx.scene.enter("vaqtinchalikFunc");
   // console
   //   .log

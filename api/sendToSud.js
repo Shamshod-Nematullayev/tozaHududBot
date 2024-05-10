@@ -284,7 +284,9 @@ async function sendToSud({
   }
   const payload = {
     case: {
-      doc_date: `${yil}-${formatNumber(oy)}-${parseInt(kun) - 1}T19:00:00.000Z`,
+      doc_date: `${yil}-${formatNumber(oy)}-${formatNumber(
+        parseInt(kun) - 1
+      )}T19:00:00.000Z`,
       doc_number: doc_number,
       court_id: "d007c274-844f-49b9-b2c1-b514fc407c2f",
       duty_reason_id: "b4c87d9e-1f9e-4e9f-94f5-0b21840d57b1",

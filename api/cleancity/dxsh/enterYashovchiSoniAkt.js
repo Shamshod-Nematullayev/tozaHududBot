@@ -93,6 +93,9 @@ async function enterYashovchiSoniAkt({
     } else {
       const date = new Date();
       const abonent = await Abonent.findOne({ licshet });
+      if (!abonent) {
+        return { success: false, msg: "Abonent aniqlanmadi" };
+      }
       let options = {
         method: "POST",
         url: `https://cleancity.uz/` + session.path.enterYashovchiSoniAkt,

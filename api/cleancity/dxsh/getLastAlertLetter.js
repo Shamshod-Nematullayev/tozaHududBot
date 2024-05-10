@@ -126,7 +126,7 @@ async function getLastAlertLetter(kod) {
           },
         }
       );
-      getLastAlertLetter(kod);
+      return await getLastAlertLetter(kod);
     }
   } catch (error) {
     throw error;

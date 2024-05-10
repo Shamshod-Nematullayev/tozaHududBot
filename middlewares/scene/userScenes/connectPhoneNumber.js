@@ -9,7 +9,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
   async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
-      if (isNaN(ctx.message.text))
+      if (!ctx.message || isNaN(ctx.message?.text))
         return ctx.reply(
           messages.enterOnlyNumber,
           keyboards[ctx.session.til].cancelBtn.resize()

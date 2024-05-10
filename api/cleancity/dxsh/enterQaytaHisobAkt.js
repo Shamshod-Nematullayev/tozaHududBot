@@ -96,6 +96,9 @@ async function enterQaytaHisobAkt({
       return await enterQaytaHisobAkt(arguments[0]);
     } else {
       const abonent = await Abonent.findOne({ licshet });
+      if (!abonent) {
+        return { success: false, msg: "Abonent aniqlanmadi" };
+      }
       let findedAbonents = await fetch(cc + session.path.searchQaytaHisobAkt, {
         headers: {
           accept: "application/json, text/javascript, */*; q=0.01",
