@@ -7,6 +7,7 @@ const fs = require("fs");
 
 const { CleanCitySession } = require("../models/CleanCitySession");
 const { SudMaterial } = require("../models/SudMaterial");
+const { Mahalla } = require("../models/Mahalla");
 
 (async function () {
   // let res = await enterMaterialTOBilling(
@@ -93,6 +94,7 @@ async function importSudMaterialsToBilling(pachka_id) {
             },
           },
         };
+        console.log(file_path);
 
         return new Promise((resolve, reject) => {
           request(options, function (error, response) {
@@ -165,22 +167,28 @@ async function importSudMaterialsToBilling(pachka_id) {
       if (counter === pachka.items.length)
         return { success: true, msg: "Proccess tugadi" };
       const item = pachka.items[counter];
+
+      if (item.savedOnBilling) {
+        counter++;
+        console.log(item.KOD, "Kiritilgan allaqachon");
+        return await upload();
+      }
       const res1 = await enterMaterialTOBilling(
-        `./uploads/${pachka_id}/shakl2/${item.KOD}/ariza.PDF`,
+        `./uploads/${pachka_id}/arizalar/${item.KOD}.PDF`,
         item.KOD,
         "ARIZA"
       );
-      const res2 = await enterMaterialTOBilling(
-        `./uploads/${pachka_id}/shakl2/${item.KOD}/ilovalar.PDF`,
-        item.KOD,
-        "ILOVALAR"
-      );
+      // const res2 = await enterMaterialTOBilling(
+      //   `./uploads/${pachka_id}/shakl2/${item.KOD}/ilovalar.PDF`,
+      //   item.KOD,
+      //   "ILOVALAR"
+      // );
 
       // if (res1.success && res2.success) {
       const session = await CleanCitySession.findOne({ type: "dxsh" });
       const res3 = await fetch(
         `https://cleancity.uz/${
-          session.path.save_send_to_court + res2.proccess_id
+          session.path.save_send_to_court + res1.proccess_id
         }`,
         { headers: { Cookie: session.cookie } }
       );
@@ -192,6 +200,7 @@ async function importSudMaterialsToBilling(pachka_id) {
       console.log(item.KOD, "Bajarildi");
 
       await pachka.updateOne({ $set: { items: newItems } });
+      console.log(counter);
       counter++;
       await upload();
       // }
@@ -202,15 +211,15 @@ async function importSudMaterialsToBilling(pachka_id) {
   }
 }
 
-// importSudMaterialsToBilling("66277fa736703c72089efc6a");
+// importSudMaterialsToBilling("664dc9430e5794763f32d0bd");
 
 async function sendToSudMaterial(pachka_id) {
   const pachka = await SudMaterial.findById(pachka_id);
   let counter = 0;
   let newItems = pachka.items;
   async function update() {
-    if (counter == 200)
-      return await pachka.updateOne({ $set: { items: newItems } });
+    // if (counter == 200)
+    //   return await pachka.updateOne({ $set: { items: newItems } });
 
     const item = pachka.items[counter];
 
@@ -262,4 +271,5 @@ async function sendToSudMaterial(pachka_id) {
   }
   await update();
 }
-// sendToSudMaterial("66277fa736703c72089efc6a");
+
+// sendToSudMaterial("663dea41d85ea026bf29f561");

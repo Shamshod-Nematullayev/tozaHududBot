@@ -105,7 +105,7 @@ const mfyIncomeReport = async (ctx = false) => {
               mahallalar.push({
                 id: row.id,
                 xisoblandi: mahalla.reja,
-                name: row.name,
+                name: mahalla.name,
                 tushum: Number(row.ab_all_amount),
                 nazoratchi: mahalla.biriktirilganNazoratchi,
               });

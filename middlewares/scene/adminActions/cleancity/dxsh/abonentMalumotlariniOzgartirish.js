@@ -151,7 +151,7 @@ async function changeAbonentDates({
         "path.getAboDataUrl": getAboDataUrl,
       },
     });
-    // changeAbonentDates(arguments[0]);
+    return await changeAbonentDates(arguments[0]);
   } else {
     // abonent kartasi topish urlini aniqlash
     const startpage = await fetch(cc + "startpage", {

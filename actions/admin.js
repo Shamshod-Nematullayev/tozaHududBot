@@ -343,11 +343,20 @@ composer.hears("q", async (ctx) => {
     writeMode: "writeFile",
     writeOptions: {},
   };
+  const ishdanKetganNazoratchilar = [27300, 200, 29203];
   const content = [];
   xatlar.forEach((xat) => {
-    xat.abonents.forEach((kod) => {
-      content.push({ licshet: kod });
+    let ishdanKetganYozgan = false;
+    ishdanKetganNazoratchilar.forEach((id) => {
+      if (xat.inspector.id == id) {
+        ishdanKetganYozgan = true;
+      }
     });
+    if (!ishdanKetganYozgan) {
+      xat.abonents.forEach((kod) => {
+        content.push({ licshet: kod });
+      });
+    }
   });
   const data = [
     {
@@ -398,7 +407,6 @@ composer.hears("ExportWarningLettersZip", async (ctx) => {
 composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
   ctx.scene.enter("pochtaHarajatiniTekshirishScene")
 );
-
 composer.hears("b", async (ctx) => {
   console.log(await getAbonentDXJ({ licshet: "105120500123" }));
   // ctx.scene.enter("vaqtinchalikFunc");

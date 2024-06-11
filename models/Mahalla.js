@@ -18,6 +18,17 @@ const schema = new mongoose.Schema({
     default: [],
   },
   ommaviy_shartnoma: Object,
+  sektor: String,
+  mfy_rais_name: String,
+  mfy_rais_phone: String,
+  hokim_yordamchi_name: String,
+  hokim_yordamchi_phone: String,
+  yoshlar_yetakchi_name: String,
+  yoshlar_yetakchi_phone: String,
+  xotinqizlar_name: String,
+  xotinqizlar_phone: String,
+  uchastkavoy_name: String,
+  uchastkavoy_phone: String,
 });
 
 module.exports.Mahalla = mongoose.model("mahalla", schema);

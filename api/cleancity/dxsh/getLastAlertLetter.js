@@ -59,7 +59,7 @@ async function getLastAlertLetter(kod) {
             Cookie: session.cookie,
           },
           referrerPolicy: "strict-origin-when-cross-origin",
-          body: "sud_processes_id=" + findedProcesses.rows[0].id,
+          body: "sud_processes_id=" + findedProcesses.rows[1].id,
           method: "POST",
           mode: "cors",
           credentials: "include",
