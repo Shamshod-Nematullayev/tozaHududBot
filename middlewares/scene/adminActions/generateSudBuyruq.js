@@ -72,12 +72,13 @@ const generateSBuyruq = new Scenes.WizardScene(
                   // }
                 });
                 const filePath = "./example.docx";
-                fs.writeFile(filePath, fileBuffer, (error) => {
+                fs.writeFile(filePath, fileBuffer, async (error) => {
                   if (error) {
                     console.log("Docx file creation failed");
                     return;
                   }
-                  ctx.replyWithDocument({ source: filePath }).finally(() => {});
+                  await ctx.replyWithDocument({ source: filePath });
+                  fs.unlink(filePath, (err) => {});
                 });
                 // ctx.scene.leave();
               }

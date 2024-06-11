@@ -368,6 +368,7 @@ composer.hears("q", async (ctx) => {
 
   await xlsx(data, settings);
   await ctx.replyWithDocument({ source: fileName + ".xlsx" });
+  fs.unlink(fileName + ".xlsx", (err) => {});
 });
 
 composer.hears(/karta_/g, async (ctx) => {

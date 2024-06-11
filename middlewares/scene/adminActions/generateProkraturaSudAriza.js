@@ -68,12 +68,13 @@ const generateProkuraturaSudAriza = new Scenes.WizardScene(
                 if (err) console.log(err);
 
                 const filePath = "./prokuratura.html";
-                fs.writeFile(filePath, str, (error) => {
+                fs.writeFile(filePath, str, async (error) => {
                   if (error) {
-                    console.log("Docx file creation failed");
+                    console.error("Docx file creation failed");
                     return;
                   }
-                  ctx.replyWithDocument({ source: filePath });
+                  await ctx.replyWithDocument({ source: filePath });
+                  fs.unlink(filePath, (err) => {});
                   console.log("Docx file created successfully");
                 });
                 ctx.scene.leave();
