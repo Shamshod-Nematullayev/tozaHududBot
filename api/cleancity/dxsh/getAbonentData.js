@@ -1,5 +1,7 @@
 const { Abonent } = require("../../../models/Abonent");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
+const cc = "https://cleancity.uz/";
+const { JSDOM } = require("jsdom");
 
 module.exports.getAbonentDataByLicshet =
   async function getAbonentDataByLicshet({ licshet }) {
@@ -41,7 +43,7 @@ module.exports.getAbonentDataByLicshet =
               Cookie: session.cookie,
             },
             referrerPolicy: "strict-origin-when-cross-origin",
-            body: `to_card_abo_hf_0=&id=${abonent_id}&companies_id=1144`,
+            body: `to_card_abo_hf_0=&id=${abonent.id}&companies_id=1144`,
             method: "POST",
             mode: "cors",
             credentials: "include",
@@ -93,6 +95,7 @@ module.exports.getAbonentDataByLicshet =
       );
       return await abonent_data.json();
     } catch (err) {
+      console.error(err);
       return { success: false, msg: "Error on getAbonentData" };
     }
   };
