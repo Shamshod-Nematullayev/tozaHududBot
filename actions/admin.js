@@ -109,8 +109,7 @@ composer.hears(["👨‍💻 Ish maydoni", "👨‍💻 Иш майдони"], a
 });
 
 composer.action("CHARGE_VILOYAT_LOGIN", async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-
+  await ctx.deleteMessage();
   const session = await CleanCitySession.findOne({
     type: "stm_reports",
   });

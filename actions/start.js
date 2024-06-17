@@ -6,6 +6,7 @@ const { Abonent } = require("../models/YangiAbonent");
 const { Admin } = require("../models/Admin");
 const { Picture } = require("../models/Picture");
 const { Guvohnoma } = require("../models/Guvohnoma");
+const { User } = require("../models/User");
 const composer = new Composer();
 
 composer.start(async (ctx) => {
@@ -100,6 +101,13 @@ composer.start(async (ctx) => {
           keyboards[ctx.session.til].adminKeyboard.resize()
         );
       } else {
+        const user = await User.findOne({ "user.id": ctx.chat.id });
+        if (user.is_stm_xodimi) {
+          return ctx.reply(
+            "Asosiy menyu",
+            keyboards.lotin.stm_xodimi_main_keyboard
+          );
+        }
         ctx.reply(
           messages.startGreeting,
           keyboards[ctx.session.til].mainKeyboard.resize()

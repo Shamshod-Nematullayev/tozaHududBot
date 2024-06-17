@@ -82,11 +82,6 @@ composer.action("o'lim guvohnomasi", (ctx) => {
   ctx.scene.enter("GUVOHNOMA_KIRITISH");
 });
 
-// Fuqoro rasmini tashlash
-composer.action("fuqoro_rasmi", (ctx) => {
-  ctx.deleteMessage();
-  ctx.scene.enter("fuqoro_rasmini_kiritish");
-});
 composer.action("searchByFISH", (ctx) => {
   ctx.deleteMessage();
   ctx.scene.enter("SEARCH_BY_NAME");

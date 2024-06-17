@@ -7,6 +7,7 @@ const clearMessages = (ctx) => {
         console.error(error);
       }
     });
+    ctx.session.messages_for_delete = [];
   }
 };
 

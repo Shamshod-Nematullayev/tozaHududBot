@@ -116,5 +116,4 @@ const drawDebitViloyat = async (sendingType) => {
   });
 };
 
-module.exports = { toSendDebitor };
-module.exports = { drawDebitViloyat };
+module.exports = { toSendDebitor, drawDebitViloyat };

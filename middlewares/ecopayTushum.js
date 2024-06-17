@@ -330,7 +330,7 @@ setInterval(async () => {
     }
   } catch (err) {
     console.log(err);
-    bot.telegram.sendMessage(5347896070, JSON.stringify(err));
+    // bot.telegram.sendMessage(5347896070, JSON.stringify(err));
   }
 }, 60 * 1000);
 
