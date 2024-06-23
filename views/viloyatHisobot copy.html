@@ -74,7 +74,27 @@
     </style>
   </head>
   <body>
-    <table
+    <div>
+      <h2 id="sarlavha">Аҳолидан маиший чиқиндилар учун
+        <span
+          style="
+            font-weight: bold;
+            color: #000000;
+            font-family: 'Arial';
+            font-size: 28pt;
+          "
+          >дебиторлик ва уларнинг ундирилиши буйича</span
+        ><span
+          style="
+            font-weight: bold;
+            color: #000000;
+            font-family: 'Arial';
+            font-size: 28pt;
+          "
+          ><br />
+          МАЪЛУМОТ</span
+        ></h2>
+      <table
       border="0"
       cellpadding="0"
       cellspacing="0"
@@ -82,29 +102,6 @@
       class="sheet0 gridlines"
     >
       <tbody>
-        <tr>
-          <td id="sarlavha" colspan="10">
-            Аҳолидан маиший чиқиндилар учун
-            <span
-              style="
-                font-weight: bold;
-                color: #000000;
-                font-family: 'Arial';
-                font-size: 28pt;
-              "
-              >дебиторлик ва уларнинг ундирилиши буйича</span
-            ><span
-              style="
-                font-weight: bold;
-                color: #000000;
-                font-family: 'Arial';
-                font-size: 28pt;
-              "
-              ><br />
-              МАЪЛУМОТ</span
-            >
-          </td>
-        </tr>
         <tr>
           <td style="font-size: 26pt; font-family: Arial" colspan="10">
             <i><%= sana%></i>
@@ -119,7 +116,7 @@
             Туман ва шаҳарлар<br />
             номи
           </td>
-          <td rowspan="2" style="padding: 5px 25px;">
+          <td rowspan="2">
             <span
               style="
                 font-weight: bold;
@@ -147,8 +144,8 @@
               >ҳолатига дебитор қарздорлик
             </span>
           </td>
-          <td rowspan="2" style="padding: 5px 25px;">Бир кунлик РЕЖА</td>
-          <td rowspan="2" style="padding: 5px 25px;">
+          <td rowspan="2">Бир кунлик РЕЖА</td>
+          <td rowspan="2">
             Кунлик тушум<br />
             <span
               style="
@@ -162,7 +159,7 @@
             >
           </td>
           <td colspan="2">Фарқи</td>
-          <td rowspan="2" style="padding: 5px 25px;">
+          <td rowspan="2">
             <span
               style="
                 font-weight: bold;
@@ -206,10 +203,10 @@
           <td colspan="2">Фарқи</td>
         </tr>
         <tr class="korsatkich">
-          <td style="padding: 5px 25px;">(+/-)</td>
-          <td style="padding: 5px 25px;">(%)</td>
-          <td style="padding: 5px 25px;">(+/-)</td>
-          <td style="padding: 5px 25px;">(%)</td>
+          <td>(+/-)</td>
+          <td>(%)</td>
+          <td>(+/-)</td>
+          <td>(%)</td>
         </tr>
         <tr class="jamiViloyat">
           <td colspan="2" style="text-align: left">Жами вилоят бўйича</td>
@@ -240,5 +237,7 @@
         <% }) %>
       </tbody>
     </table>
+    </div>
+   
   </body>
 </html>

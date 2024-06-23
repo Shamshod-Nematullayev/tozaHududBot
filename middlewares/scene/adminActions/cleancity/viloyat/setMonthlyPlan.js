@@ -14,6 +14,8 @@ const set_monthly_plan = new Scenes.WizardScene(
     ctx.wizard.next();
   },
   async (ctx) => {
+    if (!ctx.message)
+      return ctx.reply(`Necha kunda bajarish kerak? Faqat son kiriting`);
     if (isNaN(ctx.message.text)) return ctx.reply(`Faqat son kiriting`);
 
     const promises = ctx.wizard.state.json.map(async (row) => {

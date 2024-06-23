@@ -22,6 +22,9 @@ function downloadFile(url, dest) {
 
 async function handleTelegramExcel(ctx) {
   try {
+    if (!ctx.message) {
+      ctx.scene.leave();
+    }
     if (
       ctx.message.document &&
       (ctx.message.document.mime_type ===

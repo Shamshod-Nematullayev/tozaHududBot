@@ -144,12 +144,21 @@ async function hisobot_3(ctx) {
     jamiViloyat.daily_income = formatNumber(jamiViloyat.daily_income);
     jamiViloyat.monthly_plan = formatNumber(jamiViloyat.monthly_plan);
     jamiViloyat.monthly_income = formatNumber(jamiViloyat.monthly_income);
+    newRows.sort(
+      (a, b) => a.monthly_plan_diff_procent - b.monthly_plan_diff_procent
+    );
 
     const sana = formatDate(date);
     let html = ``;
     ejs.renderFile(
       "./views/viloyatHisobot.ejs",
-      { rows: newRows, jamiViloyat, sana, vaqt: formatTime(date) },
+      {
+        rows: newRows,
+        jamiViloyat,
+        sana,
+        vaqt: formatTime(date),
+        oy: String(date.getMonth() + 1).padStart(2, "0"),
+      },
       (err, res) => {
         if (err) throw err;
 

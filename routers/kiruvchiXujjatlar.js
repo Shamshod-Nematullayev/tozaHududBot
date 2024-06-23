@@ -3,6 +3,7 @@ const { IncomingDocument } = require("../models/IncomingDocument");
 const path = require("path");
 const { bot } = require("../core/bot");
 const { Counter } = require("../models/Counter");
+const fs = require("fs");
 
 const router = require("express").Router();
 
@@ -67,12 +68,7 @@ router.post("/search", async (req, res, next) => {
 
 router.post("/create", upload.single("file"), async (req, res, next) => {
   try {
-    if (
-      !req.file ||
-      !req.body.abonent ||
-      !req.body.doc_type ||
-      !req.body.inspector
-    ) {
+    if (!req.file || !req.body.doc_type || !req.body.inspector) {
       return res
         .status(400)
         .json({ ok: false, message: "Required fields are missing" });
