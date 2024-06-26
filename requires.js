@@ -22,6 +22,9 @@ const {
 const {
   yashovchiSoniKopaytirish,
 } = require("./middlewares/scene/adminActions/cleancity/dxsh/yashovchiSoniKopaytirish");
+const {
+  changeAbonentDates,
+} = require("./middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");
 
 // telegraf resources
 const { Composer } = require("telegraf");
@@ -37,6 +40,8 @@ const { Guvohnoma } = require("./models/Guvohnoma");
 const { Abonent } = require("./models/Abonent");
 const { Bildirishnoma } = require("./models/SudBildirishnoma");
 const { MultiplyRequest } = require("./models/MultiplyRequest");
+const { CustomDataRequest } = require("./models/CustomDataRequest");
+const { Nazoratchi } = require("./models/Nazoratchi");
 
 module.exports = {
   // node modules
@@ -53,6 +58,7 @@ module.exports = {
   find_address_by_pinfil_from_mvd,
   getAbonentCardHtml,
   getAbonentSaldoData,
+  changeAbonentDates,
   // telegraf resourses
   Composer,
   bot,
@@ -66,4 +72,6 @@ module.exports = {
   Abonent,
   Bildirishnoma,
   MultiplyRequest,
+  CustomDataRequest,
+  Nazoratchi,
 };

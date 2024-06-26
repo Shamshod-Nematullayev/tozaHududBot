@@ -1,12 +1,11 @@
-const { Composer } = require("telegraf");
-const { bot } = require("../core/bot");
-const { CustomDataRequest } = require("../models/CustomDataRequest");
-const { Nazoratchi } = require("../models/Nazoratchi");
 const {
+  Composer,
+  bot,
+  CustomDataRequest,
+  Nazoratchi,
   changeAbonentDates,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");
-const { Abonent } = require("../models/Abonent");
-const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
+  Abonent,
+} = require("../requires");
 
 const composer = new Composer();
 
