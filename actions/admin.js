@@ -1,61 +1,52 @@
-const { Composer } = require("telegraf");
-const { bot } = require("../core/bot");
-const { keyboards } = require("../lib/keyboards");
-const { messages } = require("../lib/messages");
-const { Admin } = require("../models/Admin");
-const { drawAndSendTushum } = require("../middlewares/drawTushum");
 const {
+  // node modules
+  fs,
+  path,
+  xlsx,
+  htmlPDF,
+  // required functions
+  drawAndSendTushum,
   fetchEcopayTushum,
   fetchEcoTranzaksiyalar,
-} = require("../middlewares/fetchEcopay");
-const { CleanCitySession } = require("../models/CleanCitySession");
-const {
   drawDebitViloyat,
-} = require("../middlewares/scene/adminActions/cleancity/viloyat/toSendDebitorReport");
-const {
   yashovchiSoniKopaytirish,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/yashovchiSoniKopaytirish");
-const { Counter } = require("../models/Counter");
-const { Guvohnoma } = require("../models/Guvohnoma");
-const { MultiplyRequest } = require("../models/MultiplyRequest");
-const {
-  yangiAbonent,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/yangiAbonent");
-const {
-  find_one_by_pinfil_from_mvd,
   find_address_by_pinfil_from_mvd,
-} = require("../api/mvd-pinfil");
-const {
-  changeAbonentDates,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");
-const {
-  sendMahallaKunlikTushum,
-  getMahallaKunlikTushum,
-  drawMahallaKunlikTushum,
-} = require("../intervals/mahallaKunlikTushum");
-const { Abonent } = require("../models/Abonent");
-const fs = require("fs");
-const path = require("path");
-const xlsx = require("json-as-xlsx");
-const { Bildirishnoma } = require("../models/SudBildirishnoma");
-const {
   getAbonentCardHtml,
-} = require("../api/cleancity/dxsh/getAbonentCardHTML");
-const htmlPDF = require("html-pdf");
-const {
-  enterWarningLetterToBilling,
-} = require("../api/cleancity/dxsh/enterWarningLetterToBilling");
-const {
-  enterYashovchiSoniAkt,
-} = require("../api/cleancity/dxsh/enterYashovchiSoniAkt");
-const {
-  enterQaytaHisobAkt,
-} = require("../api/cleancity/dxsh/enterQaytaHisobAkt");
-const { getAbonentDXJ } = require("../api/cleancity/dxsh/getAbonentDXJ");
+  getAbonentSaldoData,
+  // telegraf resourses
+  Composer,
+  bot,
+  keyboards,
+  messages,
+  // mongo models
+  Admin,
+  CleanCitySession,
+  Counter,
+  Guvohnoma,
+  Abonent,
+  Bildirishnoma,
+  MultiplyRequest,
+} = require("./../requires");
 
-// =====================================================================================
+// small required functions =========================================================================
+function bugungiSana() {
+  const date = new Date();
+  return `${date.getDate()}.${
+    date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1
+  }.${date.getFullYear()}`;
+}
+
+async function isAdmin(ctx) {
+  if (!ctx) return false;
+
+  const admins = await Admin.find();
+  return admins.some((admin) => admin.user_id === ctx.from.id);
+}
+
+// Main codes =====================================================================================
 const composer = new Composer();
 
+//  Entering scenes by inline button =========================================
 const ADMIN_ACTIONS = [
   "import_abonents_data",
   "generate_sud_buyruq",
@@ -75,14 +66,6 @@ const ADMIN_ACTIONS = [
   "sudBuyruqlariYaratish",
 ];
 
-// main required functions
-async function isAdmin(ctx) {
-  if (!ctx) return false;
-
-  const admins = await Admin.find();
-  return admins.some((admin) => admin.user_id === ctx.from.id);
-}
-
 function enterAdminAction(actionType) {
   if (!actionType) return;
 
@@ -90,12 +73,12 @@ function enterAdminAction(actionType) {
     if (isAdmin(ctx)) {
       ctx.deleteMessage();
       ctx.scene.enter(actionType);
-    } else {
-      ctx.reply(messages.youAreNotAdmin);
-    }
+    } else ctx.reply(messages.youAreNotAdmin);
   });
 }
 ADMIN_ACTIONS.forEach((actionType) => enterAdminAction(actionType));
+
+// ============================================================
 
 composer.command("admin", async (ctx) => {
   const admins = await Admin.find();
@@ -119,17 +102,6 @@ composer.action("CHARGE_VILOYAT_LOGIN", async (ctx) => {
     ctx.session.session_type = "stm_reports";
     ctx.scene.enter("recover_clean_city_session");
   }
-});
-
-// ======================== Special functions (not required just shortcuts) ========================//
-composer.command("tushum", async (ctx) => {
-  const data = await fetchEcopayTushum();
-  fetchEcoTranzaksiyalar();
-  drawAndSendTushum(data, ctx);
-});
-
-composer.hears("debit", (ctx) => {
-  drawDebitViloyat("toMySelf");
 });
 
 composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
@@ -235,17 +207,23 @@ composer.action(/done_\w+/g, async (ctx) => {
   }
 });
 
+// ======================== Special functions (not required just shortcuts) ========================//
+composer.command("tushum", async (ctx) => {
+  const data = await fetchEcopayTushum();
+  fetchEcoTranzaksiyalar();
+  drawAndSendTushum(data, ctx);
+});
+
+composer.hears("debit", (ctx) => {
+  drawDebitViloyat("toMySelf");
+});
+
 composer.hears("Aborotka chiqorish", async (ctx) => {
   if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
   ctx.scene.enter("draw_abarotka");
 });
 
 composer.hears(/mvd_\w+/g, (ctx) => {
-  // find_one_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
-  //   (res) => {
-  //     console.log(res);
-  //   }
-  // );
   console.log("here");
   find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1]))
     .then((res) => {
@@ -258,11 +236,6 @@ composer.hears(/mvd_\w+/g, (ctx) => {
     .catch((err) => console.log(err));
 });
 composer.hears(/k_\w+/g, (ctx) => {
-  // find_one_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
-  //   (res) => {
-  //     console.log(res);
-  //   }
-  // );
   find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
     (res) => {
       ctx.reply(
@@ -279,14 +252,7 @@ const mahallaGroup = {
   type: "supergroup",
 };
 
-bot.hears("kunlik", (ctx) => {
-  const date = new Date();
-  getMahallaKunlikTushum(date).then(async (rows) => {
-    const imgPath = await drawMahallaKunlikTushum(rows, new Date());
-    sendMahallaKunlikTushum([1382670100, mahallaGroup.id], imgPath, ctx);
-  });
-});
-
+// this shortcut for export billing_abonents collection from mongodb
 composer.hears("export_abonents", async (ctx) => {
   let abonents = await Abonent.find({}, { photo: 0 });
   const content = [];
@@ -377,14 +343,12 @@ composer.hears(/karta_/g, async (ctx) => {
       format: "A4",
       orientation: "portrait",
     })
-    .toFile("./uploads/abonent_card.pdf", (err, res) => {
+    .toFile("./uploads/abonent_card.pdf", async (err, res) => {
       if (err) throw err;
-      ctx.replyWithDocument({ source: "./uploads/abonent_card.pdf" });
-      // .then(() => {
-      //   fs.unlink("./uploads/abonent_card.pdf", (err) =>
-      //     err ? console.log(err) : ""
-      //   );
-      // });
+      await ctx.replyWithDocument({ source: "./uploads/abonent_card.pdf" });
+      fs.unlink("./uploads/abonent_card.pdf", (err) =>
+        err ? console.log(err) : ""
+      );
     });
 });
 
@@ -407,20 +371,17 @@ composer.hears("ExportWarningLettersZip", async (ctx) => {
 composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
   ctx.scene.enter("pochtaHarajatiniTekshirishScene")
 );
-composer.hears("b", async (ctx) => {
-  console.log(await getAbonentDXJ({ licshet: "105120500123" }));
-  // ctx.scene.enter("vaqtinchalikFunc");
-  // console
-  //   .log
-  // await enterQaytaHisobAkt({
-  //   licshet: "105120500123",
-  //   akt_number: 1,
-  //   amount: 10,
-  //   comment: "test 1",
-  //   filepath: "./file.pdf",
-  //   stack_akts_id: 4434970,
-  // })
-  // ();
+composer.hears(/xat_/g, async (ctx) => {
+  getAbonentSaldoData(ctx.message.text.split("_")[1]);
+  let html = "";
+  ejs.renderFile(
+    path.join(__dirname, "../", "views", "gibrid.ogohlantirish.ejs"),
+    { data },
+    {},
+    (err, str) => {
+      html = str;
+    }
+  );
 });
 
 bot.use(composer);

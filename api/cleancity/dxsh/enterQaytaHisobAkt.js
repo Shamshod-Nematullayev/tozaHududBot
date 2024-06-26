@@ -4,6 +4,9 @@ const { Abonent } = require("../../../models/Abonent");
 const request = require("request");
 const cc = `https://cleancity.uz/`;
 const fs = require("fs");
+const {
+  getCleanCityPageByNavigation,
+} = require("../helpers/getCleanCityPageByNavigation");
 
 function getCurrentDate() {
   // Create a new Date object
@@ -40,45 +43,20 @@ async function enterQaytaHisobAkt({
       !session.path.confirmQaytaHisobAkt ||
       !session.path.getQaytaHisobAktlar
     ) {
-      const startpage = await fetch(cc + "startpage", {
-        headers: { Cookie: session.cookie },
+      const aktlarPage = await getCleanCityPageByNavigation({
+        navigation_text: "Актлар",
+        session,
       });
-      const startpageText = await startpage.text();
-      const startpageDoc = new JSDOM(startpageText).window.document;
-      const elements = startpageDoc.querySelectorAll("a");
-      let qaytaHisobAktlarPage = "";
-      elements.forEach(function (element) {
-        // Check if the text content matches "hello world"
-
-        if (
-          element.textContent.trim() === "Актлар" ||
-          element.textContent.trim() === "Aktlar"
-        ) {
-          // Found the element, do something with it
-          qaytaHisobAktlarPage = element.href;
-        }
-      });
-      const res1 = await fetch(
-        `https://cleancity.uz/dashboard/${qaytaHisobAktlarPage}`,
-        { headers: { Cookie: session.cookie } }
-      );
-      const res2 = await fetch(res1.url, {
-        headers: {
-          Cookie: session.cookie,
-        },
-      });
-      //   Shu joyiga linklarni topish vazifasi yoziladi
-      const res2Text = await res2.text();
-      let searchQaytaHisobAkt = res2Text
+      let searchQaytaHisobAkt = aktlarPage
         .match(/post\('ds\?xenc([^']+)'/g)[6]
         .split("'")[1];
-      let enterQaytaHisobAktPath = res2Text
+      let enterQaytaHisobAktPath = aktlarPage
         .match(/dsm\?xenc=([^']+)'/g)[1]
         .split("'")[0];
-      let getQaytaHisobAktlar = res2Text
+      let getQaytaHisobAktlar = aktlarPage
         .match(/url:\s*'([^']*)'/g)[4]
         .split("'")[1];
-      let confirmQaytaHisobAktPath = res2Text
+      let confirmQaytaHisobAktPath = aktlarPage
         .match(/post\('ds\?xenc([^']+)'/g)[1]
         .split("'")[1];
 
