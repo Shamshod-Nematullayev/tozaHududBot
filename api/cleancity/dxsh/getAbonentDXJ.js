@@ -113,4 +113,4 @@ async function getAbonentDXJ({ licshet }) {
   }
 }
 
-module.exports = { getAbonentDXJ };
+module.exports = getAbonentDXJ;

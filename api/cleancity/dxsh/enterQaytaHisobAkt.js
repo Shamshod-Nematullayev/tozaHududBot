@@ -207,4 +207,4 @@ async function enterQaytaHisobAkt({
   }
 }
 
-module.exports = { enterQaytaHisobAkt };
+module.exports = enterQaytaHisobAkt;

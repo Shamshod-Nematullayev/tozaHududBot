@@ -54,4 +54,4 @@ const getAbonentSaldoData = async (litsavoy) => {
   }
 };
 
-module.exports = { getAbonentSaldoData };
+module.exports = getAbonentSaldoData;

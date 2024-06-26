@@ -1,9 +1,7 @@
 const {
   enterQaytaHisobAkt,
 } = require("../api/cleancity/dxsh/enterQaytaHisobAkt");
-const {
-  enterYashovchiSoniAkt,
-} = require("../api/cleancity/dxsh/enterYashovchiSoniAkt");
+const { enterYashovchiSoniAkt } = require("../api/cleancity/dxsh");
 const { upload } = require("../middlewares/multer");
 const { CleanCitySession } = require("../models/CleanCitySession");
 const { Counter } = require("../models/Counter");
@@ -11,10 +9,8 @@ const { IncomingDocument } = require("../models/IncomingDocument");
 const cc = `https://cleancity.uz/`;
 const { bot } = require("../core/bot");
 const path = require("path");
-const { getAbonentDXJ } = require("../api/cleancity/dxsh/getAbonentDXJ");
-const {
-  getAbonentDataByLicshet,
-} = require("../api/cleancity/dxsh/getAbonentData");
+const { getAbonentDXJ } = require("../api/cleancity/dxsh");
+const { getAbonentDataByLicshet } = require("../api/cleancity/dxsh");
 
 const router = require("express").Router();
 router.get("/next-incoming-document-number", async (req, res) => {

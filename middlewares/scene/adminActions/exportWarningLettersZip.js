@@ -7,9 +7,7 @@ const { messages } = require("../../../lib/messages");
 const excelToJson = require("convert-excel-to-json");
 const { keyboards } = require("../../../lib/keyboards");
 const isCancel = require("../../smallFunctions/isCancel");
-const {
-  getLastAlertLetter,
-} = require("../../../api/cleancity/dxsh/getLastAlertLetter");
+const { getLastAlertLetter } = require("../../../api/cleancity/dxsh");
 
 const exportWarningLettersZip = new Scenes.WizardScene(
   "exportWarningLettersZip",

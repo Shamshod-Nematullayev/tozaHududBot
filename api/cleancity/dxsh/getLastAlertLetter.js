@@ -133,4 +133,4 @@ async function getLastAlertLetter(kod) {
   }
 }
 
-module.exports = { getLastAlertLetter };
+module.exports = getLastAlertLetter;

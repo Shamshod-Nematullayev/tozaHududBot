@@ -97,4 +97,4 @@ async function enterWarningLetterToBilling({
   }
 }
 
-module.exports = { enterWarningLetterToBilling };
+module.exports = enterWarningLetterToBilling;

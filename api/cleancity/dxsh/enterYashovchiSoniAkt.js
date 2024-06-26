@@ -197,4 +197,4 @@ async function enterYashovchiSoniAkt({
   }
 }
 
-module.exports = { enterYashovchiSoniAkt };
+module.exports = enterYashovchiSoniAkt;
