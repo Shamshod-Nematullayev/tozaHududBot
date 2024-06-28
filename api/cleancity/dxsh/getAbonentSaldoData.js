@@ -6,12 +6,7 @@ const {
 const getAbonentSaldoData = async (litsavoy) => {
   try {
     const session = await CleanCitySession.findOne({ type: "dxsh" });
-    const abonentsPage = await getCleanCityPageByNavigation({
-      navigation_text: "Абонентлар",
-      session,
-    });
     const date = new Date();
-
     const headers = {
       accept: "application/json, text/javascript, */*; q=0.01",
       "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7,ru;q=0.6",
@@ -26,16 +21,39 @@ const getAbonentSaldoData = async (litsavoy) => {
       "x-requested-with": "XMLHttpRequest",
       Cookie: session.cookie,
     };
-    let getQaytaHisobAktlar = abonentsPage
+
+    // Agar oldindan abonent ma'lumotlarini olish path mavjud bo'lsa
+    if (session.path.getAbonentSaldoData) {
+      const res = await fetch(
+        process.env.CLEAN_CITY_DOMEN + session.path.getAbonentSaldoData,
+        {
+          headers,
+          referrerPolicy: "strict-origin-when-cross-origin",
+          body: `licshet=${litsavoy}&mes=${
+            date.getMonth() + 1
+          }&god=${date.getFullYear()}&page=1&rows=20&sort=a.id&order=asc`,
+          method: "POST",
+          mode: "cors",
+          credentials: "include",
+        }
+      );
+      const data = (await res.json()).rows[0];
+      return data;
+    }
+    // Agar oldindan abonent ma'lumotlarini olish path mavjud bo'lmasa
+    const abonentsPage = await getCleanCityPageByNavigation({
+      navigation_text: "Абонентлар",
+      session,
+    });
+
+    let getAbonentSaldoData = abonentsPage
       .match(/url:\s*'([^']*)'/g)[7]
       .split("'")[1];
-    console.log(
-      `licshet=${litsavoy}&mes=${
-        date.getMonth() + 1
-      }&god=${date.getFullYear()}&page=1&rows=20&sort=a.id&order=asc`
-    );
+    await session.updateOne({
+      $set: { "path.getAbonentSaldoData": getAbonentSaldoData },
+    });
     const res = await fetch(
-      process.env.CLEAN_CITY_DOMEN + getQaytaHisobAktlar,
+      process.env.CLEAN_CITY_DOMEN + getAbonentSaldoData,
       {
         headers,
         referrerPolicy: "strict-origin-when-cross-origin",
@@ -48,7 +66,7 @@ const getAbonentSaldoData = async (litsavoy) => {
       }
     );
     const data = (await res.json()).rows[0];
-    console.log(data);
+    return data;
   } catch (error) {
     throw error;
   }

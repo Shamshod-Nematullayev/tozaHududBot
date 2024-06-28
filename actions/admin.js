@@ -1,9 +1,16 @@
 const {
+  getAllMails,
+  gertOneMailById,
+  createMail,
+} = require("../api/hybrid.pochta.uz/");
+const { HybridMail } = require("../models/HybridMail");
+const {
   // node modules
   fs,
   path,
   xlsx,
   htmlPDF,
+  ejs,
   // required functions
   drawAndSendTushum,
   fetchEcopayTushum,
@@ -371,17 +378,61 @@ composer.hears("ExportWarningLettersZip", async (ctx) => {
 composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
   ctx.scene.enter("pochtaHarajatiniTekshirishScene")
 );
+async function createWarningLetterPDF(licshet) {
+  const abonentData = await getAbonentSaldoData(licshet);
+  const data = {
+    FISH: abonentData.fio,
+    MFY: abonentData.mahalla_name,
+    STREET: abonentData.streets_name,
+    KOD: abonentData.licshet,
+    SALDO: abonentData.saldo_k,
+    SANA: bugungiSana(),
+  };
+  const createHtmlString = new Promise((resolve, reject) => {
+    ejs.renderFile(
+      path.join(__dirname, "../", "views", "gibrid.ogohlantirish.ejs"),
+      { data },
+      {},
+      (err, str) => {
+        if (err) return reject(err);
+        resolve(str);
+      }
+    );
+  });
+
+  const html = await createHtmlString;
+  const convertPDF = new Promise((resolve, reject) => {
+    htmlPDF
+      .create(html, { format: "A4", orientation: "portrait" })
+      .toBuffer((err, str) => {
+        if (err) return reject(err);
+        const base64PDF = str.toString("base64");
+        resolve(base64PDF);
+      });
+  });
+  return await convertPDF;
+}
 composer.hears(/xat_/g, async (ctx) => {
-  getAbonentSaldoData(ctx.message.text.split("_")[1]);
-  let html = "";
-  ejs.renderFile(
-    path.join(__dirname, "../", "views", "gibrid.ogohlantirish.ejs"),
-    { data },
-    {},
-    (err, str) => {
-      html = str;
-    }
+  const licshet = ctx.message.text.split("_")[1];
+  const mail = await HybridMail.findOne({ licshet });
+  if (mail) return { ok: false, message: "Mail already exists" };
+
+  const abonentData = await getAbonentSaldoData(licshet);
+  const base64PDF = await createWarningLetterPDF(licshet);
+  const newMail = await createMail(
+    `${abonentData.mahalla_name}, ${abonentData.streets_name}`,
+    abonentData.fio,
+    base64PDF
   );
+  await HybridMail.create({
+    licshet: licshet,
+    type: "xat",
+    hybridMailId: newMail.Id,
+    createdOn: new Date(),
+    receiver: abonentData.fio,
+  });
+  console.log(newMail);
+  // ctx.replyWithDocument({ source: pdfFilePath });
 });
 
 bot.use(composer);

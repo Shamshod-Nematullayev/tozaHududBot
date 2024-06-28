@@ -2,13 +2,10 @@ const { Scenes } = require("telegraf");
 const { inputAbonentLicshet } = require("../../../constants");
 const https = require("https");
 const fs = require("fs");
-const compresser = require("compressing");
 const { messages } = require("../../../lib/messages");
 const excelToJson = require("convert-excel-to-json");
 const htmlPDF = require("html-pdf");
-const {
-  getAbonentCardHtml,
-} = require("../../../api/cleancity/dxsh/getAbonentCardHTML");
+const { getAbonentCardHtml } = require("../../../api/cleancity/dxsh/");
 const { keyboards } = require("../../../lib/keyboards");
 const isCancel = require("../../smallFunctions/isCancel");
 

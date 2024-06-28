@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const xlsx = require("json-as-xlsx");
 const htmlPDF = require("html-pdf");
+const ejs = require("ejs");
 
 // required functions
 const { drawAndSendTushum } = require("./middlewares/drawTushum");
@@ -49,6 +50,7 @@ module.exports = {
   path,
   xlsx,
   htmlPDF,
+  ejs,
   // required functions
   drawAndSendTushum,
   fetchEcopayTushum,
