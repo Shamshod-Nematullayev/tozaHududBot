@@ -2,6 +2,7 @@ const https = require("https");
 const fs = require("fs");
 const xlsx = require("xlsx");
 const { messages } = require("../../lib/messages");
+const { keyboards } = require("../../requires");
 
 // Helper function to download file using HTTPS
 function downloadFile(url, dest) {
@@ -54,7 +55,10 @@ async function handleTelegramExcel(ctx) {
 
       return jsonData; // Return JSON data if needed
     } else {
-      ctx.reply("Invalid or unsupported document type.");
+      ctx.reply(
+        "Invalid or unsupported document type.",
+        keyboards.lotin.cancelBtn
+      );
     }
   } catch (error) {
     console.error("Error handling Excel file:", error);

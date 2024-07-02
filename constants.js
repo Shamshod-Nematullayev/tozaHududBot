@@ -11,3 +11,4 @@ module.exports.inputAbonentLicshet = `BQACAgIAAxkBAAEDm9ll6F9SmQ5HQCW4S0X-BxOuV6
 module.exports.pochtaHarajatlariTekshirishInputExcelShablon = `BQACAgIAAxkBAAED4Wpl-YyHr_4xajjXZa9MTvh1-dj8RAAClz0AAr1M0UvDetJFMVvbOzQE`;
 module.exports.SudBuyruqInputExcel = `BQACAgIAAxkBAAEEDelmDRB_CbUC0r05dRbh_I9jzzAHlQAC2UcAAjV7aEjrH8IgmTfeUzQE`;
 module.exports.OylikRejaBelgilashViloyat = `BQACAgIAAxkBAAEE2q5mb_GENCndgaODnaWEJQY_r240sgACd0cAAgRogUtPOm2fnU1PYjUE`;
+module.exports.INPUT_ABONENTS_LICSHET = `BQACAgIAAxkBAAEE9QABZn-1q0Qj4i1UThSKcirrbiLJ834AAo9DAAIfCQFIEb1x-j_e2t01BA`;

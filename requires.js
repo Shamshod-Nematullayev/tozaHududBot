@@ -1,5 +1,6 @@
 // node modules
 const fs = require("fs");
+const https = require("https");
 const path = require("path");
 const xlsx = require("json-as-xlsx");
 const htmlPDF = require("html-pdf");
@@ -47,6 +48,7 @@ const { Nazoratchi } = require("./models/Nazoratchi");
 module.exports = {
   // node modules
   fs,
+  https,
   path,
   xlsx,
   htmlPDF,

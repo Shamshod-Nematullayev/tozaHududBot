@@ -14,6 +14,7 @@ const schema = new Schema({
   receiver: String,
   sentOn: Date,
   type: String,
+  isSavedBilling: { type: Boolean, default: false },
 });
 
 module.exports.HybridMail = mongoose.model("hybrid_mail", schema);

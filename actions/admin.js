@@ -1,6 +1,6 @@
 const {
   getAllMails,
-  gertOneMailById,
+  getOneMailById,
   createMail,
 } = require("../api/hybrid.pochta.uz/");
 const { HybridMail } = require("../models/HybridMail");
@@ -71,6 +71,7 @@ const ADMIN_ACTIONS = [
   "ommaviy_shartnoma_biriktirish",
   "generateProkuraturaSudAriza",
   "sudBuyruqlariYaratish",
+  "Ogohlantish xati yuborish",
 ];
 
 function enterAdminAction(actionType) {
@@ -380,6 +381,8 @@ composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
 );
 async function createWarningLetterPDF(licshet) {
   const abonentData = await getAbonentSaldoData(licshet);
+  if (!abonentData)
+    return { success: false, message: "Abonent data not found" };
   const data = {
     FISH: abonentData.fio,
     MFY: abonentData.mahalla_name,
@@ -407,7 +410,7 @@ async function createWarningLetterPDF(licshet) {
       .toBuffer((err, str) => {
         if (err) return reject(err);
         const base64PDF = str.toString("base64");
-        resolve(base64PDF);
+        resolve({ success: true, data: base64PDF });
       });
   });
   return await convertPDF;
@@ -419,10 +422,13 @@ composer.hears(/xat_/g, async (ctx) => {
 
   const abonentData = await getAbonentSaldoData(licshet);
   const base64PDF = await createWarningLetterPDF(licshet);
+  if (!base64PDF.success) {
+    return ctx.reply(base64PDF.message);
+  }
   const newMail = await createMail(
     `${abonentData.mahalla_name}, ${abonentData.streets_name}`,
     abonentData.fio,
-    base64PDF
+    base64PDF.data
   );
   await HybridMail.create({
     licshet: licshet,

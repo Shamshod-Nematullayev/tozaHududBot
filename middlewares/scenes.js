@@ -75,6 +75,9 @@ const {
 const {
   set_monthly_plan,
 } = require("./scene/adminActions/cleancity/viloyat/setMonthlyPlan");
+const {
+  sendWarningLettersByHybrid,
+} = require("./scene/adminActions/sendWarningLettersByHybrid");
 
 const stage = new Scenes.Stage([
   newAdminScene,
@@ -113,6 +116,7 @@ const stage = new Scenes.Stage([
   sudBuyruqlariYaratish,
   set_monthly_plan,
   vaqtinchalikFunc,
+  sendWarningLettersByHybrid,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

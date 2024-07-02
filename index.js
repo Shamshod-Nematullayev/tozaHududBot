@@ -22,7 +22,7 @@ app.use("/api/inspectors", require("./routers/inspectorsRouter"));
 app.use("/api/abonents", require("./routers/abonentsRouter"));
 app.use("/api/billing", require("./routers/billing"));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, async () => {
   console.log(`Server listening port: ${PORT}`);
 });

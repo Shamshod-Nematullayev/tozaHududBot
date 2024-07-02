@@ -1,3 +1,5 @@
+const { fs, https } = require("../../requires");
+
 // headers for all requests
 const headers = {
   accept: "application/json, text/plain, */*",
@@ -35,7 +37,7 @@ const getAllMails = async function (limit, isSent) {
 };
 
 // get the all mails from the server
-const gertOneMailById = async function (mail_id) {
+const getOneMailById = async function (mail_id) {
   const response = await fetch(
     `https://hybrid.pochta.uz/api/mail?id=${mail_id}`,
     {
@@ -73,4 +75,41 @@ const createMail = async function (Address, Receiver, Document64) {
   return mails;
 };
 
-module.exports = { getAllMails, gertOneMailById, createMail };
+// get pdf file
+
+const getPdf = async function (mail_id) {
+  try {
+    const response = await fetch(
+      `https://hybrid.pochta.uz/api/PdfMail/${mail_id}`,
+      {
+        method: "GET",
+        headers: headers,
+        referrer: "https://hybrid.pochta.uz/",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        body: null,
+        mode: "cors",
+        credentials: "include",
+      }
+    );
+    const blobData = await response.blob();
+    const arrayBuffer = await blobData.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const filename = `./uploads/${mail_id}.pdf`; // Replace with actual filename
+
+    const fs = require("fs");
+    const promise = new Promise((resolve, reject) => {
+      fs.writeFile(`./${filename}`, buffer, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ ok: true, filename: filename });
+        }
+      });
+    });
+    return await promise;
+  } catch (err) {
+    return { ok: false, err };
+  }
+};
+
+module.exports = { getAllMails, getOneMailById, createMail, getPdf };

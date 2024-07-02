@@ -93,7 +93,7 @@ async function enterWarningLetterToBilling({
     await session.updateOne({
       $set: { "path.enterWarningLetterToBilling": findSudProccessPath[0] },
     });
-    return enterWarningLetterToBilling(arguments);
+    return await enterWarningLetterToBilling(arguments);
   }
 }
 
