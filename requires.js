@@ -16,8 +16,8 @@ const { find_address_by_pinfil_from_mvd } = require("./api/mvd-pinfil");
 const {
   getAbonentCardHtml,
   getAbonentSaldoData,
-  getAbonentDXJ,
-} = require("./api/cleancity/dxsh");
+} = require("./api/cleancity/dxsh/index");
+console.log({ getAbonentSaldoData });
 const {
   drawDebitViloyat,
 } = require("./middlewares/scene/adminActions/cleancity/viloyat/toSendDebitorReport");

@@ -7,7 +7,8 @@ const {
 const { INPUT_ABONENTS_LICSHET } = require("../../../constants");
 const { createInlineKeyboard } = require("../../../lib/keyboards");
 const { HybridMail } = require("../../../models/HybridMail");
-const { keyboards, getAbonentSaldoData } = require("../../../requires");
+const getAbonentSaldoData = require("../../../api/cleancity/dxsh/getAbonentSaldoData");
+const { keyboards } = require("../../../requires");
 const {
   handleTelegramExcel,
 } = require("../../smallFunctions/handleTelegramExcel");
@@ -16,7 +17,10 @@ const ejs = require("ejs");
 const path = require("path");
 
 const htmlPDF = require("html-pdf");
-const { enterWarningLetterToBilling } = require("../../../api/cleancity/dxsh");
+const {
+  enterWarningLetterToBilling,
+  confirmNewWarningLetterByLicshet,
+} = require("../../../api/cleancity/dxsh");
 const PDFMerger = require("pdf-merger-js");
 
 // required small functions
@@ -128,7 +132,6 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
     const results = [];
     async function loop() {
       if (counter == ctx.wizard.state.arrayMails.length) return;
-      console.log(counter);
       const row = ctx.wizard.state.arrayMails[counter];
       const response = await getOneMailById(row.mail_id);
       results.push(response);
@@ -169,6 +172,12 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
     async function loop() {
       if (counter == ctx.wizard.state.arrayMails.length) return;
       const row = ctx.wizard.state.arrayMails[counter];
+      const mail = await HybridMail.findById(row._id);
+      if (mail.isSavedBilling) {
+        counter++;
+        return;
+        //  return loop()
+      }
       const response = await getOneMailById(row.mail_id);
       const pdf = await getPdf(row.mail_id);
       if (!pdf.ok) return { success: false, message: pdf.err };
@@ -204,6 +213,8 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
                   );
                 };
                 await convert();
+                console.log(getAbonentSaldoData);
+                const abonentData = await getAbonentSaldoData(row.licshet);
                 const response = await enterWarningLetterToBilling({
                   lischet: row.lischet,
                   comment: "Gibrit pochta orqali yuborilgan ogohlantirish xati",
@@ -213,9 +224,14 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
                 });
 
                 if (response.success) {
-                  // await HybridMail.findByIdAndUpdate(row._id, {
-                  //   $set: { isSavedBilling: true },
-                  // });
+                  const res = await confirmNewWarningLetterByLicshet(
+                    row.lischet
+                  );
+                  if (res.success) {
+                    await HybridMail.findByIdAndUpdate(row._id, {
+                      $set: { isSavedBilling: true },
+                    });
+                  }
                 }
               }
             );
