@@ -62,7 +62,7 @@ router.post("/create-full-akt", upload.single("file"), async (req, res) => {
         filepath: path.join(__dirname, "../uploads/", req.file.filename),
         licshet: req.body.licshet,
         prescribed_cnt: req.body.prescribed_cnt,
-        stack_prescribed_akts_id: "7618", // yashovchi soni akt pachkasi har oy o'zgartiriladi
+        stack_prescribed_akts_id: "7941", // yashovchi soni akt pachkasi har oy o'zgartiriladi
       });
     }
     let qaytahisob = { success: true };
@@ -74,7 +74,7 @@ router.post("/create-full-akt", upload.single("file"), async (req, res) => {
         amount: req.body.amount,
         filepath: path.join(__dirname, "../uploads/", req.file.filename),
         licshet: req.body.licshet,
-        stack_akts_id: "4437436", // qayta hisob kitob aktlari har oy yangilanadi
+        stack_akts_id: "4439648", // qayta hisob kitob aktlari har oy yangilanadi
       });
     }
 
