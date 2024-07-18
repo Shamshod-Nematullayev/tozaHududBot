@@ -8,7 +8,6 @@ const enterQaytaHisobAkt = require("./enterQaytaHisobAkt");
 const getLastAlertLetter = require("./getLastAlertLetter");
 const confirmNewWarningLetterByLicshet = require("./confirmNewWarningLetterByLicshet");
 
-console.log({ getAbonentSaldoData });
 module.exports = {
   getAbonentCardHtml,
   getAbonentSaldoData,

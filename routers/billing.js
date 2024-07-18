@@ -1,6 +1,4 @@
-const {
-  enterQaytaHisobAkt,
-} = require("../api/cleancity/dxsh/enterQaytaHisobAkt");
+const enterQaytaHisobAkt = require("../api/cleancity/dxsh/enterQaytaHisobAkt");
 const { enterYashovchiSoniAkt } = require("../api/cleancity/dxsh");
 const { upload } = require("../middlewares/multer");
 const { CleanCitySession } = require("../models/CleanCitySession");

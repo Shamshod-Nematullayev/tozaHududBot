@@ -13,11 +13,8 @@ const {
   fetchEcoTranzaksiyalar,
 } = require("./middlewares/fetchEcopay");
 const { find_address_by_pinfil_from_mvd } = require("./api/mvd-pinfil");
-const {
-  getAbonentCardHtml,
-  getAbonentSaldoData,
-} = require("./api/cleancity/dxsh/index");
-console.log({ getAbonentSaldoData });
+const getAbonentCardHtml = require("./api/cleancity/dxsh/getAbonentCardHTML");
+const getAbonentSaldoData = require("./api/cleancity/dxsh/getAbonentSaldoData");
 const {
   drawDebitViloyat,
 } = require("./middlewares/scene/adminActions/cleancity/viloyat/toSendDebitorReport");

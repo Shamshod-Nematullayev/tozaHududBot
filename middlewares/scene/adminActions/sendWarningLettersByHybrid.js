@@ -131,7 +131,12 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
     let counter = 0;
     const results = [];
     async function loop() {
-      if (counter == ctx.wizard.state.arrayMails.length) return;
+      if (counter == ctx.wizard.state.arrayMails.length) {
+        ctx.replyWithHTML(
+          `Tasdiqlangan xatlar: ${results.length} / ${ctx.wizard.state.arrayMails.length}`
+        );
+        return;
+      }
       const row = ctx.wizard.state.arrayMails[counter];
       const response = await getOneMailById(row.mail_id);
       results.push(response);
@@ -175,10 +180,11 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
       const mail = await HybridMail.findById(row._id);
       if (mail.isSavedBilling) {
         counter++;
+        loop();
         return;
-        //  return loop()
       }
       const response = await getOneMailById(row.mail_id);
+      console.log({ row });
       const pdf = await getPdf(row.mail_id);
       if (!pdf.ok) return { success: false, message: pdf.err };
 
@@ -213,10 +219,9 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
                   );
                 };
                 await convert();
-                console.log(getAbonentSaldoData);
                 const abonentData = await getAbonentSaldoData(row.licshet);
                 const response = await enterWarningLetterToBilling({
-                  lischet: row.lischet,
+                  lischet: row.licshet,
                   comment: "Gibrit pochta orqali yuborilgan ogohlantirish xati",
                   qarzdorlik: abonentData.saldo_k,
                   sana: bugungiSana(),
@@ -225,21 +230,20 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
 
                 if (response.success) {
                   const res = await confirmNewWarningLetterByLicshet(
-                    row.lischet
+                    row.licshet
                   );
                   if (res.success) {
                     await HybridMail.findByIdAndUpdate(row._id, {
                       $set: { isSavedBilling: true },
                     });
+                    counter++;
+                    loop();
                   }
                 }
               }
             );
         }
       );
-
-      // counter++;
-      // await loop();
     }
     await loop();
   }

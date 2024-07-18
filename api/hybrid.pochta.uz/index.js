@@ -1,11 +1,9 @@
-const { fs, https } = require("../../requires");
-
 // headers for all requests
 const headers = {
   accept: "application/json, text/plain, */*",
   "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7,ru;q=0.6",
   authorization:
-    "Bearer eJY9Px0AJbg_HvQCaUj0l6v9to4pUnyOkWhuzBd3DAc_bUMeAWAAnCVaUhmsXbIgYGjOXfX4lW-KGi-2OXj37QNXoWVC-dxqzNK2toNiUyePDlueEs6yLP0hWF0Ul-frcnt8P0IliEM-_L8X6B5S-i72DPmlY_ee-oRmQWSzfcXB4H1-tmCBxnqWOI9HR0D9qWAISeJSZEqBEk4D4lPBxr7J6rga7WlrFr2AWX0ekCQ87Me5A5XVD9RvTVP4M10lsshWoqHHG2ZUapG7CYZKlKRqTDCPciUznetOPuEuWl8aKRzg_Id268uW9spyU8Bx",
+    "Bearer T6FsPQvnNUzrwmC9QMNCQVJFrBKidsQ0XMcRozAPXWrB-3BVRQW9sgJ7hUHhvINw-P4U5fjcG0jvppr3my_F8R5BtAVp2tJ-CHS2ZDgxGPw5elNOIg0ZJVVIcyTKA-TQjpLEg46XSg2RhVXo5Ueg76kU87ks8EUzbpZLmQkM18EDJnc5Ta5uj8bsivz9lxoynNcrh_rNXFgauNBYIirJ14_uXAcQ-5Ld_NhglbwJ4fOLBktgOP5r1df5w2DFn9Egib0e4iLD3OiHiT0jnQAd4o8QiYdQIupwa3c0Bqn0KvA5jSocU-pwPAIReQ03o8Zi",
   "content-type": "application/json;charset=UTF-8",
   "sec-ch-ua":
     '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
@@ -31,7 +29,10 @@ const getAllMails = async function (limit, isSent) {
       mode: "cors",
       credentials: "include",
     }
-  );
+  ).catch((err) => {
+    console.error(err);
+  });
+
   const mails = await response.json();
   return mails;
 };
@@ -45,11 +46,11 @@ const getOneMailById = async function (mail_id) {
       headers: headers,
       referrer: "https://hybrid.pochta.uz/",
       referrerPolicy: "strict-origin-when-cross-origin",
-      body: null,
       mode: "cors",
       credentials: "include",
     }
   );
+
   const mails = await response.json();
   return mails;
 };

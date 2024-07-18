@@ -7,6 +7,7 @@ const fs = require("fs");
 
 const { CleanCitySession } = require("../models/CleanCitySession");
 const { SudMaterial } = require("../models/SudMaterial");
+const { SudAkt } = require("../models/SudAkt");
 const { Mahalla } = require("../models/Mahalla");
 
 (async function () {
@@ -271,5 +272,36 @@ async function sendToSudMaterial(pachka_id) {
   }
   await update();
 }
+async function updateMongo() {
+  const sud_akts = await SudAkt.find();
+  let counter = 0;
 
+  async function loop() {
+    if (counter == sud_akts.length) return console.log("Bajarildi");
+    const akt = sud_akts[counter];
+
+    if (true) {
+      const parts = akt["Ogohlantirilgan sana"].split("-");
+      const day = parseInt(parts[0], 10); // Convert to integer
+      const month = parseInt(parts[1], 10) - 1; // Month in JavaScript Date is 0-indexed (0 for January)
+      const year = parseInt(parts[2], 10);
+      // Create a new Date object using the components
+      const parsedDate = new Date(year, month, day);
+
+      await SudAkt.findByIdAndUpdate(akt._id, {
+        // $set: { warning_sended_date: parsedDate },
+        $unset: { "Ogohlantirilgan sana": 1 },
+      });
+      counter++;
+      console.log(counter);
+      await loop();
+    } else {
+      counter++;
+      console.log(counter);
+      await loop();
+    }
+  }
+  await loop();
+}
+// updateMongo();
 // sendToSudMaterial("663dea41d85ea026bf29f561");

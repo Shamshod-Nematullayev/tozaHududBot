@@ -83,7 +83,15 @@ const confirmGuvohnomaScene = new Scenes.WizardScene(
           .then(() => {
             ctx.reply(messages.sended);
             return ctx.scene.leave();
+          })
+          .catch((err) => {
+            console.error(err);
+            ctx.reply("Userga javobini qaytarishda xatolik");
           });
+      })
+      .catch((err) => {
+        console.error(err);
+        ctx.reply("Telegramdagi xabarni o'zgarishda xatolik");
       });
   }
 );
