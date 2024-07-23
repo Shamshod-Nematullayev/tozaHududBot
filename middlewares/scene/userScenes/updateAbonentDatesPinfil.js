@@ -201,4 +201,11 @@ updateAbonentDatesByPinfl.enter((ctx) => {
   ctx.reply(`Abonent shaxsiy raqamini kiriting`);
 });
 
+updateAbonentDatesByPinfl.on("text", (ctx, next) => {
+  if (isCancel(ctx.message.text)) {
+    ctx.reply("Bekor qilindi");
+    return ctx.scene.leave();
+  } else next();
+});
+
 module.exports = { updateAbonentDatesByPinfl };

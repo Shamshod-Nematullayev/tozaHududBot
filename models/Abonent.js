@@ -56,6 +56,12 @@ const schema = new Schema(
         confirm: false,
       },
     },
+    ekt_kod_tasdiqlandi: {
+      type: Object,
+      default: {
+        confirm: false,
+      },
+    },
   },
   {
     timestamps: true,
