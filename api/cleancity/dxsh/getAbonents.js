@@ -29,15 +29,17 @@ const getAbonents = async ({ mfy_id }) => {
         {
           headers,
           referrerPolicy: "strict-origin-when-cross-origin",
-          body: `&mes=${
+          body: `mahallas_id=${mfy_id}&mes=${
             date.getMonth() + 1
-          }&god=${date.getFullYear()}&page=1&rows=20&sort=a.id&order=asc`,
+          }&god=${date.getFullYear()}&page=1&rows=2000&sort=a.id&order=asc`,
           method: "POST",
           mode: "cors",
           credentials: "include",
         }
       );
-      const data = (await res.json()).rows[0];
+
+      const a = await res.json();
+      const data = a.rows;
       return data;
     }
     // Agar oldindan abonent ma'lumotlarini olish path mavjud bo'lmasa
@@ -53,14 +55,14 @@ const getAbonents = async ({ mfy_id }) => {
     const res = await fetch(process.env.CLEAN_CITY_DOMEN + getAbonents, {
       headers,
       referrerPolicy: "strict-origin-when-cross-origin",
-      body: `licshet=${litsavoy}&mes=${
+      body: `mahallas_id=${mfy_id}&mes=${
         date.getMonth() + 1
-      }&god=${date.getFullYear()}&page=1&rows=20&sort=a.id&order=asc`,
+      }&god=${date.getFullYear()}&page=1&rows=2000&sort=a.id&order=asc`,
       method: "POST",
       mode: "cors",
       credentials: "include",
     });
-    const data = (await res.json()).rows[0];
+    const data = (await res.json()).rows;
     return data;
   } catch (error) {
     throw error;

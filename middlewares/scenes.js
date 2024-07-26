@@ -79,6 +79,9 @@ const {
   sendWarningLettersByHybrid,
 } = require("./scene/adminActions/sendWarningLettersByHybrid");
 const { updateElektrKod } = require("./scene/userScenes/updateElektrKod");
+const {
+  changeAbonentStreet,
+} = require("./scene/userScenes/changeAbonentStreet");
 
 const stage = new Scenes.Stage([
   newAdminScene,
@@ -119,6 +122,7 @@ const stage = new Scenes.Stage([
   vaqtinchalikFunc,
   sendWarningLettersByHybrid,
   updateElektrKod,
+  changeAbonentStreet,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

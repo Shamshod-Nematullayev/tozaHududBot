@@ -8,6 +8,9 @@ composer.hears(["👤Yangi abonent ochish", "👤Янги абонент"], (ctx
 composer.hears(["🔎Izlash", "🔎Излаш"], (ctx) => {
   ctx.reply(messages.izlashUsuliTanlash, keyboards[ctx.session.til].searchType);
 });
+composer.hears(["🔌ЭЛЕКТР КОДИ🔌", "🔌ELEKTR KODI🔌"], async (ctx) => {
+  ctx.scene.enter("updateElektrKod");
+});
 composer.action("searchByID", (ctx) => {
   ctx.scene.enter("searchByID");
 });
@@ -81,6 +84,7 @@ const actions = [
   "multiply_livings",
   "update_abonent_date_by_pinfil",
   "connect_phone_number",
+  "changeAbonentStreet",
 ];
 
 actions.forEach((action) => {

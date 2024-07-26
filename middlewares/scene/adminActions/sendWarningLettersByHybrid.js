@@ -102,7 +102,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           receiver: abonentData.fio,
         });
         arrayMails.push({
-          mail_id: newMail.Id,
+          hybridMailId: newMail.Id,
           _id: newMailOnDB._id,
           licshet: licshet,
         });
@@ -138,7 +138,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
         return;
       }
       const row = ctx.wizard.state.arrayMails[counter];
-      const response = await getOneMailById(row.mail_id);
+      const response = await getOneMailById(row.hybridMailId);
       results.push(response);
       if (response.IsSent) {
         await HybridMail.findByIdAndUpdate(row._id, {
@@ -173,9 +173,12 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
         createInlineKeyboard([[["Billingga yuklash ⬆️", "uploadToBilling"]]])
       );
     ctx.reply("Tekshirish");
-    let counter = 0;
+    let counter = 300;
     async function loop() {
-      if (counter == ctx.wizard.state.arrayMails.length) return;
+      if (counter == ctx.wizard.state.arrayMails.length) {
+        await ctx.reply("Billingga yuklab bo'ldim.");
+        return ctx.scene.leave();
+      }
       const row = ctx.wizard.state.arrayMails[counter];
       const mail = await HybridMail.findById(row._id);
       if (mail.isSavedBilling) {
@@ -183,9 +186,9 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
         loop();
         return;
       }
-      const response = await getOneMailById(row.mail_id);
       console.log({ row });
-      const pdf = await getPdf(row.mail_id);
+      const response = await getOneMailById(row.hybridMailId);
+      const pdf = await getPdf(row.hybridMailId);
       if (!pdf.ok) return { success: false, message: pdf.err };
 
       ejs.renderFile(
@@ -197,7 +200,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           htmlPDF
             .create(str, { format: "A4", orientation: "portrait" })
             .toFile(
-              "./uploads/cash" + row.mail_id + ".pdf",
+              "./uploads/cash" + row.hybridMailId + ".pdf",
               async (err, res) => {
                 if (err) return console.error(err);
 
@@ -205,7 +208,9 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
                 const convert = async () => {
                   await merger.add(pdf.filename);
 
-                  await merger.add("./uploads/cash" + row.mail_id + ".pdf");
+                  await merger.add(
+                    "./uploads/cash" + row.hybridMailId + ".pdf"
+                  );
 
                   // Set metadata
                   await merger.setMetadata({
@@ -220,6 +225,11 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
                 };
                 await convert();
                 const abonentData = await getAbonentSaldoData(row.licshet);
+                if (!abonentData) {
+                  ctx.reply(row.licshet + ": " + "Abonent topilmadi");
+                  counter++;
+                  return loop();
+                }
                 const response = await enterWarningLetterToBilling({
                   lischet: row.licshet,
                   comment: "Gibrit pochta orqali yuborilgan ogohlantirish xati",
@@ -236,6 +246,13 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
                     await HybridMail.findByIdAndUpdate(row._id, {
                       $set: { isSavedBilling: true },
                     });
+                    counter++;
+                    loop();
+                  }
+                } else {
+                  console.error(response);
+                  ctx.reply(row.licshet + ": " + response.msg);
+                  if (response.msg == "Сумма не корректно") {
                     counter++;
                     loop();
                   }

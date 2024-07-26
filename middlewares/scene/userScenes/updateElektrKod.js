@@ -121,7 +121,7 @@ const updateElektrKod = new Scenes.WizardScene(
           return ctx.answerCbQuery(res.msg);
         }
 
-        await Abonent.findByIdAndUpdate(ctx.wizard.state.abonent._id, {
+        await Abonent.findByIdAndUpdate(abonent._id, {
           $set: {
             ekt_kod_tasdiqlandi: {
               confirm: true,

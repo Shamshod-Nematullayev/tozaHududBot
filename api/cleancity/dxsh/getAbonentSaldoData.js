@@ -56,7 +56,7 @@ const getAbonentSaldoData = async (litsavoy) => {
       process.env.CLEAN_CITY_DOMEN + getAbonentSaldoData,
       {
         headers,
-        referrerPolicy: "strict-origin-when-cross-origin",
+        referrerPolicy: "strict-origin- when-cross-origin",
         body: `licshet=${litsavoy}&mes=${
           date.getMonth() + 1
         }&god=${date.getFullYear()}&page=1&rows=20&sort=a.id&order=asc`,

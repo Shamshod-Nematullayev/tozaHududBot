@@ -29,6 +29,10 @@ const schema = new mongoose.Schema({
   xotinqizlar_phone: String,
   uchastkavoy_name: String,
   uchastkavoy_phone: String,
+  abarotka_berildi: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports.Mahalla = mongoose.model("mahalla", schema);

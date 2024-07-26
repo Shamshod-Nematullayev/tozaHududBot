@@ -16,6 +16,7 @@ async function enterWarningLetterToBilling({
   const session = await CleanCitySession.findOne({ type: "dxsh" });
 
   if (session.path.enterWarningLetterToBilling) {
+    console.log(file_path);
     let options = {
       method: "POST",
       url: `https://cleancity.uz/${session.path.enterWarningLetterToBilling}&resource_types_id=15&system_companies_id=1144&licshet=${lischet}`,

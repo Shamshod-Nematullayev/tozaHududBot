@@ -40,12 +40,10 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         const abonent = await Abonent.findOne({
           pinfl: parseInt(ctx.message.text),
         });
-        if (abonent) {
-          if (abonent.mahallas_id != 60364) {
-            return ctx.reply(
-              `Ushbu abonentga ${abonent.licshet} hisob raqami ochilgan`
-            );
-          }
+        if (abonent && abonent.shaxsi_tasdiqlandi?.confirm) {
+          return ctx.reply(
+            `Ushbu abonentga ${abonent.licshet} hisob raqami ochilgan`
+          );
         }
 
         const customDates = await find_one_by_pinfil_from_mvd(ctx.message.text);

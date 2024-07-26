@@ -98,11 +98,6 @@ composer.hears(["👨‍💻 Ish maydoni", "👨‍💻 Иш майдони"], a
 
   ctx.reply(messages.chooseMenu, keyboards[ctx.session.til].adminWorkSpace);
 });
-composer.hears(["🔌ЭЛЕКТР КОДИ🔌", "🔌ELEKTR KODI🔌"], async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-
-  ctx.scene.enter("updateElektrKod");
-});
 
 composer.action("CHARGE_VILOYAT_LOGIN", async (ctx) => {
   await ctx.deleteMessage();

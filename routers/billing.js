@@ -1,7 +1,7 @@
 const enterQaytaHisobAkt = require("../api/cleancity/dxsh/enterQaytaHisobAkt");
 const { enterYashovchiSoniAkt } = require("../api/cleancity/dxsh");
 const { upload } = require("../middlewares/multer");
-const { CleanCitySession } = require("../models/CleanCitySession");
+const { Mahalla } = require("../models/Mahalla");
 const { Counter } = require("../models/Counter");
 const { IncomingDocument } = require("../models/IncomingDocument");
 const cc = `https://cleancity.uz/`;
@@ -9,6 +9,7 @@ const { bot } = require("../core/bot");
 const path = require("path");
 const { getAbonentDXJ } = require("../api/cleancity/dxsh");
 const { getAbonentDataByLicshet } = require("../api/cleancity/dxsh");
+const getAbonents = require("../api/cleancity/dxsh/getAbonents");
 
 const router = require("express").Router();
 router.get("/next-incoming-document-number", async (req, res) => {
@@ -99,6 +100,75 @@ router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
       rows: data.rows,
       abonentData: abonentData.rows[0],
     });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
+
+const uchirilishiKerakBulganAbonentlar = [105120350731];
+router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
+  try {
+    const data = await getAbonents({ mfy_id: req.params.mfy_id });
+    const filteredData = data.filter((abonent) => {
+      return !uchirilishiKerakBulganAbonentlar.includes(
+        Number(abonent.licshet)
+      );
+    });
+    res.json({ ok: true, data: filteredData });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
+
+router.get("/get-all-active-mfy", async (req, res) => {
+  try {
+    const data = await Mahalla.find({ reja: { $gt: 0 } });
+    res.json({ ok: true, data });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
+
+router.get("/abarotka-berildi/:mfy_id", async (req, res) => {
+  try {
+    const result = await Mahalla.updateOne(
+      { id: req.params.mfy_id },
+      { $set: { abarotka_berildi: true } }
+    );
+    if (!result.modifiedCount) {
+      return res.json({ ok: false, message: "Mahalla topilmadi" });
+    }
+    res.json({ ok: true, message: "Updated" });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
+router.get("/abarotka-berilmadi/:mfy_id", async (req, res) => {
+  try {
+    const result = await Mahalla.updateOne(
+      { id: req.params.mfy_id },
+      { $set: { abarotka_berildi: false } }
+    );
+    if (!result.modifiedCount) {
+      return res.json({ ok: false, message: "Mahalla topilmadi" });
+    }
+    res.json({ ok: true, message: "Updated" });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
+router.get("/barchasiga-abarotka-berilmadi", async (req, res) => {
+  try {
+    await Mahalla.updateMany(
+      { reja: { $gt: 0 } },
+      { $set: { abarotka_berildi: false } }
+    );
+    res.json({ ok: true, message: "Updated" });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
     console.error(error);

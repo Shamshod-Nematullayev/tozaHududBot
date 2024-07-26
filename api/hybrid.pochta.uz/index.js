@@ -3,7 +3,7 @@ const headers = {
   accept: "application/json, text/plain, */*",
   "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7,ru;q=0.6",
   authorization:
-    "Bearer T6FsPQvnNUzrwmC9QMNCQVJFrBKidsQ0XMcRozAPXWrB-3BVRQW9sgJ7hUHhvINw-P4U5fjcG0jvppr3my_F8R5BtAVp2tJ-CHS2ZDgxGPw5elNOIg0ZJVVIcyTKA-TQjpLEg46XSg2RhVXo5Ueg76kU87ks8EUzbpZLmQkM18EDJnc5Ta5uj8bsivz9lxoynNcrh_rNXFgauNBYIirJ14_uXAcQ-5Ld_NhglbwJ4fOLBktgOP5r1df5w2DFn9Egib0e4iLD3OiHiT0jnQAd4o8QiYdQIupwa3c0Bqn0KvA5jSocU-pwPAIReQ03o8Zi",
+    "Bearer zjfvnj6Q2RcIwn9a4ajvi4gIak_bGu5JF9PlvryoCso_ANJWCL2FCw8avaw-VGEsEXbWk_E_J-9zFtne8WEIYj4IANpvenhojCMHol-pYGu1zF_5uZwjkNP8QzVv3PO54zHP2JX5EOG3VKsludsMlXa0AB4SmTsw4f6_l2-9q-kFsgJfC_bqhTesjS3t1Vpnp-mJYE9hN8EL15hJGOCtvB3qlHNRrHv6XmQz--jp2v_pxJtF7rU-4Ai216tPdcL6trwy9SGNMDP23_6EhjThlawrSdPNKk1mBBFlZ94jPX2U9FbfOD1uBU8OSZB4rBtu",
   "content-type": "application/json;charset=UTF-8",
   "sec-ch-ua":
     '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',

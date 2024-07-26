@@ -62,6 +62,12 @@ const schema = new Schema(
         confirm: false,
       },
     },
+    street_tasdiqlandi: {
+      type: Object,
+      default: {
+        confirm: false,
+      },
+    },
   },
   {
     timestamps: true,
