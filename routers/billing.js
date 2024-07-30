@@ -10,6 +10,7 @@ const path = require("path");
 const { getAbonentDXJ } = require("../api/cleancity/dxsh");
 const { getAbonentDataByLicshet } = require("../api/cleancity/dxsh");
 const getAbonents = require("../api/cleancity/dxsh/getAbonents");
+const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 
 const router = require("express").Router();
 router.get("/next-incoming-document-number", async (req, res) => {
@@ -110,11 +111,16 @@ const uchirilishiKerakBulganAbonentlar = [105120350731];
 router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
   try {
     const data = await getAbonents({ mfy_id: req.params.mfy_id });
-    const filteredData = data.filter((abonent) => {
+    let filteredData = data.filter((abonent) => {
       return !uchirilishiKerakBulganAbonentlar.includes(
         Number(abonent.licshet)
       );
     });
+    filteredData = filteredData.map((abonent) => ({
+      ...abonent,
+      fio: kirillga(abonent.fio),
+    }));
+    filteredData.sort((a, b) => a.fio.localeCompare(b.fio));
     res.json({ ok: true, data: filteredData });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
@@ -125,7 +131,12 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
 router.get("/get-all-active-mfy", async (req, res) => {
   try {
     const data = await Mahalla.find({ reja: { $gt: 0 } });
-    res.json({ ok: true, data });
+    const mahallalar = data.map((mfy) => {
+      return { id: mfy.id, name: mfy.name, printed: mfy.abarotka_berildi };
+    });
+    mahallalar.sort((a, b) => a.name.localeCompare(b.name));
+    mahallalar.sort((a, b) => parseInt(a.printed) - parseInt(b.printed));
+    res.json({ ok: true, data: mahallalar });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
     console.error(error);
@@ -169,6 +180,17 @@ router.get("/barchasiga-abarotka-berilmadi", async (req, res) => {
       { $set: { abarotka_berildi: false } }
     );
     res.json({ ok: true, message: "Updated" });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
+router.get("/get-mfy-by-id/:mfy_id", async (req, res) => {
+  try {
+    const mahalla = await Mahalla.findOne({ id: req.params.mfy_id });
+    if (!mahalla) return res.json({ ok: false, message: "MFY not found" });
+
+    res.json({ ok: true, data: mahalla });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
     console.error(error);
