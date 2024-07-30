@@ -1,0 +1,21 @@
+warning: in the working copy of 'middlewares/scene/adminActions/generateSudBuyruq.js', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/middlewares/scene/adminActions/generateSudBuyruq.js b/middlewares/scene/adminActions/generateSudBuyruq.js[m
+[1mindex 103d18c..2fdcebb 100644[m
+[1m--- a/middlewares/scene/adminActions/generateSudBuyruq.js[m
+[1m+++ b/middlewares/scene/adminActions/generateSudBuyruq.js[m
+[36m@@ -100,10 +100,11 @@[m [mconst generateSBuyruq = new Scenes.WizardScene([m
+ );[m
+ [m
+ generateSBuyruq.enter((ctx) => {[m
+[31m-  ctx.replyWithDocument(importSudBuyruqlariExample, {[m
+[31m-    caption: `Sud buyruqlari generatsiya qilinadigan abonentlar ma'lumotini ushbu shablonga ko'ra menga yuboring!`,[m
+[31m-    reply_markup: keyboards.lotin.cancelBtn,[m
+[31m-  });[m
+[32m+[m[32m  // ctx.replyWithDocument(importSudBuyruqlariExample, {[m
+[32m+[m[32m  //   caption: `Sud buyruqlari generatsiya qilinadigan abonentlar ma'lumotini ushbu shablonga ko'ra menga yuboring!`,[m
+[32m+[m[32m  //   reply_markup: keyboards.lotin.cancelBtn,[m
+[32m+[m[32m  // });[m
+[32m+[m[32m  ctx.reply("Kirit");[m
+ });[m
+ [m
+ module.exports = { generateSBuyruq };[m
