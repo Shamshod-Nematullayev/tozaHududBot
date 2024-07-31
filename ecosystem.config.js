@@ -17,6 +17,7 @@ module.exports = {
         "uploads",
         "/uploads",
         "./uploads",
+        "./.git",
         "lib",
       ],
       env: {

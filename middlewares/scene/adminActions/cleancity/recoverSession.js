@@ -3,11 +3,16 @@ const { CleanCitySession } = require("../../../../models/CleanCitySession");
 const { JSDOM } = require("jsdom");
 const nodeFetch = require("node-fetch");
 const fs = require("fs");
+const {
+  clearMessages,
+} = require("../../../smallFunctions/clearMessagesForDelete");
 
 const recoverCleanCitySession = new Scenes.WizardScene(
   "recover_clean_city_session",
   async (ctx) => {
     try {
+      ctx.session.messages_for_delete.push(ctx.message.message_id);
+      clearMessages(ctx);
       const session = await CleanCitySession.findOne({
         type: ctx.session.session_type,
       });
@@ -57,7 +62,11 @@ const recoverCleanCitySession = new Scenes.WizardScene(
                 }
               )
               .then(() => {
+<<<<<<< HEAD
                 fs.unlink("./captcha.png");
+=======
+                fs.unlink("./captcha.png", () => {});
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
               });
           })
         );
@@ -70,7 +79,8 @@ const recoverCleanCitySession = new Scenes.WizardScene(
         path: {},
         active: true,
       });
-      ctx.reply("Muvaffaqqiyatli login qilindi");
+      const msg = await ctx.reply("Muvaffaqqiyatli login qilindi");
+      ctx.session.messages_for_delete.push(msg.message_id);
       ctx.scene.leave();
     } catch (err) {
       ctx.reply("error step 1, recover_clean_city_session");
@@ -84,9 +94,10 @@ recoverCleanCitySession.enter(async (ctx) => {
     const resHomePage = await fetch("https://cleancity.uz/home");
     ctx.session.cookie = resHomePage.headers.get("set-cookie");
     if (ctx.session.cookie == null) return console.log("Xatolik");
-    ctx.reply("Cookie: <code>" + ctx.session.cookie + "</code>", {
-      parse_mode: "HTML",
-    });
+    const msg = await ctx.replyWithHTML(
+      "Cookie: <code>" + ctx.session.cookie + "</code>"
+    );
+    ctx.session.messages_for_delete.push(msg.message_id);
     const textHomePage = await resHomePage.text();
     const homepage = new JSDOM(textHomePage);
 
@@ -106,9 +117,6 @@ recoverCleanCitySession.enter(async (ctx) => {
       .getElementById("submit_btn")
       .getAttribute("onclick")
       .split("'")[3];
-    ctx.reply(`<code>${ctx.session.loginpath}</code>`, {
-      parse_mode: "HTML",
-    });
     const captchaImg = await nodeFetch(
       `https://cleancity.uz/home/${loginpage.querySelector(".captcha").src}`,
       {
@@ -119,10 +127,15 @@ recoverCleanCitySession.enter(async (ctx) => {
     );
     captchaImg.body.pipe(
       fs.createWriteStream("./captcha.png").on("finish", () => {
-        ctx.replyWithPhoto(
-          { source: "./captcha.png" },
-          { caption: "Rasmdagi belgilarni kiriting" }
-        );
+        ctx
+          .replyWithPhoto(
+            { source: "./captcha.png" },
+            { caption: "Rasmdagi belgilarni kiriting" }
+          )
+          .then((msg) => {
+            ctx.session.messages_for_delete.push(msg.message_id);
+            fs.unlink("./captcha.png", () => {});
+          });
       })
     );
   } catch (error) {

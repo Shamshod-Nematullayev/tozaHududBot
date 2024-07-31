@@ -8,6 +8,10 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  is_stm_xodimi: {
+    type: Boolean,
+    default: false,
+  },
   created: Date,
 });
 

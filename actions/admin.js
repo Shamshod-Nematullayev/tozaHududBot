@@ -1,48 +1,25 @@
-const { Composer } = require("telegraf");
-const { bot } = require("../core/bot");
-const { keyboards } = require("../lib/keyboards");
-const { messages } = require("../lib/messages");
-const { Admin } = require("../models/Admin");
-const { drawAndSendTushum } = require("../middlewares/drawTushum");
 const {
+  getAllMails,
+  getOneMailById,
+  createMail,
+} = require("../api/hybrid.pochta.uz/");
+const { HybridMail } = require("../models/HybridMail");
+const {
+  // node modules
+  fs,
+  path,
+  xlsx,
+  htmlPDF,
+  ejs,
+  // required functions
+  drawAndSendTushum,
   fetchEcopayTushum,
   fetchEcoTranzaksiyalar,
-} = require("../middlewares/fetchEcopay");
-const { CleanCitySession } = require("../models/CleanCitySession");
-const {
   drawDebitViloyat,
-} = require("../middlewares/scene/adminActions/cleancity/viloyat/toSendDebitorReport");
-const {
   yashovchiSoniKopaytirish,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/yashovchiSoniKopaytirish");
-const { Counter } = require("../models/Counter");
-const { Guvohnoma } = require("../models/Guvohnoma");
-const { MultiplyRequest } = require("../models/MultiplyRequest");
-const {
-  yangiAbonent,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/yangiAbonent");
-const {
-  find_one_by_pinfil_from_mvd,
   find_address_by_pinfil_from_mvd,
-} = require("../api/mvd-pinfil");
-const {
-  changeAbonentDates,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");
-const {
-  sendMahallaKunlikTushum,
-  getMahallaKunlikTushum,
-  drawMahallaKunlikTushum,
-} = require("../intervals/mahallaKunlikTushum");
-const { Abonent } = require("../models/Abonent");
-const fs = require("fs");
-const path = require("path");
-const xlsx = require("json-as-xlsx");
-const { Bildirishnoma } = require("../models/SudBildirishnoma");
-const {
-  importAlertLetter,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/importAlertLetter");
-const {
   getAbonentCardHtml,
+<<<<<<< HEAD
 } = require("../api/cleancity/dxsh/getAbonentCardHTML");
 const htmlPDF = require("html-pdf");
 const {
@@ -51,10 +28,43 @@ const {
 const {
   enterWarningLetterToBilling,
 } = require("../api/cleancity/dxsh/enterWarningLetterToBilling");
+=======
+  getAbonentSaldoData,
+  // telegraf resourses
+  Composer,
+  bot,
+  keyboards,
+  messages,
+  // mongo models
+  Admin,
+  CleanCitySession,
+  Counter,
+  Guvohnoma,
+  Abonent,
+  Bildirishnoma,
+  MultiplyRequest,
+} = require("./../requires");
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 
-// =====================================================================================
+// small required functions =========================================================================
+function bugungiSana() {
+  const date = new Date();
+  return `${date.getDate()}.${
+    date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1
+  }.${date.getFullYear()}`;
+}
+
+async function isAdmin(ctx) {
+  if (!ctx) return false;
+
+  const admins = await Admin.find();
+  return admins.some((admin) => admin.user_id === ctx.from.id);
+}
+
+// Main codes =====================================================================================
 const composer = new Composer();
 
+//  Entering scenes by inline button =========================================
 const ADMIN_ACTIONS = [
   "import_abonents_data",
   "generate_sud_buyruq",
@@ -71,15 +81,9 @@ const ADMIN_ACTIONS = [
   "get_sud_material",
   "ommaviy_shartnoma_biriktirish",
   "generateProkuraturaSudAriza",
+  "sudBuyruqlariYaratish",
+  "Ogohlantish xati yuborish",
 ];
-
-// main required functions
-async function isAdmin(ctx) {
-  if (!ctx) return false;
-
-  const admins = await Admin.find();
-  return admins.some((admin) => admin.user_id === ctx.from.id);
-}
 
 function enterAdminAction(actionType) {
   if (!actionType) return;
@@ -88,12 +92,12 @@ function enterAdminAction(actionType) {
     if (isAdmin(ctx)) {
       ctx.deleteMessage();
       ctx.scene.enter(actionType);
-    } else {
-      ctx.reply(messages.youAreNotAdmin);
-    }
+    } else ctx.reply(messages.youAreNotAdmin);
   });
 }
 ADMIN_ACTIONS.forEach((actionType) => enterAdminAction(actionType));
+
+// ============================================================
 
 composer.command("admin", async (ctx) => {
   const admins = await Admin.find();
@@ -106,15 +110,8 @@ composer.hears(["👨‍💻 Ish maydoni", "👨‍💻 Иш майдони"], a
   ctx.reply(messages.chooseMenu, keyboards[ctx.session.til].adminWorkSpace);
 });
 
-composer.hears(["Тушумни ташлаш", "Tushumni tashlash"], async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-
-  ctx.scene.enter("import_income_report");
-});
-
 composer.action("CHARGE_VILOYAT_LOGIN", async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-
+  await ctx.deleteMessage();
   const session = await CleanCitySession.findOne({
     type: "stm_reports",
   });
@@ -124,17 +121,6 @@ composer.action("CHARGE_VILOYAT_LOGIN", async (ctx) => {
     ctx.session.session_type = "stm_reports";
     ctx.scene.enter("recover_clean_city_session");
   }
-});
-
-// ======================== Special functions (not required just shortcuts) ========================//
-composer.command("tushum", async (ctx) => {
-  const data = await fetchEcopayTushum();
-  fetchEcoTranzaksiyalar();
-  drawAndSendTushum(data, ctx);
-});
-
-composer.hears("debit", (ctx) => {
-  drawDebitViloyat("toMySelf");
 });
 
 composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
@@ -233,10 +219,22 @@ composer.action(/done_\w+/g, async (ctx) => {
         process.env.CHANNEL,
         ctx.callbackQuery.message.message_id
       );
+      await ctx.deleteMessage(ctx.callbackQuery.message.message_id);
     }
   } catch (error) {
     console.log(error);
   }
+});
+
+// ======================== Special functions (not required just shortcuts) ========================//
+composer.command("tushum", async (ctx) => {
+  const data = await fetchEcopayTushum();
+  fetchEcoTranzaksiyalar();
+  drawAndSendTushum(data, ctx);
+});
+
+composer.hears("debit", (ctx) => {
+  drawDebitViloyat("toMySelf");
 });
 
 composer.hears("Aborotka chiqorish", async (ctx) => {
@@ -245,11 +243,7 @@ composer.hears("Aborotka chiqorish", async (ctx) => {
 });
 
 composer.hears(/mvd_\w+/g, (ctx) => {
-  // find_one_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
-  //   (res) => {
-  //     console.log(res);
-  //   }
-  // );
+  console.log("here");
   find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1]))
     .then((res) => {
       console.log(res);
@@ -261,11 +255,6 @@ composer.hears(/mvd_\w+/g, (ctx) => {
     .catch((err) => console.log(err));
 });
 composer.hears(/k_\w+/g, (ctx) => {
-  // find_one_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
-  //   (res) => {
-  //     console.log(res);
-  //   }
-  // );
   find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
     (res) => {
       ctx.reply(
@@ -282,14 +271,7 @@ const mahallaGroup = {
   type: "supergroup",
 };
 
-bot.hears("kunlik", (ctx) => {
-  const date = new Date();
-  getMahallaKunlikTushum(date).then(async (rows) => {
-    const imgPath = await drawMahallaKunlikTushum(rows, new Date());
-    sendMahallaKunlikTushum([1382670100, mahallaGroup.id], imgPath, ctx);
-  });
-});
-
+// this shortcut for export billing_abonents collection from mongodb
 composer.hears("export_abonents", async (ctx) => {
   let abonents = await Abonent.find({}, { photo: 0 });
   const content = [];
@@ -299,8 +281,10 @@ composer.hears("export_abonents", async (ctx) => {
       tartib: i + 1,
       licshet: abonent.licshet,
       fio: abonent.fio,
+      fio2: `${abonent.last_name} ${abonent.first_name} ${abonent.middle_name}`,
       street: abonent.mahalla_name,
       kadastr_number: abonent.kadastr_number,
+      passport: abonent.passport_number,
       pinfl: abonent.pinfl,
       confirm: abonent.shaxsi_tasdiqlandi?.confirm,
     });
@@ -313,8 +297,10 @@ composer.hears("export_abonents", async (ctx) => {
         { label: "№", value: "tartib" },
         { label: "Лицевой", value: "licshet" },
         { label: "ФИО--", value: "fio" },
+        { label: "ФИО--2", value: "fio2" },
         { label: "Кўча", value: "street" },
         { label: "Кадастр", value: "kadastr_number" },
+        { label: "ПАССПОРТ", value: "passport" },
         { label: "ЖШШИР", value: "pinfl" },
         { label: "Шахси тасдиқланди", value: "confirm" },
       ],
@@ -324,34 +310,37 @@ composer.hears("export_abonents", async (ctx) => {
 
   const fileName = path.join(__dirname + "/../uploads/", "abonents");
   let settings = {
-    fileName: fileName, // Name of the resulting spreadsheet
-    extraLength: 3, // A bigger number means that columns will be wider
-    writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
-    writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
-    // RTL: true, // Display the columns from right-to-left (the default value is false)
+    fileName: fileName,
+    extraLength: 3,
+    writeMode: "writeFile",
+    writeOptions: {},
   };
   await xlsx(data, settings);
   await ctx.replyWithDocument({ source: fileName + ".xlsx" });
-  // fs.unlink(fileName + ".xlsx", (err) => {
-  //   if (err) throw err;
-  // });
 });
 
 composer.hears("q", async (ctx) => {
   const xatlar = await Bildirishnoma.find({ type: "sudga_chiqoring" });
   const fileName = path.join(__dirname + "/../uploads/", "bildirish_xati bor");
   let settings = {
-    fileName: fileName, // Name of the resulting spreadsheet
-    extraLength: 3, // A bigger number means that columns will be wider
-    writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
-    writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
-    // RTL: true, // Display the columns from right-to-left (the default value is false)
+    fileName: fileName,
+    writeMode: "writeFile",
+    writeOptions: {},
   };
+  const ishdanKetganNazoratchilar = [27300, 200, 29203];
   const content = [];
   xatlar.forEach((xat) => {
-    xat.abonents.forEach((kod) => {
-      content.push({ licshet: kod });
+    let ishdanKetganYozgan = false;
+    ishdanKetganNazoratchilar.forEach((id) => {
+      if (xat.inspector.id == id) {
+        ishdanKetganYozgan = true;
+      }
     });
+    if (!ishdanKetganYozgan) {
+      xat.abonents.forEach((kod) => {
+        content.push({ licshet: kod });
+      });
+    }
   });
   const data = [
     {
@@ -363,6 +352,7 @@ composer.hears("q", async (ctx) => {
 
   await xlsx(data, settings);
   await ctx.replyWithDocument({ source: fileName + ".xlsx" });
+  fs.unlink(fileName + ".xlsx", (err) => {});
 });
 
 composer.hears(/karta_/g, async (ctx) => {
@@ -372,14 +362,12 @@ composer.hears(/karta_/g, async (ctx) => {
       format: "A4",
       orientation: "portrait",
     })
-    .toFile("./uploads/abonent_card.pdf", (err, res) => {
+    .toFile("./uploads/abonent_card.pdf", async (err, res) => {
       if (err) throw err;
-      ctx.replyWithDocument({ source: "./uploads/abonent_card.pdf" });
-      // .then(() => {
-      //   fs.unlink("./uploads/abonent_card.pdf", (err) =>
-      //     err ? console.log(err) : ""
-      //   );
-      // });
+      await ctx.replyWithDocument({ source: "./uploads/abonent_card.pdf" });
+      fs.unlink("./uploads/abonent_card.pdf", (err) =>
+        err ? console.log(err) : ""
+      );
     });
 });
 
@@ -402,6 +390,7 @@ composer.hears("ExportWarningLettersZip", async (ctx) => {
 composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
   ctx.scene.enter("pochtaHarajatiniTekshirishScene")
 );
+<<<<<<< HEAD
 
 composer.hears("a", (ctx) => {
   importAlertLetter();
@@ -416,6 +405,68 @@ composer.hears("b", async (ctx) => {
       file_path: "./380070.PDF",
     })
   );
+=======
+async function createWarningLetterPDF(licshet) {
+  const abonentData = await getAbonentSaldoData(licshet);
+  if (!abonentData)
+    return { success: false, message: "Abonent data not found" };
+  const data = {
+    FISH: abonentData.fio,
+    MFY: abonentData.mahalla_name,
+    STREET: abonentData.streets_name,
+    KOD: abonentData.licshet,
+    SALDO: abonentData.saldo_k,
+    SANA: bugungiSana(),
+  };
+  const createHtmlString = new Promise((resolve, reject) => {
+    ejs.renderFile(
+      path.join(__dirname, "../", "views", "gibrid.ogohlantirish.ejs"),
+      { data },
+      {},
+      (err, str) => {
+        if (err) return reject(err);
+        resolve(str);
+      }
+    );
+  });
+
+  const html = await createHtmlString;
+  const convertPDF = new Promise((resolve, reject) => {
+    htmlPDF
+      .create(html, { format: "A4", orientation: "portrait" })
+      .toBuffer((err, str) => {
+        if (err) return reject(err);
+        const base64PDF = str.toString("base64");
+        resolve({ success: true, data: base64PDF });
+      });
+  });
+  return await convertPDF;
+}
+composer.hears(/xat_/g, async (ctx) => {
+  const licshet = ctx.message.text.split("_")[1];
+  const mail = await HybridMail.findOne({ licshet });
+  if (mail) return { ok: false, message: "Mail already exists" };
+
+  const abonentData = await getAbonentSaldoData(licshet);
+  const base64PDF = await createWarningLetterPDF(licshet);
+  if (!base64PDF.success) {
+    return ctx.reply(base64PDF.message);
+  }
+  const newMail = await createMail(
+    `${abonentData.mahalla_name}, ${abonentData.streets_name}`,
+    abonentData.fio,
+    base64PDF.data
+  );
+  await HybridMail.create({
+    licshet: licshet,
+    type: "xat",
+    hybridMailId: newMail.Id,
+    createdOn: new Date(),
+    receiver: abonentData.fio,
+  });
+  console.log(newMail);
+  // ctx.replyWithDocument({ source: pdfFilePath });
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 });
 
 bot.use(composer);

@@ -64,7 +64,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
     }
     if (!isPinfl(ctx.message.text)) {
       return ctx.replyWithPhoto(
-        "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DZjJS0SoXq6A&psig=AOvVaw1IOqLHD3CndpvLm1vqLwHJ&ust=1679216266118000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCPDp6ZqO5f0CFQAAAAAdAAAAABAE",
+        "https://scontent.fbhk1-4.fna.fbcdn.net/v/t39.30808-6/245114763_1689005674643325_574715679907072430_n.jpg?cstp=mx960x540&ctp=s960x540&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=UuAJ9wX9hRUQ7kNvgFH6cIS&_nc_ht=scontent.fbhk1-4.fna&oh=00_AYBErDlZHdtXHYwOa1n9AicX7rhWP63Hkf8COiCnTKAlUw&oe=669E7F35",
         {
           caption: messages.enterReallyPinfl,
           reply_markup: keyboards.lotin.cancelBtn.resize().reply_markup,
@@ -109,64 +109,68 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
     ctx.wizard.next();
   },
   async (ctx) => {
-    const customDates = ctx.wizard.state.customDates;
-    if (ctx.message?.text)
-      return await ctx.replyWithHTML(
-        `<b>${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}</b> <i>${customDates.birth_date}</i>\n Siz shu kishini nazarda tutyapsizmi?`,
-        createInlineKeyboard([
-          [
-            ["Xa 👌", "yes"],
-            ["Yo'q 🙅‍♂️", "no"],
-          ],
-        ])
-      );
-    switch (ctx.callbackQuery?.data) {
-      case "yes":
-        ctx.deleteMessage();
-        const req = await CustomDataRequest.create({
-          user: ctx.from,
-          data: {
-            ...ctx.wizard.state.customDates,
-            pinfl: ctx.wizard.state.pinfl,
-          },
-          inspector_id: ctx.wizard.state.inspector_id,
-          licshet: ctx.wizard.state.abonent.licshet,
-        });
-        // let filename = "./uploads/" + Date.now() + ".png";
-        // if (!customDates.photo) {
-        //   filename = "./lib/personicon.png";
-        // }
-        let filename = ctx.wizard.state.filename;
-        fs.writeFile(filename, customDates.photo, "base64", async (err) => {
-          if (err) throw err;
+    try {
+      const customDates = ctx.wizard.state.customDates;
+      if (ctx.message?.text)
+        return await ctx.replyWithHTML(
+          `<b>${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}</b> <i>${customDates.birth_date}</i>\n Siz shu kishini nazarda tutyapsizmi?`,
+          createInlineKeyboard([
+            [
+              ["Xa 👌", "yes"],
+              ["Yo'q 🙅‍♂️", "no"],
+            ],
+          ])
+        );
+      switch (ctx.callbackQuery?.data) {
+        case "yes":
+          ctx.deleteMessage();
+          const req = await CustomDataRequest.create({
+            user: ctx.from,
+            data: {
+              ...ctx.wizard.state.customDates,
+              pinfl: ctx.wizard.state.pinfl,
+            },
+            inspector_id: ctx.wizard.state.inspector_id,
+            licshet: ctx.wizard.state.abonent.licshet,
+          });
+          // let filename = "./uploads/" + Date.now() + ".png";
+          // if (!customDates.photo) {
+          //   filename = "./lib/personicon.png";
+          // }
+          let filename = ctx.wizard.state.filename;
+          fs.writeFile(filename, customDates.photo, "base64", async (err) => {
+            if (err) throw err;
 
-          await ctx.telegram.sendPhoto(
-            process.env.CHANNEL_ID_SHAXSI_TASDIQLANDI,
-            { source: filename },
-            {
-              caption: `KOD: ${ctx.wizard.state.abonent.licshet}\nPasport: ${customDates.last_name} ${customDates.first_name} ${customDates.middle_name} ${customDates.birth_date}\nBilling: ${ctx.wizard.state.abonent.fio}\nInspector: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
-              reply_markup: createInlineKeyboard([
-                [
-                  ["✅✅", "shaxsitasdiqlandi_" + req._id + "_true"],
-                  ["🙅‍♂️🙅‍♂️", "shaxsitasdiqlandi_" + req._id + "_false"],
-                ],
-              ]).oneTime().reply_markup,
-              parse_mode: "HTML",
-            }
-          );
-          ctx.reply(
-            "Rahmat 😇\nMa'lumotlar tizim adminiga o'rganish uchun yuborildi..\n Yana kiritishni hohlaysizmi? 🙂",
-            createInlineKeyboard([[["Xa", "xa"]], [["Yo'q", "yoq"]]])
-          );
+            await ctx.telegram.sendPhoto(
+              process.env.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+              { source: filename },
+              {
+                caption: `KOD: ${ctx.wizard.state.abonent.licshet}\nPasport: ${customDates.last_name} ${customDates.first_name} ${customDates.middle_name} ${customDates.birth_date}\nBilling: ${ctx.wizard.state.abonent.fio}\nInspector: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+                reply_markup: createInlineKeyboard([
+                  [
+                    ["✅✅", "shaxsitasdiqlandi_" + req._id + "_true"],
+                    ["🙅‍♂️🙅‍♂️", "shaxsitasdiqlandi_" + req._id + "_false"],
+                  ],
+                ]).oneTime().reply_markup,
+                parse_mode: "HTML",
+              }
+            );
+            ctx.reply(
+              "Rahmat 😇\nMa'lumotlar tizim adminiga o'rganish uchun yuborildi..\n Yana kiritishni hohlaysizmi? 🙂",
+              createInlineKeyboard([[["Xa", "xa"]], [["Yo'q", "yoq"]]])
+            );
 
-          ctx.wizard.next();
-        });
-        break;
-      case "no":
-        ctx.deleteMessage();
-        ctx.reply("Bekor qilindi. Demak PINFL raqami noto'g'ri ekan");
-        ctx.scene.leave();
-        break;
+            ctx.wizard.next();
+          });
+          break;
+        case "no":
+          ctx.deleteMessage();
+          ctx.reply("Bekor qilindi. Demak PINFL raqami noto'g'ri ekan");
+          ctx.scene.leave();
+          break;
+      }
+    } catch (error) {
+      console.error(error);
     }
   },
   (ctx) => {
@@ -182,7 +186,6 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           ctx.wizard.selectStep(0);
           break;
         case "yoq":
-          ctx.deleteMessage();
           ctx.reply("OK", keyboards.lotin.mainKeyboard.resize());
           ctx.scene.leave();
           break;
@@ -196,6 +199,13 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
 
 updateAbonentDatesByPinfl.enter((ctx) => {
   ctx.reply(`Abonent shaxsiy raqamini kiriting`);
+});
+
+updateAbonentDatesByPinfl.on("text", (ctx, next) => {
+  if (isCancel(ctx.message.text)) {
+    ctx.reply("Bekor qilindi");
+    return ctx.scene.leave();
+  } else next();
 });
 
 module.exports = { updateAbonentDatesByPinfl };

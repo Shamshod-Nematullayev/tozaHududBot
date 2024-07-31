@@ -56,6 +56,10 @@ const cancelGuvohnoma = new Scenes.WizardScene(
               },
             });
             return ctx.scene.leave();
+          })
+          .catch(async () => {
+            console.error(err);
+            ctx.reply("Telegramdagi xabarni o'zgarishda xatolik");
           });
       });
   }

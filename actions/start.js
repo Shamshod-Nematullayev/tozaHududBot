@@ -4,8 +4,8 @@ const { messages } = require("../lib/messages");
 const { keyboards } = require("../lib/keyboards");
 const { Abonent } = require("../models/YangiAbonent");
 const { Admin } = require("../models/Admin");
-const { Picture } = require("../models/Picture");
 const { Guvohnoma } = require("../models/Guvohnoma");
+const { User } = require("../models/User");
 const composer = new Composer();
 
 composer.start(async (ctx) => {
@@ -23,73 +23,19 @@ composer.start(async (ctx) => {
         });
         return ctx.scene.enter("cancel_guvohnoma");
       }
-      if (ctx.startPayload.split("_")[0] == "picture") {
-        if (admin) {
-          const confirm =
-            ctx.startPayload.split("_")[1] == "accept"
-              ? "TASDIQLANDI"
-              : "BEKOR QILINDI";
-          const id = ctx.startPayload.split("_")[2];
-          const pic = await Picture.findById(id);
-          await pic
-            .updateOne({
-              $set: { confirm },
-            })
-            .then(() => {
-              ctx.telegram
-                .editMessageCaption(
-                  process.env.CHANNEL,
-                  pic.messageIdChannel,
-                  0,
-                  `${
-                    confirm == "TASDIQLANDI" ? "✅✅✅" : "❌❌❌"
-                  }\nFuqoro rasmi #rasm \n\n<code>${pic.kod}</code>`,
-                  { parse_mode: "HTML" }
-                )
-                .then(() => {
-                  if (confirm == "TASDIQLANDI") {
-                    return ctx.telegram
-                      .sendPhoto(pic.user_id, pic.photo_file_id, {
-                        caption: messages.acceptedPicture,
-                      })
-                      .then(() => {
-                        ctx.reply(messages.sended);
-                      });
-                  } else {
-                    return ctx.telegram
-                      .sendPhoto(pic.user_id, pic.photo_file_id, {
-                        caption: messages.canceledPicture,
-                      })
-                      .then(() => {
-                        ctx.reply(messages.sended);
-                      });
-                  }
-                });
-            });
-        } else {
-          return ctx.reply(
-            messages.youAreNotAdmin,
-            keyboards[ctx.session.til].mainKeyboard.resize()
-          );
-        }
+
+      const abonent = await Abonent.findById(ctx.startPayload);
+      if (!abonent) {
+        return ctx.reply(messages.notFoundData);
+      }
+      if (admin) {
+        ctx.session.abonent_id = ctx.startPayload;
+        return ctx.scene.enter("answer_to_inspector");
       } else {
-        const abenent = await Abonent.findById(ctx.startPayload)
-          .then(async () => {
-            const admin = await Admin.findOne({ user_id: ctx.from.id });
-            if (admin) {
-              ctx.session.abonent_id = ctx.startPayload;
-              ctx.scene.enter("answer_to_inspector");
-            } else {
-              ctx.reply(
-                messages.youAreNotAdmin,
-                keyboards[ctx.session.til].mainKeyboard.resize()
-              );
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            ctx.reply(messages.notFoundData);
-          });
+        return ctx.reply(
+          messages.youAreNotAdmin,
+          keyboards[ctx.session.til].mainKeyboard.resize()
+        );
       }
     } else {
       const admin = await Admin.findOne({ user_id: ctx.from.id });
@@ -100,6 +46,13 @@ composer.start(async (ctx) => {
           keyboards[ctx.session.til].adminKeyboard.resize()
         );
       } else {
+        const user = await User.findOne({ "user.id": ctx.chat.id });
+        if (user.is_stm_xodimi) {
+          return ctx.reply(
+            "Asosiy menyu",
+            keyboards.lotin.stm_xodimi_main_keyboard
+          );
+        }
         ctx.reply(
           messages.startGreeting,
           keyboards[ctx.session.til].mainKeyboard.resize()

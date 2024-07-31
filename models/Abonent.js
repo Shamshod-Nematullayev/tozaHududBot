@@ -10,6 +10,15 @@ const schema = new Schema(
       type: String,
       required: true,
     },
+    last_name: {
+      type: String,
+    },
+    first_name: {
+      type: String,
+    },
+    middle_name: {
+      type: String,
+    },
     licshet: {
       type: String,
       max: 12,
@@ -42,6 +51,18 @@ const schema = new Schema(
     // photo: String,
     prescribed_cnt: Number,
     shaxsi_tasdiqlandi: {
+      type: Object,
+      default: {
+        confirm: false,
+      },
+    },
+    ekt_kod_tasdiqlandi: {
+      type: Object,
+      default: {
+        confirm: false,
+      },
+    },
+    street_tasdiqlandi: {
       type: Object,
       default: {
         confirm: false,

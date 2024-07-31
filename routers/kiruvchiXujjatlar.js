@@ -3,6 +3,7 @@ const { IncomingDocument } = require("../models/IncomingDocument");
 const path = require("path");
 const { bot } = require("../core/bot");
 const { Counter } = require("../models/Counter");
+const fs = require("fs");
 
 const router = require("express").Router();
 
@@ -67,39 +68,57 @@ router.post("/search", async (req, res, next) => {
 
 router.post("/create", upload.single("file"), async (req, res, next) => {
   try {
-    console.log(process.env.TEST_BASE_CHANNEL_ID);
-    const documentOnTelegram = await bot.telegram.sendDocument(
+    if (!req.file || !req.body.doc_type || !req.body.inspector) {
+      return res
+        .status(400)
+        .json({ ok: false, message: "Required fields are missing" });
+    }
+    const filePath = path.join(__dirname, "../uploads/", req.file.filename);
+    const telegramResponse = await bot.telegram.sendDocument(
       process.env.TEST_BASE_CHANNEL_ID,
-      {
-        source: path.join(__dirname, "../uploads/", req.file.filename),
-      }
+      { source: filePath }
     );
     const counter = await Counter.findOne({ name: "incoming_document_number" });
-    const document = await IncomingDocument.create({
+    if (!counter) {
+      return res.status(500).json({ ok: false, message: "Counter not found" });
+    }
+
+    const newDocument = await IncomingDocument.create({
       abonent: req.body.abonent,
       abonents: req.body.abonents,
       doc_type: req.body.doc_type,
       inspector: req.body.inspector,
-      file_id: documentOnTelegram.document.file_id,
+      file_id: telegramResponse.document.file_id,
       file_name: req.file.filename,
       comment: req.body.comment,
-      date: Date.now(),
+      date: new Date(),
       doc_num: counter.value + 1,
     });
+
     await counter.updateOne({
       $set: {
         value: counter.value + 1,
-        last_update: Date.now(),
+        last_update: new Date(),
       },
+    });
+
+    // Delete the uploaded file
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error("Failed to delete uploaded file:", err);
+      }
     });
 
     return res.json({
       ok: true,
-      document,
+      document: newDocument,
       message: "Xujjat qabul qilindi",
     });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    console.error("Error while creating document:", error);
+    return res
+      .status(500)
+      .json({ ok: false, message: "Internal Server Error" });
   }
 });
 

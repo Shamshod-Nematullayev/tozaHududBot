@@ -39,6 +39,11 @@ const searchAbonentbyName = new Scenes.WizardScene(
         );
       });
       if (abonent.length > 0) {
+        if (abonent.length > 100) {
+          return ctx.reply(
+            "Qidiruv natijalari juda ko'p, iltimos ko'proq belgi kiriting"
+          );
+        }
         let messageText = ``;
         abonent.forEach((doc, i) => {
           messageText += `${i + 1}. <code>${doc.licshet}</code> <b>${

@@ -35,4 +35,4 @@ async function getAbonentCardHtml(kod) {
   return await res.text();
 }
 
-module.exports = { getAbonentCardHtml };
+module.exports = getAbonentCardHtml;

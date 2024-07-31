@@ -284,7 +284,13 @@ async function sendToSud({
   }
   const payload = {
     case: {
+<<<<<<< HEAD
       doc_date: `${yil}-${formatNumber(oy)}-${parseInt(kun) - 1}T19:00:00.000Z`,
+=======
+      doc_date: `${yil}-${formatNumber(oy)}-${formatNumber(
+        parseInt(kun) - 1
+      )}T19:00:00.000Z`,
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
       doc_number: doc_number,
       court_id: "d007c274-844f-49b9-b2c1-b514fc407c2f",
       duty_reason_id: "b4c87d9e-1f9e-4e9f-94f5-0b21840d57b1",
@@ -467,6 +473,13 @@ async function sendToSud({
   res = await res.json();
   fs.writeFile("./text.txt", JSON.stringify(payload), "utf-8", (err) => {});
   console.log(res);
+<<<<<<< HEAD
   return res;
+=======
+  return {
+    ...res,
+    FISH: `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`,
+  };
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 }
 module.exports = { sendToSud };

@@ -1,12 +1,9 @@
 const { Scenes } = require("telegraf");
 const { bot } = require("../core/bot");
 const LocalSession = require("telegraf-session-local");
-const newAbonentScene = require("./scene/userScenes/newAbonentScene");
 const newAdminScene = require("./scene/userScenes/newAdminScene");
 const findAbonentScene = require("./scene/userScenes/findAbonentById");
 const sendAnswerScene = require("./scene/adminActions/sendAnswerScene");
-const importIncomeScene = require("./scene/adminActions/importIncome");
-const { fuqoroRasmiScene } = require("./scene/userScenes/fuqoroRasmiScene");
 const { showAbonentPic } = require("./scene/adminActions/showAbonentPic");
 const { addNotification } = require("./scene/adminActions/addNotification");
 const generateAlertLetter = require("./scene/adminActions/generateAlertLetter");
@@ -26,7 +23,6 @@ const { generateSBuyruq } = require("./scene/adminActions/generateSudBuyruq");
 const {
   connect_mfy_tg_group_scene,
 } = require("./scene/adminActions/connect_mfy_tg_group");
-const { loginviloyat } = require("./scene/adminActions/loginviloyat");
 const {
   generateSavdoSanoatAriza,
 } = require("./scene/adminActions/generateSavdoSanoatAriza");
@@ -70,14 +66,30 @@ const {
 const {
   new_abonent_request_by_pinfl_scene,
 } = require("./scene/userScenes/newAbonentRequestByPinfl");
+<<<<<<< HEAD
+=======
+const {
+  sudBuyruqlariYaratish,
+} = require("./scene/adminActions/sud/sudBuyruqlariYaratish");
+const {
+  vaqtinchalikFunc,
+} = require("./scene/adminActions/vaqtinchalikFunksiya");
+const {
+  set_monthly_plan,
+} = require("./scene/adminActions/cleancity/viloyat/setMonthlyPlan");
+const {
+  sendWarningLettersByHybrid,
+} = require("./scene/adminActions/sendWarningLettersByHybrid");
+const { updateElektrKod } = require("./scene/userScenes/updateElektrKod");
+const {
+  changeAbonentStreet,
+} = require("./scene/userScenes/changeAbonentStreet");
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 
 const stage = new Scenes.Stage([
-  newAbonentScene,
   newAdminScene,
   sendAnswerScene,
   findAbonentScene,
-  importIncomeScene,
-  fuqoroRasmiScene,
   showAbonentPic,
   addNotification,
   generateAlertLetter,
@@ -91,7 +103,6 @@ const stage = new Scenes.Stage([
   importAbonentsScene,
   generateSBuyruq,
   connect_mfy_tg_group_scene,
-  loginviloyat,
   generateSavdoSanoatAriza,
   loginCleanCityScene,
   loginCleanCityViloyatScene,
@@ -109,9 +120,16 @@ const stage = new Scenes.Stage([
   importAlertLetters,
   pochtaHarajatiniTekshirishScene,
   new_abonent_request_by_pinfl_scene,
+<<<<<<< HEAD
+=======
+  sudBuyruqlariYaratish,
+  set_monthly_plan,
+  vaqtinchalikFunc,
+  sendWarningLettersByHybrid,
+  updateElektrKod,
+  changeAbonentStreet,
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());
 bot.use(stage.middleware());
-
-// const composer = new Composer();

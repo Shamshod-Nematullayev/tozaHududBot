@@ -1,9 +1,7 @@
-const { Composer } = require("telegraf");
-const { bot } = require("../core/bot");
-const { keyboards } = require("../lib/keyboards");
-const { messages } = require("../lib/messages");
+const { Composer, bot, keyboards, messages } = require("../requires");
 
 const composer = new Composer();
+
 composer.action("language", (ctx) => {
   ctx.deleteMessage();
   return ctx.reply(
@@ -11,6 +9,7 @@ composer.action("language", (ctx) => {
     keyboards[ctx.session.til].chooseLanguge
   );
 });
+
 composer.action("lotin_tili_tanlash", (ctx) => {
   ctx.deleteMessage();
   ctx.session.til = "lotin";
@@ -19,6 +18,7 @@ composer.action("lotin_tili_tanlash", (ctx) => {
     keyboards[ctx.session.til].mainKeyboard.resize()
   );
 });
+
 composer.action("kiril_tili_tanlash", (ctx) => {
   ctx.deleteMessage();
   ctx.session.til = "kiril";

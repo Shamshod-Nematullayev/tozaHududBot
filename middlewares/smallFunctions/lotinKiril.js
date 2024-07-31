@@ -238,7 +238,7 @@ function kirillga(originalMessage) {
   /*original textni olyapti */
   var CyrillicTranslated = ""; //kirill ga o'girilgan xabar
   /*avval bu harf birikmalar o'zgartirilsin : */
-  originalMessage = originalMessage.replace(/`/g, "'");
+  // originalMessage = originalMessage.replace(/`/g, "'");
   originalMessage = originalMessage.replace(/ʹ/g, "'");
   originalMessage = originalMessage.replace(/ʻ/g, "'");
   originalMessage = originalMessage.replace(/ʼ/g, "'");

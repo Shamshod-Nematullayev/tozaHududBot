@@ -42,9 +42,12 @@ const generateProkuraturaSudAriza = new Scenes.WizardScene(
         const excelFile = fs.createWriteStream(filename);
         https.get(xlsx.href, (res) => {
           res.pipe(excelFile);
-          excelFile.on("finish", async (cb) => {
+          excelFile.on("finish", async () => {
             const xls = excelToJson({
               sourceFile: filename,
+            });
+            fs.unlink(filename, (err) => {
+              if (err) throw err;
             });
             //   excel filedagi ma'lumotlarni json formati o'zgartirish
             const sheet = xls[Object.keys(xls)[0]];
@@ -68,12 +71,17 @@ const generateProkuraturaSudAriza = new Scenes.WizardScene(
                 if (err) console.log(err);
 
                 const filePath = "./prokuratura.html";
-                fs.writeFile(filePath, str, (error) => {
+                fs.writeFile(filePath, str, async (error) => {
                   if (error) {
-                    console.log("Docx file creation failed");
+                    console.error("Docx file creation failed");
                     return;
                   }
-                  ctx.replyWithDocument({ source: filePath });
+                  ctx.telegram.deleteMessage(
+                    ctx.chat.id,
+                    waiterMessage.message_id
+                  );
+                  await ctx.replyWithDocument({ source: filePath });
+                  fs.unlink(filePath, (err) => {});
                   console.log("Docx file created successfully");
                 });
                 ctx.scene.leave();

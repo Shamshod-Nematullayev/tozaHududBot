@@ -33,8 +33,13 @@ const pochtaHarajatiniTekshirishScene = new Scenes.WizardScene(
           const sheet = xls[Object.keys(xls)[0]];
           const results = [];
           const checkInvoise = async () => {
+<<<<<<< HEAD
             console.log(sheet[counter].B);
             if (counter !== sheet.length && counter > 0) {
+=======
+            if (counter !== sheet.length && counter > 0) {
+              console.log(sheet[counter].B);
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
               const response = await pochtaHarajatiniTekshirish(
                 sheet[counter].B
               );

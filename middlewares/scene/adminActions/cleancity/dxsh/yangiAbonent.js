@@ -1,6 +1,7 @@
 const cc = `https://cleancity.uz/`;
 const { CleanCitySession } = require("../../../../../models/CleanCitySession");
 const { JSDOM } = require("jsdom");
+const { Context } = require("telegraf");
 
 // ========================================================================
 
@@ -64,6 +65,11 @@ const yangiAbonent = async ({
       body: `mahallas_id=${mfy_id}&companies_id=1144`,
     });
     availableKOD = await availableKOD.json();
+<<<<<<< HEAD
+=======
+    if (availableKOD.msg == "Тизим хатоси")
+      return { success: false, ...availableKOD };
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
     console.log({ availableKOD });
     // return;
     let finalResponse = await fetch("https://cleancity.uz/" + new_abonent_url, {
@@ -104,12 +110,21 @@ const yangiAbonent = async ({
     const final = await finalResponse.json();
     console.log({ final });
     if (final.success) {
+<<<<<<< HEAD
       await session.updateOne({
         $set: {
           "path.new_abonent_url": new_abonent_url,
           "path.get_litschet_url": get_litschet_url,
         },
       });
+=======
+      // await session.updateOne({
+      //   $set: {
+      //     "path.new_abonent_url": new_abonent_url,
+      //     "path.get_litschet_url": get_litschet_url,
+      //   },
+      // });
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
     }
     return {
       litschet: availableKOD.value,

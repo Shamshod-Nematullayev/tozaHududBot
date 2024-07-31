@@ -102,17 +102,18 @@ const drawDebitViloyat = async (sendingType) => {
         await bot.telegram.sendPhoto(process.env.ANVARJON_BZ_GR_ID, {
           source: "debitorviloyat.png",
         });
+        fs.unlink("debitorviloyat.png", (err) => {});
         break;
       case "toMySelf":
-        bot.telegram
-          .sendPhoto(5347896070, { source: "debitorviloyat.png" })
-          .finally(() => {
-            fs.unlink("debitorviloyat.png", (err) => {});
-          });
+        await bot.telegram.sendPhoto(5347896070, {
+          source: "debitorviloyat.png",
+        });
+
+        fs.unlink("debitorviloyat.png", (err) => {});
+
         break;
     }
   });
 };
 
-module.exports = { toSendDebitor };
-module.exports = { drawDebitViloyat };
+module.exports = { toSendDebitor, drawDebitViloyat };

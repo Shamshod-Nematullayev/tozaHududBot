@@ -1,12 +1,11 @@
-const { Composer } = require("telegraf");
-const { bot } = require("../core/bot");
-const { CustomDataRequest } = require("../models/CustomDataRequest");
-const { Nazoratchi } = require("../models/Nazoratchi");
 const {
+  Composer,
+  bot,
+  CustomDataRequest,
+  Nazoratchi,
   changeAbonentDates,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");
-const { Abonent } = require("../models/Abonent");
-const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
+  Abonent,
+} = require("../requires");
 
 const composer = new Composer();
 
@@ -86,7 +85,15 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       //   tizimga kiritgan nazoratchiga javob yo'llash
       await ctx.telegram.sendMessage(
         req.user.id,
-        `Tabriklaymiz 🥳🥳 Siz yuborgan pasport ma'lumot qabul qilindi. <b>${req.licshet}</b> \nPasport: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}\n 1 ballni qo'lga kiritdingiz`,
+        `Tabriklaymiz 🥳🥳 Siz yuborgan pasport ma'lumot qabul qilindi. <b>${
+          req.licshet
+        }</b> \nPasport: ${req.data.last_name} ${req.data.first_name} ${
+          req.data.middle_name
+        } ${
+          req.data.birth_date
+        }\n 1 ballni qo'lga kiritdingiz. \n Jami to'plagan ballaringiz: <b>${
+          Number(inspector.shaxs_tasdiqlash_ball) + 1
+        }</b>`,
         { parse_mode: "HTML" }
       );
       //   adminga amaliyot tugagani haqida xabar yuborish status: 200

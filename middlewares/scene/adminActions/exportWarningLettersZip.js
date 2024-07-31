@@ -7,9 +7,7 @@ const { messages } = require("../../../lib/messages");
 const excelToJson = require("convert-excel-to-json");
 const { keyboards } = require("../../../lib/keyboards");
 const isCancel = require("../../smallFunctions/isCancel");
-const {
-  getLastAlertLetter,
-} = require("../../../api/cleancity/dxsh/getLastAlertLetter");
+const { getLastAlertLetter } = require("../../../api/cleancity/dxsh");
 
 const exportWarningLettersZip = new Scenes.WizardScene(
   "exportWarningLettersZip",
@@ -37,29 +35,37 @@ const exportWarningLettersZip = new Scenes.WizardScene(
             if (err) throw err;
           });
           try {
-            const pdfPromises = sheet.map(async (item) => {
-              return new Promise(async (resolve, reject) => {
-                const warningLetter = await getLastAlertLetter(item.A);
-                if (!warningLetter.success) {
-                  ctx.replyWithHTML(
-                    `<code>${item.A}</code> ogohlantirish xati topilmadi..`
-                  );
-                  return resolve(warningLetter);
-                }
-                fs.copyFile(
-                  warningLetter.filename,
-                  dirname + "/" + item.A + ".pdf",
-                  (err) => {
-                    if (err) reject(err);
-                    else resolve("done");
-                  }
+            // const pdfPromises = sheet.map(async (item) => {
+            let counter = 0;
+            let errors = [];
+            async function download() {
+              if (counter == sheet.length) return;
+              const item = sheet[counter];
+              const warningLetter = await getLastAlertLetter(item.A);
+              // let promis =  new Promise((resolve, reject) => {
+              if (!warningLetter.success) {
+                ctx.replyWithHTML(
+                  `<code>${item.A}</code> ogohlantirish xati topilmadi..`
                 );
-              });
-            });
+              }
+              ctx.replyWithHTML(`<code>${item.A}</code> Bo'ldi..`);
+              fs.copyFile(
+                warningLetter.filename,
+                dirname + "/" + item.A + ".pdf",
+                async (err) => {
+                  if (err) errors.push(err);
 
-            await Promise.all(pdfPromises);
-            await compresser.zip.compressDir(dirname, dirname + ".zip");
-            ctx.replyWithDocument({ source: dirname + ".zip" });
+                  counter++;
+                  await download();
+                }
+              );
+              // });
+              // await Promise.
+            }
+            await download();
+
+            // await compresser.zip.compressDir(dirname, dirname + ".zip");
+            // ctx.replyWithDocument({ source: dirname + ".zip" });
             ctx.scene.leave();
           } catch (error) {
             console.error("Error:", error);

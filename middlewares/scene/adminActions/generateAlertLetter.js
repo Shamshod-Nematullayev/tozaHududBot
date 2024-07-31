@@ -93,15 +93,12 @@ const generateAlertLetter = new Scenes.WizardScene(
   }
 );
 
+// Scene enter and leave handlers
 generateAlertLetter.enter((ctx) => {
-  ctx.replyWithDocument(
-    // Na'muna uchun ajtarilgan fayl id
-    INPUT_ALERT_LETTER_EXCEL,
-    {
-      caption: `Ogohlantirish xati namuna \n` + messages.enterExcelFile,
-      reply_markup: keyboards[ctx.session.til].cancelBtn.resize().reply_markup,
-    }
-  );
+  ctx.replyWithDocument(INPUT_ALERT_LETTER_EXCEL, {
+    caption: `Ogohlantirish xati namuna \n` + messages.enterExcelFile,
+    reply_markup: keyboards[ctx.session.til].cancelBtn.resize().reply_markup,
+  });
 });
 
 generateAlertLetter.leave((ctx) => {

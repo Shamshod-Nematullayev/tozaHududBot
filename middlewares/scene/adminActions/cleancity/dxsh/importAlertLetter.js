@@ -16,7 +16,11 @@ const {
 const compressing = require("compressing");
 const {
   enterWarningLetterToBilling,
+<<<<<<< HEAD
 } = require("../../../../../api/cleancity/dxsh/enterWarningLetterToBilling");
+=======
+} = require("../../../../../api/cleancity/dxsh");
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 
 const importAlertLetters = new Scenes.WizardScene(
   "importAlertLetters",

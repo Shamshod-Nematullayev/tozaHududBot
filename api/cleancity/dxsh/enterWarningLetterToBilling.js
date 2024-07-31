@@ -16,6 +16,10 @@ async function enterWarningLetterToBilling({
   const session = await CleanCitySession.findOne({ type: "dxsh" });
 
   if (session.path.enterWarningLetterToBilling) {
+<<<<<<< HEAD
+=======
+    console.log(file_path);
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
     let options = {
       method: "POST",
       url: `https://cleancity.uz/${session.path.enterWarningLetterToBilling}&resource_types_id=15&system_companies_id=1144&licshet=${lischet}`,
@@ -69,7 +73,14 @@ async function enterWarningLetterToBilling({
     elements.forEach(function (element) {
       // Check if the text content matches "hello world"
 
+<<<<<<< HEAD
       if (element.textContent.trim() === "Суд огоҳлантириш") {
+=======
+      if (
+        element.textContent.trim() === "Суд огоҳлантириш" ||
+        element.textContent.trim() === "Sud ogohlantirish"
+      ) {
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
         // Found the element, do something with it
         warningLettersPage = element.href;
       }
@@ -90,8 +101,16 @@ async function enterWarningLetterToBilling({
     await session.updateOne({
       $set: { "path.enterWarningLetterToBilling": findSudProccessPath[0] },
     });
+<<<<<<< HEAD
     return enterWarningLetterToBilling(arguments);
   }
 }
 
 module.exports = { enterWarningLetterToBilling };
+=======
+    return await enterWarningLetterToBilling(arguments);
+  }
+}
+
+module.exports = enterWarningLetterToBilling;
+>>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
