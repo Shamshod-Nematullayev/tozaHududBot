@@ -27,9 +27,12 @@ router.get("/", async (req, res) => {
       });
       rows.push(inspektor);
     });
+    rows.sort((a, b) => a.name.localeCompare(b.name));
+    mahallalar.sort((a, b) => a.name.localeCompare(b.name));
     res.json({
       ok: true,
       rows: rows,
+      mahallalar,
     });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error" });

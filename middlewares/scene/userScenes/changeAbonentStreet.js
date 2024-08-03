@@ -79,6 +79,7 @@ const changeAbonentStreet = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
+      if (!ctx.callbackQuery) return ctx.scene.leave();
       const street = ctx.wizard.state.streets.find(
         (street) => street.id == ctx.callbackQuery.data
       );

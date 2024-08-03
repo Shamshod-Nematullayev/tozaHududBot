@@ -105,7 +105,7 @@ const updateElektrKod = new Scenes.WizardScene(
     switch (ctx.callbackQuery?.data) {
       case "yes":
         const abonent = ctx.wizard.state.abonent;
-        const res = await changeAbonentDates({
+        let res = await changeAbonentDates({
           abonent_id: abonent.id,
           abo_data: {
             description: `${ctx.wizard.state.inspector_id} ${ctx.wizard.state.inspector_name} ma'lumotiga asosan ETK hisob raqami va telefoni kiritildi.`,
@@ -116,6 +116,20 @@ const updateElektrKod = new Scenes.WizardScene(
               : undefined,
           },
         });
+        if (res.msg == "Кадастр рақам формати нотоғри киритилди") {
+          res = await changeAbonentDates({
+            abonent_id: abonent.id,
+            abo_data: {
+              description: `${ctx.wizard.state.inspector_id} ${ctx.wizard.state.inspector_name} ma'lumotiga asosan ETK hisob raqami va telefoni kiritildi.`,
+              energy_licshet: ctx.wizard.state.ETK,
+              energy_coato: "18214",
+              phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE
+                ? ctx.wizard.state.etk_abonent.MOBILE_PHONE
+                : undefined,
+              kadastr_number: "",
+            },
+          });
+        }
         if (!res.success) {
           console.log(res);
           return ctx.answerCbQuery(res.msg);

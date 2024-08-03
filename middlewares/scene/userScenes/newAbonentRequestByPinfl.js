@@ -6,10 +6,11 @@ const isPinfl = require("../../smallFunctions/isPinfl");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const { kirillga } = require("../../smallFunctions/lotinKiril");
 const { yangiAbonent } = require("../adminActions/cleancity/dxsh/yangiAbonent");
-const { keyboards } = require("../../../lib/keyboards");
+const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
 const { Abonent } = require("../../../models/Abonent");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
+const { Mahalla } = require("../../../models/Mahalla");
 const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {
@@ -58,10 +59,22 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         await ctx.reply(
           `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
         );
-        await ctx.reply(
-          "Mahallasini tanlang",
-          keyboards.lotin.mahallalar.oneTime()
+        const mahallalar = await Mahalla.find({
+          "biriktirilganNazoratchi.inspactor_id": inspektor.id,
+        });
+        if (mahallalar.length == 0) {
+          return ctx.reply(
+            "Sizga biriktirilgan mahallalar yo'q!",
+            keyboards.lotin.cancelBtn.resize()
+          );
+        }
+        const sortedMahallalar = mahallalar.sort((a, b) =>
+          a.name.localeCompare(b.name)
         );
+        const buttons = sortedMahallalar.map((mfy) => [
+          Markup.button.callback(mfy.name, "mahalla_" + mfy.id),
+        ]);
+        await ctx.reply("Mahallasini tanlang", Markup.inlineKeyboard(buttons));
         ctx.wizard.state.customDates = {
           fullname: kirillga(
             `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`

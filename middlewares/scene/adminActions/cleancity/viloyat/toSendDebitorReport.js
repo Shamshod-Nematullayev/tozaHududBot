@@ -20,10 +20,10 @@ const toSendDebitor = async (ctx) => {
       "#g_acccordion > div > div > ul > li:nth-child(1) > a"
     ) == undefined
   ) {
-    bot.telegram.sendMessage(
-      5347896070,
-      `Xukmdorim viloyat debitor reja tashlash bo'yicha Cookie va Xenc yo'li boy berildi`
-    );
+    // bot.telegram.sendMessage(
+    //   5347896070,
+    //   `Xukmdorim viloyat debitor reja tashlash bo'yicha Cookie va Xenc yo'li boy berildi`
+    // );
     return [];
   }
   const dxsh1Url = startpage.querySelector(

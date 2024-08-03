@@ -294,39 +294,39 @@ setInterval(async () => {
       drawDebitViloyat("toViloyat");
       if (soat < 22) {
         const data = await fetchEcopayTushum();
-        mfyIncomeReport();
+        // mfyIncomeReport();
         drawAndSendTushum(data);
         fetchEcoTranzaksiyalar();
       }
       // sendViloyatKunlikReja();
     } else if (date.getMinutes() % 10 === 0) {
-      if (text == undefined) {
-        sendViloyatKunlikReja("test", 5347896070);
-      }
+      // if (text == undefined) {
+      //   sendViloyatKunlikReja("test", 5347896070);
+      // }
       // if (!text.match(/url:\s*'([^']+)'/g))
       //   return bot.telegram.sendMessage(
       //     5347896070,
       //     `Xukmdorim viloyat kunlik reja tashlash bo'yicha Cookie va Xenc yo'li boy berildi`
       //   );
-      const res = await fetch(
-        `${cc}/${text.match(/url:\s*'([^']+)'/g)[1].split("'")[1]}`,
-        {
-          headers,
-          body: `mes=${
-            date.getMonth() + 1
-          }&god=${date.getFullYear()}&from_day=${date.getDate()}&to_day=${date.getDate()}&gov_level=1&sort=id&order=asc`,
-          method: "POST",
-          mode: "cors",
-          credentials: "include",
-        }
-      );
-      const data = await res.json();
-      if (!data.rows || data.rows.length < 1) {
-        //bot.telegram.sendMessage(
-        //  5347896070,
-        //  `Xukmdorim viloyat kunlik reja tashlash bo'yicha Cookie va Xenc yo'li boy berildi`
-        //);
-      }
+      // const res = await fetch(
+      //   `${cc}/${text.match(/url:\s*'([^']+)'/g)[1].split("'")[1]}`,
+      //   {
+      //     headers,
+      //     body: `mes=${
+      //       date.getMonth() + 1
+      //     }&god=${date.getFullYear()}&from_day=${date.getDate()}&to_day=${date.getDate()}&gov_level=1&sort=id&order=asc`,
+      //     method: "POST",
+      //     mode: "cors",
+      //     credentials: "include",
+      //   }
+      // );
+      // const data = await res.json();
+      // if (!data.rows || data.rows.length < 1) {
+      //   //bot.telegram.sendMessage(
+      //   //  5347896070,
+      //   //  `Xukmdorim viloyat kunlik reja tashlash bo'yicha Cookie va Xenc yo'li boy berildi`
+      //   //);
+      // }
     }
   } catch (err) {
     console.log(err);

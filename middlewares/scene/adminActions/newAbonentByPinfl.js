@@ -83,6 +83,7 @@ const new_abonent_by_pinfl_scene = new Scenes.WizardScene(
         }
       }
     } catch (error) {
+      console.log("Xatolikni shu joyda kursatyapti");
       console.log(error);
     }
   },
@@ -114,7 +115,9 @@ const new_abonent_by_pinfl_scene = new Scenes.WizardScene(
           const street = streets[i];
           keyboardsArray.push([Markup.button.callback(street.name, street.id)]);
         }
-        ctx.deleteMessage();
+        try {
+          ctx.deleteMessage();
+        } catch (error) {}
         await ctx.reply(
           "Ko'chani tanlang",
           Markup.inlineKeyboard(keyboardsArray).oneTime()
@@ -134,7 +137,9 @@ const new_abonent_by_pinfl_scene = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       ctx.wizard.state.street_id = ctx.update.callback_query.data;
-      ctx.deleteMessage();
+      try {
+        ctx.deleteMessage();
+      } catch (error) {}
       ctx.reply(
         "Yashovchi yoki kiriting",
         Markup.keyboard([

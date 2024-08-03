@@ -226,11 +226,6 @@ composer.hears("debit", (ctx) => {
   drawDebitViloyat("toMySelf");
 });
 
-composer.hears("Aborotka chiqorish", async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-  ctx.scene.enter("draw_abarotka");
-});
-
 composer.hears(/mvd_\w+/g, (ctx) => {
   console.log("here");
   find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1]))
