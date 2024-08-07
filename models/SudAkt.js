@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 
-const schema = mongoose.Schema(
+const schema = new mongoose.Schema(
   {
     "№": String,
     reg_number: Number,
@@ -32,6 +32,10 @@ const schema = mongoose.Schema(
     "To'langan sanasi": String,
     "To'landi": String,
     "Bugungi kundagi qarzdorlik,06.04.2024": String,
+    sudQaroriBillinggaYuklandi: {
+      type: Boolean,
+      defalt: false,
+    },
   },
   {
     timestamps: true,
