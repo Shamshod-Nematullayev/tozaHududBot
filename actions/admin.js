@@ -72,6 +72,7 @@ const ADMIN_ACTIONS = [
   "generateProkuraturaSudAriza",
   "sudBuyruqlariYaratish",
   "Ogohlantish xati yuborish",
+  "upload_execution_to_billing",
 ];
 
 function enterAdminAction(actionType) {
@@ -216,6 +217,20 @@ composer.action(/done_\w+/g, async (ctx) => {
 });
 
 // ======================== Special functions (not required just shortcuts) ========================//
+
+composer.hears("Sud buyruqlarini billingga yuklash", (ctx) => {});
+
+composer.command("help", (ctx) => {
+  ctx.reply(
+    `<b> 🚀 Bot nazoratlarini boshqarish uchun qanday so'raying? </b>\n\n` +
+      `1️⃣ /start - Botni qo'rsatish\n` +
+      `2️⃣ /admin - Bot administratorlar uchun qanday so'raying?\n` +
+      `3️⃣ /tushum - Botning Tushum shartnomasini o'qish\n` +
+      `4️⃣ /debit - Botning debit viloyatlarini o'qish\n` +
+      `5️⃣ /mvd_PINFIL - MVD-ning PINFIL-iga mos qilingan manzilni o'qish\n`,
+    { parse_mode: "HTML" }
+  );
+});
 composer.command("tushum", async (ctx) => {
   const data = await fetchEcopayTushum();
   fetchEcoTranzaksiyalar();

@@ -10,7 +10,7 @@ async function sudQaroriniBiriktirish({ process_id, file_path }) {
   const fileType = `Sud qarori`;
   const session = await CleanCitySession.findOne({ type: "dxsh" });
   //faylni saqlash uchun linklar mavjud bo'lmagan holatlarda
-  if (!session.path.saveFileLink || !session.path.save_send_to_court) {
+  if (!session.path.saveFileLink || !session.path.save_desined_file) {
     const sudJarayonlarPage = getCleanCityPageByNavigation({
       navigation_text: "Суд жараёнлари",
       session: session,
@@ -79,14 +79,7 @@ async function sudQaroriniBiriktirish({ process_id, file_path }) {
   if (!res.success) {
     return { success: false, msg: "Fayl qabul qilinmadi" };
   }
-  //sud qarorini sudga joylash
-  await fetch(
-    `https://cleancity.uz/${session.path.save_send_to_court + process_id}`,
-    { headers: { Cookie: session.cookie } }
-  );
-  await SudAkt.updateOne(
-    { sud_process_id_billing: process_id },
-    { $set: { sudQaroriBillinggaYuklandi: true } }
-  );
+
   return { success: true };
 }
+module.exports = { sudQaroriniBiriktirish };

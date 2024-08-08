@@ -81,6 +81,9 @@ const { updateElektrKod } = require("./scene/userScenes/updateElektrKod");
 const {
   changeAbonentStreet,
 } = require("./scene/userScenes/changeAbonentStreet");
+const {
+  uploadSudBuyruqlarBillingga,
+} = require("./scene/adminActions/uploadSudBuyruqlarBillingga");
 
 const stage = new Scenes.Stage([
   newAdminScene,
@@ -121,6 +124,7 @@ const stage = new Scenes.Stage([
   sendWarningLettersByHybrid,
   updateElektrKod,
   changeAbonentStreet,
+  uploadSudBuyruqlarBillingga,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

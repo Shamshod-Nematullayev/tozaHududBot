@@ -18,6 +18,7 @@ const schema = new mongoose.Schema(
     "FORMA 1": String,
     "Ariza sanasi": String,
     case_id: String,
+    sud_case_id: String,
     "Sud Ijro raqami": String,
     "my.sud.uz": String,
     "yuborilgan vaqt": String,
