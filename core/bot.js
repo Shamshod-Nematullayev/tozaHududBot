@@ -15,9 +15,8 @@ bot.catch((error, ctx) => {
   }
 });
 bot
-  .launch()
-  .then(() => {
-    console.log("Server connected to telegram");
+  .launch(() => {
+    console.log("Bot has been started.");
   })
   .catch((err) => {
     console.log(err);

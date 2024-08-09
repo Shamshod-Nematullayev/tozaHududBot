@@ -4,24 +4,26 @@ const {
 } = require("../helpers/getCleanCityPageByNavigation");
 const fs = require("fs");
 const request = require("request");
-const { SudAkt } = require("../../../models/SudAkt");
 
 async function sudQaroriniBiriktirish({ process_id, file_path }) {
   const fileType = `Sud qarori`;
   const session = await CleanCitySession.findOne({ type: "dxsh" });
   //faylni saqlash uchun linklar mavjud bo'lmagan holatlarda
   if (!session.path.saveFileLink || !session.path.save_desined_file) {
-    const sudJarayonlarPage = getCleanCityPageByNavigation({
+    const sudJarayonlarPage = await getCleanCityPageByNavigation({
       navigation_text: "Суд жараёнлари",
       session: session,
     });
+    if (!sudJarayonlarPage.match(/dsmmf\?xenc=([^']+)id='/g))
+      return { success: false, message: "Session has expired." };
     let saveFileLink = sudJarayonlarPage
       .match(/dsmmf\?xenc=([^']+)id='/g)[0]
       .split("'")[0];
     let save_desined_file = sudJarayonlarPage
       .match(/dsmmf\?xenc=([^']+)id='/g)[1]
       .split("'")[0];
-    await CleanCitySession.findOne(
+
+    await CleanCitySession.findOneAndUpdate(
       { type: "dxsh" },
       {
         $set: {
