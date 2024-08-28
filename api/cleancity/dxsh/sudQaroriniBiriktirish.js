@@ -35,6 +35,7 @@ async function sudQaroriniBiriktirish({ process_id, file_path }) {
     return await sudQaroriniBiriktirish(process_id);
   }
   //sud qarorini biriktirish
+  console.log({ file_path });
   let options = {
     method: "POST",
     url: `https://cleancity.uz/${session.path.saveFileLink + process_id}`,

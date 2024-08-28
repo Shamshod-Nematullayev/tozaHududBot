@@ -76,6 +76,7 @@ const recoverCleanCitySession = new Scenes.WizardScene(
         active: true,
       });
       const msg = await ctx.reply("Muvaffaqqiyatli login qilindi");
+
       ctx.session.messages_for_delete.push(msg.message_id);
       ctx.scene.leave();
     } catch (err) {

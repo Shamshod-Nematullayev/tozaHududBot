@@ -21,6 +21,7 @@ app.use("/api/documents", require("./routers/kiruvchiXujjatlar"));
 app.use("/api/inspectors", require("./routers/inspectorsRouter"));
 app.use("/api/abonents", require("./routers/abonentsRouter"));
 app.use("/api/billing", require("./routers/billing"));
+app.use("/api/arizalar", require("./routers/arizalarRouter"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {

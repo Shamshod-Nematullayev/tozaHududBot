@@ -9,9 +9,6 @@ const fs = require("fs");
 const {
   sudQaroriniBiriktirish,
 } = require("../../../api/cleancity/dxsh/sudQaroriniBiriktirish");
-const {
-  sudQaroruChiqorildiStatusigaUtkazish,
-} = require("../../../api/cleancity/dxsh/sudQaroriChiqorildiStatusigaUtkazish");
 
 const uploadSudBuyruqlarBillingga = new Scenes.WizardScene(
   "upload_execution_to_billing",
@@ -60,6 +57,7 @@ const uploadSudBuyruqlarBillingga = new Scenes.WizardScene(
               mode: "cors",
             }
           );
+          console.log(await case_details.text());
           const case_details = await case_details_res.json();
           const case_documents = case_details.case_case_documents;
           const decisionDocs = case_documents.filter(
@@ -129,17 +127,18 @@ const uploadSudBuyruqlarBillingga = new Scenes.WizardScene(
               });
             });
             await Promise.all(promises);
-            const statusAlmashtirish =
-              await sudQaroruChiqorildiStatusigaUtkazish(
-                sudAkt.sud_process_id_billing
-              );
-            if (statusAlmashtirish.success) {
-              ctx.reply(sudAkt.licshet + " billingga yuklandi");
-              resolve({
-                success: true,
-                message: sudAkt.licshet + " billingga yuklandi",
-              });
-            }
+            // const statusAlmashtirish =
+            //   await sudQaroruChiqorildiStatusigaUtkazish(
+            //     sudAkt.sud_process_id_billing
+            //   );
+            // console.log({ statusAlmashtirish });
+            // if (statusAlmashtirish.success) {
+            ctx.reply(sudAkt.licshet + " billingga yuklandi");
+            resolve({
+              success: true,
+              message: sudAkt.licshet + " billingga yuklandi",
+            });
+            // }
           } else {
             reject({
               success: false,
