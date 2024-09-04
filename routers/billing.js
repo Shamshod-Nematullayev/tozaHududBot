@@ -106,16 +106,31 @@ router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
     console.error(error);
   }
 });
+router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
+  try {
+    const abonentData = await getAbonentDataByLicshet({
+      licshet: req.params.licshet,
+    });
+    console.log(abonentData);
+
+    res.json({
+      ok: true,
+      abonentData: abonentData.rows[0],
+    });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
 
 const uchirilishiKerakBulganAbonentlar = [105120350731];
 router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
   try {
     const data = await getAbonents({ mfy_id: req.params.mfy_id });
     let filteredData = data.filter((abonent) => {
-      return (
-        !uchirilishiKerakBulganAbonentlar.includes(Number(abonent.licshet)) &&
-        Number(abonent.saldo_k) > 200000
-      );
+      return !uchirilishiKerakBulganAbonentlar.includes(
+        Number(abonent.licshet)
+      ); //&& Number(abonent.saldo_k) > 200000
     });
     filteredData = filteredData.map((abonent) => ({
       ...abonent,

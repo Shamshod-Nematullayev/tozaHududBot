@@ -18,5 +18,19 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  comment: {
+    type: String,
+    default: "",
+  },
+  aktSummasi: {
+    type: Number,
+    default: 0,
+  },
+  current_prescribed_cnt: {
+    type: Number,
+  },
+  next_prescribed_cnt: {
+    type: Number,
+  },
 });
 module.exports.Ariza = mongoose.model("ariza", schema, "arizalar");

@@ -1,6 +1,7 @@
 const { drawSendLastSeen } = require("./drawTushum");
 
 let cookie = "";
+let Authorization = "";
 module.exports.fetchEcopayTushum = async () => {
   try {
     let response;
@@ -12,10 +13,13 @@ module.exports.fetchEcopayTushum = async () => {
         Date.now()
       )}&date_to=${date.getDate(Date.now())}.${
         date.getMonth(Date.now()) + 1
-      }.${date.getFullYear(Date.now())}&companies_id=1144&sys_companies_id=336`,
+      }.${date.getFullYear(Date.now())}&companies_id=1144&sys_companies_id=503`,
       {
         method: "GET",
-        headers: { Cookie: "JSESSIONID=" + cookie },
+        headers: {
+          Cookie: `JSESSIONID=${cookie};user_name=${process.env.ECOPAY_LOGIN}`,
+          Authorization: `Bearer ${Authorization}`,
+        },
       }
     );
     response = await res.json();
@@ -52,6 +56,7 @@ module.exports.fetchEcopayLogin = async (callback) => {
   }).then(async (res) => {
     let data = await res.json();
     cookie = data.user.session_id;
+    Authorization = data.user.token;
   });
 };
 
