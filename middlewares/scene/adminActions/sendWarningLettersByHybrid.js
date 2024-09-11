@@ -76,14 +76,26 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
       const arrayMails = [];
       let i = 0;
       const loop = async () => {
-        if (i == jsonData.length) return;
+        if (i == jsonData.length) {
+          ctx.replyWithHTML(
+            `Xatlar gibrit pochta bazasiga jo'natildi. <a href="https://hybrid.pochta.uz/#/main/mails/listing/draft?sortBy=createdOn&sortDesc=true&page=1&itemsPerPage=50">Saytga</a> kirib ularni tasdiqlashingiz kerak`,
+            createInlineKeyboard([[["Tekshirish 🔄", "refresh"]]])
+          );
+          ctx.wizard.state.arrayMails = arrayMails;
+          ctx.wizard.next();
+          return;
+        }
         const row = jsonData[i];
         const licshet = row[Object.keys(row)[1]];
         if (licshet === undefined) {
           return ctx.reply(`${i + 2}-qatorda licshet topilmadi`);
         }
         const mail = await HybridMail.findOne({ licshet });
-        if (mail) return { ok: false, message: "Mail already exists" };
+        if (mail) {
+          console.log({ ok: false, message: "Mail already exists" });
+          i++;
+          return loop();
+        }
         const abonentData = await getAbonentSaldoData(licshet);
         const base64PDF = await createWarningLetterPDF(licshet);
         if (!base64PDF.success) {
@@ -107,16 +119,9 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           licshet: licshet,
         });
         i++;
-        await loop();
+        loop();
       };
-      await loop();
-
-      ctx.replyWithHTML(
-        `Xatlar gibrit pochta bazasiga jo'natildi. <a href="https://hybrid.pochta.uz/#/main/mails/listing/draft?sortBy=createdOn&sortDesc=true&page=1&itemsPerPage=50">Saytga</a> kirib ularni tasdiqlashingiz kerak`,
-        createInlineKeyboard([[["Tekshirish 🔄", "refresh"]]])
-      );
-      ctx.wizard.state.arrayMails = arrayMails;
-      ctx.wizard.next();
+      loop();
     } catch (e) {
       console.error(e);
     }
@@ -152,7 +157,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
     let jonatilmagan;
     const hammasiJonatildi = results.every((result) => {
       jonatilmagan = result;
-      return result.IsSent;
+      return result.SendStatus === 0;
     });
     if (!hammasiJonatildi) {
       return ctx.replyWithHTML(
@@ -161,7 +166,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
     }
     ctx.deleteMessage();
     await ctx.reply(
-      "Hammasi jonatildi. Ruxsat bersangiz hisobga olishning yagona elektron tizimiga ham pochka kvitansiyalarini yuklab qo'yar edim",
+      "Hammasi jonatildi. Ruxsat bersangiz hisobga olishning yagona elektron tizimiga ham pochta kvitansiyalarini yuklab qo'yar edim",
       createInlineKeyboard([[["Billingga yuklash ⬆️", "uploadToBilling"]]])
     );
     return ctx.wizard.next();
@@ -169,11 +174,11 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
   async (ctx) => {
     if (ctx.update.callback_query?.data !== "uploadToBilling")
       return await ctx.reply(
-        "Hammasi jonatildi. Ruxsat bersangiz hisobga olishning yagona elektron tizimiga ham pochka kvitansiyalarini yuklab qo'yar edim",
+        "Hammasi jonatildi. Ruxsat bersangiz hisobga olishning yagona elektron tizimiga ham pochta kvitansiyalarini yuklab qo'yar edim",
         createInlineKeyboard([[["Billingga yuklash ⬆️", "uploadToBilling"]]])
       );
     ctx.reply("Tekshirish");
-    let counter = 300;
+    let counter = 0;
     async function loop() {
       if (counter == ctx.wizard.state.arrayMails.length) {
         await ctx.reply("Billingga yuklab bo'ldim.");
@@ -204,6 +209,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
               async (err, res) => {
                 if (err) return console.error(err);
 
+                const filePath = `./uploads/ogohlantirish_xati${row.licshet}.PDF`;
                 let merger = new PDFMerger();
                 const convert = async () => {
                   await merger.add(pdf.filename);
@@ -211,7 +217,6 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
                   await merger.add(
                     "./uploads/cash" + row.hybridMailId + ".pdf"
                   );
-
                   // Set metadata
                   await merger.setMetadata({
                     producer: "oliy ong",
@@ -219,9 +224,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
                     creator: "Toza Hudud bot",
                     title: "Ogohlantirish xati",
                   });
-                  await merger.save(
-                    `./uploads/ogohlantirish_xati${row.licshet}.PDF`
-                  );
+                  await merger.save(filePath);
                 };
                 await convert();
                 const abonentData = await getAbonentSaldoData(row.licshet);
@@ -235,7 +238,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
                   comment: "Gibrit pochta orqali yuborilgan ogohlantirish xati",
                   qarzdorlik: abonentData.saldo_k,
                   sana: bugungiSana(),
-                  file_path: `./uploads/ogohlantirish_xati${row.licshet}.PDF`,
+                  file_path: filePath,
                 });
 
                 if (response.success) {

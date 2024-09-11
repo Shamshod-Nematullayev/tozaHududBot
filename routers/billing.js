@@ -2,6 +2,7 @@ const enterQaytaHisobAkt = require("../api/cleancity/dxsh/enterQaytaHisobAkt");
 const { enterYashovchiSoniAkt } = require("../api/cleancity/dxsh");
 const { upload } = require("../middlewares/multer");
 const { Mahalla } = require("../models/Mahalla");
+const { Ariza } = require("../models/Ariza");
 const { Counter } = require("../models/Counter");
 const { IncomingDocument } = require("../models/IncomingDocument");
 const cc = `https://cleancity.uz/`;
@@ -11,6 +12,12 @@ const { getAbonentDXJ } = require("../api/cleancity/dxsh");
 const { getAbonentDataByLicshet } = require("../api/cleancity/dxsh");
 const getAbonents = require("../api/cleancity/dxsh/getAbonents");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
+const akt_pachka_id = {
+  viza: "4441920",
+  odam_soni: "4441921",
+  dvaynik: "4441922",
+  boshqa: "4441923",
+};
 
 const router = require("express").Router();
 router.get("/next-incoming-document-number", async (req, res) => {
@@ -24,6 +31,7 @@ router.get("/next-incoming-document-number", async (req, res) => {
 router.post("/create-full-akt", upload.single("file"), async (req, res) => {
   try {
     let counter = {};
+    console.log("so'rov keldi");
     if (req.body.autoAktNumber === "true") {
       counter = await Counter.findOne({ name: "incoming_document_number" });
 
@@ -38,7 +46,7 @@ router.post("/create-full-akt", upload.single("file"), async (req, res) => {
         doc_type: req.body.doc_type,
         inspector: req.body.inspector,
         file_id: documentOnTelegram.document.file_id,
-        file_name: req.file.filename,
+        file_name: req.file.filename + ".pdf",
         comment: req.body.comment,
         date: Date.now(),
         doc_num: counter.value + 1,
@@ -62,11 +70,10 @@ router.post("/create-full-akt", upload.single("file"), async (req, res) => {
         filepath: path.join(__dirname, "../uploads/", req.file.filename),
         licshet: req.body.licshet,
         prescribed_cnt: req.body.prescribed_cnt,
-        stack_prescribed_akts_id: "8259", // yashovchi soni akt pachkasi har oy o'zgartiriladi
+        stack_prescribed_akts_id: "8594", // yashovchi soni akt pachkasi har oy o'zgartiriladi
       });
     }
     let qaytahisob = { success: true };
-
     if (req.body.qaytaHisobBuladi == "true") {
       qaytahisob = await enterQaytaHisobAkt({
         akt_number: counter.value + 1,
@@ -74,7 +81,34 @@ router.post("/create-full-akt", upload.single("file"), async (req, res) => {
         amount: req.body.amount,
         filepath: path.join(__dirname, "../uploads/", req.file.filename),
         licshet: req.body.licshet,
-        stack_akts_id: "4441002", // qayta hisob kitob aktlari har oy yangilanadi
+        nds_summ: req.body.nds_summ,
+        stack_akts_id: req.body.ariza_id
+          ? akt_pachka_id[req.body.ariza.document_type]
+          : akt_pachka_id.boshqa,
+      });
+    }
+    if (req.body.ariza_id) {
+      const ariza = await Ariza.findByIdAndUpdate(req.body.ariza_id, {
+        $set: {
+          status: "tasdiqlangan",
+          akt_pachka_id: req.body.ariza_id
+            ? akt_pachka_id[req.body.ariza.document_type]
+            : akt_pachka_id.boshqa,
+          akt_id: qaytahisob.akt_id,
+          aktInfo: {
+            akt_number: counter.value + 1,
+            comment: req.body.comment,
+            amount: req.body.amount,
+            licshet: req.body.licshet,
+            nds_summ: req.body.nds_summ,
+          },
+        },
+      });
+      return res.json({
+        ok: qaytahisob.success && yashovchi.success ? true : false,
+        qaytahisob,
+        yashovchi,
+        ariza,
       });
     }
 
@@ -128,9 +162,10 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
   try {
     const data = await getAbonents({ mfy_id: req.params.mfy_id });
     let filteredData = data.filter((abonent) => {
-      return !uchirilishiKerakBulganAbonentlar.includes(
-        Number(abonent.licshet)
-      ); //&& Number(abonent.saldo_k) > 200000
+      return (
+        !uchirilishiKerakBulganAbonentlar.includes(Number(abonent.licshet)) &&
+        Number(abonent.saldo_k) > 200000
+      );
     });
     filteredData = filteredData.map((abonent) => ({
       ...abonent,

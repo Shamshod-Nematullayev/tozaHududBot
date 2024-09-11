@@ -32,5 +32,18 @@ const schema = new mongoose.Schema({
   next_prescribed_cnt: {
     type: Number,
   },
+  status: {
+    type: String,
+    enum: ["yangi", "qabul qilindi", "tasdiqlangan", "bekor qilindi"],
+    default: "yangi",
+  },
+  is_canceled: {
+    type: Boolean,
+    default: false,
+  },
+  canceling_description: String,
+  akt_pachka_id: String,
+  akt_id: String,
+  aktInfo: Object,
 });
 module.exports.Ariza = mongoose.model("ariza", schema, "arizalar");

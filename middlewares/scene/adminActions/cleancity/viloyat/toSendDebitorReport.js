@@ -5,6 +5,9 @@ const ejs = require("ejs");
 const nodeHtmlToImage = require("node-html-to-image");
 const { bot } = require("../../../../../core/bot");
 const path = require("path");
+const {
+  virtualConsole,
+} = require("../../../../../api/cleancity/helpers/virtualConsole");
 
 const cc = "https://cleancity.uz";
 const toSendDebitor = async (ctx) => {
@@ -14,7 +17,9 @@ const toSendDebitor = async (ctx) => {
       Cookie: session.cookie,
     },
   });
-  const startpage = new JSDOM(await res.text()).window.document;
+  const startpage = new JSDOM(await res.text(), {
+    virtualConsole: virtualConsole,
+  }).window.document;
   if (
     startpage.querySelector(
       "#g_acccordion > div > div > ul > li:nth-child(1) > a"
@@ -115,5 +120,4 @@ const drawDebitViloyat = async (sendingType) => {
     }
   });
 };
-
 module.exports = { toSendDebitor, drawDebitViloyat };

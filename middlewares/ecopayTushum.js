@@ -15,6 +15,7 @@ const fs = require("fs");
 const {
   mfyIncomeReport,
 } = require("./scene/adminActions/cleancity/dxsh/mfyIncomeReport");
+const { virtualConsole } = require("../api/cleancity/helpers/virtualConsole");
 
 const cc = "https://cleancity.uz";
 let text = "";
@@ -28,7 +29,9 @@ const sendViloyatKunlikReja = async (resType, senderId) => {
       },
     });
 
-    const startpage = new JSDOM(await res.text()).window.document;
+    const startpage = new JSDOM(await res.text(), {
+      virtualConsole: virtualConsole,
+    }).window.document;
     console.log(
       startpage.querySelector(
         "#g_acccordion > div > div > ul > li:nth-child(13) > a"

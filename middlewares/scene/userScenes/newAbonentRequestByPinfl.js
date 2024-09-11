@@ -159,6 +159,15 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
+      if (!ctx.message)
+        return ctx.reply(
+          "Yashovchi yoki kiriting",
+          Markup.keyboard([
+            ["1", "2", "3"],
+            ["4", "5", "6"],
+            ["7", "8", "9"],
+          ])
+        );
       if (isNaN(ctx.message.text))
         return ctx.reply(
           "Yashovchi sonini raqamda kiritish kerak",

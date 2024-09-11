@@ -4,6 +4,7 @@ const cc = `https://cleancity.uz/`;
 const { JSDOM } = require("jsdom");
 const fs = require("fs");
 const https = require("https");
+const { virtualConsole } = require("../helpers/virtualConsole");
 
 async function getLastAlertLetter(kod) {
   try {
@@ -90,7 +91,9 @@ async function getLastAlertLetter(kod) {
         headers: { Cookie: session.cookie },
       });
       const startpageText = await startpage.text();
-      const startpageDoc = new JSDOM(startpageText).window.document;
+      const startpageDoc = new JSDOM(startpageText, {
+        virtualConsole: virtualConsole,
+      }).window.document;
       const elements = startpageDoc.querySelectorAll("a");
       let toSudActionsPage = "";
       elements.forEach(function (element) {

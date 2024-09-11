@@ -2,6 +2,9 @@ const cc = `https://cleancity.uz/`;
 const { CleanCitySession } = require("../../../../../models/CleanCitySession");
 const { JSDOM } = require("jsdom");
 const { Context } = require("telegraf");
+const {
+  virtualConsole,
+} = require("../../../../../api/cleancity/helpers/virtualConsole");
 
 // ========================================================================
 
@@ -33,7 +36,9 @@ const yangiAbonent = async ({
 
       // let url = startpageText.match(/href="?x=([^"]+)'/g);
       // console.log(url);
-      const startpageDoc = new JSDOM(startpageText).window.document;
+      const startpageDoc = new JSDOM(startpageText, {
+        virtualConsole: virtualConsole,
+      }).window.document;
       let find_abonents_page_url = startpageDoc
         .querySelector(
           "#g_acccordion > div > div:nth-child(1) > ul > li:nth-child(1) > a"

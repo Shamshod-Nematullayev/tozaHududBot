@@ -6,6 +6,9 @@ const fs = require("fs");
 const {
   clearMessages,
 } = require("../../../smallFunctions/clearMessagesForDelete");
+const {
+  virtualConsole,
+} = require("../../../../api/cleancity/helpers/virtualConsole");
 
 const recoverCleanCitySession = new Scenes.WizardScene(
   "recover_clean_city_session",
@@ -40,7 +43,9 @@ const recoverCleanCitySession = new Scenes.WizardScene(
         }
       );
       const textLoginResponse = await resLogin.text();
-      const resDoc = new JSDOM(textLoginResponse).window.document;
+      const resDoc = new JSDOM(textLoginResponse, {
+        virtualConsole: virtualConsole,
+      }).window.document;
       //   fs.writeFile("./startpage.html", textLoginResponse, () => {});
       if (resDoc.querySelector(".feedbackPanelERROR")?.textContent) {
         const captchaImg = await nodeFetch(
@@ -96,7 +101,9 @@ recoverCleanCitySession.enter(async (ctx) => {
     );
     ctx.session.messages_for_delete.push(msg.message_id);
     const textHomePage = await resHomePage.text();
-    const homepage = new JSDOM(textHomePage);
+    const homepage = new JSDOM(textHomePage, {
+      virtualConsole: virtualConsole,
+    });
 
     const resLoginPage = await fetch(
       `https://cleancity.uz/home/${
@@ -109,7 +116,9 @@ recoverCleanCitySession.enter(async (ctx) => {
       }
     );
     const textLoginPage = await resLoginPage.text();
-    const loginpage = new JSDOM(textLoginPage).window.document;
+    const loginpage = new JSDOM(textLoginPage, {
+      virtualConsole: virtualConsole,
+    }).window.document;
     ctx.session.loginpath = loginpage
       .getElementById("submit_btn")
       .getAttribute("onclick")

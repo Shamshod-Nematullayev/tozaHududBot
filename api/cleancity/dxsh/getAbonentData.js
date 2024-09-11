@@ -2,12 +2,16 @@ const { Abonent } = require("../../../models/Abonent");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const cc = "https://cleancity.uz/";
 const { JSDOM } = require("jsdom");
+const { virtualConsole } = require("../helpers/virtualConsole");
 
 module.exports = async function getAbonentDataByLicshet({ licshet }) {
   try {
     const session = await CleanCitySession.findOne({ type: "dxsh" });
 
     const abonent = await Abonent.findOne({ licshet });
+    // if (!abonent) {
+    //   return { success: false, msg: `abonent not found on mongodb` };
+    // }
 
     if (!session.path.getAboDataUrl) {
       const startpage = await fetch(cc + "startpage", {
@@ -15,7 +19,9 @@ module.exports = async function getAbonentDataByLicshet({ licshet }) {
       });
       const startpageText = await startpage.text();
 
-      const startpageDoc = new JSDOM(startpageText).window.document;
+      const startpageDoc = new JSDOM(startpageText, {
+        virtualConsole: virtualConsole,
+      }).window.document;
       let toCardAboUrl = startpageDoc
         .getElementById("to_card_abo")
         .getAttribute("action");
@@ -94,7 +100,7 @@ module.exports = async function getAbonentDataByLicshet({ licshet }) {
     );
     return await abonent_data.json();
   } catch (err) {
-    console.error(err);
+    console.error(err, arguments);
     return { success: false, msg: "Error on getAbonentData" };
   }
 };

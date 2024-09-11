@@ -8,6 +8,9 @@ const ejs = require("ejs");
 const nodeHtmlToImage = require("node-html-to-image");
 const path = require("path");
 const fs = require("fs");
+const {
+  virtualConsole,
+} = require("../../../../../api/cleancity/helpers/virtualConsole");
 
 // ==============================================================
 // MAIN FUNCTION
@@ -38,7 +41,10 @@ const mfyIncomeReport = async (ctx = false) => {
       });
       // Tushumlar tahliliga o'tkazadigan linkni aniqlash
       const textHomePage = await resHomePage.text();
-      const docHomePage = new JSDOM(textHomePage).window.document;
+
+      const docHomePage = new JSDOM(textHomePage, {
+        virtualConsole: virtualConsole,
+      }).window.document;
       // Mana o'sha link => tushumlar tahlili sahifasiga
       if (
         !docHomePage.querySelector(
@@ -46,7 +52,6 @@ const mfyIncomeReport = async (ctx = false) => {
         ) &&
         ctx
       ) {
-        console.log("shu joy");
         const msg = await ctx.reply(
           `Faol sessiyalar mavjud emas qaytadan login qiling`
         );
