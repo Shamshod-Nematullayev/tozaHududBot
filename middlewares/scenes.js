@@ -65,8 +65,6 @@ const {
 const {
   new_abonent_request_by_pinfl_scene,
 } = require("./scene/userScenes/newAbonentRequestByPinfl");
-<<<<<<< HEAD
-=======
 const {
   sudBuyruqlariYaratish,
 } = require("./scene/adminActions/sud/sudBuyruqlariYaratish");
