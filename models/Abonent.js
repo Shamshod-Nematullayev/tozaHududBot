@@ -24,15 +24,10 @@ const schema = new Schema(
       max: 12,
       min: 12,
     },
-    address: {
-      type: String,
-    },
-    akt: String,
     saldo_n: Number,
     saldo_k: Number,
     energy_licshet: Number,
     kadastr_number: String,
-    last_pay_amount: Number,
     last_pay_date: String,
     mahalla_name: String,
     mahallas_id: {
@@ -48,7 +43,6 @@ const schema = new Schema(
     phone: String,
     pinfl: Number,
     passport_number: String,
-    // photo: String,
     prescribed_cnt: Number,
     shaxsi_tasdiqlandi: {
       type: Object,

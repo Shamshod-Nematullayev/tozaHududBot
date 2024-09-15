@@ -14,10 +14,16 @@ bot.catch((error, ctx) => {
     console.error("Error:", error);
   }
 });
+
+bot.telegram.setMyCommands([
+  { command: "start", description: "Start the bot" },
+  { command: "help", description: "Get help information" },
+  { command: "settings", description: "Configure your settings" },
+]);
+
 bot
-  .launch()
-  .then(() => {
-    console.log("Server connected to telegram");
+  .launch(() => {
+    console.log("Bot has been started.");
   })
   .catch((err) => {
     console.log(err);

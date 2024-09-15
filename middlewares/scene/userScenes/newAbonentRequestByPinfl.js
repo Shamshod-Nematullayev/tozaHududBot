@@ -6,6 +6,7 @@ const isPinfl = require("../../smallFunctions/isPinfl");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const { kirillga } = require("../../smallFunctions/lotinKiril");
 const { yangiAbonent } = require("../adminActions/cleancity/dxsh/yangiAbonent");
+<<<<<<< HEAD
 const { keyboards } = require("../../../lib/keyboards");
 <<<<<<< HEAD
 =======
@@ -13,6 +14,13 @@ const { messages } = require("../../../lib/messages");
 const { Abonent } = require("../../../models/Abonent");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 >>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
+=======
+const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
+const { messages } = require("../../../lib/messages");
+const { Abonent } = require("../../../models/Abonent");
+const { Nazoratchi } = require("../../../models/Nazoratchi");
+const { Mahalla } = require("../../../models/Mahalla");
+>>>>>>> 6f9661884d5b3a3f8956641cfb7b382682299a89
 const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {
@@ -80,10 +88,22 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         await ctx.reply(
           `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
         );
-        await ctx.reply(
-          "Mahallasini tanlang",
-          keyboards.lotin.mahallalar.oneTime()
+        const mahallalar = await Mahalla.find({
+          "biriktirilganNazoratchi.inspactor_id": inspektor.id,
+        });
+        if (mahallalar.length == 0) {
+          return ctx.reply(
+            "Sizga biriktirilgan mahallalar yo'q!",
+            keyboards.lotin.cancelBtn.resize()
+          );
+        }
+        const sortedMahallalar = mahallalar.sort((a, b) =>
+          a.name.localeCompare(b.name)
         );
+        const buttons = sortedMahallalar.map((mfy) => [
+          Markup.button.callback(mfy.name, "mahalla_" + mfy.id),
+        ]);
+        await ctx.reply("Mahallasini tanlang", Markup.inlineKeyboard(buttons));
         ctx.wizard.state.customDates = {
           fullname: kirillga(
             `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
@@ -168,6 +188,15 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
+      if (!ctx.message)
+        return ctx.reply(
+          "Yashovchi yoki kiriting",
+          Markup.keyboard([
+            ["1", "2", "3"],
+            ["4", "5", "6"],
+            ["7", "8", "9"],
+          ])
+        );
       if (isNaN(ctx.message.text))
         return ctx.reply(
           "Yashovchi sonini raqamda kiritish kerak",

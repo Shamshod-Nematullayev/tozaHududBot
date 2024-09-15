@@ -4,6 +4,7 @@ const { Abonent } = require("../../../models/Abonent");
 const request = require("request");
 const cc = `https://cleancity.uz/`;
 const fs = require("fs");
+const { virtualConsole } = require("../helpers/virtualConsole");
 
 function getCurrentDate() {
   // Create a new Date object
@@ -43,7 +44,9 @@ async function enterYashovchiSoniAkt({
         headers: { Cookie: session.cookie },
       });
       const startpageText = await startpage.text();
-      const startpageDoc = new JSDOM(startpageText).window.document;
+      const startpageDoc = new JSDOM(startpageText, {
+        virtualConsole: virtualConsole,
+      }).window.document;
       const elements = startpageDoc.querySelectorAll("a");
       let yashovchiSoniAktlarPage = "";
       elements.forEach(function (element) {

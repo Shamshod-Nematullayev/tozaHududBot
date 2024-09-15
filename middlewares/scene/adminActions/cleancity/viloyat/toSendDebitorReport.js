@@ -5,6 +5,9 @@ const ejs = require("ejs");
 const nodeHtmlToImage = require("node-html-to-image");
 const { bot } = require("../../../../../core/bot");
 const path = require("path");
+const {
+  virtualConsole,
+} = require("../../../../../api/cleancity/helpers/virtualConsole");
 
 const cc = "https://cleancity.uz";
 const toSendDebitor = async (ctx) => {
@@ -14,16 +17,18 @@ const toSendDebitor = async (ctx) => {
       Cookie: session.cookie,
     },
   });
-  const startpage = new JSDOM(await res.text()).window.document;
+  const startpage = new JSDOM(await res.text(), {
+    virtualConsole: virtualConsole,
+  }).window.document;
   if (
     startpage.querySelector(
       "#g_acccordion > div > div > ul > li:nth-child(1) > a"
     ) == undefined
   ) {
-    bot.telegram.sendMessage(
-      5347896070,
-      `Xukmdorim viloyat debitor reja tashlash bo'yicha Cookie va Xenc yo'li boy berildi`
-    );
+    // bot.telegram.sendMessage(
+    //   5347896070,
+    //   `Xukmdorim viloyat debitor reja tashlash bo'yicha Cookie va Xenc yo'li boy berildi`
+    // );
     return [];
   }
   const dxsh1Url = startpage.querySelector(
@@ -115,5 +120,4 @@ const drawDebitViloyat = async (sendingType) => {
     }
   });
 };
-
 module.exports = { toSendDebitor, drawDebitViloyat };

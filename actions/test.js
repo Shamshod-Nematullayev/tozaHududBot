@@ -9,6 +9,17 @@ const { CleanCitySession } = require("../models/CleanCitySession");
 const { SudMaterial } = require("../models/SudMaterial");
 const { SudAkt } = require("../models/SudAkt");
 const { Mahalla } = require("../models/Mahalla");
+const getAbonentData = require("../api/cleancity/dxsh/getAbonentData");
+const { HybridMail } = require("../models/HybridMail");
+const { getOneMailById, getPdf } = require("../api/hybrid.pochta.uz");
+const ejs = require("ejs");
+const { htmlPDF } = require("../requires");
+const PDFMerger = require("pdf-merger-js");
+const {
+  enterWarningLetterToBilling,
+  confirmNewWarningLetterByLicshet,
+} = require("../api/cleancity/dxsh");
+const { virtualConsole } = require("../api/cleancity/helpers/virtualConsole");
 
 (async function () {
   // let res = await enterMaterialTOBilling(
@@ -113,7 +124,9 @@ async function importSudMaterialsToBilling(pachka_id) {
         headers: { Cookie: session.cookie },
       });
       const startpageText = await startpage.text();
-      const startpageDoc = new JSDOM(startpageText).window.document;
+      const startpageDoc = new JSDOM(startpageText, {
+        virtualConsole: virtualConsole,
+      }).window.document;
       const elements = startpageDoc.querySelectorAll("a");
       let toSudActionsPage = "";
       elements.forEach(function (element) {
@@ -273,35 +286,134 @@ async function sendToSudMaterial(pachka_id) {
   await update();
 }
 async function updateMongo() {
-  const sud_akts = await SudAkt.find();
-  let counter = 0;
-
-  async function loop() {
-    if (counter == sud_akts.length) return console.log("Bajarildi");
-    const akt = sud_akts[counter];
-
-    if (true) {
-      const parts = akt["Ogohlantirilgan sana"].split("-");
-      const day = parseInt(parts[0], 10); // Convert to integer
-      const month = parseInt(parts[1], 10) - 1; // Month in JavaScript Date is 0-indexed (0 for January)
-      const year = parseInt(parts[2], 10);
-      // Create a new Date object using the components
-      const parsedDate = new Date(year, month, day);
-
-      await SudAkt.findByIdAndUpdate(akt._id, {
-        // $set: { warning_sended_date: parsedDate },
-        $unset: { "Ogohlantirilgan sana": 1 },
-      });
-      counter++;
-      console.log(counter);
-      await loop();
-    } else {
-      counter++;
-      console.log(counter);
-      await loop();
-    }
+  function bugungiSana() {
+    const date = new Date();
+    return `${date.getDate()}.${
+      date.getMonth() + 1 < 10
+        ? "0" + (date.getMonth() + 1)
+        : date.getMonth() + 1
+    }.${date.getFullYear()}`;
   }
-  await loop();
+
+  const bazagaYuklashKk = `105120500328 
+  105120210883 
+  105120600001 
+  105120320264 
+  105120440055 
+  105120350185 
+  105120550322 
+  105120470267 
+  105120310056 
+  105120590125 
+  105120690523 
+  105120660011 
+  105120590189 
+  105120460197 
+  105120400323 
+  105120710305 
+  105120630543 
+  105120340527 
+  105120380477 
+  105120710459 
+  `;
+  const codes = bazagaYuklashKk.trim().split(/\s+/);
+  // const mails = await HybridMail.find({isSavedBilling: false})
+  let counter = 0;
+  async function loop() {
+    if (counter == codes.length) {
+      console.log("Billingga yuklab bo'ldim.");
+      return;
+    }
+    await HybridMail.updateOne(
+      { licshet: codes[counter] },
+      { $set: { isSavedBilling: true } }
+    );
+    counter++;
+    loop();
+    // const mail = await HybridMail.findOne({ licshet: codes[counter] });
+    // if (mail.isSavedBilling) {
+    //   counter++;
+    //   loop();
+    //   return;
+    // }
+    // const response = await getOneMailById(mail.hybridMailId);
+    // const pdf = await getPdf(mail.hybridMailId);
+    // if (!pdf.ok) return { success: false, message: pdf.err };
+    // ejs.renderFile(
+    //   "./views/hybridPochtaCash.ejs",
+    //   { mail: { ...response } },
+    //   (err, str) => {
+    //     if (err) return console.error(err);
+
+    //     htmlPDF
+    //       .create(str, { format: "A4", orientation: "portrait" })
+    //       .toFile(
+    //         "./uploads/cash" + mail.hybridMailId + ".pdf",
+    //         async (err, res) => {
+    //           if (err) return console.error(err);
+    //           let merger = new PDFMerger();
+    //           console.log(pdf.filename);
+    //           const convert = async () => {
+    //             await merger.add(pdf.filename);
+
+    //             await merger.add("./uploads/cash" + mail.hybridMailId + ".pdf");
+
+    //             // Set metadata
+    //             await merger.setMetadata({
+    //               producer: "oliy ong",
+    //               author: "Shamshod Nematullayev",
+    //               creator: "Toza Hudud bot",
+    //               title: "Ogohlantirish xati",
+    //             });
+    //             await merger.save(
+    //               `./uploads/ogohlantirish_xati${mail.licshet}.PDF`
+    //             );
+    //           };
+    //           await convert();
+    //           const abonentData = await getAbonentData({
+    //             licshet: mail.licshet,
+    //           });
+    //           if (!abonentData) {
+    //             console.log(mail.licshet + ": " + "Abonent topilmadi");
+    //             counter++;
+    //             return loop();
+    //           }
+    //           console.log(`./uploads/ogohlantirish_xati${mail.licshet}.PDF`);
+    //           const response = await enterWarningLetterToBilling({
+    //             lischet: mail.licshet,
+    //             comment: "Gibrit pochta orqali yuborilgan ogohlantirish xati",
+    //             qarzdorlik: abonentData.saldo_k,
+    //             sana: bugungiSana(),
+    //             file_path: `./uploads/ogohlantirish_xati${mail.licshet}.PDF`,
+    //           });
+
+    //           if (response.success) {
+    //             const res = await confirmNewWarningLetterByLicshet(
+    //               mail.licshet
+    //             );
+    //             if (res.success) {
+    //               await HybridMail.findByIdAndUpdate(mail._id, {
+    //                 $set: { isSavedBilling: true },
+    //               });
+    //               counter++;
+    //               console.log(counter, mail.licshet);
+    //               loop();
+    //             }
+    //           } else {
+    //             console.error(response);
+    //             ctx.reply(mail.licshet + ": " + response.msg);
+    //             if (response.msg == "Сумма не корректно") {
+    //               console.log("Сумма не корректно");
+    //               counter++;
+    //               loop();
+    //             }
+    //           }
+    //         }
+    //       );
+    //   }
+    // );
+  }
+  loop();
 }
 // updateMongo();
 // sendToSudMaterial("663dea41d85ea026bf29f561");

@@ -93,11 +93,10 @@ const addNotification = new Scenes.WizardScene(
   },
   async (ctx) => {
     if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
-    let arr = [];
-    ctx.message.text.split("\n").forEach((txt) => {
-      if (txt != "") arr.push(...txt.split(" "));
-    });
-    ctx.wizard.state.abonents = arr;
+
+    // Split the string into an array
+    const arr = ctx.message.text.trim().split(/\s+/);
+
     const documents = await Bildirishnoma.find({ type: "sudga_chiqoring" });
     let doc_num = documents[documents.length - 1].doc_num + 1;
     const newDocument = new Bildirishnoma({

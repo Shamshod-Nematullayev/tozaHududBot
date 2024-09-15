@@ -3,6 +3,9 @@ const { Scenes } = require("telegraf");
 const nodeFetch = require("node-fetch");
 const { JSDOM } = require("jsdom");
 const { CleanCitySession } = require("../../../../../models/CleanCitySession");
+const {
+  virtualConsole,
+} = require("../../../../../api/cleancity/helpers/virtualConsole");
 
 const enteredCallback = async (ctx) => {
   ctx.reply(`Viloyat xodimining logini kiritilsin!`);
@@ -29,7 +32,9 @@ const loginCleanCityViloyatScene = new Scenes.WizardScene(
         parse_mode: "HTML",
       });
       const textHomePage = await resHomePage.text();
-      const homepage = new JSDOM(textHomePage);
+      const homepage = new JSDOM(textHomePage, {
+        virtualConsole: virtualConsole,
+      });
 
       const resLoginPage = await fetch(
         `https://cleancity.uz/home/${
@@ -42,7 +47,9 @@ const loginCleanCityViloyatScene = new Scenes.WizardScene(
         }
       );
       const textLoginPage = await resLoginPage.text();
-      const loginpage = new JSDOM(textLoginPage).window.document;
+      const loginpage = new JSDOM(textLoginPage, {
+        virtualConsole: virtualConsole,
+      }).window.document;
       ctx.wizard.state.loginpath = loginpage
         .getElementById("submit_btn")
         .getAttribute("onclick")
@@ -102,7 +109,9 @@ const loginCleanCityViloyatScene = new Scenes.WizardScene(
         }
       );
       const textLoginResponse = await resLogin.text();
-      const resDoc = new JSDOM(textLoginResponse).window.document;
+      const resDoc = new JSDOM(textLoginResponse, {
+        virtualConsole: virtualConsole,
+      }).window.document;
       //   fs.writeFile("./startpage.html", textLoginResponse, () => {});
       if (resDoc.querySelector(".feedbackPanelERROR")?.textContent) {
         const captchaImg = await nodeFetch(

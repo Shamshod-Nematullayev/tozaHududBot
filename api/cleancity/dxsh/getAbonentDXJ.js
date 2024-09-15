@@ -2,6 +2,7 @@ const { Abonent } = require("../../../models/Abonent");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const cc = `https://cleancity.uz/`;
 const { JSDOM } = require("jsdom");
+const { virtualConsole } = require("../helpers/virtualConsole");
 
 async function getAbonentDXJ({ licshet }) {
   try {
@@ -16,7 +17,9 @@ async function getAbonentDXJ({ licshet }) {
         headers: { Cookie: session.cookie },
       });
       const startpageText = await startpage.text();
-      const startpageDoc = new JSDOM(startpageText).window.document;
+      const startpageDoc = new JSDOM(startpageText, {
+        virtualConsole: virtualConsole,
+      }).window.document;
       let toCardAboUrl = startpageDoc
         .getElementById("to_card_abo")
         .getAttribute("action");

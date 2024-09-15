@@ -4,6 +4,7 @@ const cc = "https://cleancity.uz/";
 const { JSDOM } = require("jsdom");
 const fs = require("fs");
 const path = require("path");
+const { virtualConsole } = require("../helpers/virtualConsole");
 // const FormData = require("form-data");
 
 async function enterWarningLetterToBilling({
@@ -67,7 +68,9 @@ async function enterWarningLetterToBilling({
       headers: { Cookie: session.cookie },
     });
     const startpageText = await startpage.text();
-    const startpageDoc = new JSDOM(startpageText).window.document;
+    const startpageDoc = new JSDOM(startpageText, {
+      virtualConsole: virtualConsole,
+    }).window.document;
     const elements = startpageDoc.querySelectorAll("a");
     let warningLettersPage = "";
     elements.forEach(function (element) {

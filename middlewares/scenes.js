@@ -43,7 +43,6 @@ const { userToInspektor } = require("./scene/adminActions/userToInspektor");
 const {
   updateAbonentDatesByPinfl,
 } = require("./scene/userScenes/updateAbonentDatesPinfil");
-const { aborotkaChiqorish } = require("./scene/adminActions/aborotkaChiqorish");
 const { getSudMaterial } = require("./scene/adminActions/getSudMaterials");
 const {
   ommaviyShartnomaBiriktirish,
@@ -84,7 +83,6 @@ const { updateElektrKod } = require("./scene/userScenes/updateElektrKod");
 const {
   changeAbonentStreet,
 } = require("./scene/userScenes/changeAbonentStreet");
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 
 const stage = new Scenes.Stage([
   newAdminScene,
@@ -111,7 +109,6 @@ const stage = new Scenes.Stage([
   personConfirm,
   userToInspektor,
   updateAbonentDatesByPinfl,
-  aborotkaChiqorish,
   getSudMaterial,
   ommaviyShartnomaBiriktirish,
   generateProkuraturaSudAriza,
@@ -120,15 +117,12 @@ const stage = new Scenes.Stage([
   importAlertLetters,
   pochtaHarajatiniTekshirishScene,
   new_abonent_request_by_pinfl_scene,
-<<<<<<< HEAD
-=======
   sudBuyruqlariYaratish,
   set_monthly_plan,
   vaqtinchalikFunc,
   sendWarningLettersByHybrid,
   updateElektrKod,
   changeAbonentStreet,
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

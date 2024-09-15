@@ -34,6 +34,7 @@ async function enterQaytaHisobAkt({
   filepath,
   stack_akts_id,
   akt_number,
+  nds_summ,
 }) {
   try {
     const session = await CleanCitySession.findOne({ type: "dxsh" });
@@ -134,6 +135,7 @@ async function enterQaytaHisobAkt({
           akt_date: getCurrentDate(),
           amount: Math.abs(amount),
           purpose: comment,
+          nds_amount: Math.abs(nds_summ),
           file_bytes: {
             value: fs.createReadStream(filepath),
             options: {
@@ -178,7 +180,6 @@ async function enterQaytaHisobAkt({
       const akt = rows.find(function (obj) {
         return obj.licshet == licshet && obj.akt_number == akt_number;
       });
-      console.log(akt);
       const result = await fetch(cc + session.path.confirmQaytaHisobAkt, {
         headers: {
           accept: "application/json, text/javascript, */*; q=0.01",
@@ -200,7 +201,8 @@ async function enterQaytaHisobAkt({
         mode: "cors",
         credentials: "include",
       });
-      return await result.json();
+      const data = await result.json();
+      return { ...data, akt_id: akt.id };
     }
   } catch (err) {
     console.error(err);

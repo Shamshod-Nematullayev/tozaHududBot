@@ -1,5 +1,6 @@
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const { JSDOM } = require("jsdom");
+const { virtualConsole } = require("../helpers/virtualConsole");
 
 async function viloyatJamiTushumlar(mes, god, from_day, to_day) {
   try {
@@ -12,7 +13,9 @@ async function viloyatJamiTushumlar(mes, god, from_day, to_day) {
           Cookie: session.cookie,
         },
       });
-      const startpage = new JSDOM(await res.text()).window.document;
+      const startpage = new JSDOM(await res.text(), {
+        virtualConsole: virtualConsole,
+      }).window.document;
       if (
         startpage.querySelector(
           "#g_acccordion > div > div > ul > li:nth-child(1) > a"

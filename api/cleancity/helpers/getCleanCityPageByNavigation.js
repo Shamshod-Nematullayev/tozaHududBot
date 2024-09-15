@@ -1,11 +1,14 @@
 const { JSDOM } = require("jsdom");
+const { virtualConsole } = require("./virtualConsole");
 const getCleanCityPageByNavigation = async ({ navigation_text, session }) => {
   try {
     const startpage = await fetch(process.env.CLEAN_CITY_DOMEN + "startpage", {
       headers: { Cookie: session.cookie },
     });
     const startpageText = await startpage.text();
-    const startpageDoc = new JSDOM(startpageText).window.document;
+    const startpageDoc = new JSDOM(startpageText, {
+      virtualConsole: virtualConsole,
+    }).window.document;
     const elements = startpageDoc.querySelectorAll("a");
     let hrefToPage = "";
     elements.forEach(function (element) {

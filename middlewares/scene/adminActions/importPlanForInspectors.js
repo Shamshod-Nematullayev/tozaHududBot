@@ -40,10 +40,6 @@ const importPlanForInspectors = new Scenes.WizardScene(
             {
               $set: {
                 reja: 0,
-                activ: false,
-                biriktirilganNazoratchi: {
-                  activ: false,
-                },
               },
             }
           );
@@ -54,10 +50,6 @@ const importPlanForInspectors = new Scenes.WizardScene(
                 {
                   $set: {
                     reja: row.C,
-                    biriktirilganNazoratchi: {
-                      inspector_name: row.E,
-                      inspactor_id: row.D,
-                    },
                   },
                 }
               );

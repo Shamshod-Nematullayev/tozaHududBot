@@ -2,6 +2,9 @@ const cc = `https://cleancity.uz/`;
 const { CleanCitySession } = require("../../../../../models/CleanCitySession");
 const { JSDOM } = require("jsdom");
 const { Abonent } = require("../../../../../models/Abonent");
+const {
+  virtualConsole,
+} = require("../../../../../api/cleancity/helpers/virtualConsole");
 
 // Yordamchi funksiyalar
 // URL qayta aniqlash
@@ -12,7 +15,9 @@ const yashovchiSoniOshirishUrlTiklash = async (session, litsavoy) => {
   });
   const startpageText = await startpage.text();
 
-  const startpageDoc = new JSDOM(startpageText).window.document;
+  const startpageDoc = new JSDOM(startpageText, {
+    virtualConsole: virtualConsole,
+  }).window.document;
   let toCardAboUrl = startpageDoc
     .getElementById("to_card_abo")
     .getAttribute("action");

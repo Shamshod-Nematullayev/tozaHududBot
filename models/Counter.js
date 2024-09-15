@@ -22,6 +22,9 @@ module.exports.Counter = mongoose.model("counter", schema, "counter");
   const counterShaxsiTasdiqlandi = await this.Counter.findOne({
     name: "shaxsi_tashdiqlandi_bildirish_xati",
   });
+  const counterAriza = await this.Counter.findOne({
+    name: "ariza_tartib_raqami",
+  });
   if (!counter) {
     await this.Counter.create({ name: "incoming_document_number", value: 0 });
   }
@@ -30,5 +33,8 @@ module.exports.Counter = mongoose.model("counter", schema, "counter");
       name: "shaxsi_tashdiqlandi_bildirish_xati",
       value: 0,
     });
+  }
+  if (!counterAriza) {
+    await this.Counter.create({ name: "ariza_tartib_raqami", value: 0 });
   }
 })();
