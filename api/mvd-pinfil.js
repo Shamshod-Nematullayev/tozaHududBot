@@ -73,14 +73,9 @@ const find_address_by_pinfil_from_mvd = async (pinfil) => {
       credentials: "omit",
     }
   );
-<<<<<<< HEAD
-  const data = await res.json();
-  if (data.success === false) return data;
-=======
   try {
     const data = await res.json();
     if (data.success === false) return data;
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 
     if (data.statusCode == 500) {
       return data;
@@ -93,14 +88,6 @@ const find_address_by_pinfil_from_mvd = async (pinfil) => {
   } catch (error) {
     return find_address_by_pinfil_from_mvd(pinfil);
   }
-<<<<<<< HEAD
-  if (data.result == 0)
-    return {
-      success: false,
-    };
-  return { ...data.data[0].entity_details, success: true };
-=======
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 };
 
 // TESTING

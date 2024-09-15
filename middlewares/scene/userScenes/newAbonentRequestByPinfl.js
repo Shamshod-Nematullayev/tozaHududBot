@@ -1,26 +1,15 @@
 const { Scenes, Markup } = require("telegraf");
 const { find_one_by_pinfil_from_mvd } = require("../../../api/mvd-pinfil");
-const fs = require("fs");
 const isCancel = require("../../smallFunctions/isCancel");
 const isPinfl = require("../../smallFunctions/isPinfl");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const { kirillga } = require("../../smallFunctions/lotinKiril");
 const { yangiAbonent } = require("../adminActions/cleancity/dxsh/yangiAbonent");
-<<<<<<< HEAD
+const { messages } = require("../../../lib/messages");
 const { keyboards } = require("../../../lib/keyboards");
-<<<<<<< HEAD
-=======
-const { messages } = require("../../../lib/messages");
-const { Abonent } = require("../../../models/Abonent");
-const { Nazoratchi } = require("../../../models/Nazoratchi");
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
-=======
-const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
-const { messages } = require("../../../lib/messages");
 const { Abonent } = require("../../../models/Abonent");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { Mahalla } = require("../../../models/Mahalla");
->>>>>>> 6f9661884d5b3a3f8956641cfb7b382682299a89
 const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {
@@ -48,31 +37,12 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           }
         );
       } else {
-<<<<<<< HEAD
-        const customDates = await find_one_by_pinfil_from_mvd(ctx.message.text);
-        if (!customDates.success) {
-          return ctx.reply(
-            customDates.message,
-            keyboards.lotin.cancelBtn.resize()
-          );
-        }
-        let filename = "fuqoro" + Date.now() + ".png";
-        if (customDates.photo != null) {
-          fs.writeFile(
-            "custom.png",
-            customDates.photo,
-            "base64",
-            async (err) => {
-              if (err) throw err;
-            }
-=======
         const abonent = await Abonent.findOne({
           pinfl: parseInt(ctx.message.text),
         });
         if (abonent && abonent.shaxsi_tasdiqlandi?.confirm) {
           return ctx.reply(
             `Ushbu abonentga ${abonent.licshet} hisob raqami ochilgan`
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
           );
         }
 
@@ -214,10 +184,6 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       });
 
       if (abonent.success) {
-<<<<<<< HEAD
-        ctx.reply(`Yangi abonent qo'shildi <code>${abonent.litschet}</code>`);
-      } else {
-=======
         ctx.replyWithHTML(
           `Yangi abonent qo'shildi <code>${abonent.litschet}</code>`
         );
@@ -230,7 +196,6 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         ctx.scene.leave();
       } else {
         ctx.reply(abonent.msg);
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
       }
     } catch (error) {
       console.log(error);

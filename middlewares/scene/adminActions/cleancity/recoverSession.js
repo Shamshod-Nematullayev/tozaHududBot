@@ -67,11 +67,7 @@ const recoverCleanCitySession = new Scenes.WizardScene(
                 }
               )
               .then(() => {
-<<<<<<< HEAD
-                fs.unlink("./captcha.png");
-=======
                 fs.unlink("./captcha.png", () => {});
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
               });
           })
         );

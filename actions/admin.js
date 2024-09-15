@@ -3,7 +3,6 @@ const {
   getOneMailById,
   createMail,
 } = require("../api/hybrid.pochta.uz/");
-const { HybridMail } = require("../models/HybridMail");
 const {
   // node modules
   fs,
@@ -19,17 +18,6 @@ const {
   yashovchiSoniKopaytirish,
   find_address_by_pinfil_from_mvd,
   getAbonentCardHtml,
-<<<<<<< HEAD
-} = require("../api/cleancity/dxsh/getAbonentCardHTML");
-const htmlPDF = require("html-pdf");
-const {
-  getLastAlertLetter,
-} = require("../api/cleancity/dxsh/getLastAlertLetter");
-const {
-  enterWarningLetterToBilling,
-} = require("../api/cleancity/dxsh/enterWarningLetterToBilling");
-=======
-  getAbonentSaldoData,
   // telegraf resourses
   Composer,
   bot,
@@ -44,7 +32,6 @@ const {
   Bildirishnoma,
   MultiplyRequest,
 } = require("./../requires");
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 
 // small required functions =========================================================================
 function bugungiSana() {
@@ -401,22 +388,6 @@ composer.hears("ExportWarningLettersZip", async (ctx) => {
 composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
   ctx.scene.enter("pochtaHarajatiniTekshirishScene")
 );
-<<<<<<< HEAD
-
-composer.hears("a", (ctx) => {
-  importAlertLetter();
-});
-composer.hears("b", async (ctx) => {
-  console.log(
-    await enterWarningLetterToBilling({
-      lischet: "105120380070",
-      qarzdorlik: 217464,
-      comment: "Test 1",
-      sana: "07.03.2024",
-      file_path: "./380070.PDF",
-    })
-  );
-=======
 async function createWarningLetterPDF(licshet) {
   const abonentData = await getAbonentSaldoData(licshet);
   if (!abonentData)
@@ -476,8 +447,6 @@ composer.hears(/xat_/g, async (ctx) => {
     receiver: abonentData.fio,
   });
   console.log(newMail);
-  // ctx.replyWithDocument({ source: pdfFilePath });
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
 });
 
 bot.use(composer);

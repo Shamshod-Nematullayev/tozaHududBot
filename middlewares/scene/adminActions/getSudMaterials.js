@@ -340,8 +340,6 @@ const getSudMaterial = new Scenes.WizardScene(
             const pachka = await SudMaterial.findById(
               ctx.wizard.state.pachka_id
             );
-<<<<<<< HEAD
-=======
             let count = 0;
             // pachka.items.forEach(async (item) => {
             async function downloadOmmaviy() {
@@ -371,7 +369,6 @@ const getSudMaterial = new Scenes.WizardScene(
             }
             // await downloadOmmaviy();
             // });
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
             const newItems = pachka.items;
             // for (let item of pachka.items) {
             let counter = 0;
@@ -478,17 +475,12 @@ const getSudMaterial = new Scenes.WizardScene(
                     }
                     if (indexToUpdate !== -1) {
                       newItems[indexToUpdate].sud_case_id = response.case_id;
-<<<<<<< HEAD
-                    }
-                    await pachka.updateOne({ $set: { items: newItems } });
-=======
                       newItems[indexToUpdate].FISH = response.FISH;
                     }
                     await pachka.updateOne({ $set: { items: newItems } });
                     ctx.reply(`<code>${item.KOD}</code> kiritildi`, {
                       parse_mode: "HTML",
                     });
->>>>>>> 088521e41d6c2213c08eddc44555ca5ea7b657a4
                     counter++;
                     sudgaKiritish();
                     return;
