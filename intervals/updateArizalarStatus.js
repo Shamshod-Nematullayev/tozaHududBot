@@ -1,3 +1,6 @@
+const {
+  getAktsFromPacket,
+} = require("../api/cleancity/dxsh/getAktsFromPacket");
 const { Ariza } = require("../models/Ariza");
 
 setInterval(async () => {
@@ -23,6 +26,11 @@ setInterval(async () => {
         ? null
         : pachka_ids.push(ariza.akt_pachka_id);
     });
-    const arizalarBillingdagi = []; // aslida bu yerda billingdan pachla_id bo'yicha aktlar ma'lumoti oladigan kod bo'lishi kerak
+    let counter = 0;
+    const loop = async () => {
+      if (counter == pachka_ids.length) return;
+      const arizalarBillingdagi = await getAktsFromPacket();
+    };
+    loop();
   }
 }, 1000 * 60);
