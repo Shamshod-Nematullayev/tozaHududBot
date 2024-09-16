@@ -42,6 +42,7 @@ const schema = new mongoose.Schema({
     default: false,
   },
   canceling_description: String,
+  akt_date: Date,
   akt_pachka_id: String,
   akt_id: String,
   aktInfo: Object,

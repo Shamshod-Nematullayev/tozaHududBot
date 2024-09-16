@@ -110,15 +110,6 @@ const yangiAbonent = async ({
     });
 
     const final = await finalResponse.json();
-    console.log({ final });
-    if (final.success) {
-      // await session.updateOne({
-      //   $set: {
-      //     "path.new_abonent_url": new_abonent_url,
-      //     "path.get_litschet_url": get_litschet_url,
-      //   },
-      // });
-    }
     return {
       litschet: availableKOD.value,
       ...final,

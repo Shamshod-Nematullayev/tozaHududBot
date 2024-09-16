@@ -17,7 +17,6 @@ async function enterWarningLetterToBilling({
   const session = await CleanCitySession.findOne({ type: "dxsh" });
 
   if (session.path.enterWarningLetterToBilling) {
-    console.log(file_path);
     let options = {
       method: "POST",
       url: `https://cleancity.uz/${session.path.enterWarningLetterToBilling}&resource_types_id=15&system_companies_id=1144&licshet=${lischet}`,
@@ -72,7 +71,6 @@ async function enterWarningLetterToBilling({
     let warningLettersPage = "";
     elements.forEach(function (element) {
       // Check if the text content matches "hello world"
-
       if (
         element.textContent.trim() === "Суд огоҳлантириш" ||
         element.textContent.trim() === "Sud ogohlantirish"
@@ -97,6 +95,7 @@ async function enterWarningLetterToBilling({
     await session.updateOne({
       $set: { "path.enterWarningLetterToBilling": findSudProccessPath[0] },
     });
+
     return await enterWarningLetterToBilling(arguments);
   }
 }

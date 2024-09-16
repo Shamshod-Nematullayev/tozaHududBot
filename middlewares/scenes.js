@@ -81,12 +81,6 @@ const { updateElektrKod } = require("./scene/userScenes/updateElektrKod");
 const {
   changeAbonentStreet,
 } = require("./scene/userScenes/changeAbonentStreet");
-const {
-  uploadSudBuyruqlarBillingga,
-} = require("./scene/adminActions/uploadSudBuyruqlarBillingga");
-const {
-  getMalumotnomalar,
-} = require("./scene/adminActions/cleancity/dxsh/getMalumotnomalar");
 
 const stage = new Scenes.Stage([
   newAdminScene,
@@ -127,8 +121,6 @@ const stage = new Scenes.Stage([
   sendWarningLettersByHybrid,
   updateElektrKod,
   changeAbonentStreet,
-  uploadSudBuyruqlarBillingga,
-  getMalumotnomalar,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

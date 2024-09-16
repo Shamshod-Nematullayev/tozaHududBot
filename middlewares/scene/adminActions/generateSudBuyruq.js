@@ -101,10 +101,11 @@ const generateSBuyruq = new Scenes.WizardScene(
 );
 
 generateSBuyruq.enter((ctx) => {
-  ctx.replyWithDocument(importSudBuyruqlariExample, {
-    caption: `Sud buyruqlari generatsiya qilinadigan abonentlar ma'lumotini ushbu shablonga ko'ra menga yuboring!`,
-    reply_markup: keyboards.lotin.cancelBtn,
-  });
+  // ctx.replyWithDocument(importSudBuyruqlariExample, {
+  //   caption: `Sud buyruqlari generatsiya qilinadigan abonentlar ma'lumotini ushbu shablonga ko'ra menga yuboring!`,
+  //   reply_markup: keyboards.lotin.cancelBtn,
+  // });
+  ctx.reply("Kirit");
 });
 
 module.exports = { generateSBuyruq };

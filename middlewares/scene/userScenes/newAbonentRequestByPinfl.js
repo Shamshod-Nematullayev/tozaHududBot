@@ -1,13 +1,12 @@
 const { Scenes, Markup } = require("telegraf");
 const { find_one_by_pinfil_from_mvd } = require("../../../api/mvd-pinfil");
-const fs = require("fs");
 const isCancel = require("../../smallFunctions/isCancel");
 const isPinfl = require("../../smallFunctions/isPinfl");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const { kirillga } = require("../../smallFunctions/lotinKiril");
 const { yangiAbonent } = require("../adminActions/cleancity/dxsh/yangiAbonent");
-const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
+const { keyboards } = require("../../../lib/keyboards");
 const { Abonent } = require("../../../models/Abonent");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { Mahalla } = require("../../../models/Mahalla");

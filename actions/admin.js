@@ -3,7 +3,6 @@ const {
   getOneMailById,
   createMail,
 } = require("../api/hybrid.pochta.uz/");
-const { HybridMail } = require("../models/HybridMail");
 const {
   // node modules
   fs,
@@ -19,7 +18,6 @@ const {
   yashovchiSoniKopaytirish,
   find_address_by_pinfil_from_mvd,
   getAbonentCardHtml,
-  getAbonentSaldoData,
   // telegraf resourses
   Composer,
   bot,
@@ -449,7 +447,6 @@ composer.hears(/xat_/g, async (ctx) => {
     receiver: abonentData.fio,
   });
   console.log(newMail);
-  // ctx.replyWithDocument({ source: pdfFilePath });
 });
 
 bot.use(composer);
