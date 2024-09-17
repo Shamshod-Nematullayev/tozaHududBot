@@ -68,7 +68,7 @@ router.post("/search", async (req, res, next) => {
 
 router.post("/create", upload.single("file"), async (req, res, next) => {
   try {
-    if (!req.file || !req.body.doc_type || !req.body.inspector) {
+    if (!req.file || !req.body.doc_type) {
       return res
         .status(400)
         .json({ ok: false, message: "Required fields are missing" });

@@ -6,7 +6,7 @@ const schema = new mongoose.Schema({
   sana: Date,
   document_type: {
     type: String,
-    enum: ["dvaynik", "odam_soni", "viza"],
+    enum: ["dvaynik", "odam_soni", "viza", "death"],
     required: true,
   },
   document_number: {

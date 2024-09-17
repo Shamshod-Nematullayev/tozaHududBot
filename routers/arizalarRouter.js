@@ -23,6 +23,25 @@ router.get("/get-ariza-by-id/:_id", async (req, res) => {
     res.json({ ok: false, message: `internal error: ${error.message}` });
   }
 });
+router.get(
+  "/get-ariza-by-document-number/:document_number",
+  async (req, res) => {
+    try {
+      const ariza = await Ariza.findOne({
+        document_number: req.params.document_number,
+      });
+      if (!ariza)
+        return res.json({
+          ok: false,
+          message: "Ariza topilmadi",
+        });
+      res.json({ ok: true, ariza });
+    } catch (error) {
+      console.error(error);
+      res.json({ ok: false, message: `internal error: ${error.message}` });
+    }
+  }
+);
 
 router.post("/cancel-ariza-by-id", async (req, res) => {
   try {
@@ -53,7 +72,8 @@ router.post("/create", async (req, res) => {
     if (
       req.body.document_type !== "dvaynik" &&
       req.body.document_type !== "viza" &&
-      req.body.document_type !== "odam_soni"
+      req.body.document_type !== "odam_soni" &&
+      req.body.document_type !== "death"
     )
       return res.json({ ok: false, message: "Noma'lum xujjat turi kiritildi" });
     if (
@@ -76,6 +96,25 @@ router.post("/create", async (req, res) => {
           ok: false,
           message:
             "Odam soni hozirgi kundagi va keyin bo'lishi kerak bo'lgan odam soni kiritilishi majburiy!",
+        });
+    }
+    if (req.body.document_type === "odam_soni") {
+      if (!req.body.current_prescribed_cnt || !req.body.next_prescribed_cnt)
+        return res.json({
+          ok: false,
+          message:
+            "Odam soni hozirgi kundagi va keyin bo'lishi kerak bo'lgan odam soni kiritilishi majburiy!",
+        });
+    }
+    if (
+      req.body.document_type === "death" &&
+      req.body.next_prescribed_cnt === req.body.current_prescribed_cnt &&
+      req.body.aktSummasi === 0
+    ) {
+      if (!req.body.current_prescribed_cnt || !req.body.next_prescribed_cnt)
+        return res.json({
+          ok: false,
+          message: "Majburiy qiymatlar kiritilmagan",
         });
     }
 
