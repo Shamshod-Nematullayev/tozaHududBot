@@ -48,7 +48,7 @@ const mfyIncomeReport = async (ctx = false) => {
       // Mana o'sha link => tushumlar tahlili sahifasiga
       if (
         !docHomePage.querySelector(
-          "#g_acccordion > div > div:nth-child(4) > ul > li:nth-child(4) > a"
+          "#g_acccordion > div > div:nth-child(5) > ul > li:nth-child(4) > a"
         ) &&
         ctx
       ) {
@@ -62,7 +62,7 @@ const mfyIncomeReport = async (ctx = false) => {
         return;
       }
       const jamiTushumlarTahliliPath = docHomePage.querySelector(
-        "#g_acccordion > div > div:nth-child(4) > ul > li:nth-child(4) > a"
+        "#g_acccordion > div > div:nth-child(5) > ul > li:nth-child(4) > a"
       ).href;
 
       // Tushumlar tahlili sahifasini yuklab olish

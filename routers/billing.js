@@ -111,6 +111,7 @@ router.post("/create-full-akt", upload.single("file"), async (req, res) => {
             licshet: req.body.licshet,
             nds_summ: req.body.nds_summ,
           },
+          akt_date: new Date(),
         },
       });
       return res.json({
@@ -180,6 +181,7 @@ router.post("/create-dvaynik-akt", upload.single("file"), async (req, res) => {
           akt_pachka_id: akt_pachka_id.dvaynik,
           akt_id: response.akt_id,
           aktInfo: { akt_number: req.body.akt_number },
+          akt_date: new Date(),
         },
       });
       return res.json({

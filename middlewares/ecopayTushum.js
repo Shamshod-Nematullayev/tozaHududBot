@@ -296,10 +296,10 @@ setInterval(async () => {
     ) {
       drawDebitViloyat("toViloyat");
       if (soat < 22) {
-        // const data = await fetchEcopayTushum();
-        // if (data) drawAndSendTushum(data);
+        const data = await fetchEcopayTushum();
+        if (data) drawAndSendTushum(data);
         mfyIncomeReport();
-        // fetchEcoTranzaksiyalar();
+        fetchEcoTranzaksiyalar();
       }
       // sendViloyatKunlikReja();
     }
