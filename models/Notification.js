@@ -3,14 +3,14 @@ const { Schema, default: mongoose } = require("mongoose");
 const schema = new Schema({
   type: {
     type: String,
-    enum: ["akt_warning", "akt_canceled", "akt_deleted"],
+    enum: ["akt_warning", "akt_canceled", "akt_deleted", "akt_not_confirmed"],
     required: true,
   },
   message_id: {
     type: Number,
   },
   ariza_id: {
-    type: Number,
+    type: String,
     required: true,
   },
   status: {

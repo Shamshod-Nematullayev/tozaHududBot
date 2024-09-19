@@ -42,7 +42,6 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         },
       });
       if (!res.success) {
-        console.log(res);
         return ctx.answerCbQuery(res.msg);
       }
       //   mongodb ma'lumotlar bazada yangilanish

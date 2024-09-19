@@ -3,3 +3,4 @@ start.bat
 session.json
 .env
 /uploads
+error.log

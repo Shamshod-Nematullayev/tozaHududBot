@@ -5,6 +5,4 @@ const {
 require("./yuqoriQarzdorliklar");
 require("./cleanCitySessionSaver");
 require("../api/sendToSud");
-(async () => {
-  //   console.log(await getAktsFromPacket("4441923"));
-})();
+require("./updateArizalarStatus");

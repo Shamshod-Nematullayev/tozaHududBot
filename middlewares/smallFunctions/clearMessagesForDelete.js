@@ -4,7 +4,7 @@ const clearMessages = (ctx) => {
       try {
         await ctx.telegram.deleteMessage(ctx.chat.id, message_id);
       } catch (error) {
-        console.error(error);
+        // console.error();
       }
     });
     ctx.session.messages_for_delete = [];

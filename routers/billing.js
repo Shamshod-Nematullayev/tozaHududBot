@@ -235,9 +235,11 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
   try {
     const data = await getAbonents({ mfy_id: req.params.mfy_id });
     let filteredData = data.filter((abonent) => {
-      return !uchirilishiKerakBulganAbonentlar.includes(
-        Number(abonent.licshet)
-      ); // &&        Number(abonent.saldo_k) > 200000
+      return (
+        !uchirilishiKerakBulganAbonentlar.includes(Number(abonent.licshet)) &&
+        Number(abonent.saldo_k) > 100000 &&
+        Number(abonent.saldo_k) < 200000
+      );
     });
     filteredData = filteredData.map((abonent) => ({
       ...abonent,

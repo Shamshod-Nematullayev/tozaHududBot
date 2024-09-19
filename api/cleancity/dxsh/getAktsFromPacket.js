@@ -1,4 +1,7 @@
 const { CleanCitySession } = require("../../../models/CleanCitySession");
+const {
+  getCleanCityPageByNavigation,
+} = require("../helpers/getCleanCityPageByNavigation");
 const cc = `https://cleancity.uz/`;
 
 async function getAktsFromPacket(pachka_id) {
@@ -22,7 +25,7 @@ async function getAktsFromPacket(pachka_id) {
       Cookie: session.cookie,
     },
     referrerPolicy: "strict-origin-when-cross-origin",
-    body: "stack_akts_id=" + pachka_id + "&page=1&rows=20&sort=id&order=desc",
+    body: "stack_akts_id=" + pachka_id + "&page=1&rows=500&sort=id&order=desc",
     method: "POST",
     mode: "cors",
     credentials: "include",

@@ -3,6 +3,8 @@ const {
   getOneMailById,
   createMail,
 } = require("../api/hybrid.pochta.uz/");
+const { NOTIFICATIONS_CHANNEL_ID } = require("../constants");
+const { Notification } = require("../models/Notification");
 const {
   // node modules
   fs,
@@ -213,6 +215,19 @@ composer.action(/done_\w+/g, async (ctx) => {
   } catch (error) {
     console.log(error);
   }
+});
+
+composer.action(/notification_\w+/g, async (ctx) => {
+  const notificationCb = ctx.update.callback_query.data;
+  const notificationId = notificationCb.split("_")[1];
+  const notification = await Notification.findById(notificationId);
+  await notification.updateOne({ $set: { status: "read" } });
+  ctx.telegram.editMessageText(
+    NOTIFICATIONS_CHANNEL_ID,
+    notification.message_id,
+    1,
+    ctx.update.callback_query.message.text
+  );
 });
 
 // ======================== Special functions (not required just shortcuts) ========================//

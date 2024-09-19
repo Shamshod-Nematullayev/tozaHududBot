@@ -37,6 +37,17 @@ const schema = new mongoose.Schema({
     enum: ["yangi", "qabul qilindi", "tasdiqlangan", "bekor qilindi"],
     default: "yangi",
   },
+  akt_statuses_name: {
+    type: String,
+    enum: [
+      "Tasdiqlangan bekor qilindi",
+      "Yangi",
+      "Камчилик тўғирланди",
+      "Огоҳлантирилди",
+      "Tasdiqlandi",
+    ],
+    default: "Yangi",
+  },
   is_canceled: {
     type: Boolean,
     default: false,
