@@ -6,6 +6,7 @@ async function updateMongo() {
     const sudAkts = await SudAkt.find();
     let counter = 0;
     async function loop() {
+      console.log(counter);
       if (counter === sudAkts.length) return console.log("Jarayon yakunlandi");
 
       const akt = sudAkts[counter];
@@ -43,19 +44,27 @@ async function updateMongo() {
       ).json();
       const promises = caseDocuments.map((document) => {
         return new Promise(async (resolve, reject) => {
-          await CaseDocument.create({
-            case_id: document.case_id,
-            document_id: document.id,
-            file_id: document.file_id,
-            id: document.id,
-            owner_name: document.owner_name,
-            sudAktId: akt.sud_process_id_billing,
-          });
-          resolve("Successfull done");
-          reject("Reason");
+          try {
+            const existingDocument = await CaseDocument.findOne({
+              document_id: document.id,
+            });
+            if (existingDocument) return;
+            await CaseDocument.create({
+              case_id: document.case_id,
+              document_id: document.id,
+              file_id: document.file_id,
+              id: document.id,
+              owner_name: document.owner_name,
+              sudAktId: akt.sud_process_id_billing,
+            });
+            resolve("Successfull done");
+          } catch (error) {
+            reject(error);
+          }
         });
       });
       await Promise.all(promises);
+      console.log(counter);
       counter++;
       loop();
     }
