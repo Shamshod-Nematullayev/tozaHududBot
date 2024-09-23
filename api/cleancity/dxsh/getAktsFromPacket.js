@@ -7,7 +7,7 @@ const cc = `https://cleancity.uz/`;
 async function getAktsFromPacket(pachka_id) {
   const session = await CleanCitySession.findOne({ type: "dxsh" });
   if (!session.path.getAktsFromPacket) {
-    return (session.path = await recoverPath(session));
+    session.path = await recoverPath(session);
   }
   const res = await fetch(`${cc}${session.path.getAktsFromPacket}`, {
     headers: {

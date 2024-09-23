@@ -7,8 +7,8 @@ const {
 const isCancel = require("../../smallFunctions/isCancel");
 const fs = require("fs");
 const {
-  sudQaroriniBiriktirish,
-} = require("../../../api/cleancity/dxsh/sudQaroriniBiriktirish");
+  sudXujjatlariBiriktirish,
+} = require("../../../api/cleancity/dxsh/sudXujjatlariBiriktirish");
 
 const uploadSudBuyruqlarBillingga = new Scenes.WizardScene(
   "upload_execution_to_billing",
@@ -116,7 +116,7 @@ const uploadSudBuyruqlarBillingga = new Scenes.WizardScene(
                     console.log(
                       `Successfully saved ${document_data.name} to./uploads/`
                     );
-                    const yuklashNatijasi = await sudQaroriniBiriktirish({
+                    const yuklashNatijasi = await sudXujjatlariBiriktirish({
                       process_id: sudAkt.sud_process_id_billing,
                       file_path: filename,
                     });
