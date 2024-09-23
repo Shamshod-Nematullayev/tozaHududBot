@@ -6,7 +6,7 @@ const app = express();
 const cors = require("cors");
 
 // App middlewares
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
@@ -22,6 +22,9 @@ app.use("/api/inspectors", require("./routers/inspectorsRouter"));
 app.use("/api/abonents", require("./routers/abonentsRouter"));
 app.use("/api/billing", require("./routers/billing"));
 app.use("/api/arizalar", require("./routers/arizalarRouter"));
+process.on("warning", (warning) => {
+  console.warn(warning.stack);
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
