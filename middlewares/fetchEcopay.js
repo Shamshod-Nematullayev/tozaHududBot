@@ -53,11 +53,15 @@ module.exports.fetchEcopayLogin = async (callback) => {
     method: "POST",
     mode: "cors",
     credentials: "omit",
-  }).then(async (res) => {
-    let data = await res.json();
-    cookie = data.user.session_id;
-    Authorization = data.user.token;
-  });
+  })
+    .then(async (res) => {
+      let data = await res.json();
+      cookie = data.user.session_id;
+      Authorization = data.user.token;
+    })
+    .catch((err) => {
+      console.error(new Error(err));
+    });
 };
 
 // Last seen
