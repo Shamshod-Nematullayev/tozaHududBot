@@ -15,7 +15,10 @@ const userToInspektor = new Scenes.WizardScene(
 
       const user = await User.findOne({ "user.id": Number(ctx.message.text) });
       if (!user) {
-        return ctx.reply("Bunday id raqamiga ega foydalanuvchi topilmadi");
+        return ctx.reply(
+          "Bunday id raqamiga ega foydalanuvchi topilmadi",
+          keyboards.lotin.cancelBtn.resize()
+        );
       }
       if (user.nazoratchiQilingan) {
         return ctx.reply(
@@ -45,7 +48,10 @@ const userToInspektor = new Scenes.WizardScene(
   async (ctx) => {
     try {
       if (ctx.message?.text) {
-        await ctx.reply("Bekor qilindi");
+        await ctx.reply(
+          "Bekor qilindi",
+          keyboards.lotin.adminKeyboard.resize()
+        );
         return ctx.scene.leave();
       }
       ctx.deleteMessage();

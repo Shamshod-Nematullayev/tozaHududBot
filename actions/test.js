@@ -73,4 +73,4 @@ async function updateMongo() {
     console.error(error);
   }
 }
-updateMongo();
+//updateMongo();
