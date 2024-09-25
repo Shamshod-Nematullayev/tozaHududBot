@@ -14,7 +14,7 @@ async function sudQaroruChiqorildiStatusigaUtkazish(process_id) {
     let statusAlmashtirish = sudJarayonlarPage
       .match(/ds\?xenc=([^']{93})VDA"/g)[0]
       .split(`"`)[0];
-    console.log(statusAlmashtirish);
+    console.log({ statusAlmashtirish });
     await CleanCitySession.updateOne(
       { _id: session._id },
       { $set: { "path.statusAlmashtirish": statusAlmashtirish } }
@@ -22,17 +22,19 @@ async function sudQaroruChiqorildiStatusigaUtkazish(process_id) {
     return await sudQaroruChiqorildiStatusigaUtkazish(process_id);
   }
   const res = await fetch(
-    "https://cleancity.uz/" + session.path.statusAlmashtirish + "/",
+    "https://cleancity.uz/" + session.path.save_desined_file + "/",
     {
       headers: { Cookie: session.cookie },
     }
   );
-  await SudAkt.updateOne(
-    { sud_process_id_billing: process_id },
-    { $set: { sudQaroriBillinggaYuklandi: true } }
-  );
+  const result = await res.json();
+  if (result.success)
+    await SudAkt.updateOne(
+      { sud_process_id_billing: process_id },
+      { $set: { sudQaroriBillinggaYuklandi: true } }
+    );
 
-  return { success: await res.json() };
+  return result;
 }
 
 module.exports = { sudQaroruChiqorildiStatusigaUtkazish };
