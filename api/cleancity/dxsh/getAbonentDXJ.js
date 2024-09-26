@@ -56,32 +56,6 @@ async function getAbonentDXJ({ licshet }) {
       const findedUrls = responseText
         .match(/url:"ds\?xenc=([^']{107})="/g)[1]
         .split(`"`)[1];
-      const findedUrls2 = responseText
-        .match(/url:"ds\?xenc=([^']{107})="/g)[0]
-        .split(`"`)[1];
-
-      const res2 = await fetch("https://cleancity.uz/" + findedUrls2, {
-        headers: {
-          accept: "application/json, text/javascript, */*; q=0.01",
-          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
-          "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-          "sec-ch-ua":
-            '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"Windows"',
-          "sec-fetch-dest": "empty",
-          "sec-fetch-mode": "cors",
-          "sec-fetch-site": "same-origin",
-          "x-requested-with": "XMLHttpRequest",
-          Cookie: session.cookie,
-        },
-        referrer: "https://cleancity.uz/startpage?x=uClGJQog3-t34nu-YGpa8g",
-        referrerPolicy: "strict-origin-when-cross-origin",
-        body: "page=1&rows=200&sort=id&order=desc",
-        method: "POST",
-        mode: "cors",
-        credentials: "include",
-      });
 
       // index 2 =    aktlar haqida ma'lumot
       // index 1 =    dxj

@@ -17,8 +17,15 @@ const schema = new mongoose.Schema(
       type: Boolean,
       defalt: false,
     },
+    warningDate: Date,
     case_documents: Array,
     ariza_date: Date,
+    tushum: Number,
+    isDelete: {
+      type: Boolean,
+      default: false,
+    },
+    pinfl: Number,
   },
   {
     timestamps: true,

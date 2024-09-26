@@ -1,3 +1,4 @@
+const getAbonentDXJ = require("../api/cleancity/dxsh/getAbonentDXJ");
 const {
   sudQaroruChiqorildiStatusigaUtkazish,
 } = require("../api/cleancity/dxsh/sudQaroriChiqorildiStatusigaUtkazish");
@@ -85,7 +86,7 @@ async function updateMongo() {
 // updateMongo();
 async function upload() {
   const case_documents = await CaseDocument.find();
-  let counter = 0;
+  let counter = 8000;
   async function loop() {
     if (counter === case_documents.length)
       return console.log("Jarayon yakunlandi");
@@ -158,35 +159,43 @@ async function upload() {
   }
   loop();
 }
-upload();
+// upload();
 
-async () => {
-  const session = {
-    cookie: "JSESSIONID=B49FDC2B30EC43D57CE3BE1B980EBADB.thweb8",
-  };
-  console.log("sudga so'rov ketdi");
-  const fileFromSud = require("../api/cleancity/helpers/kk.json");
-  const fileBuffer = Buffer.from(fileFromSud.data, "base64");
-  console.log("file yuklab olindi");
-  const res = await uploadFileToBilling({
-    url_path:
-      "dsm?xenc=Z31Qj75w-6Z_brILYFHKMOlc6fnmmcKOORB4iPMbWQWchF--BPQegmDomQJ-UbEGUneamfOYni_5Zrj95X1QwA==",
-    fileName: fileFromSud.name,
-    session,
-    fileBuffer,
-    otherFormDataParams: {
-      abonents_id: 12529555,
-      osv_id: 441507746,
-      resource_types_id: 12,
-      stack_akts_id: 4441923,
-      saldo_k: 178242.84,
-      phone: "",
-      akt_number: "",
-      akt_types_id: 1,
-      akt_date: "24.09.2024",
-      amount: 5,
-      purpose: "",
-    },
-  });
-  console.log(res);
-};
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<KERAKLI>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// Sudga chiqganidan buyon jami qancha tushum tushganini hisoblaydigan funksiya
+// (async () => {
+//   const sudAkts = await SudAkt.find();
+//   counter = 0;
+//   async function loop() {
+//     if (counter === sudAkts.length) return console.log("Jarayon yakunlandi");
+//     const document = sudAkts[counter];
+//     try {
+//       if (document.isDelete) {
+//         counter++;
+//         return loop();
+//       }
+//       console.log(counter);
+//       const processStartedMonth = new Date(document.warningDate).getMonth() + 1;
+//       const processStartedYear = new Date(document.warningDate).getFullYear();
+//       const res = await getAbonentDXJ({ licshet: document.licshet });
+//       const sudgaChiqgandanKeyingiDavr = res.rows.filter(
+//         (a) =>
+//           (a.god == processStartedYear && a.mes >= processStartedMonth) ||
+//           a.god > processStartedYear
+//       );
+//       let tushumlar = 0;
+//       sudgaChiqgandanKeyingiDavr.forEach((davr) => {
+//         tushumlar += Math.floor(
+//           Number(davr.saldo_n) + Number(davr.nachis) - Number(davr.saldo_k)
+//         );
+//       });
+//       await document.updateOne({ $set: { tushum: tushumlar } });
+//       counter++;
+//       loop();
+//     } catch (error) {
+//       console.log(document);
+//       console.error(error);
+//     }
+//   }
+//   loop();
+// })();
