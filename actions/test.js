@@ -9,6 +9,7 @@ const {
   uploadFileToBilling,
 } = require("../api/cleancity/helpers/uploadFileToBilling");
 const { CaseDocument } = require("../models/CaseDocuments");
+const { HybridMail } = require("../models/HybridMail");
 const { SudAkt } = require("../models/SudAkt");
 
 async function updateMongo() {

@@ -439,29 +439,5 @@ async function createWarningLetterPDF(licshet) {
   });
   return await convertPDF;
 }
-composer.hears(/xat_/g, async (ctx) => {
-  const licshet = ctx.message.text.split("_")[1];
-  const mail = await HybridMail.findOne({ licshet });
-  if (mail) return { ok: false, message: "Mail already exists" };
-
-  const abonentData = await getAbonentSaldoData(licshet);
-  const base64PDF = await createWarningLetterPDF(licshet);
-  if (!base64PDF.success) {
-    return ctx.reply(base64PDF.message);
-  }
-  const newMail = await createMail(
-    `${abonentData.mahalla_name}, ${abonentData.streets_name}`,
-    abonentData.fio,
-    base64PDF.data
-  );
-  await HybridMail.create({
-    licshet: licshet,
-    type: "xat",
-    hybridMailId: newMail.Id,
-    createdOn: new Date(),
-    receiver: abonentData.fio,
-  });
-  console.log(newMail);
-});
 
 bot.use(composer);

@@ -15,6 +15,9 @@ const schema = new Schema({
   sentOn: Date,
   type: String,
   isSavedBilling: { type: Boolean, default: false },
+  warning_amount: Number,
+  sud_process_id_billing: String,
+  warning_date_billing: Date,
 });
 
 module.exports.HybridMail = mongoose.model("hybrid_mail", schema);

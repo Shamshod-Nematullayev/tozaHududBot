@@ -90,7 +90,15 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
         if (licshet === undefined) {
           return ctx.reply(`${i + 2}-qatorda licshet topilmadi`);
         }
-        const mail = await HybridMail.findOne({ licshet });
+        const now = new Date();
+        const oltiOyAvval = new Date(now.getFullYear(), now.getMonth(), 1);
+        const mail = await HybridMail.findOne({
+          licshet,
+          warning_date_billing: {
+            $gte: oltiOyAvval,
+            $lt: now,
+          },
+        });
         if (mail) {
           console.log({ ok: false, message: "Mail already exists" });
           i++;
@@ -112,6 +120,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           hybridMailId: newMail.Id,
           createdOn: new Date(),
           receiver: abonentData.fio,
+          warning_date_billing: new Date(),
         });
         arrayMails.push({
           hybridMailId: newMail.Id,
