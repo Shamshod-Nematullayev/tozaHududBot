@@ -22,6 +22,9 @@ const {
   confirmNewWarningLetterByLicshet,
 } = require("../../../api/cleancity/dxsh");
 const PDFMerger = require("pdf-merger-js");
+const {
+  getLastProccesIdByLicshet,
+} = require("../../../api/cleancity/dxsh/getLastProccesIdByLicshet");
 
 // required small functions
 function bugungiSana() {
@@ -31,8 +34,7 @@ function bugungiSana() {
   }.${date.getFullYear()}`;
 }
 
-async function createWarningLetterPDF(licshet) {
-  const abonentData = await getAbonentSaldoData(licshet);
+async function createWarningLetterPDF(licshet, abonentData) {
   if (!abonentData)
     return { success: false, message: "Abonent data not found" };
   const data = {
@@ -105,7 +107,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           return loop();
         }
         const abonentData = await getAbonentSaldoData(licshet);
-        const base64PDF = await createWarningLetterPDF(licshet);
+        const base64PDF = await createWarningLetterPDF(licshet, abonentData);
         if (!base64PDF.success) {
           return ctx.reply(base64PDF.message);
         }
@@ -121,6 +123,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           createdOn: new Date(),
           receiver: abonentData.fio,
           warning_date_billing: new Date(),
+          warning_amount: abonentData.saldo_k,
         });
         arrayMails.push({
           hybridMailId: newMail.Id,
@@ -254,6 +257,8 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
                   const res = await confirmNewWarningLetterByLicshet(
                     row.licshet
                   );
+                  await getLastProccesIdByLicshet({ mail, session });
+
                   if (res.success) {
                     await HybridMail.findByIdAndUpdate(row._id, {
                       $set: { isSavedBilling: true },
