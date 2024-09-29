@@ -32,6 +32,7 @@ app.listen(PORT, async () => {
   console.log(`Server listening port: ${PORT}`);
 });
 
+// telegram bot
 require("./core/bot");
 require("./middlewares");
 require("./actions");
