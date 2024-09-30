@@ -2,7 +2,6 @@ const { bot } = require("../core/bot");
 const { Composer } = require("telegraf");
 const { messages } = require("../lib/messages");
 const { keyboards } = require("../lib/keyboards");
-const { Abonent } = require("../models/YangiAbonent");
 const { Admin } = require("../models/Admin");
 const { Guvohnoma } = require("../models/Guvohnoma");
 const { User } = require("../models/User");
@@ -22,20 +21,6 @@ composer.start(async (ctx) => {
           // ctx.telegram.
         });
         return ctx.scene.enter("cancel_guvohnoma");
-      }
-
-      const abonent = await Abonent.findById(ctx.startPayload);
-      if (!abonent) {
-        return ctx.reply(messages.notFoundData);
-      }
-      if (admin) {
-        ctx.session.abonent_id = ctx.startPayload;
-        return ctx.scene.enter("answer_to_inspector");
-      } else {
-        return ctx.reply(
-          messages.youAreNotAdmin,
-          keyboards[ctx.session.til].mainKeyboard.resize()
-        );
       }
     } else {
       const admin = await Admin.findOne({ user_id: ctx.from.id });

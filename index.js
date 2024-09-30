@@ -32,10 +32,15 @@ app.listen(PORT, async () => {
   console.log(`Server listening port: ${PORT}`);
 });
 
-require("./core/bot");
-require("./middlewares");
-require("./actions");
-require("./intervals");
+// telegram bot
+function useTelegramBot() {
+  require("./core/bot");
+  require("./middlewares");
+  require("./actions");
+  require("./intervals");
+}
+// useTelegramBot()
+require("./test");
 
 mongoose
   .connect(process.env.MONGO)

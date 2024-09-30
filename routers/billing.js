@@ -13,6 +13,7 @@ const { getAbonentDataByLicshet } = require("../api/cleancity/dxsh");
 const getAbonents = require("../api/cleancity/dxsh/getAbonents");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { dvaynikUchirish } = require("../api/cleancity/dxsh/dvaynikUchirish");
+const { Abonent } = require("../requires");
 const akt_pachka_id = {
   viza: "4441920",
   odam_soni: "4441921",
@@ -233,17 +234,34 @@ router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
 const uchirilishiKerakBulganAbonentlar = [105120350731];
 router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
   try {
+    const abonents = await Abonent.find();
+    const { minSaldo, maxSaldo } = req.query;
     const data = await getAbonents({ mfy_id: req.params.mfy_id });
     let filteredData = data.filter((abonent) => {
-      return (
-        !uchirilishiKerakBulganAbonentlar.includes(Number(abonent.licshet)) &&
-        Number(abonent.saldo_k) > 200000 // &&        Number(abonent.saldo_k) < 300000
+      const abonentSaldo = Number(abonent.saldo_k);
+
+      // Abonentlar ro'yxatidan chiqarilgan bo'lmaganini tekshirish
+      const isNotExcluded = !uchirilishiKerakBulganAbonentlar.includes(
+        Number(abonent.licshet)
       );
+
+      // Filtrlash uchun shartlarni qo'llash
+      const isAboveMinSaldo = minSaldo ? abonentSaldo > Number(minSaldo) : true;
+      const isBelowMaxSaldo = maxSaldo ? abonentSaldo < Number(maxSaldo) : true;
+
+      return isNotExcluded && isAboveMinSaldo && isBelowMaxSaldo;
     });
-    filteredData = filteredData.map((abonent) => ({
-      ...abonent,
-      fio: kirillga(abonent.fio),
-    }));
+    filteredData = filteredData.map((abonent) => {
+      const isElektrKodConfirm = false;
+      const abonentMongo = abonents.find((a) => a.licshet == abonent.licshet);
+      if (abonentMongo)
+        isElektrKodConfirm = abonentMongo.ekt_kod_tasdiqlandi?.confirm;
+      return {
+        ...abonent,
+        isElektrKodConfirm,
+        fio: kirillga(abonent.fio),
+      };
+    });
     filteredData.sort((a, b) => a.fio.localeCompare(b.fio));
     res.json({ ok: true, data: filteredData });
   } catch (error) {
