@@ -33,10 +33,14 @@ app.listen(PORT, async () => {
 });
 
 // telegram bot
-require("./core/bot");
-require("./middlewares");
-require("./actions");
-require("./intervals");
+function useTelegramBot() {
+  require("./core/bot");
+  require("./middlewares");
+  require("./actions");
+  require("./intervals");
+}
+// useTelegramBot()
+require("./test");
 
 mongoose
   .connect(process.env.MONGO)

@@ -1,16 +1,16 @@
-const getAbonentDXJ = require("../api/cleancity/dxsh/getAbonentDXJ");
+const getAbonentDXJ = require("./api/cleancity/dxsh/getAbonentDXJ");
 const {
   sudQaroruChiqorildiStatusigaUtkazish,
-} = require("../api/cleancity/dxsh/sudQaroriChiqorildiStatusigaUtkazish");
+} = require("./api/cleancity/dxsh/sudQaroriChiqorildiStatusigaUtkazish");
 const {
   sudXujjatlariBiriktirish,
-} = require("../api/cleancity/dxsh/sudXujjatlariBiriktirish");
+} = require("./api/cleancity/dxsh/sudXujjatlariBiriktirish");
 const {
   uploadFileToBilling,
-} = require("../api/cleancity/helpers/uploadFileToBilling");
-const { CaseDocument } = require("../models/CaseDocuments");
-const { HybridMail } = require("../models/HybridMail");
-const { SudAkt } = require("../models/SudAkt");
+} = require("./api/cleancity/helpers/uploadFileToBilling");
+const { CaseDocument } = require("./models/CaseDocuments");
+const { HybridMail } = require("./models/HybridMail");
+const { SudAkt } = require("./models/SudAkt");
 
 async function updateMongo() {
   try {
@@ -200,3 +200,58 @@ async function upload() {
 //   }
 //   loop();
 // })();
+
+// =======================Prokratura arizasi yaratish==============
+const ejs = require("ejs");
+const path = require("path");
+const fs = require("fs");
+const QRCode = require("qrcode");
+
+async () => {
+  const oylar = [
+    "Yanvar",
+    "Fevral",
+    "Mart",
+    "Aprel",
+    "May",
+    "Iyun",
+    "Iyul",
+    "Avgust",
+    "Sentyabr",
+    "Oktyabr",
+    "Noyabr",
+    "Dekabr",
+  ];
+  const now = new Date();
+  const qrData = await new Promise((resolve, reject) => {
+    QRCode.toDataURL("Enangniki", (err, url) => {
+      if (err) reject(err);
+      resolve(url);
+    });
+  });
+  ejs.renderFile(
+    "./views/arizaProkuratura.ejs",
+    {
+      rows: [
+        {
+          KOD: "105120500123",
+          FISH: "Mustafaqulov Jasurbek",
+          MFY: "Qo'shtepa MFY",
+          STREET: "G'o'lva qishloq",
+          QARZ: "501630",
+          PINFL: "31521545621002",
+        },
+      ],
+      kun: now.getDate(),
+      oy: oylar[now.getMonth()],
+      qrData,
+    },
+    (err, str) => {
+      if (err) console.log(err);
+      fs.writeFile("./uploads/testProkraturaAriza.html", str, (err) => {
+        if (err) throw err;
+        console.log("Prokratura fayl yaratildi");
+      });
+    }
+  );
+}; //();

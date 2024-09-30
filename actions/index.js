@@ -9,7 +9,7 @@ require("./language");
 require("./../middlewares/scene/adminActions/cleancity/dxsh/mfyIncomeReport");
 require("./shaxsiTasdiqlandi");
 require("./stm_xodimi");
-require("./test");
+require("../test");
 bot.on("text", (ctx) => {
   ctx.reply(
     messages.startGreeting,

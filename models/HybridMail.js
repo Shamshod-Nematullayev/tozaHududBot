@@ -18,6 +18,10 @@ const schema = new Schema({
   warning_amount: Number,
   sud_process_id_billing: String,
   warning_date_billing: Date,
+  sud_akt_id: {
+    type: String,
+    default: "",
+  },
 });
 
 module.exports.HybridMail = mongoose.model("hybrid_mail", schema);
