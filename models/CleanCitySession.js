@@ -6,8 +6,10 @@ const schema = new Schema(
     cookie: String,
     login: String,
     password: String,
+    authorization: String,
     type: {
       type: String,
+      enum: ["dxsh", "ekopay"],
       default: "dxsh",
     },
     path: {

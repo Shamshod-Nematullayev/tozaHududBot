@@ -252,7 +252,7 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
       return isNotExcluded && isAboveMinSaldo && isBelowMaxSaldo;
     });
     filteredData = filteredData.map((abonent) => {
-      const isElektrKodConfirm = false;
+      let isElektrKodConfirm = false;
       const abonentMongo = abonents.find((a) => a.licshet == abonent.licshet);
       if (abonentMongo)
         isElektrKodConfirm = abonentMongo.ekt_kod_tasdiqlandi?.confirm;
