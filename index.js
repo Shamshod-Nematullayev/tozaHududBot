@@ -39,7 +39,7 @@ function useTelegramBot() {
   require("./actions");
   require("./intervals");
 }
-// useTelegramBot()
+useTelegramBot();
 require("./test");
 
 mongoose
