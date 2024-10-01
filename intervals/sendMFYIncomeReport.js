@@ -1,5 +1,5 @@
 const nodeHtmlToImage = require("node-html-to-image");
-const { getTransactionMFY } = require("../api/ekopay/getTransactionsMFY");
+const { getTransactionMFY } = require("../api/ekopay.uz/getTransactionsMFY");
 const { Mahalla } = require("../models/Mahalla");
 const ejs = require("ejs");
 const { bot } = require("../requires");
