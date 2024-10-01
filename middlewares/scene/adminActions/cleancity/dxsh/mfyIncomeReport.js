@@ -129,7 +129,7 @@ const mfyIncomeReport = async (ctx = false) => {
               parseFloat(b.tushum / b.xisoblandi) -
               parseFloat(a.tushum / a.xisoblandi)
           );
-          mahallalar.forEach((mfy, index) => {
+          mahallalar.forEach((mfy) => {
             jamiXisoblandi += mfy.xisoblandi;
             jamiTushum += mfy.tushum;
           });
