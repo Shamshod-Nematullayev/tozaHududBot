@@ -298,7 +298,7 @@ setInterval(async () => {
       if (soat < 22) {
         const data = await fetchEcopayTushum();
         if (data) drawAndSendTushum(data);
-        mfyIncomeReport();
+        // mfyIncomeReport();
         fetchEcoTranzaksiyalar();
       }
       // sendViloyatKunlikReja();

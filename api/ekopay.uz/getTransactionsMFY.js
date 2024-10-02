@@ -16,7 +16,7 @@ const getTransactionMFY = async () => {
         headers: {
           accept: "application/json, text/plain, */*",
           "accept-language": "uz",
-          authorization: "Bearer " + session.authorization,
+          authorization: "Bearer " + session?.authorization,
           "sec-ch-ua":
             '"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"',
           "sec-ch-ua-mobile": "?0",

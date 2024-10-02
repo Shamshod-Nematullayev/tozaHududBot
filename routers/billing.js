@@ -15,12 +15,12 @@ const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { dvaynikUchirish } = require("../api/cleancity/dxsh/dvaynikUchirish");
 const { Abonent } = require("../requires");
 const akt_pachka_id = {
-  viza: "4441920",
-  odam_soni: "4441921",
-  dvaynik: "4441922",
-  pul_kuchirish: "4442069",
-  death: "4442091",
-  boshqa: "4441923",
+  viza: "4442831",
+  odam_soni: "4442830",
+  dvaynik: "4442829",
+  pul_kuchirish: "4442828",
+  death: "4442827",
+  boshqa: "4442832",
 };
 
 const router = require("express").Router();
@@ -73,7 +73,7 @@ router.post("/create-full-akt", upload.single("file"), async (req, res) => {
         filepath: path.join(__dirname, "../uploads/", req.file.filename),
         licshet: req.body.licshet,
         prescribed_cnt: req.body.prescribed_cnt,
-        stack_prescribed_akts_id: "8594", // yashovchi soni akt pachkasi har oy o'zgartiriladi
+        stack_prescribed_akts_id: "8778", // yashovchi soni akt pachkasi har oy o'zgartiriladi
       });
     }
     let qaytahisob = { success: true };
