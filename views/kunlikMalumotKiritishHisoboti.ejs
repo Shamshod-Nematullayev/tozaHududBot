@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      table {
+        overflow: hidden;
+        border-collapse: collapse;
+        padding: 10px;
+      }
+      div {
+        display: inline-block;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 5px 15px;
+        margin: 0;
+        border-collapse: collapse;
+      }
+      p {
+        text-decoration: underline;
+      }
+      th {
+        background-color: rgb(227, 37, 37);
+      }
+      td:last-child {
+        text-align: right;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <p><%= sana %></p>
+      <h2><%= report_name %> бўйича тезкор хисобот</h2>
+      <table cellscasing="0">
+        <% inspectors.map(ins => ( %>
+        <tr>
+          <th rowspan="2">№</th>
+          <th rowspan="2">Назоратчи</th>
+          <th colspan="2">Бугун киритди</th>
+        </tr>
+        <tr>
+          <td><%= >index + 1 %></td>
+          <td><%= >ins.name %></td>
+          <td><%= >ins.counterOfConfirm %></td>
+        </tr>
+        <% )) %>
+        <tr>
+          <td></td>
+          <td>Жами</td>
+          <td>${allConfirmed}</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

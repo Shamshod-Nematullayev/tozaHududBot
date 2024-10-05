@@ -141,6 +141,7 @@ const updateElektrKod = new Scenes.WizardScene(
               confirm: true,
               inspector_id: ctx.wizard.state.inspector_id,
               inspector_name: ctx.wizard.state.inspector_name,
+              updated_at: new Date(),
             },
             energy_licshet: ctx.wizard.state.ETK,
           },

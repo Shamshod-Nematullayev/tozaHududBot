@@ -61,6 +61,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
           shaxsi_tasdiqlandi: {
             confirm: true,
             inspector: { name: inspector.name, _id: inspector._id },
+            updated_at: new Date(),
           },
         },
       });
