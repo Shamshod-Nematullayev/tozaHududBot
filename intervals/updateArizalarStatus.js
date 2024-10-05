@@ -6,7 +6,7 @@ const { Ariza } = require("../models/Ariza");
 const { NOTIFICATIONS_CHANNEL_ID } = require("../constants");
 const { Notification } = require("../models/Notification");
 const { Markup } = require("telegraf");
-const dvaynik_bekor_qilish_pachka_id = 4441922;
+const dvaynik_bekor_qilish_pachka_id = 4442829;
 
 const callbackFunction = async function () {
   try {

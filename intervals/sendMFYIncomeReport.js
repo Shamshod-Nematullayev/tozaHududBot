@@ -75,7 +75,7 @@ setInterval(() => {
   const hour = now.getHours();
   const minut = now.getMinutes();
   if (minut === 0) {
-    if (hour > 7 && hour < 20) {
+    if (hour == 9 || hour == 10 || hour == 1 || hour == 16 || hour == 17) {
       sendMFYIncomeReport();
     }
   }

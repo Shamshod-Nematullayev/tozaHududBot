@@ -29,6 +29,7 @@ const schema = new mongoose.Schema({
   xotinqizlar_phone: String,
   uchastkavoy_name: String,
   uchastkavoy_phone: String,
+  shaxsi_tasdiqlandi_reja: Number,
   abarotka_berildi: {
     type: Boolean,
     default: false,

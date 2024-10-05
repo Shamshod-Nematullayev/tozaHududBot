@@ -299,7 +299,7 @@ setInterval(async () => {
         const data = await fetchEcopayTushum();
         if (data) drawAndSendTushum(data);
         // mfyIncomeReport();
-        fetchEcoTranzaksiyalar();
+        // fetchEcoTranzaksiyalar();
       }
       // sendViloyatKunlikReja();
     }

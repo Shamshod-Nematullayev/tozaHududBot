@@ -15,11 +15,11 @@ bot.catch((error, ctx) => {
   }
 });
 
-bot.telegram.setMyCommands([
-  { command: "start", description: "Start the bot" },
-  { command: "help", description: "Get help information" },
-  { command: "settings", description: "Configure your settings" },
-]);
+// bot.telegram.setMyCommands([
+//   { command: "start", description: "Start the bot" },
+//   { command: "help", description: "Get help information" },
+//   { command: "settings", description: "Configure your settings" },
+// ]);
 
 bot
   .launch(() => {

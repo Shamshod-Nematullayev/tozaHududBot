@@ -206,6 +206,8 @@ const ejs = require("ejs");
 const path = require("path");
 const fs = require("fs");
 const QRCode = require("qrcode");
+const { Abonent, xlsx } = require("./requires");
+const { Mahalla } = require("./models/Mahalla");
 
 async () => {
   const oylar = [
@@ -254,4 +256,52 @@ async () => {
       });
     }
   );
+}; //();
+
+// export abonents
+async () => {
+  let abonents = await Abonent.find({}, { photo: 0 });
+  const content = [];
+  abonents = abonents.sort((a, b) => a.fio.localeCompare(b.fio));
+  abonents.forEach((abonent, i) => {
+    content.push({
+      tartib: i + 1,
+      licshet: abonent.licshet,
+      fio: abonent.fio,
+      fio2: `${abonent.last_name} ${abonent.first_name} ${abonent.middle_name}`,
+      street: abonent.mahallas_id,
+      kadastr_number: abonent.kadastr_number,
+      passport: abonent.passport_number,
+      pinfl: abonent.pinfl,
+      confirm: abonent.shaxsi_tasdiqlandi?.confirm,
+    });
+  });
+
+  const data = [
+    {
+      Sheet: "Abonents",
+      columns: [
+        { label: "№", value: "tartib" },
+        { label: "Лицевой", value: "licshet" },
+        { label: "ФИО--", value: "fio" },
+        { label: "ФИО--2", value: "fio2" },
+        { label: "Кўча", value: "street" },
+        { label: "Кадастр", value: "kadastr_number" },
+        { label: "ПАССПОРТ", value: "passport" },
+        { label: "ЖШШИР", value: "pinfl" },
+        { label: "Шахси тасдиқланди", value: "confirm" },
+      ],
+      content,
+    },
+  ];
+
+  const fileName = "./uploads/abonents1";
+  let settings = {
+    fileName: fileName,
+    extraLength: 3,
+    writeMode: "writeFile",
+    writeOptions: {},
+  };
+  await xlsx(data, settings);
+  console.log("Bajarildi");
 }; //();
