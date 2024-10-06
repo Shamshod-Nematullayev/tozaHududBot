@@ -4,6 +4,12 @@ const {
   createMail,
 } = require("../api/hybrid.pochta.uz/");
 const { NOTIFICATIONS_CHANNEL_ID } = require("../constants");
+const {
+  nazoratchilarKunlikTushum,
+} = require("../intervals/nazoratchilarKunlikTushum");
+const {
+  mfyIncomeReport,
+} = require("../middlewares/scene/adminActions/cleancity/dxsh/mfyIncomeReport");
 const { Notification } = require("../models/Notification");
 const {
   // node modules
@@ -13,8 +19,6 @@ const {
   htmlPDF,
   ejs,
   // required functions
-  drawAndSendTushum,
-  fetchEcopayTushum,
   fetchEcoTranzaksiyalar,
   drawDebitViloyat,
   yashovchiSoniKopaytirish,
@@ -93,6 +97,11 @@ ADMIN_ACTIONS.forEach((actionType) => enterAdminAction(actionType));
 composer.command("admin", async (ctx) => {
   const admins = await Admin.find();
   if (admins.length === 0) ctx.scene.enter("newAdmin");
+});
+
+composer.action("mfy_income_report", async (ctx) => {
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+  mfyIncomeReport();
 });
 
 composer.hears(["👨‍💻 Ish maydoni", "👨‍💻 Иш майдони"], async (ctx) => {
@@ -246,9 +255,7 @@ composer.command("help", (ctx) => {
   );
 });
 composer.command("tushum", async (ctx) => {
-  const data = await fetchEcopayTushum();
-  fetchEcoTranzaksiyalar();
-  drawAndSendTushum(data, ctx);
+  nazoratchilarKunlikTushum();
 });
 
 composer.hears("debit", (ctx) => {

@@ -7,11 +7,7 @@ const htmlPDF = require("html-pdf");
 const ejs = require("ejs");
 
 // required functions
-const { drawAndSendTushum } = require("./middlewares/drawTushum");
-const {
-  fetchEcopayTushum,
-  fetchEcoTranzaksiyalar,
-} = require("./middlewares/fetchEcopay");
+const { fetchEcoTranzaksiyalar } = require("./middlewares/fetchEcopay");
 const { find_address_by_pinfil_from_mvd } = require("./api/mvd-pinfil");
 const getAbonentCardHtml = require("./api/cleancity/dxsh/getAbonentCardHTML");
 const getAbonentSaldoData = require("./api/cleancity/dxsh/getAbonentSaldoData");
@@ -51,8 +47,6 @@ module.exports = {
   htmlPDF,
   ejs,
   // required functions
-  drawAndSendTushum,
-  fetchEcopayTushum,
   fetchEcoTranzaksiyalar,
   drawDebitViloyat,
   yashovchiSoniKopaytirish,

@@ -80,4 +80,4 @@ async function sendKunlikEtkReports() {
     console.error(error);
   }
 }
-sendKunlikEtkReports();
+// sendKunlikEtkReports();

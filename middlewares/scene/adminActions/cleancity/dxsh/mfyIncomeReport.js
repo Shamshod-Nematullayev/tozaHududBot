@@ -1,5 +1,4 @@
 // ==============================================================
-const { Composer } = require("telegraf");
 const { bot } = require("../../../../../core/bot");
 const { CleanCitySession } = require("../../../../../models/CleanCitySession");
 const { JSDOM } = require("jsdom");
@@ -14,8 +13,6 @@ const {
 
 // ==============================================================
 // MAIN FUNCTION
-
-const composer = new Composer();
 
 const mfyIncomeReport = async (ctx = false) => {
   const sessions = await CleanCitySession.find({
@@ -195,6 +192,4 @@ const mfyIncomeReport = async (ctx = false) => {
 };
 
 // =========== EXPORT ======================//
-composer.action("mfy_income_report", mfyIncomeReport);
 module.exports = { mfyIncomeReport };
-bot.use(composer);
