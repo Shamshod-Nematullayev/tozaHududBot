@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style type="text/css" rel="stylesheet">
+      table {
+        overflow: hidden;
+        border-collapse: collapse;
+        padding: 10px;
+      }
+      div {
+        display: inline-block;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 5px 15px;
+        margin: 0;
+        border-collapse: collapse;
+      }
+      p{
+        text-decoration: underline;
+      }
+      th {
+        background-color: rgb(244, 212, 246);
+      }
+      td:last-child {
+        text-align: right;
+      }
+    </style>
+  </head>
+  <body>
+  <div>
+  <p><%= sana %></p>
+  <h2>Транзаксиялар хисоботи</h2>
+  <br>
+  <table cellscasing="0">
+
+      <tr>
+        <th rowspan="2">№</th>
+        <th rowspan="2">Худуд</th>
+        <th colspan="2">Келиб тушган транзаксиялар</th>
+      </tr>
+      <tr>
+        <th>Сони</th>
+        <th>Сумма</th>
+      </tr>
+      <% rows.map((elem, index) => { %>
+      <tr>
+        <td><%= index + 1 %></td>
+        <td><%= elem.name %></td>
+        <td><%= elem.tushumSoni %></td>
+        <td><%= elem.summasi %></td>
+      </tr>
+      <% }) %>
+      <tr>
+        <td></td>
+        <td>Жами</td>
+        <td><%= jamiTushumSoni %></td>
+        <td><%= jamiTushumSummasi %></td>
+      </tr>
+    </table>
+    </div>
+  </body>
+</html>

@@ -1,5 +1,4 @@
-const { fetchEcopayTushum, fetchEcoTranzaksiyalar } = require("./fetchEcopay");
-const { drawAndSendTushum } = require("./drawTushum");
+const { fetchEcoTranzaksiyalar } = require("./fetchEcopay");
 const {
   getAllWeekdaysInMonth,
 } = require("./smallFunctions/getWeekDaysInMonth");
@@ -12,9 +11,6 @@ const {
   drawDebitViloyat,
 } = require("./scene/adminActions/cleancity/viloyat/toSendDebitorReport");
 const fs = require("fs");
-const {
-  mfyIncomeReport,
-} = require("./scene/adminActions/cleancity/dxsh/mfyIncomeReport");
 const { virtualConsole } = require("../api/cleancity/helpers/virtualConsole");
 
 const cc = "https://cleancity.uz";
@@ -294,11 +290,8 @@ setInterval(async () => {
       (soat == 22 && minut == 0) ||
       (soat == 23 && minut == 0)
     ) {
-      drawDebitViloyat("toViloyat");
+      // drawDebitViloyat("toViloyat");
       if (soat < 22) {
-        const data = await fetchEcopayTushum();
-        if (data) drawAndSendTushum(data);
-        // mfyIncomeReport();
         // fetchEcoTranzaksiyalar();
       }
       // sendViloyatKunlikReja();

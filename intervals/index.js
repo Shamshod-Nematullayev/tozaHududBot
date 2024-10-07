@@ -4,3 +4,4 @@ require("./updateArizalarStatus");
 require("./sendMFYIncomeReport");
 require("./sendPinflMfyReport");
 require("./kunlikEtkReports");
+require("./nazoratchilarKunlikTushum");

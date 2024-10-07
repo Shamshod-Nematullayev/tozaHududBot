@@ -16,7 +16,4 @@ Kerakli xulosalarni shu yerga yozib boraman
 Abonentlar ma'lumotlarini to'g'rilash bo'yicha reja grafik tuziladi.
 
 1. Yangi abonent qo'shilishi bilan pinfl kiritildi hisobiga o'tishi kerak.
-2. Abonentlar bazasini billing bilan solishtirish
-3. Tahlil qilib oylik reja belgilash
-4. Reja va uning bajarilishini kuzatib borish uchun hisobot
 5. PINFL kiritganlarni hisoblash qaytadan va noto'g'ri kiritganlarni noto'g'ri kiritgan qilib o'chirish. Bunda ballidan kamaytiriladi

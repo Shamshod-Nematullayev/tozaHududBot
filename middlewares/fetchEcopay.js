@@ -2,40 +2,6 @@ const { drawSendLastSeen } = require("./drawTushum");
 
 let cookie = "";
 let Authorization = "";
-module.exports.fetchEcopayTushum = async () => {
-  try {
-    let response;
-    const date = new Date();
-    const res = await fetch(
-      `https://ekopay.uz/api/ecopay/transaction-report;descending=false;page=1;perPage=100?parent_id=32&date_from=${date.getDate(
-        Date.now()
-      )}.${date.getMonth(Date.now()) + 1}.${date.getFullYear(
-        Date.now()
-      )}&date_to=${date.getDate(Date.now())}.${
-        date.getMonth(Date.now()) + 1
-      }.${date.getFullYear(Date.now())}&companies_id=1144&sys_companies_id=503`,
-      {
-        method: "GET",
-        headers: {
-          Cookie: `JSESSIONID=${cookie};user_name=${process.env.ECOPAY_LOGIN}`,
-          Authorization: `Bearer ${Authorization}`,
-        },
-      }
-    );
-    response = await res.json();
-    if (response.ERROR && response.ERROR.message == "Пользователь не найден") {
-      await this.fetchEcopayLogin().then(async () => {
-        response = await this.fetchEcopayTushum();
-      });
-      return response;
-    } else {
-      return response;
-    }
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-};
 
 module.exports.fetchEcopayLogin = async (callback) => {
   await fetch("https://ekopay.uz/api/admin/auth/login", {
