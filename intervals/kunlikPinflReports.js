@@ -12,13 +12,13 @@ function bugungiSana() {
 
 //   main function
 
-async function sendKunlikEtkReports() {
+async function sendKunlikPinflReports() {
   try {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const abonents = await Abonent.find({
-      "ekt_kod_tasdiqlandi.confirm": true,
-      "ekt_kod_tasdiqlandi.updated_at": { $gt: today },
+      "shaxsi_tasdiqlandi.confirm": true,
+      "shaxsi_tasdiqlandi.updated_at": { $gt: today },
     });
     let inspectors = await Nazoratchi.find({ activ: true });
     inspectors.forEach((nazoratchi) => {
@@ -27,7 +27,8 @@ async function sendKunlikEtkReports() {
     abonents.forEach((abonent) => {
       const nazoratchi = inspectors.find(
         (nazoratchi) =>
-          nazoratchi.id === abonent.ekt_kod_tasdiqlandi.inspector_id
+          nazoratchi._id.toString() ==
+          abonent.shaxsi_tasdiqlandi.inspector._id.toString()
       );
       if (nazoratchi) {
         nazoratchi.counterOfConfirm++;
@@ -53,7 +54,7 @@ async function sendKunlikEtkReports() {
         allConfirmed,
         inspectors,
         sana: bugungiSana(),
-        report_name: "ETK Код киритиш",
+        report_name: "ПИНФЛ киритиш",
       },
       async (err, res) => {
         if (err) throw err;
@@ -85,9 +86,9 @@ setInterval(() => {
   const now = new Date();
   if (now.getMinutes() == 0) {
     if (hour > 7 && hour < 20) {
-      sendKunlikEtkReports();
+      sendKunlikPinflReports();
     }
   }
 }, 1000 * 60);
 
-module.exports = { sendKunlikEtkReports };
+module.exports = { sendKunlikPinflReports };
