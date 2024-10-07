@@ -52,15 +52,22 @@ const mfyIncomeReport = async (ctx = false) => {
         const msg = await ctx.reply(
           `Faol sessiyalar mavjud emas qaytadan login qiling`
         );
-        ctx.session.messages_for_delete.push(msg.message_id);
         // session yaratish sahnasi va callback function shu joyida tugab yangi sahna boshlanadi
         ctx.session.session_type = "dxsh";
         await ctx.scene.enter("recover_clean_city_session");
         return;
       }
       const jamiTushumlarTahliliPath = docHomePage.querySelector(
-        "#g_acccordion > div > div:nth-child(5) > ul > li:nth-child(4) > a"
-      ).href;
+        "#g_acccordion > div > div:nth-child(5) > div.panel-body.accordion-body > ul > li:nth-child(4) > a"
+      )?.href;
+      const msg = await ctx.reply(
+        `Faol sessiyalar mavjud emas qaytadan login qiling`
+      );
+      if (!jamiTushumlarTahliliPath) {
+        ctx.session.session_type = "dxsh";
+        await ctx.scene.enter("recover_clean_city_session");
+        return;
+      }
 
       // Tushumlar tahlili sahifasini yuklab olish
       const resTushumlarTahlili = await fetch(
@@ -186,7 +193,7 @@ const mfyIncomeReport = async (ctx = false) => {
           ctx.reply("xatolik tushumlar ma'lumotini json formatida olishda");
         });
     } catch (error) {
-      console.error(new Error(error));
+      console.error(error);
     }
   });
 };

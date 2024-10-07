@@ -17,7 +17,7 @@ const searchAbonentbyName = new Scenes.WizardScene(
       ctx.wizard.next();
     } catch (error) {
       ctx.reply("Xatolik", keyboards.lotin.cancelBtn.resize());
-      console.log(error);
+      console.error(error);
     }
   },
   async (ctx) => {

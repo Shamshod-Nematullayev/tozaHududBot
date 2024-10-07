@@ -80,7 +80,7 @@ composer.hears(["⚙Sozlamalar", "⚙Созламалар"], (ctx) => {
 // Entering to scene by inline buttons
 const actions = [
   "GUVOHNOMA_KIRITISH",
-  "SEARCH_BY_NAME",
+  // "SEARCH_BY_NAME",
   "multiply_livings",
   "update_abonent_date_by_pinfil",
   "connect_phone_number",

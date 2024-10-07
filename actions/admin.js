@@ -101,7 +101,7 @@ composer.command("admin", async (ctx) => {
 
 composer.action("mfy_income_report", async (ctx) => {
   if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-  mfyIncomeReport();
+  mfyIncomeReport(ctx);
 });
 
 composer.hears(["👨‍💻 Ish maydoni", "👨‍💻 Иш майдони"], async (ctx) => {

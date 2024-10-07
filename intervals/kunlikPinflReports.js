@@ -68,7 +68,7 @@ async function sendKunlikPinflReports() {
         const buffer = Buffer.from(binaryData, "binary");
 
         bot.telegram.sendPhoto(
-          5347896070,
+          process.env.NAZORATCHILAR_GURUPPASI,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
@@ -84,8 +84,8 @@ async function sendKunlikPinflReports() {
 
 setInterval(() => {
   const now = new Date();
-  if (now.getMinutes() == 0) {
-    if (hour > 7 && hour < 20) {
+  if (now.getMinutes() == 5) {
+    if (now.getHours() > 7 && now.getHours() < 20) {
       sendKunlikPinflReports();
     }
   }
