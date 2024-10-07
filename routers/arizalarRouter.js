@@ -91,15 +91,10 @@ router.post("/create", async (req, res) => {
         message: "Ikkilamchi aktlarda dvaynik kod kiritilishi majburiy!",
       });
     if (req.body.document_type === "odam_soni") {
-      if (!req.body.current_prescribed_cnt || !req.body.next_prescribed_cnt)
-        return res.json({
-          ok: false,
-          message:
-            "Odam soni hozirgi kundagi va keyin bo'lishi kerak bo'lgan odam soni kiritilishi majburiy!",
-        });
-    }
-    if (req.body.document_type === "odam_soni") {
-      if (!req.body.current_prescribed_cnt || !req.body.next_prescribed_cnt)
+      if (
+        isNaN(req.body.current_prescribed_cnt) ||
+        isNaN(req.body.next_prescribed_cnt)
+      )
         return res.json({
           ok: false,
           message:
