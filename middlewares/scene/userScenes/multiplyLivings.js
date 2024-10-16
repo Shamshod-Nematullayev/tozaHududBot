@@ -3,10 +3,11 @@ const { keyboards } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
 const { MultiplyRequest } = require("../../../models/MultiplyRequest");
 const isCancel = require("../../smallFunctions/isCancel");
+const { Abonent } = require("../../../models/Abonent");
 
 const multiplyLivingsScene = new Scenes.WizardScene(
   "multiply_livings",
-  (ctx) => {
+  async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (isNaN(ctx.message.text))
@@ -20,26 +21,22 @@ const multiplyLivingsScene = new Scenes.WizardScene(
           keyboards[ctx.session.til].cancelBtn.resize()
         );
 
-      const abonents = require("../../../lib/abonents.json");
+      const abonent = await Abonent.findOne({ licshet: ctx.message.text });
 
-      const abonent = abonents[Object.keys(abonents)[0]].filter((a) => {
-        return a.litsavoy == ctx.message.text;
-      })[0];
-
-      if (abonent) {
-        ctx.wizard.state.abonent = abonent;
-        ctx.wizard.state.KOD = ctx.message.text;
-        ctx.replyWithHTML(
-          `<b>${abonent.FISH}</b> ${abonent.MFY} MFY\n` +
-            messages.enterYashovchiSoni,
-          keyboards[ctx.session.til].cancelBtn.resize()
-        );
-        ctx.wizard.next();
-      } else {
-        ctx.reply(messages.abonentNotFound);
+      if (!abonent) {
+        return ctx.reply(messages.abonentNotFound);
       }
+
+      ctx.wizard.state.abonent = abonent;
+      ctx.wizard.state.KOD = ctx.message.text;
+      ctx.replyWithHTML(
+        `<b>${abonent.fio}</b> ${abonent.mahalla_name} MFY\n` +
+          messages.enterYashovchiSoni,
+        keyboards[ctx.session.til].cancelBtn.resize()
+      );
+      ctx.wizard.next();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       ctx.reply("Xatolik");
     }
   },
@@ -52,7 +49,6 @@ const multiplyLivingsScene = new Scenes.WizardScene(
           keyboards[ctx.session.til].cancelBtn.resize()
         );
       } else {
-        const abonent = ctx.wizard.state.abonent;
         ctx.scene.state.YASHOVCHILAR = parseInt(ctx.message.text);
         const request = new MultiplyRequest({
           ...ctx.wizard.state,
@@ -63,7 +59,7 @@ const multiplyLivingsScene = new Scenes.WizardScene(
         ctx.reply(messages.accepted);
         ctx.telegram.sendMessage(
           process.env.CHANNEL,
-          `#yashovchisoni by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n<code>${ctx.wizard.state.KOD}</code>\n${ctx.message.text} kishi`,
+          `#yashovchisoni by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n<code>${ctx.wizard.state.licshet}</code>\n${ctx.message.text} kishi`,
           {
             parse_mode: "HTML",
             reply_markup: Markup.inlineKeyboard([

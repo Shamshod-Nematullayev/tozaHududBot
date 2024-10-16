@@ -9,6 +9,7 @@ const { log } = require("console");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const { kirillga } = require("../../smallFunctions/lotinKiril");
 const { yangiAbonent } = require("./cleancity/dxsh/yangiAbonent");
+const { NewAbonent } = require("../../../models/NewAbonents");
 const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {
@@ -164,6 +165,12 @@ const new_abonent_by_pinfl_scene = new Scenes.WizardScene(
       });
 
       if (abonent.success) {
+        await NewAbonent.create({
+          abonent_name: ctx.wizard.state.customDates.fullname,
+          licshet: abonent.litschet,
+          mahalla_id: ctx.wizard.state.mfy_id,
+          nazoratchi_id: `ADMIN:` + ctx.from.id,
+        });
         ctx.reply(`Yangi abonent qo'shildi <code>${abonent.litschet}</code>`, {
           parse_mode: "HTML",
         });

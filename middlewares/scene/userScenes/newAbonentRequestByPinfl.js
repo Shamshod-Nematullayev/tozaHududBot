@@ -10,6 +10,7 @@ const { keyboards } = require("../../../lib/keyboards");
 const { Abonent } = require("../../../models/Abonent");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { Mahalla } = require("../../../models/Mahalla");
+const { NewAbonent } = require("../../../models/NewAbonents");
 const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {
@@ -184,6 +185,12 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       });
 
       if (abonent.success) {
+        await NewAbonent.create({
+          abonent_name: ctx.wizard.state.customDates.fullname,
+          licshet: abonent.litschet,
+          mahalla_id: ctx.wizard.state.mfy_id,
+          nazoratchi_id: ctx.wizard.state.inspektor.id,
+        });
         ctx.replyWithHTML(
           `Yangi abonent qo'shildi <code>${abonent.litschet}</code>`
         );

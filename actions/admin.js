@@ -188,13 +188,13 @@ composer.action(/done_\w+/g, async (ctx) => {
     const req = await MultiplyRequest.findById(doneCb.split("_")[1]);
 
     const cleancityResponse = await yashovchiSoniKopaytirish(
-      req.KOD,
+      req.abonent.licshet,
       req.YASHOVCHILAR
     );
     if (!cleancityResponse.success) {
       await ctx.telegram.sendMessage(
         req.from.id,
-        `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n 🟥🟥 Bekor qilindi. \n Asos: ${cleancityResponse.msg}`,
+        `<code>${req.abonent.licshet}</code>\n ${req.YASHOVCHILAR} kishi \n 🟥🟥 Bekor qilindi. \n Asos: ${cleancityResponse.msg}`,
         { parse_mode: "HTML" }
       );
       await req.updateOne({
@@ -207,11 +207,11 @@ composer.action(/done_\w+/g, async (ctx) => {
       await ctx.answerCbQuery(JSON.stringify(cleancityResponse));
       await ctx.telegram.sendMessage(
         req.from.id,
-        `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n ✅✅ Tasdiqlandi`,
+        `<code>${req.licshet}</code>\n ${req.YASHOVCHILAR} kishi \n ✅✅ Tasdiqlandi`,
         { parse_mode: "HTML" }
       );
       await ctx.editMessageText(
-        `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.KOD}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+        `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.abonent.licshet}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
         { parse_mode: "HTML", disable_web_page_preview: true }
       );
       await ctx.telegram.forwardMessage(
