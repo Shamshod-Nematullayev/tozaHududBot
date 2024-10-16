@@ -39,7 +39,7 @@ const searchAbonentbyName = new Scenes.WizardScene(
         );
       });
       if (abonent.length > 0) {
-        if (abonent.length > 100) {
+        if (abonent.length > 50) {
           return ctx.reply(
             "Qidiruv natijalari juda ko'p, iltimos ko'proq belgi kiriting"
           );

@@ -2,7 +2,6 @@ const { Scenes } = require("telegraf");
 const { bot } = require("../core/bot");
 const LocalSession = require("telegraf-session-local");
 const newAdminScene = require("./scene/userScenes/newAdminScene");
-const findAbonentScene = require("./scene/userScenes/findAbonentById");
 const { showAbonentPic } = require("./scene/adminActions/showAbonentPic");
 const { addNotification } = require("./scene/adminActions/addNotification");
 const generateAlertLetter = require("./scene/adminActions/generateAlertLetter");
@@ -83,7 +82,6 @@ const {
 
 const stage = new Scenes.Stage([
   newAdminScene,
-  findAbonentScene,
   showAbonentPic,
   addNotification,
   generateAlertLetter,

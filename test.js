@@ -206,7 +206,7 @@ const ejs = require("ejs");
 const path = require("path");
 const fs = require("fs");
 const QRCode = require("qrcode");
-const { Abonent, xlsx } = require("./requires");
+const { Abonent, xlsx, changeAbonentDates } = require("./requires");
 const { Mahalla } = require("./models/Mahalla");
 
 async () => {
@@ -304,4 +304,56 @@ async () => {
   };
   await xlsx(data, settings);
   console.log("Bajarildi");
+}; //();
+
+// To'g'ri etk kodlarni bazaga import qilish
+async () => {
+  const etk_abonents = require("./lib/etk_baza.json");
+  const rows = require("./main.json");
+  console.log("Jarayon boshlandi");
+  const promises = rows.map((row) => {
+    return new Promise(async (resolve, reject) => {
+      const abonent = await Abonent.findOne({ licshet: row.licshet });
+      const etk = etk_abonents.find((a) => a.CUSTOMER_CODE == row.etk);
+      let res = await changeAbonentDates({
+        abonent_id: abonent.id,
+        abo_data: {
+          description: `FIO bo'yicha ETK kod to'g'ri deb tasdiqlandi`,
+          energy_licshet: etk.CUSTOMER_CODE,
+          energy_coato: "18214",
+          phone: etk.MOBILE_PHONE ? etk.MOBILE_PHONE : undefined,
+        },
+      });
+      if (res.msg == "Кадастр рақам формати нотоғри киритилди") {
+        res = await changeAbonentDates({
+          abonent_id: abonent.id,
+          abo_data: {
+            description: `FIO bo'yicha ETK kod to'g'ri deb tasdiqlandi`,
+            energy_licshet: etk.CUSTOMER_CODE,
+            energy_coato: "18214",
+            phone: etk.MOBILE_PHONE ? etk.MOBILE_PHONE : undefined,
+            kadastr_number: "",
+          },
+        });
+      }
+      if (!res.success) {
+        return console.log(res.msg);
+      }
+
+      await Abonent.findByIdAndUpdate(abonent._id, {
+        $set: {
+          ekt_kod_tasdiqlandi: {
+            confirm: true,
+            inspector_id: 29624,
+            inspector_name: `Шамшод Неъматуллаев`,
+            updated_at: new Date(),
+          },
+          energy_licshet: etk.CUSTOMER_CODE,
+        },
+      });
+      return resolve("Etk hisob raqami muvaffaqqiyatli kiritildi");
+    });
+  });
+  await Promise.all(promises);
+  console.log("Jarayon tugadi");
 }; //();

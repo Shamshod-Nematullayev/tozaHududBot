@@ -24,7 +24,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         return ctx.answerCbQuery("Bu abonent ma'lumoti kiritilib bo'lingan");
       }
       //   billingga yangilov so'rovini yuborish
-      const res = await changeAbonentDates({
+      let res = await changeAbonentDates({
         abonent_id: abonent.id,
         abo_data: {
           brith_date: `${kun}.${oy}.${yil}`,
@@ -42,7 +42,26 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         },
       });
       if (!res.success) {
-        return ctx.answerCbQuery(res.msg);
+        if (res.msg === "Кадастр рақам формати нотоғри киритилди") {
+          res = await changeAbonentDates({
+            abonent_id: abonent.id,
+            abo_data: {
+              brith_date: `${kun}.${oy}.${yil}`,
+              fio: `${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic}`,
+              description: `${inspector.id} ${inspector.name} ma'lumotiga asosan o'zgartirildi.`,
+              //   passport_location: req.data.photo,
+              passport_number: `${req.data.passport_serial}-${req.data.passport_number}`,
+              passport_expire_date: req.data.details.doc_end_date
+                ? `${req.data.details.doc_end_date.split("-")[2]}.${
+                    req.data.details.doc_end_date.split("-")[1]
+                  }.${req.data.details.doc_end_date.split("-")[0]}`
+                : undefined,
+              pinfl: req.data.pinfl,
+              kadastr_number: "",
+              passport_location: req.data.details.division,
+            },
+          });
+        } else return ctx.answerCbQuery(res.msg);
       }
       //   mongodb ma'lumotlar bazada yangilanish
       await abonent.updateOne({

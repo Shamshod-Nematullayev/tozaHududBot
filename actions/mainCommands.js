@@ -6,13 +6,10 @@ composer.hears(["👤Yangi abonent ochish", "👤Янги абонент"], (ctx
   ctx.scene.enter("new_abonent_request");
 });
 composer.hears(["🔎Izlash", "🔎Излаш"], (ctx) => {
-  ctx.reply(messages.izlashUsuliTanlash, keyboards[ctx.session.til].searchType);
+  ctx.scene.enter("SEARCH_BY_NAME");
 });
 composer.hears(["🔌ЭЛЕКТР КОДИ🔌", "🔌ELEKTR KODI🔌"], async (ctx) => {
   ctx.scene.enter("updateElektrKod");
-});
-composer.action("searchByID", (ctx) => {
-  ctx.scene.enter("searchByID");
 });
 
 // const mahallalar = require("../lib/mahallalar.json");
@@ -80,7 +77,6 @@ composer.hears(["⚙Sozlamalar", "⚙Созламалар"], (ctx) => {
 // Entering to scene by inline buttons
 const actions = [
   "GUVOHNOMA_KIRITISH",
-  // "SEARCH_BY_NAME",
   "multiply_livings",
   "update_abonent_date_by_pinfil",
   "connect_phone_number",
