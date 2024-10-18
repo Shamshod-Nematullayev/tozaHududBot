@@ -1,6 +1,8 @@
+const { NOTIFICATIONS_CHANNEL_ID } = require("../constants");
 const { HybridMail } = require("../models/HybridMail");
+const { Notification } = require("../models/Notification");
 const { SudAkt } = require("../models/SudAkt");
-const { getAbonentSaldoData } = require("../requires");
+const { getAbonentSaldoData, bot } = require("../requires");
 
 const checkMails = async () => {
   try {
@@ -12,7 +14,11 @@ const checkMails = async () => {
   let counter = 0;
   async function loop() {
     if (counter === mails.length) {
-      console.log("jarayon yakunlandi");
+      console.log("Ogohlantirish xatlari holati tekshirib chiqildi");
+      const yangiAktlar = await SudAkt.countDocuments({status: 'yangi'});
+      if(yangiAktlar > 50){
+        bot.telegram.sendMessage(NOTIFICATIONS_CHANNEL_ID, `Prokratura arizasini yaratish kerak bo'lgan aktlar soni <b>${yangiAktlar}</b> ga yetdi`, {parse_mode: "HTML" })
+      }
       return;
     }
     const mail = mails[counter];
