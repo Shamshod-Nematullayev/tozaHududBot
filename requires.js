@@ -19,7 +19,7 @@ const {
 } = require("./middlewares/scene/adminActions/cleancity/dxsh/yashovchiSoniKopaytirish");
 const {
   changeAbonentDates,
-} = require("./middlewares/scene/adminActions/cleancity/dxsh/abonentMalumotlariniOzgartirish");
+} = require("./api/cleancity/dxsh/changeAbonentDatas");
 
 // telegraf resources
 const { Composer } = require("telegraf");

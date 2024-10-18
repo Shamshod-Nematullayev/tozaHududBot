@@ -36,6 +36,9 @@ async function changeAbonentDates({
     }
   }
   const session = await CleanCitySession.findOne({ type: "dxsh" });
+  if(!session.path.updateAboDataUrl || !session.path.getAboDataUrl){
+    session.path = await recoverPath(session, abonent_id)
+  }
   if (session.path.updateAboDataUrl && session.path.getAboDataUrl) {
     let abonent_data = await fetch(
       "https://cleancity.uz/" + session.path.getAboDataUrl,
@@ -43,19 +46,8 @@ async function changeAbonentDates({
         headers: {
           accept:
             "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
-          "cache-control": "max-age=0",
-          "content-type": "application/x-www-form-urlencoded",
-          "sec-ch-ua":
-            '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"Windows"',
-          "sec-fetch-dest": "iframe",
-          "sec-fetch-mode": "navigate",
-          "sec-fetch-site": "same-origin",
-          "sec-fetch-user": "?1",
-          "upgrade-insecure-requests": "1",
-          Cookie: session.cookie,
+          "accept-language": "uz",
+          "content-type": "application/x-www-form-urlencoded",          Cookie: session.cookie,
         },
         referrerPolicy: "strict-origin-when-cross-origin",
         body: `abonents_id=${abonent_id}&module_name=AbonentCardModule`,
@@ -79,18 +71,8 @@ async function changeAbonentDates({
         headers: {
           accept:
             "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
-          "cache-control": "max-age=0",
+          "accept-language": "uz",
           "content-type": "application/x-www-form-urlencoded",
-          "sec-ch-ua":
-            '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"Windows"',
-          "sec-fetch-dest": "iframe",
-          "sec-fetch-mode": "navigate",
-          "sec-fetch-site": "same-origin",
-          "sec-fetch-user": "?1",
-          "upgrade-insecure-requests": "1",
           Cookie: session.cookie,
         },
         referrerPolicy: "strict-origin-when-cross-origin",
@@ -101,20 +83,20 @@ async function changeAbonentDates({
       }
     );
     return await res.json();
-  } else if (session.path.toCardAboUrl) {
-    const startpage = await fetch(cc + "startpage", {
+  }
+}
+async function recoverPath(session, abonent_id){
+  const startpage = await fetch(cc + "startpage", {
       headers: { Cookie: session.cookie },
     });
     const startpageText = await startpage.text();
-
     const startpageDoc = new JSDOM(startpageText, {
-      virtualConsole: virtualConsole,
-    }).window.document;
+      virtualConsole: virtualConsole
+    });
     let toCardAboUrl = startpageDoc
       .getElementById("to_card_abo")
       .getAttribute("action");
 
-    // Abonent kartasini topish manzili mavjud bo'lganida
     const abonentCardPage = await fetch(
       "https://cleancity.uz/dashboard" + toCardAboUrl,
       {
@@ -124,15 +106,6 @@ async function changeAbonentDates({
           "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
           "cache-control": "max-age=0",
           "content-type": "application/x-www-form-urlencoded",
-          "sec-ch-ua":
-            '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"Windows"',
-          "sec-fetch-dest": "document",
-          "sec-fetch-mode": "navigate",
-          "sec-fetch-site": "same-origin",
-          "sec-fetch-user": "?1",
-          "upgrade-insecure-requests": "1",
           Cookie: session.cookie,
         },
         referrerPolicy: "strict-origin-when-cross-origin",
@@ -154,26 +127,14 @@ async function changeAbonentDates({
       $set: {
         "path.updateAboDataUrl": updateAboDataUrl,
         "path.getAboDataUrl": getAboDataUrl,
+        "path.toCardAboUrl": toCardAboUrl
       },
     });
-    return await changeAbonentDates(arguments[0]);
-  } else {
-    // abonent kartasi topish urlini aniqlash
-    const startpage = await fetch(cc + "startpage", {
-      headers: { Cookie: session.cookie },
-    });
-    const startpageText = await startpage.text();
-
-    const startpageDoc = new JSDOM(startpageText, {
-      virtualConsole: virtualConsole,
-    }).window.document;
-    let toCardAboUrl = startpageDoc
-      .getElementById("to_card_abo")
-      .getAttribute("action");
-
-    await session.updateOne({ $set: { "path.toCardAboUrl": toCardAboUrl } });
-    return await changeAbonentDates(arguments[0]);
-  }
+    return {
+      updateAboDataUrl,
+      getAboDataUrl,
+      toCardAboUrl
+    }
 }
 
 module.exports = { changeAbonentDates };
