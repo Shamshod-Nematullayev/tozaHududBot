@@ -314,6 +314,9 @@ async () => {
   const promises = rows.map((row) => {
     return new Promise(async (resolve, reject) => {
       const abonent = await Abonent.findOne({ licshet: row.licshet });
+      if (abonent.ekt_kod_tasdiqlandi.confirm) {
+        return resolve(`Allaqachon kiritilgan`);
+      }
       const etk = etk_abonents.find((a) => a.CUSTOMER_CODE == row.etk);
       let res = await changeAbonentDates({
         abonent_id: abonent.id,

@@ -12,19 +12,50 @@ const {
 } = require("../controllers/sudAktController");
 const { CaseDocument } = require("../models/CaseDocuments");
 const { SudAkt } = require("../models/SudAkt");
+const { HybridMail } = require("../models/HybridMail");
 
 // get all dates   GET
-router.get("/", getAllAkts);
-// get one data    GET
-router.get("/:id", getAktById);
-// create new data POST
-router.post("/", createNewAkt);
-// update one data PUT
-router.put("/:id", updateAktById);
-// update one without id PUT
-router.put("/", updateAktByKod);
-// delete one data DELETE
-router.delete("/:id", deleteById);
+// router.get("/", getAllAkts);
+// // get one data    GET
+// router.get("/:id", getAktById);
+// // create new data POST
+// router.post("/", createNewAkt);
+// // update one data PUT
+// router.put("/:id", updateAktById);
+// // update one without id PUT
+// router.put("/", updateAktByKod);
+// // delete one data DELETE
+// router.delete("/:id", deleteById);
+
+router.get("/hybrid-mails", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const { sortField = "createdAt", sortDirection = "asc" } = req.query;
+    const sortOptions = {};
+    sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
+
+    const skip = (page - 1) * limit;
+
+    const mails = await HybridMail.find()
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions);
+
+    const total = await HybridMail.countDocuments();
+    res.json({
+      ok: true,
+      rows: mails,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
 
 router.put("/update-case-documents-to-billing/:case_id", async (req, res) => {
   try {

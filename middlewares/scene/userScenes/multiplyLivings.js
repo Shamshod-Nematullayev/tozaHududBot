@@ -59,7 +59,7 @@ const multiplyLivingsScene = new Scenes.WizardScene(
         ctx.reply(messages.accepted);
         ctx.telegram.sendMessage(
           process.env.CHANNEL,
-          `#yashovchisoni by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n<code>${ctx.wizard.state.licshet}</code>\n${ctx.message.text} kishi`,
+          `#yashovchisoni by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n<code>${ctx.wizard.state.abonent.licshet}</code>\n${ctx.message.text} kishi`,
           {
             parse_mode: "HTML",
             reply_markup: Markup.inlineKeyboard([

@@ -57,7 +57,7 @@ composer.action(/newAbonentsList_/, async (ctx) => {
       return ctx.reply("Abonentlar yo'q!");
     }
     abonents.forEach((abonent) => {
-      str += `<b>${abonent.kod}</b> = ${abonent.abonent_name}\n`;
+      str += `<b>${abonent.licshet}</b> = ${abonent.abonent_name}\n`;
     });
     ctx.replyWithHTML(str);
   } catch (err) {
