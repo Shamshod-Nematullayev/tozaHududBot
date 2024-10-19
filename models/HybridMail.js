@@ -22,6 +22,7 @@ const schema = new Schema({
     type: String,
     default: "",
   },
+  abonent_deleted: { type: Boolean, default: false },
 });
 
 module.exports.HybridMail = mongoose.model("hybrid_mail", schema);

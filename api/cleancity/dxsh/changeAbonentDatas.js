@@ -1,9 +1,8 @@
-const { CleanCitySession } = require("../../../../../models/CleanCitySession");
+const { CleanCitySession } = require("../../../models/CleanCitySession");
 const { JSDOM } = require("jsdom");
-const { Abonent } = require("../../../../../models/Abonent");
-const {
-  virtualConsole,
-} = require("../../../../../api/cleancity/helpers/virtualConsole");
+const { virtualConsole } = require("../helpers/virtualConsole");
+
+// ========================================================================
 const cc = `https://cleancity.uz/`;
 
 async function changeAbonentDates({
@@ -36,8 +35,8 @@ async function changeAbonentDates({
     }
   }
   const session = await CleanCitySession.findOne({ type: "dxsh" });
-  if(!session.path.updateAboDataUrl || !session.path.getAboDataUrl){
-    session.path = await recoverPath(session, abonent_id)
+  if (!session.path.updateAboDataUrl || !session.path.getAboDataUrl) {
+    session.path = await recoverPath(session, abonent_id);
   }
   if (session.path.updateAboDataUrl && session.path.getAboDataUrl) {
     let abonent_data = await fetch(
@@ -47,7 +46,8 @@ async function changeAbonentDates({
           accept:
             "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
           "accept-language": "uz",
-          "content-type": "application/x-www-form-urlencoded",          Cookie: session.cookie,
+          "content-type": "application/x-www-form-urlencoded",
+          Cookie: session.cookie,
         },
         referrerPolicy: "strict-origin-when-cross-origin",
         body: `abonents_id=${abonent_id}&module_name=AbonentCardModule`,
@@ -85,56 +85,56 @@ async function changeAbonentDates({
     return await res.json();
   }
 }
-async function recoverPath(session, abonent_id){
+async function recoverPath(session, abonent_id) {
   const startpage = await fetch(cc + "startpage", {
-      headers: { Cookie: session.cookie },
-    });
-    const startpageText = await startpage.text();
-    const startpageDoc = new JSDOM(startpageText, {
-      virtualConsole: virtualConsole
-    });
-    let toCardAboUrl = startpageDoc
-      .getElementById("to_card_abo")
-      .getAttribute("action");
+    headers: { Cookie: session.cookie },
+  });
+  const startpageText = await startpage.text();
+  const startpageDoc = new JSDOM(startpageText, {
+    virtualConsole: virtualConsole,
+  }).window.document;
+  let toCardAboUrl = startpageDoc
+    .getElementById("to_card_abo")
+    .getAttribute("action");
 
-    const abonentCardPage = await fetch(
-      "https://cleancity.uz/dashboard" + toCardAboUrl,
-      {
-        headers: {
-          accept:
-            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
-          "cache-control": "max-age=0",
-          "content-type": "application/x-www-form-urlencoded",
-          Cookie: session.cookie,
-        },
-        referrerPolicy: "strict-origin-when-cross-origin",
-        body: `to_card_abo_hf_0=&id=${abonent_id}&companies_id=1144`,
-        method: "POST",
-        mode: "cors",
-        credentials: "include",
-      }
-    );
-    const responseText = await abonentCardPage.text();
-    const updateAboDataUrl = responseText
-      .match(/url_upd\s*=\s*'([^']*)'/g)[0]
-      .split("'")[1];
-
-    const getAboDataUrl = responseText
-      .match(/ds\?xenc=([^']*)'/g)[2]
-      .split("'")[0];
-    await session.updateOne({
-      $set: {
-        "path.updateAboDataUrl": updateAboDataUrl,
-        "path.getAboDataUrl": getAboDataUrl,
-        "path.toCardAboUrl": toCardAboUrl
+  const abonentCardPage = await fetch(
+    "https://cleancity.uz/dashboard" + toCardAboUrl,
+    {
+      headers: {
+        accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
+        "cache-control": "max-age=0",
+        "content-type": "application/x-www-form-urlencoded",
+        Cookie: session.cookie,
       },
-    });
-    return {
-      updateAboDataUrl,
-      getAboDataUrl,
-      toCardAboUrl
+      referrerPolicy: "strict-origin-when-cross-origin",
+      body: `to_card_abo_hf_0=&id=${abonent_id}&companies_id=1144`,
+      method: "POST",
+      mode: "cors",
+      credentials: "include",
     }
+  );
+  const responseText = await abonentCardPage.text();
+  const updateAboDataUrl = responseText
+    .match(/url_upd\s*=\s*'([^']*)'/g)[0]
+    .split("'")[1];
+
+  const getAboDataUrl = responseText
+    .match(/ds\?xenc=([^']*)'/g)[2]
+    .split("'")[0];
+  await session.updateOne({
+    $set: {
+      "path.updateAboDataUrl": updateAboDataUrl,
+      "path.getAboDataUrl": getAboDataUrl,
+      "path.toCardAboUrl": toCardAboUrl,
+    },
+  });
+  return {
+    updateAboDataUrl,
+    getAboDataUrl,
+    toCardAboUrl,
+  };
 }
 
 module.exports = { changeAbonentDates };
