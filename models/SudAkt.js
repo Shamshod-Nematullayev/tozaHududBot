@@ -20,6 +20,11 @@ const schema = new mongoose.Schema(
     warningDate: Date,
     case_documents: Array,
     ariza_date: Date,
+    ariza_order_num: Number,
+    ariza_type: {
+      type: String,
+      enum: ["prokuratura", "savdo-sanoat"],
+    },
     tushum: Number,
     isDelete: {
       type: Boolean,

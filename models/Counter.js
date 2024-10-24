@@ -13,28 +13,22 @@ const schema = new mongoose.Schema(
 // name: counter nomi boshqalaridan ajratib olish uchun
 // value: counter qiymati
 // last_update: ohirgi marta qachon yangilanganligi
-module.exports.Counter = mongoose.model("counter", schema, "counter");
+const Counter = mongoose.model("counter", schema, "counter");
+
+module.exports = { Counter };
 // creating counter for incoming document serial number
 (async () => {
-  const counter = await this.Counter.findOne({
-    name: "incoming_document_number",
-  });
-  const counterShaxsiTasdiqlandi = await this.Counter.findOne({
-    name: "shaxsi_tashdiqlandi_bildirish_xati",
-  });
-  const counterAriza = await this.Counter.findOne({
-    name: "ariza_tartib_raqami",
-  });
-  if (!counter) {
-    await this.Counter.create({ name: "incoming_document_number", value: 0 });
+  const counterNames = [
+    "incoming_document_number",
+    "shaxsi_tashdiqlandi_bildirish_xati",
+    "ariza_tartib_raqami",
+    "sudga_ariza_tartib_raqami",
+  ];
+  async function checkAndCreateCounter(name) {
+    const counter = await Counter.findOne({ name });
+    if (!counter) {
+      await Counter.create({ name, value: 0 });
+    }
   }
-  if (!counterShaxsiTasdiqlandi) {
-    await this.Counter.create({
-      name: "shaxsi_tashdiqlandi_bildirish_xati",
-      value: 0,
-    });
-  }
-  if (!counterAriza) {
-    await this.Counter.create({ name: "ariza_tartib_raqami", value: 0 });
-  }
+  counterNames.forEach((name) => checkAndCreateCounter(name));
 })();

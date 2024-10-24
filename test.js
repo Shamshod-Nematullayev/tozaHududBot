@@ -206,8 +206,9 @@ const ejs = require("ejs");
 const path = require("path");
 const fs = require("fs");
 const QRCode = require("qrcode");
-const { Abonent, xlsx, changeAbonentDates } = require("./requires");
+const { Abonent, xlsx, changeAbonentDates, bot } = require("./requires");
 const { Mahalla } = require("./models/Mahalla");
+const nodeHtmlToImage = require("node-html-to-image");
 
 async () => {
   const oylar = [
@@ -360,3 +361,57 @@ async () => {
   await Promise.all(promises);
   console.log("Jarayon tugadi");
 }; //();
+
+// Mahalla bazasi
+// (async () => {
+//   const rows = require("./main.json");
+//   const mahallalar = [];
+//   rows.forEach((m) => {
+//     if (!mahallalar.find((a) => a == m.mfy)) {
+//       mahallalar.push(m.mfy);
+//     }
+//   });
+//   let counter = 0;
+//   async function loop() {
+//     const mfy = mahallalar[counter];
+//     const str = ejs.render(
+//       `<html>
+//         <div style="display: inline-block">
+//           <h3>Mahalla: <%= rows[0].mfy %></h1>
+//           <table border="1" style="border-collapse: collapse; font-family: sans-serif; font-wieght: bold">
+//   <% rows.map(row => { %>
+//     <tr style="height: 20px">
+//       <td><%= row.kod %></td>
+//       <td><%= row.fio %></td>
+//       <td><%= row.mfy %></td>
+//     </tr>
+//   <% }) %>
+// </table>
+
+//         <div>
+//       <html>`,
+//       { rows: rows.filter((row) => row.mfy == mfy) },
+//       async (err, str) => {
+//         if (err) console.log(err);
+//       }
+//     );
+//     const binaryData = await nodeHtmlToImage({
+//       html: str,
+//       type: "png",
+//       encoding: "binary",
+//       selector: "div",
+//     });
+//     const buffer = Buffer.from(binaryData, "binary");
+//     await bot.telegram.sendPhoto(
+//       process.env.NAZORATCHILAR_GURUPPASI,
+//       { source: buffer },
+//       {
+//         caption: `${mfy}`,
+//         parse_mode: "HTML",
+//       }
+//     );
+//     counter++;
+//     loop();
+//   }
+//   loop();
+// })();
