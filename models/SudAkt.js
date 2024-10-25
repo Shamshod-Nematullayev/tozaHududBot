@@ -40,7 +40,7 @@ const schema = new mongoose.Schema(
         "sud_qarori_chiqorildi",
         "rad_etildi",
       ],
-      default: "yangi",
+      // default: "yangi",
     },
   },
   {

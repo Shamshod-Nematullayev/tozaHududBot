@@ -36,11 +36,16 @@ router.get("/", async (req, res) => {
     const sortOptions = {};
     sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
     const skip = (page - 1) * limit;
-    const sudAkts = await SudAkt.find()
+    const filter = {};
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+    console.log("Filter:", filter);
+    const sudAkts = await SudAkt.find(filter)
       .sort(sortOptions)
       .skip(skip)
       .limit(limit);
-    const total = await SudAkt.countDocuments();
+    const total = await SudAkt.countDocuments(filter);
     res.json({
       ok: true,
       rows: sudAkts,
