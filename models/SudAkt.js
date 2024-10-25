@@ -20,6 +20,11 @@ const schema = new mongoose.Schema(
     warningDate: Date,
     case_documents: Array,
     ariza_date: Date,
+    ariza_order_num: Number,
+    ariza_type: {
+      type: String,
+      enum: ["prokuratura", "savdo-sanoat"],
+    },
     tushum: Number,
     isDelete: {
       type: Boolean,
@@ -27,8 +32,13 @@ const schema = new mongoose.Schema(
     },
     pinfl: Number,
     status: {
-      type: String,
-      enum: ["yangi", "ariza_yaratildi", "sudga_ariza_berildi", "sud_qarori_chiqorildi", "rad_etildi"],
+      enum: [
+        "yangi",
+        "ariza_yaratildi",
+        "sudga_ariza_berildi",
+        "sud_qarori_chiqorildi",
+        "rad_etildi",
+      ],
       default: "yangi"
     },
   },

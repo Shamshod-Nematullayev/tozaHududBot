@@ -37,8 +37,11 @@ const getAbonentSaldoData = async (litsavoy) => {
           credentials: "include",
         }
       );
-      const data = (await res.json()).rows[0];
-      return data;
+      const data = await res.json();
+      if (!data.rows[0]) {
+        return { success: false, message: "Abonent not found" };
+      }
+      return data.rows[0];
     }
     // Agar oldindan abonent ma'lumotlarini olish path mavjud bo'lmasa
     const abonentsPage = await getCleanCityPageByNavigation({
@@ -56,7 +59,6 @@ const getAbonentSaldoData = async (litsavoy) => {
       process.env.CLEAN_CITY_DOMEN + getAbonentSaldoData,
       {
         headers,
-        referrerPolicy: "strict-origin- when-cross-origin",
         body: `licshet=${litsavoy}&mes=${
           date.getMonth() + 1
         }&god=${date.getFullYear()}&page=1&rows=20&sort=a.id&order=asc`,
@@ -68,7 +70,7 @@ const getAbonentSaldoData = async (litsavoy) => {
     const data = (await res.json()).rows[0];
     return data;
   } catch (error) {
-    throw error;
+    console.error(error);
   }
 };
 

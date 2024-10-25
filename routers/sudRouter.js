@@ -13,6 +13,7 @@ const {
 const { CaseDocument } = require("../models/CaseDocuments");
 const { SudAkt } = require("../models/SudAkt");
 const { HybridMail } = require("../models/HybridMail");
+const { Counter } = require("../requires");
 
 // get all dates   GET
 // router.get("/", getAllAkts);
@@ -26,6 +27,71 @@ const { HybridMail } = require("../models/HybridMail");
 // router.put("/", updateAktByKod);
 // // delete one data DELETE
 // router.delete("/:id", deleteById);
+
+router.get("/", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.pageSize) || 10;
+    const { sortField = "createdAt", sortDirection = "asc" } = req.query;
+    const sortOptions = {};
+    sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
+    const skip = (page - 1) * limit;
+    const sudAkts = await SudAkt.find()
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit);
+    const total = await SudAkt.countDocuments();
+    res.json({
+      ok: true,
+      rows: sudAkts,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
+
+router.put("/create-ariza/:_id", async (req, res) => {
+  try {
+    const sudAkt = await SudAkt.findById(req.params._id);
+    if (!sudAkt) {
+      return res.json({ ok: false, message: "SudAkt topilmadi" });
+    }
+
+    const { ariza_date, ariza_type } = req.body;
+    if (!ariza_date || !ariza_type) {
+      return res.json({
+        ok: false,
+        message: "Ariza tartib raqami yoki turi kiritilmadi",
+      });
+    }
+    const counter = await Counter.findOne({
+      name: "sudga_ariza_tartib_raqami",
+    });
+    await sudAkt.updateOne({
+      $set: {
+        ariza_order_num: counter.value + 1,
+        ariza_date,
+        ariza_type,
+        status: "ariza_yaratildi",
+      },
+    });
+    await counter.updateOne({ $set: { value: counter.value + 1 } });
+    res.json({
+      ok: true,
+      sudAkt,
+      ariza_order_num: counter.value,
+      message: "Ariza tartib raqami qo'shildi",
+    });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
 
 router.get("/hybrid-mails", async (req, res) => {
   try {
@@ -51,6 +117,19 @@ router.get("/hybrid-mails", async (req, res) => {
       total,
       totalPages: Math.ceil(total / limit),
     });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
+// update one mail by id
+router.put("/hybrid-mails/:mail_id", async (req, res) => {
+  try {
+    const mail = await HybridMail.findByIdAndUpdate(req.params.mail_id, {
+      $set: { warning_amount: req.body.warning_amount },
+    });
+    if (!mail) return res.json({ ok: false, message: "Mail not found" });
+    res.json({ ok: true, message: "Yangilandi" });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
     console.error(error);
