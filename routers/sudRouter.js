@@ -97,6 +97,61 @@ router.put("/create-ariza/:_id", async (req, res) => {
     console.error(error);
   }
 });
+router.put("/create-many-ariza", async (req, res) => {
+  try {
+    const { sudAktIds, ariza_date, ariza_type } = req.body;
+    if (!sudAktIds || sudAktIds.length === 0) {
+      return res.json({ ok: false, message: "SudAkt idlari kiritilmadi" });
+    }
+
+    if (!ariza_date || !ariza_type) {
+      return res.json({
+        ok: false,
+        message: "Ariza sanasi yoki turi kiritilmadi",
+      });
+    }
+    if (!SudAkt.schema.paths.ariza_type.options.enum.includes(ariza_type)) {
+      return res.json({
+        ok: false,
+        message: "Ariza turi mavjud emas",
+      });
+    }
+    const sudAkts = await SudAkt.find({ _id: { $in: sudAktIds } });
+    if (sudAkts.length !== sudAktIds.length) {
+      return res.json({ ok: false, message: "SudAkt topilmadi" });
+    }
+    const counter = await Counter.findOne({
+      name: "sudga_ariza_tartib_raqami",
+    });
+    const updatedSudAkts = [];
+    for (const sudAkt of sudAkts) {
+      if (sudAkt.status === "yangi") {
+        const newOrderNum = counter.value + updatedSudAkts.length + 1;
+        await sudAkt.updateOne({
+          $set: {
+            ariza_order_num: newOrderNum,
+            ariza_date: ariza_date,
+            ariza_type: ariza_type,
+            status: "ariza_yaratildi",
+          },
+        });
+        updatedSudAkts.push({
+          ...sudAkt.toObject(),
+          ariza_order_num: newOrderNum,
+          status: "ariza_yaratildi",
+        });
+        await counter.updateOne({ $set: { value: newOrderNum } });
+      } else {
+        updatedSudAkts.push(sudAkt.toObject());
+      }
+    }
+    console.log("Updated SudAkts:", updatedSudAkts);
+    return res.json({ ok: true, rows: updatedSudAkts });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
 
 router.get("/hybrid-mails", async (req, res) => {
   try {

@@ -5,6 +5,8 @@ const schema = new mongoose.Schema(
     "№": String,
     reg_number: Number,
     licshet: String,
+    mfy_id: Number,
+    mfy_name: String,
     sud_process_id_billing: String,
     sud_process_status: String,
     fio: String,
