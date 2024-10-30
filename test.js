@@ -371,45 +371,81 @@ async () => {
 //       mahallalar.push(m.mfy);
 //     }
 //   });
+//   mahallalar.sort((a, b) => a.localeCompare(b));
 //   let counter = 0;
 //   async function loop() {
 //     const mfy = mahallalar[counter];
-//     const str = ejs.render(
-//       `<html>
-//         <div style="display: inline-block">
-//           <h3>Mahalla: <%= rows[0].mfy %></h1>
-//           <table border="1" style="border-collapse: collapse; font-family: sans-serif; font-wieght: bold">
-//   <% rows.map(row => { %>
-//     <tr style="height: 20px">
-//       <td><%= row.kod %></td>
-//       <td><%= row.fio %></td>
-//       <td><%= row.mfy %></td>
-//     </tr>
-//   <% }) %>
-// </table>
+//     const mediaGroup = [];
+//     const source = [];
+//     const filtered = rows.filter((row) => row.mfy == mfy);
+//     const arrays = [];
+//     let arr = [];
+//     for (let i = 0; i < filtered.length; i++) {
+//       const row = filtered[i];
+//       arr.push(row);
+//       if (i == filtered.length - 1) {
+//         if (arr.length != 0) arrays.push(arr);
+//         arr = [];
+//       }
+//       if ((i + 1) % 50 == 0) {
+//         if (arr.length != 0) arrays.push(arr);
+//         arr = [];
+//       }
+//     }
+//     const promises = arrays.map((array) => {
+//       return new Promise(async (resolve, reject) => {
+//         const str = ejs.render(
+//           `<html>
+//           <div style="display: inline-block">
+//             <h3>Mahalla: <%= rows[0].mfy %></h1>
+//             <table border="1" style="border-collapse: collapse; font-family: sans-serif; font-wieght: bold">
+//     <% rows.map((row, i) => { %>
+//       <tr style="height: 20px">
+//         <td><%= i+1 %></td>
+//         <td><%= row.kod %></td>
+//         <td><%= row.fio %></td>
+//         <td><%= row.mfy %></td>
+//       </tr>
+//     <% }) %>
+//   </table>
 
-//         <div>
-//       <html>`,
-//       { rows: rows.filter((row) => row.mfy == mfy) },
-//       async (err, str) => {
-//         if (err) console.log(err);
-//       }
-//     );
-//     const binaryData = await nodeHtmlToImage({
-//       html: str,
-//       type: "png",
-//       encoding: "binary",
-//       selector: "div",
+//           <div>
+//         <html>`,
+//           { rows: array },
+//           async (err, str) => {
+//             if (err) console.log(err);
+//           }
+//         );
+//         const binaryData = await nodeHtmlToImage({
+//           html: str,
+//           type: "png",
+//           encoding: "binary",
+//           selector: "div",
+//         });
+//         const buffer = Buffer.from(binaryData, "binary");
+//         source.push({ source: buffer });
+//         mediaGroup.push({ type: "photo", media: { source: buffer } });
+//         resolve();
+//       });
 //     });
-//     const buffer = Buffer.from(binaryData, "binary");
-//     await bot.telegram.sendPhoto(
-//       process.env.NAZORATCHILAR_GURUPPASI,
-//       { source: buffer },
-//       {
-//         caption: `${mfy}`,
-//         parse_mode: "HTML",
-//       }
-//     );
+//     await Promise.all(promises);
+//     if (mediaGroup.length > 1) {
+//       await bot.telegram
+//         .sendMediaGroup(
+//           process.env.NAZORATCHILAR_GURUPPASI,
+//           // process.env.ME,
+//           mediaGroup
+//         )
+//         .catch((err) => {
+//           console.log(err);
+//         });
+//     } else {
+//       await bot.telegram.sendPhoto(
+//         process.env.NAZORATCHILAR_GURUPPASI,
+//         // process.env.ME,
+//         { ...source[0] }
+//       );
+//     }
 //     counter++;
 //     loop();
 //   }
