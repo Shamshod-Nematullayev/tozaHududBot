@@ -15,6 +15,7 @@ const schema = new Schema({
     required: true,
   },
   phone: String,
+  update_at: Date,
 });
 
 module.exports.EtkKodRequest = model("etk_requests", schema);

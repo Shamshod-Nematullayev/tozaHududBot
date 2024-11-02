@@ -1,9 +1,9 @@
 // require("./yuqoriQarzdorliklar");
-require("./cleanCitySessionSaver");
-require("./updateArizalarStatus");
-require("./sendMFYIncomeReport");
-require("./sendPinflMfyReport");
+// require("./cleanCitySessionSaver");
+// require("./updateArizalarStatus");
+// require("./sendMFYIncomeReport");
+// require("./sendPinflMfyReport");
 require("./kunlikEtkReports");
 require("./kunlikPinflReports");
-require("./nazoratchilarKunlikTushum");
-require("./checkMailExpires");
+// require("./nazoratchilarKunlikTushum");
+// require("./checkMailExpires");

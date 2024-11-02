@@ -1,6 +1,7 @@
 const nodeHtmlToImage = require("node-html-to-image");
 const { Abonent, Nazoratchi, bot } = require("../requires");
 const ejs = require("ejs");
+const { EtkKodRequest } = require("../models/EtkKodRequest");
 
 // small function
 function bugungiSana() {
@@ -16,13 +17,21 @@ async function sendKunlikEtkReports() {
   try {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const abonents = await Abonent.find({
-      "ekt_kod_tasdiqlandi.confirm": true,
-      "ekt_kod_tasdiqlandi.updated_at": { $gt: today },
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    // const abonents = await Abonent.find({
+    //   "ekt_kod_tasdiqlandi.confirm": true,
+    //   "ekt_kod_tasdiqlandi.updated_at": { $gt: today },
+    // });
+    const abonents = await EtkKodRequest.find({
+      update_at: { $gt: today },
     });
+    const soatlik = abonents.filter(
+      (abonent) => new Date(abonent.shaxsi_tasdiqlandi.updated_at) > oneHourAgo
+    );
     let inspectors = await Nazoratchi.find({ activ: true });
     inspectors.forEach((nazoratchi) => {
       nazoratchi.counterOfConfirm = 0;
+      nazoratchi.counterOfConfirmHourly = 0;
     });
     abonents.forEach((abonent) => {
       const nazoratchi = inspectors.find(
@@ -33,9 +42,20 @@ async function sendKunlikEtkReports() {
         nazoratchi.counterOfConfirm++;
       }
     });
+    soatlik.forEach((abonent) => {
+      const nazoratchi = inspectors.find(
+        (nazoratchi) =>
+          nazoratchi._id.toString() ==
+          abonent.shaxsi_tasdiqlandi.inspector._id.toString()
+      );
+      if (nazoratchi) {
+        nazoratchi.counterOfConfirmHourly++;
+      }
+    });
     inspectors = inspectors.map((inspector) => ({
       name: inspector.name,
       counterOfConfirm: inspector.counterOfConfirm,
+      counterOfConfirmHourly: inspector.counterOfConfirmHourly,
     }));
     inspectors.sort(
       (inspector1, inspector2) =>
@@ -43,14 +63,17 @@ async function sendKunlikEtkReports() {
     );
 
     let allConfirmed = 0;
+    let allConfirmedHourly = 0;
     inspectors.forEach((inspector) => {
       allConfirmed += inspector.counterOfConfirm;
+      allConfirmedHourly += inspector.counterOfConfirmHourly;
     });
 
     ejs.renderFile(
       "./views/kunlikMalumotKiritishHisoboti.ejs",
       {
         allConfirmed,
+        allConfirmedHourly,
         inspectors,
         sana: bugungiSana(),
         report_name: "ETK Код киритиш",
@@ -67,7 +90,7 @@ async function sendKunlikEtkReports() {
         const buffer = Buffer.from(binaryData, "binary");
 
         bot.telegram.sendPhoto(
-          process.env.NAZORATCHILAR_GURUPPASI,
+          process.env.ME,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
@@ -91,3 +114,4 @@ setInterval(() => {
 }, 1000 * 60);
 
 module.exports = { sendKunlikEtkReports };
+sendKunlikEtkReports();

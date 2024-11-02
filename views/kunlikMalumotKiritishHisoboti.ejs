@@ -27,8 +27,13 @@
       th {
         background-color: rgb(227, 37, 37);
       }
+      td:nth-child(3) {
+        text-align: right;
+        font-weight: bold;
+      }
       td:last-child {
         text-align: right;
+        font-weight: bold;
       }
     </style>
   </head>
@@ -41,18 +46,21 @@
           <th>№</th>
           <th>Назоратчи</th>
           <th>Бугун киритди</th>
+          <th>Охирги 1 соатда</th>
         </tr>
         <% inspectors.map((ins, index) => { %>
         <tr>
           <td><%= index + 1 %></td>
           <td><%= ins.name %></td>
           <td><%= ins.counterOfConfirm %></td>
+          <td><%= ins.counterOfConfirmHourly %></td>
         </tr>
         <% }) %>
         <tr>
           <td></td>
           <td>Жами</td>
           <td><%= allConfirmed %></td>
+          <td><%= allConfirmedHourly %></td>
         </tr>
       </table>
     </div>
