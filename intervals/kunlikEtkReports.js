@@ -26,7 +26,7 @@ async function sendKunlikEtkReports() {
       update_at: { $gt: today },
     });
     const soatlik = abonents.filter(
-      (abonent) => new Date(abonent.shaxsi_tasdiqlandi.updated_at) > oneHourAgo
+      (abonent) => new Date(abonent.update_at) > oneHourAgo
     );
     let inspectors = await Nazoratchi.find({ activ: true });
     inspectors.forEach((nazoratchi) => {
@@ -35,8 +35,8 @@ async function sendKunlikEtkReports() {
     });
     abonents.forEach((abonent) => {
       const nazoratchi = inspectors.find(
-        (nazoratchi) =>
-          nazoratchi.id === abonent.ekt_kod_tasdiqlandi.inspector_id
+        (nazoratchi) => nazoratchi.id == abonent.inspector_id
+        // nazoratchi.id === abonent.ekt_kod_tasdiqlandi.inspector_id
       );
       if (nazoratchi) {
         nazoratchi.counterOfConfirm++;
@@ -44,9 +44,7 @@ async function sendKunlikEtkReports() {
     });
     soatlik.forEach((abonent) => {
       const nazoratchi = inspectors.find(
-        (nazoratchi) =>
-          nazoratchi._id.toString() ==
-          abonent.shaxsi_tasdiqlandi.inspector._id.toString()
+        (nazoratchi) => nazoratchi.id == abonent.inspector_id
       );
       if (nazoratchi) {
         nazoratchi.counterOfConfirmHourly++;
@@ -88,9 +86,9 @@ async function sendKunlikEtkReports() {
           selector: "div",
         });
         const buffer = Buffer.from(binaryData, "binary");
-
+        console.log(inspectors);
         bot.telegram.sendPhoto(
-          process.env.ME,
+          process.env.NAZORATCHILAR_GURUPPASI,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
@@ -114,4 +112,3 @@ setInterval(() => {
 }, 1000 * 60);
 
 module.exports = { sendKunlikEtkReports };
-sendKunlikEtkReports();

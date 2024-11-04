@@ -119,6 +119,7 @@ const updateElektrKod = new Scenes.WizardScene(
           etk_kod: ctx.wizard.state.ETK,
           etk_saoto: "18214",
           phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE,
+          inspector_id: ctx.wizard.state.inspector_id,
           update_at: new Date(),
         });
         ctx.editMessageText(ctx.callbackQuery.message.text);

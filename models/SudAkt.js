@@ -38,6 +38,7 @@ const schema = new mongoose.Schema(
       enum: [
         "yangi",
         "ariza_yaratildi",
+        "ariza_imzolandi",
         "sudga_ariza_berildi",
         "sud_qarori_chiqorildi",
         "rad_etildi",

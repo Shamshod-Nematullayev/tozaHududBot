@@ -16,6 +16,7 @@ const schema = new Schema({
   },
   phone: String,
   update_at: Date,
+  inspector_id: String,
 });
 
 module.exports.EtkKodRequest = model("etk_requests", schema);

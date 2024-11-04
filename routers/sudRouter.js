@@ -60,6 +60,23 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/search-by-licshet", async (req, res) => {
+  try {
+    const { licshet } = req.query;
+    if (!licshet) {
+      return res.json({ ok: false, message: "Licshet kiritilmadi" });
+    }
+    const sudAkts = await SudAkt.find({
+      licshet: new RegExp(licshet),
+      $or: [{ status: "yangi" }, { status: "ariza_yaratildi" }],
+    });
+    res.json({ ok: true, rows: sudAkts });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
+
 router.put("/create-ariza/:_id", async (req, res) => {
   try {
     const sudAkt = await SudAkt.findById(req.params._id);
