@@ -5,6 +5,8 @@ const schema = new mongoose.Schema(
     "№": String,
     reg_number: Number,
     licshet: String,
+    mfy_id: Number,
+    mfy_name: String,
     sud_process_id_billing: String,
     sud_process_status: String,
     fio: String,
@@ -25,6 +27,8 @@ const schema = new mongoose.Schema(
       type: String,
       enum: ["prokuratura", "savdo-sanoat"],
     },
+    ariza_file_name: String,
+    ariza_file_id: String,
     tushum: Number,
     isDelete: {
       type: Boolean,
@@ -36,11 +40,11 @@ const schema = new mongoose.Schema(
       enum: [
         "yangi",
         "ariza_yaratildi",
+        "ariza_imzolandi",
         "sudga_ariza_berildi",
         "sud_qarori_chiqorildi",
         "rad_etildi",
       ],
-      default: "yangi"
     },
   },
   {

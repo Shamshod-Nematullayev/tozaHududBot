@@ -4,6 +4,7 @@ const { Abonent } = require("../../../models/Abonent");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { changeAbonentDates } = require("../../../requires");
 const isCancel = require("../../smallFunctions/isCancel");
+const { EtkKodRequest } = require("../../../models/EtkKodRequest");
 
 const updateElektrKod = new Scenes.WizardScene(
   "updateElektrKod",
@@ -41,6 +42,13 @@ const updateElektrKod = new Scenes.WizardScene(
           keyboards.lotin.cancelBtn.resize()
         );
         return;
+      }
+      // =======================VAQTINCHA BILLING ISHLAGUNCHA
+      const etkReq = await EtkKodRequest.findOne({
+        licshet: ctx.wizard.state.KOD,
+      });
+      if (etkReq) {
+        return ctx.reply("Bu abonent ma'lumoti kiritilib bo'lingan..");
       }
       if (abonent.ekt_kod_tasdiqlandi?.confirm) {
         return ctx.reply(
@@ -105,54 +113,71 @@ const updateElektrKod = new Scenes.WizardScene(
     switch (ctx.callbackQuery?.data) {
       case "yes":
         const abonent = ctx.wizard.state.abonent;
-        let res = await changeAbonentDates({
+        await EtkKodRequest.create({
+          licshet: abonent.licshet,
           abonent_id: abonent.id,
-          abo_data: {
-            description: `${ctx.wizard.state.inspector_id} ${ctx.wizard.state.inspector_name} ma'lumotiga asosan ETK hisob raqami va telefoni kiritildi.`,
-            energy_licshet: ctx.wizard.state.ETK,
-            energy_coato: "18214",
-            phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE
-              ? ctx.wizard.state.etk_abonent.MOBILE_PHONE
-              : undefined,
-          },
+          etk_kod: ctx.wizard.state.ETK,
+          etk_saoto: "18214",
+          phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE,
+          inspector_id: ctx.wizard.state.inspector_id,
+          update_at: new Date(),
         });
-        if (res.msg == "Кадастр рақам формати нотоғри киритилди") {
-          res = await changeAbonentDates({
-            abonent_id: abonent.id,
-            abo_data: {
-              description: `${ctx.wizard.state.inspector_id} ${ctx.wizard.state.inspector_name} ma'lumotiga asosan ETK hisob raqami va telefoni kiritildi.`,
-              energy_licshet: ctx.wizard.state.ETK,
-              energy_coato: "18214",
-              phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE
-                ? ctx.wizard.state.etk_abonent.MOBILE_PHONE
-                : undefined,
-              kadastr_number: "",
-            },
-          });
-        }
-        if (!res.success) {
-          console.log(res);
-          return ctx.answerCbQuery(res.msg);
-        }
-
-        await Abonent.findByIdAndUpdate(abonent._id, {
-          $set: {
-            ekt_kod_tasdiqlandi: {
-              confirm: true,
-              inspector_id: ctx.wizard.state.inspector_id,
-              inspector_name: ctx.wizard.state.inspector_name,
-              updated_at: new Date(),
-            },
-            energy_licshet: ctx.wizard.state.ETK,
-          },
-        });
-        await ctx.deleteMessage();
-        ctx.reply(
-          "Etk hisob raqami muvaffaqqiyatli kiritildi",
+        ctx.editMessageText(ctx.callbackQuery.message.text);
+        ctx.replyWithHTML(
+          `ETK kod qabul qilindi`,
           keyboards.lotin.mainKeyboard.resize()
         );
-        ctx.scene.leave();
+        return ctx.scene.leave();
+        // bu funksiya vaqtinchalik to'xtatib qo'yildi billing ishlagunicha
+        // const abonent = ctx.wizard.state.abonent;
+        // let res = await changeAbonentDates({
+        //   abonent_id: abonent.id,
+        //   abo_data: {
+        //     description: `${ctx.wizard.state.inspector_id} ${ctx.wizard.state.inspector_name} ma'lumotiga asosan ETK hisob raqami va telefoni kiritildi.`,
+        //     energy_licshet: ctx.wizard.state.ETK,
+        //     energy_coato: "18214",
+        //     phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE
+        //       ? ctx.wizard.state.etk_abonent.MOBILE_PHONE
+        //       : undefined,
+        //   },
+        // });
+        // if (res.msg == "Кадастр рақам формати нотоғри киритилди") {
+        //   res = await changeAbonentDates({
+        //     abonent_id: abonent.id,
+        //     abo_data: {
+        //       description: `${ctx.wizard.state.inspector_id} ${ctx.wizard.state.inspector_name} ma'lumotiga asosan ETK hisob raqami va telefoni kiritildi.`,
+        //       energy_licshet: ctx.wizard.state.ETK,
+        //       energy_coato: "18214",
+        //       phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE
+        //         ? ctx.wizard.state.etk_abonent.MOBILE_PHONE
+        //         : undefined,
+        //       kadastr_number: "",
+        //     },
+        //   });
+        // }
+        // if (!res.success) {
+        //   return ctx.answerCbQuery(res.msg);
+        // }
+
+        // await Abonent.findByIdAndUpdate(abonent._id, {
+        //   $set: {
+        //     ekt_kod_tasdiqlandi: {
+        //       confirm: true,
+        //       inspector_id: ctx.wizard.state.inspector_id,
+        //       inspector_name: ctx.wizard.state.inspector_name,
+        //       updated_at: new Date(),
+        //     },
+        //     energy_licshet: ctx.wizard.state.ETK,
+        //   },
+        // });
+        // await ctx.deleteMessage();
+        // ctx.reply(
+        //   "Etk hisob raqami muvaffaqqiyatli kiritildi",
+        //   keyboards.lotin.mainKeyboard.resize()
+        // );
+        // ctx.scene.leave();
         break;
+      // copy
       case "no":
         ctx.deleteMessage();
         ctx.reply("Bekor qilindi.", keyboards.lotin.mainKeyboard.resize());

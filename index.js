@@ -5,6 +5,7 @@ const { default: mongoose } = require("mongoose");
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const { isLimitFileSize } = require("./middlewares/multer");
 
 // App middlewares
 app.use(express.urlencoded({ extended: true }));

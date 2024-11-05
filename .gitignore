@@ -4,3 +4,4 @@ session.json
 .env
 /uploads
 error.log
+main.json
