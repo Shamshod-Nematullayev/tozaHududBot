@@ -132,4 +132,4 @@ async function recoverPath(session, abonent_id) {
   };
 }
 
-// module.exports = { changeAbonentDates };
+module.exports = { changeAbonentDates };

@@ -32,6 +32,7 @@ const schema = new mongoose.Schema(
     },
     pinfl: Number,
     status: {
+      type: String,
       enum: [
         "yangi",
         "ariza_yaratildi",
