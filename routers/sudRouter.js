@@ -13,7 +13,12 @@ const {
 const { CaseDocument } = require("../models/CaseDocuments");
 const { SudAkt } = require("../models/SudAkt");
 const { HybridMail } = require("../models/HybridMail");
-const { Counter } = require("../requires");
+const { Counter, bot } = require("../requires");
+const {
+  upload,
+  uploadAsBlob,
+  isLimitFileSize,
+} = require("../middlewares/multer");
 
 // get all dates   GET
 // router.get("/", getAllAkts);
@@ -65,6 +70,13 @@ router.get("/search-by-licshet", async (req, res) => {
     const { licshet } = req.query;
     if (!licshet) {
       return res.json({ ok: false, message: "Licshet kiritilmadi" });
+    }
+    const results = await SudAkt.countDocuments({
+      licshet: new RegExp(licshet),
+      $or: [{ status: "yangi" }, { status: "ariza_yaratildi" }],
+    });
+    if (results > 30) {
+      return res.json({ ok: false, message: "Juda ko'p natijalar aniqlandi" });
     }
     const sudAkts = await SudAkt.find({
       licshet: new RegExp(licshet),
@@ -169,6 +181,50 @@ router.put("/create-many-ariza", async (req, res) => {
     console.error(error);
   }
 });
+router.post(
+  "/upload-ariza-file",
+  uploadAsBlob.single("file"),
+  async (req, res) => {
+    try {
+      const { file } = req;
+      const { sud_akt_id } = req.body;
+      if (!file) {
+        return res.json({ ok: false, message: "File not found" });
+      }
+      if (!file.mimetype.startsWith("application/pdf")) {
+        return res.json({
+          ok: false,
+          message: "Invalid file format. Please upload a PDF file",
+        });
+      }
+      if (!sud_akt_id) {
+        return res.json({ ok: false, message: "SudAkt id not found" });
+      }
+      const sud_akt = await SudAkt.findById(sud_akt_id);
+      const blobName = `ariza-file-${Date.now()}-${file.originalname}`;
+      const telegram_res = await bot.telegram.sendDocument(
+        process.env.TEST_BASE_CHANNEL_ID,
+        {
+          source: file.buffer,
+          filename: blobName,
+        }
+      );
+      await sud_akt.updateOne({
+        $set: {
+          ariza_file_id: telegram_res.document.file_id,
+          ariza_file_name: blobName,
+          status: "ariza_imzolandi",
+        },
+      });
+
+      res.json({ ok: true, message: "Muvaffaqqiyatli yuklandi" });
+    } catch (err) {
+      res.json({ ok: false, message: "Internal server error 500" });
+      console.error(err);
+    }
+  },
+  isLimitFileSize
+);
 
 router.get("/hybrid-mails", async (req, res) => {
   try {

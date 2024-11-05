@@ -13,6 +13,24 @@ const storage = multer.diskStorage({
   },
 });
 
+const memoryStorage = multer.memoryStorage();
+const uploadAsBlob = multer({
+  storage: memoryStorage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
+
+const isLimitFileSize = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.json({
+        ok: false,
+        message: "File is too large. Maximum size is 10 MB.",
+      });
+    }
+  }
+  next(err);
+};
+
 const upload = multer({ storage: storage });
 
-module.exports = { upload };
+module.exports = { upload, uploadAsBlob, isLimitFileSize };

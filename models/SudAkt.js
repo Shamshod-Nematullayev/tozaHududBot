@@ -27,6 +27,8 @@ const schema = new mongoose.Schema(
       type: String,
       enum: ["prokuratura", "savdo-sanoat"],
     },
+    ariza_file_name: String,
+    ariza_file_id: String,
     tushum: Number,
     isDelete: {
       type: Boolean,
