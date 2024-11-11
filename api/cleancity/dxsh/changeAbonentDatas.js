@@ -1,8 +1,3 @@
-const { CleanCitySession } = require("../../../models/CleanCitySession");
-const { JSDOM } = require("jsdom");
-const { virtualConsole } = require("../helpers/virtualConsole");
-
-// ========================================================================
 const cc = `https://cleancity.uz/`;
 
 async function changeAbonentDates({
