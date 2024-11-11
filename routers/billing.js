@@ -217,13 +217,18 @@ router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
 });
 router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
   try {
-    const abonentData = await getAbonentDataByLicshet({
-      licshet: req.params.licshet,
-    });
-
+    // const abonentData = await getAbonentDataByLicshet({
+    //   licshet: req.params.licshet,
+    // });
+    const abonentData = await Abonent.findOne({ licshet: req.params.licshet });
+    if (!abonentData)
+      return res.json({
+        ok: false,
+        message: "Abonent mavjud emas",
+      });
     res.json({
       ok: true,
-      abonentData: abonentData.rows[0],
+      abonentData: abonentData,
     });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });

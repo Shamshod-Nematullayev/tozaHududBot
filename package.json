@@ -37,7 +37,7 @@
     "node-html-to-image": "^3.3.0",
     "pdf-merger-js": "^4.3.1",
     "pdf-poppler": "^0.2.1",
-    "puppeteer": "^23.4.1",
+    "puppeteer": "^21.11.0",
     "qrcode": "^1.5.4",
     "request": "^2.88.2",
     "rimraf": "^4.4.1",
