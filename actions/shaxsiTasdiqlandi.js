@@ -1,3 +1,4 @@
+const { tozaMakonApi } = require("../api/tozaMakon");
 const {
   Composer,
   bot,
@@ -24,53 +25,57 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         return ctx.answerCbQuery("Bu abonent ma'lumoti kiritilib bo'lingan");
       }
       //   billingga yangilov so'rovini yuborish
-      let res = await changeAbonentDates({
-        abonent_id: abonent.id,
-        abo_data: {
-          brith_date: `${kun}.${oy}.${yil}`,
-          fio: `${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic}`,
-          description: `${inspector.id} ${inspector.name} ma'lumotiga asosan o'zgartirildi.`,
-          //   passport_location: req.data.photo,
-          passport_number: `${req.data.passport_serial}-${req.data.passport_number}`,
-          passport_expire_date: req.data.details.doc_end_date
-            ? `${req.data.details.doc_end_date.split("-")[2]}.${
-                req.data.details.doc_end_date.split("-")[1]
-              }.${req.data.details.doc_end_date.split("-")[0]}`
-            : undefined,
+      const pasportData = await tozaMakonApi.get("/user-service/citizens", {
+        params: {
+          passport: req.data.passport_serial + req.data.passport_number,
           pinfl: req.data.pinfl,
-          passport_location: req.data.details.division,
+          birthdate: req.data.birth_date,
         },
       });
-      if (!res.success) {
-        if (res.msg === "Кадастр рақам формати нотоғри киритилди") {
-          res = await changeAbonentDates({
-            abonent_id: abonent.id,
-            abo_data: {
-              brith_date: `${kun}.${oy}.${yil}`,
-              fio: `${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic}`,
-              description: `${inspector.id} ${inspector.name} ma'lumotiga asosan o'zgartirildi.`,
-              //   passport_location: req.data.photo,
-              passport_number: `${req.data.passport_serial}-${req.data.passport_number}`,
-              passport_expire_date: req.data.details.doc_end_date
-                ? `${req.data.details.doc_end_date.split("-")[2]}.${
-                    req.data.details.doc_end_date.split("-")[1]
-                  }.${req.data.details.doc_end_date.split("-")[0]}`
-                : undefined,
-              pinfl: req.data.pinfl,
-              kadastr_number: "",
-              passport_location: req.data.details.division,
-            },
-          });
-        } else return ctx.answerCbQuery(res.msg);
+      if (pasportData.status !== 200) {
+        return ctx.answerCbQuery("Pasport ma'lumotlarini olishda xatolik");
       }
+      const abonentDatasResponse = await tozaMakonApi.get(
+        `/user-service/residents/${abonent.id}?include=translates&withPhoto=true`
+      );
+      if (!abonentDatasResponse || abonentDatasResponse.status !== 200) {
+        return ctx.answerCbQuery(
+          "Abonent dastlabki ma'lumotlarini oliishda xatolik"
+        );
+      }
+      const data = abonentDatasResponse.data;
+      const updateResponse = await tozaMakonApi.put(
+        "/user-service/residents/" + abonent.id,
+        {
+          id: abonent.id,
+          accountNumber: abonent.licshet,
+          residentType: "INDIVIDUAL",
+          electricityAccountNumber: data.electricityAccountNumber,
+          electricityCoato: data.electricityCoato,
+          companyId: data.companyId,
+          streetId: data.streetId,
+          mahallaId: data.mahallaId,
+          contractNumber: data.contractNumber,
+          contractDate: data.contractDate,
+          homePhone: null,
+          active: data.active,
+          description: `${inspector.id} ${inspector.name} ma'lumotiga asosan shaxsi tasdiqlandi o'zgartirildi.`,
+          citizen: pasportData.data,
+          house: data.house,
+        }
+      );
+      if (!updateResponse || updateResponse.status !== 200) {
+        return ctx.answerCbQuery("Ma'lumotlarni yangilashda xatolik");
+      }
+
       //   mongodb ma'lumotlar bazada yangilanish
       await abonent.updateOne({
         $set: {
           brith_date: `${kun}.${oy}.${yil}`,
-          fio: `${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic}`,
+          fio: `${req.data.last_name} ${req.data.first_name} ${req.data.middle_name}`,
           description: `${inspector.id} ${inspector.name} ma'lumotiga asosan o'zgartirildi.`,
           photo: req.data.photo,
-          passport_number: `${req.data.passport_serial}-${req.data.passport_number}`,
+          passport_number: `${req.data.passport_serial}${req.data.passport_number}`,
           passport_expire_date: req.data.details.doc_end_date
             ? `${req.data.details.doc_end_date.split("-")[2]}.${
                 req.data.details.doc_end_date.split("-")[1]
@@ -97,7 +102,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         process.env.CHANNEL_ID_SHAXSI_TASDIQLANDI,
         ctx.update.callback_query.message.message_id,
         0,
-        `KOD: ${req.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+        `KOD: ${req.licshet}\nFIO: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
         { parse_mode: "HTML" }
       );
       await ctx.deleteMessage();
@@ -127,7 +132,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       );
       // telegram kanaldagi xabarni o'zgartirish
       await ctx.editMessageCaption(
-        `KOD: ${req.licshet}\nFIO: ${req.data.details.surname_cyrillic} ${req.data.details.name_cyrillic} ${req.data.details.patronym_cyrillic} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nBekor qilindi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+        `KOD: ${req.licshet}\nFIO: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nBekor qilindi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
         { parse_mode: "HTML" }
       );
 

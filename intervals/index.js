@@ -7,4 +7,3 @@ require("./kunlikEtkReports");
 // require("./kunlikPinflReports");
 // require("./nazoratchilarKunlikTushum");
 // require("./checkMailExpires");
-require("../api/tozaMakon");

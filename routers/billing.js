@@ -14,6 +14,7 @@ const getAbonents = require("../api/cleancity/dxsh/getAbonents");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { dvaynikUchirish } = require("../api/cleancity/dxsh/dvaynikUchirish");
 const { Abonent } = require("../requires");
+const { tozaMakonApi } = require("../api/tozaMakon");
 const akt_pachka_id = {
   viza: "4442831",
   odam_soni: "4442830",
@@ -239,11 +240,26 @@ router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
 const uchirilishiKerakBulganAbonentlar = [105120350731];
 router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
   try {
-    const abonents = await Abonent.find();
+    const abonents = await Abonent.find({ mahallas_id: req.params.mfy_id });
     const { minSaldo, maxSaldo } = req.query;
-    const data = await getAbonents({ mfy_id: req.params.mfy_id });
-    let filteredData = data.filter((abonent) => {
-      const abonentSaldo = Number(abonent.saldo_k);
+    let page = 0;
+    let totalPages = 1;
+    const rows = [];
+    const { data } = await tozaMakonApi.get(
+      `/user-service/residents?districtId=47&sort=id,DESC&page=${page}&size=400&companyId=1144&mahallaId=${req.params.mfy_id}`
+    );
+    rows.push(...data.content);
+    totalPages = data.totalPages;
+    if (totalPages > 1) {
+      for (let i = 1; i < totalPages; i++) {
+        const { data } = await tozaMakonApi.get(
+          `/user-service/residents?districtId=47&sort=id,DESC&page=${i}&size=400&companyId=1144&mahallaId=${req.params.mfy_id}`
+        );
+        rows.push(...data.content);
+      }
+    }
+    let filteredData = rows.filter((abonent) => {
+      const abonentSaldo = Number(abonent.ksaldo);
 
       // Abonentlar ro'yxatidan chiqarilgan bo'lmaganini tekshirish
       const isNotExcluded = !uchirilishiKerakBulganAbonentlar.includes(
@@ -264,10 +280,10 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
       return {
         ...abonent,
         isElektrKodConfirm,
-        fio: kirillga(abonent.fio),
+        fullName: kirillga(abonent.fullName),
       };
     });
-    filteredData.sort((a, b) => a.fio.localeCompare(b.fio));
+    filteredData.sort((a, b) => a.fullName.localeCompare(b.fullName));
     res.json({ ok: true, data: filteredData });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });

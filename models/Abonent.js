@@ -62,6 +62,7 @@ const schema = new Schema(
         confirm: false,
       },
     },
+    bumadi: Boolean,
   },
   {
     timestamps: true,
