@@ -1,6 +1,6 @@
 const enterQaytaHisobAkt = require("../api/cleancity/dxsh/enterQaytaHisobAkt");
 const { enterYashovchiSoniAkt } = require("../api/cleancity/dxsh");
-const { upload } = require("../middlewares/multer");
+const { upload, uploadAsBlob } = require("../middlewares/multer");
 const { Mahalla } = require("../models/Mahalla");
 const { Ariza } = require("../models/Ariza");
 const { Counter } = require("../models/Counter");
@@ -274,7 +274,9 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
     });
     filteredData = filteredData.map((abonent) => {
       let isElektrKodConfirm = false;
-      const abonentMongo = abonents.find((a) => a.licshet == abonent.licshet);
+      const abonentMongo = abonents.find(
+        (a) => a.licshet == abonent.accountNumber
+      );
       if (abonentMongo)
         isElektrKodConfirm = abonentMongo.ekt_kod_tasdiqlandi?.confirm;
       return {
@@ -306,8 +308,9 @@ router.get("/get-all-active-mfy", async (req, res) => {
   }
 });
 
-router.get("/abarotka-berildi/:mfy_id", async (req, res) => {
+router.put("/abarotka-berildi/:mfy_id", async (req, res) => {
   try {
+    console.log(req.params.mfy_id);
     const result = await Mahalla.updateOne(
       { id: req.params.mfy_id },
       { $set: { abarotka_berildi: true } }
@@ -321,7 +324,7 @@ router.get("/abarotka-berildi/:mfy_id", async (req, res) => {
     console.error(error);
   }
 });
-router.get("/abarotka-berilmadi/:mfy_id", async (req, res) => {
+router.put("/abarotka-berilmadi/:mfy_id", async (req, res) => {
   try {
     const result = await Mahalla.updateOne(
       { id: req.params.mfy_id },
@@ -336,7 +339,7 @@ router.get("/abarotka-berilmadi/:mfy_id", async (req, res) => {
     console.error(error);
   }
 });
-router.get("/barchasiga-abarotka-berilmadi", async (req, res) => {
+router.put("/barchasiga-abarotka-berilmadi", async (req, res) => {
   try {
     await Mahalla.updateMany(
       { reja: { $gt: 0 } },
@@ -348,6 +351,65 @@ router.get("/barchasiga-abarotka-berilmadi", async (req, res) => {
     console.error(error);
   }
 });
+router.post(
+  "/send-abonents-list-to-telegram/",
+  uploadAsBlob.any(),
+  async (req, res) => {
+    try {
+      const { minSaldo, maxSaldo, mahalla_id, mahalla_name } = req.query;
+      const files = req.files;
+
+      if (!files || files.length === 0) {
+        return res.status(400).send("Hech qanday fayl yuklanmadi!");
+      }
+
+      // Yuklangan fayllarni Telegram media group formatiga o‘tkazish
+
+      const mediaGroup = files.map((file) => ({
+        type: "photo",
+        media: { source: file.buffer }, // Faylni `buffer` orqali yuboramiz
+      }));
+
+      // Media groupni Telegram guruhiga yuborish
+      await bot.telegram.sendMediaGroup(
+        process.env.NAZORATCHILAR_GURUPPASI,
+        mediaGroup
+      );
+      await bot.telegram.sendMessage(
+        process.env.NAZORATCHILAR_GURUPPASI,
+        `${mahalla_name} ${minSaldo ? minSaldo + " dan yuqori" : ""} ${
+          maxSaldo ? maxSaldo + " dan past" : ""
+        } qarzdorligi mavjud abonentlar ro'yxati biriktirilgan aholi nazoratchisi uchun`
+      );
+
+      res.status(200).send("Rasmlar muvaffaqiyatli yuborildi!");
+    } catch (error) {
+      console.error("Xatolik yuz berdi:", error.message);
+      res.status(500).json({
+        ok: false,
+        message: "Internal server error 500",
+      });
+    }
+  }
+);
+
+router.post(
+  "/send-abonents-list-to-telegram-as-pdf",
+  uploadAsBlob.single("file"),
+  (req, res) => {
+    try {
+      // TODO: PDF yaratish
+      bot.telegram.sendDocument(process.env.ME, { source: req.file.buffer });
+    } catch (error) {
+      console.error("Xatolik yuz berdi:", error.message);
+      res.status(500).json({
+        ok: false,
+        message: "Internal server error 500",
+      });
+    }
+  }
+);
+
 router.get("/get-mfy-by-id/:mfy_id", async (req, res) => {
   try {
     const mahalla = await Mahalla.findOne({ id: req.params.mfy_id });
