@@ -15,13 +15,14 @@ const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { dvaynikUchirish } = require("../api/cleancity/dxsh/dvaynikUchirish");
 const { Abonent } = require("../requires");
 const { tozaMakonApi } = require("../api/tozaMakon");
+const FormData = require("form-data");
 const akt_pachka_id = {
-  viza: "4442831",
-  odam_soni: "4442830",
-  dvaynik: "4442829",
-  pul_kuchirish: "4442828",
-  death: "4442827",
-  boshqa: "4442832",
+  viza: "4444086",
+  odam_soni: "4443772",
+  dvaynik: "",
+  pul_kuchirish: "4444112",
+  death: "4444111",
+  boshqa: "4444109",
 };
 
 const router = require("express").Router();
@@ -33,25 +34,47 @@ router.get("/next-incoming-document-number", async (req, res) => {
   res.json({ ok: true, value: counter.value + 1 });
 });
 
-router.post("/create-full-akt", upload.single("file"), async (req, res) => {
-  try {
-    let counter = {};
-    if (req.body.autoAktNumber === "true") {
-      counter = await Counter.findOne({ name: "incoming_document_number" });
+router.post(
+  "/create-full-akt",
+  uploadAsBlob.single("file"),
+  async (req, res) => {
+    try {
+      const {
+        next_inhabitant_count,
+        akt_sum,
+        licshet,
+        ariza_id,
+        document_type,
+        description,
+      } = req.body;
+      if (isNaN(next_inhabitant_count) && isNaN(akt_sum)) {
+        return res.status(400).json({
+          ok: false,
+          message: "yashovchi soni yoki akt summasi bo'lishi kerak",
+        });
+      }
+      const abonent = await Abonent.findOne({ licshet });
+      if (!abonent)
+        return res.status(404).json({
+          ok: false,
+          message: "Abonent mavjud emas",
+        });
+      let counter = await Counter.findOne({ name: "incoming_document_number" });
 
+      // akt faylini telegram bazaga saqlash
       const documentOnTelegram = await bot.telegram.sendDocument(
         process.env.TEST_BASE_CHANNEL_ID,
         {
-          source: path.join(__dirname, "../uploads/", req.file.filename),
+          source: req.file.buffer,
+          filename: req.file.originalname,
         }
       );
-      const document = await IncomingDocument.create({
-        abonent: req.body.licshet,
-        doc_type: req.body.doc_type,
-        inspector: req.body.inspector,
+      await IncomingDocument.create({
+        abonent: licshet,
+        doc_type: document_type,
         file_id: documentOnTelegram.document.file_id,
-        file_name: req.file.filename + ".pdf",
-        comment: req.body.comment,
+        file_name: req.file.originalname,
+        comment: description,
         date: Date.now(),
         doc_num: counter.value + 1,
       });
@@ -61,78 +84,85 @@ router.post("/create-full-akt", upload.single("file"), async (req, res) => {
           last_update: Date.now(),
         },
       });
-    } else {
-      counter.value = Number(req.body.akt_number) - 1;
-    }
 
-    let yashovchi = { success: true };
+      // akt faylini tozaMakon ga saqlash
+      const formData = new FormData();
+      formData.append("file", req.file.buffer, req.file.originalname);
 
-    if (req.body.yashovchilarUzgartirish == "true") {
-      yashovchi = await enterYashovchiSoniAkt({
-        akt_number: counter.value + 1,
-        comment: req.body.comment,
-        filepath: path.join(__dirname, "../uploads/", req.file.filename),
-        licshet: req.body.licshet,
-        prescribed_cnt: req.body.prescribed_cnt,
-        stack_prescribed_akts_id: "8778", // yashovchi soni akt pachkasi har oy o'zgartiriladi
-      });
-    }
-    let qaytahisob = { success: true };
-    if (req.body.qaytaHisobBuladi == "true") {
-      qaytahisob = await enterQaytaHisobAkt({
-        akt_number: counter.value + 1,
-        comment: req.body.comment,
-        amount: req.body.amount,
-        filepath: path.join(__dirname, "../uploads/", req.file.filename),
-        licshet: req.body.licshet,
-        nds_summ: req.body.nds_summ ? req.body.nds_summ : 0,
-        stack_akts_id: req.body.ariza_id
-          ? akt_pachka_id[req.body.ariza.document_type]
-          : akt_pachka_id.boshqa,
-      });
-      if (!qaytahisob.success) {
+      const fileUploadResponse = await tozaMakonApi.post(
+        "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (!isNaN(akt_sum)) {
+        const calculateKSaldo = (
+          await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+            params: {
+              amount: Math.abs(akt_sum),
+              residentId: abonent.id,
+              actPackId: document_type
+                ? akt_pachka_id[document_type]
+                : akt_pachka_id.boshqa,
+              actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
+            },
+          })
+        ).data;
+
+        const date = new Date();
+        const aktResponse = await tozaMakonApi.post("/billing-service/acts", {
+          actPackId: document_type
+            ? akt_pachka_id[document_type]
+            : akt_pachka_id.boshqa,
+          actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
+          amount: Math.abs(akt_sum),
+          amountWithQQS: 0,
+          amountWithoutQQS: Math.abs(akt_sum),
+          description,
+          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          fileId: fileUploadResponse.data.fileId,
+          kSaldo: calculateKSaldo,
+          residentId: abonent.id,
+          inhabitantCount: next_inhabitant_count,
+        });
+
+        if (aktResponse.status !== 201) {
+          console.error(
+            "Billing tizimiga akt kiritib bo'lmadi",
+            aktResponse.data
+          );
+          return res.json({
+            ok: false,
+            message: "Billing tizimiga akt kiritib bo'lmadi",
+          });
+        }
+        const ariza = await Ariza.findByIdAndUpdate(req.body.ariza_id, {
+          $set: {
+            status: "akt_kiritilgan",
+            akt_pachka_id: aktResponse.data.actPackId,
+            akt_id: aktResponse.data.id,
+            aktInfo: {
+              ...aktResponse.data,
+            },
+            akt_date: aktResponse.data.createdAt,
+          },
+        });
         return res.json({
-          ok: false,
-          ...qaytahisob,
-          message: qaytahisob.msg,
+          ok: true,
+          message: "Akt muvaffaqqiyatli qo'shildi",
+          ariza,
         });
       }
+    } catch (err) {
+      console.error(err);
+      res.json({ ok: false, message: "Internal server error 500" });
     }
-    if (req.body.ariza_id && qaytahisob.success && yashovchi.success) {
-      const ariza = await Ariza.findByIdAndUpdate(req.body.ariza_id, {
-        $set: {
-          status: "tasdiqlangan",
-          akt_pachka_id: req.body.ariza_id
-            ? akt_pachka_id[req.body.ariza.document_type]
-            : akt_pachka_id.boshqa,
-          akt_id: qaytahisob.akt_id,
-          aktInfo: {
-            akt_number: counter.value + 1,
-            comment: req.body.comment,
-            amount: req.body.amount,
-            licshet: req.body.licshet,
-            nds_summ: req.body.nds_summ,
-          },
-          akt_date: new Date(),
-        },
-      });
-      return res.json({
-        ok: qaytahisob.success && yashovchi.success ? true : false,
-        qaytahisob,
-        yashovchi,
-        ariza,
-      });
-    }
-
-    res.json({
-      ok: qaytahisob.success && yashovchi.success ? true : false,
-      qaytahisob,
-      yashovchi,
-    });
-  } catch (err) {
-    console.error(err);
   }
-});
+);
 
 router.post("/create-dvaynik-akt", upload.single("file"), async (req, res) => {
   try {
@@ -200,16 +230,14 @@ router.post("/create-dvaynik-akt", upload.single("file"), async (req, res) => {
 
 router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
   try {
-    const data = await getAbonentDXJ({ licshet: req.params.licshet });
-    const abonentData = await getAbonentDataByLicshet({
-      licshet: req.params.licshet,
-    });
+    const { data } = await tozaMakonApi.get(
+      `/billing-service/resident-balances/dhsh?accountNumber=${req.params.licshet}&page=0&size=100`
+    );
 
     res.json({
-      ok: data.success,
+      ok: true,
       message: data.msg,
-      rows: data.rows,
-      abonentData: abonentData.rows[0],
+      rows: data.content,
     });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });

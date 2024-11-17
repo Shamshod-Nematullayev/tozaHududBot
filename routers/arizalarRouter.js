@@ -6,18 +6,38 @@ const jsqr = require("jsqr");
 const path = require("path");
 const fs = require("fs");
 const { upload } = require("../middlewares/multer");
+const { Abonent } = require("../models/Abonent");
 
 const router = require("express").Router();
 
 router.get("/get-ariza-by-id/:_id", async (req, res) => {
   try {
     const ariza = await Ariza.findById(req.params._id);
+    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
     if (!ariza)
       return res.json({
         ok: false,
         message: "Ariza topilmadi",
       });
-    res.json({ ok: true, ariza });
+    ariza.fio = abonent.fio;
+    res.json({
+      ok: true,
+      ariza: {
+        _id: ariza._id,
+        sana: ariza.sana,
+        document_type: ariza.document_type,
+        document_number: ariza.document_number,
+        licshet: ariza.licshet,
+        fio: abonent.fio,
+        comment: ariza.comment,
+        current_prescribed_cnt: ariza.current_prescribed_cnt,
+        next_prescribed_cnt: ariza.next_prescribed_cnt,
+        aktSummasi: ariza.aktSummasi,
+        status: ariza.status,
+        akt_statuses_name: ariza.akt_statuses_name,
+        is_canceled: ariza.is_canceled,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.json({ ok: false, message: `internal error: ${error.message}` });
@@ -28,14 +48,33 @@ router.get(
   async (req, res) => {
     try {
       const ariza = await Ariza.findOne({
-        document_number: req.params.document_number,
+        document_number: parseInt(req.params.document_number),
       });
+      const abonent = await Abonent.findOne({ licshet: ariza.licshet });
       if (!ariza)
         return res.json({
           ok: false,
           message: "Ariza topilmadi",
         });
-      res.json({ ok: true, ariza });
+      console.log(ariza);
+      res.json({
+        ok: true,
+        ariza: {
+          _id: ariza._id,
+          sana: ariza.sana,
+          document_type: ariza.document_type,
+          document_number: ariza.document_number,
+          licshet: ariza.licshet,
+          fio: abonent.fio,
+          comment: ariza.comment,
+          current_prescribed_cnt: ariza.current_prescribed_cnt,
+          next_prescribed_cnt: ariza.next_prescribed_cnt,
+          aktSummasi: ariza.aktSummasi,
+          status: ariza.status,
+          akt_statuses_name: ariza.akt_statuses_name,
+          is_canceled: ariza.is_canceled,
+        },
+      });
     } catch (error) {
       console.error(error);
       res.json({ ok: false, message: `internal error: ${error.message}` });
@@ -136,6 +175,16 @@ router.post("/create", async (req, res) => {
 
 router.post("/scan_ariza_qr", upload.single("file"), async (req, res) => {
   try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded." });
+    }
+
+    if (req.file.mimetype !== "application/pdf") {
+      return res
+        .status(400)
+        .json({ error: "Invalid file type. Only PDFs are allowed." });
+    }
+
     const filePath = "./uploads/" + req.file.filename;
     const outputDir = "./uploads/converted_images/"; // Directory for converted images
     const imagePath = path.join(outputDir, "page-1.png"); // Path for the converted image
