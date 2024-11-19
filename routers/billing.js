@@ -112,7 +112,30 @@ router.post(
           })
         ).data;
 
+        const inhabitantCounts =
+          next_inhabitant_count && "undefined" != next_inhabitant_count
+            ? { inhabitantCount: next_inhabitant_count }
+            : {};
         const date = new Date();
+        console.log({
+          actPackId: document_type
+            ? akt_pachka_id[document_type]
+            : akt_pachka_id.boshqa,
+          actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
+          amount: Math.abs(akt_sum),
+          amountWithQQS: 0,
+          amountWithoutQQS: Math.abs(akt_sum),
+          description,
+          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          fileId:
+            fileUploadResponse.data.fileName +
+            "*" +
+            fileUploadResponse.data.fileId,
+          kSaldo: calculateKSaldo,
+          residentId: abonent.id,
+          ...inhabitantCounts,
+        });
         const aktResponse = await tozaMakonApi.post("/billing-service/acts", {
           actPackId: document_type
             ? akt_pachka_id[document_type]
@@ -124,10 +147,13 @@ router.post(
           description,
           endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
           startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          fileId: fileUploadResponse.data.fileId,
+          fileId:
+            fileUploadResponse.data.fileName +
+            "*" +
+            fileUploadResponse.data.fileId,
           kSaldo: calculateKSaldo,
           residentId: abonent.id,
-          inhabitantCount: next_inhabitant_count,
+          ...inhabitantCounts,
         });
 
         if (aktResponse.status !== 201) {

@@ -3,7 +3,7 @@ const { keyboards } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
 const { Abonent } = require("../../../models/Abonent");
 const isCancel = require("../../smallFunctions/isCancel");
-const { kirillga } = require("../../smallFunctions/lotinKiril");
+const { kirillga, lotinga } = require("../../smallFunctions/lotinKiril");
 
 const searchAbonentbyName = new Scenes.WizardScene(
   "SEARCH_BY_NAME",
@@ -25,41 +25,37 @@ const searchAbonentbyName = new Scenes.WizardScene(
       if ((ctx.message && isCancel(ctx.message.text)) || !ctx.message)
         return ctx.scene.leave();
       ctx.scene.state.FISH = ctx.message.text;
-      // const abonentsJSON = require("../../../lib/abonents.json");
-      // const abonents = abonentsJSON[Object.keys(abonentsJSON)[0]];
       const abonents = await Abonent.find({
         mahallas_id: ctx.wizard.state.MFY_ID,
       });
       const abonent = abonents.filter((doc) => {
         return (
-          doc.fio
+          lotinga(doc.fio)
             .toLowerCase()
-            .search(kirillga(ctx.message.text.toLowerCase())) >= 0 &&
+            .search(lotinga(ctx.message.text.toLowerCase())) >= 0 &&
           doc.mahallas_id == ctx.wizard.state.MFY_ID
         );
       });
-      if (abonent.length > 0) {
-        if (abonent.length > 50) {
-          return ctx.reply(
-            "Qidiruv natijalari juda ko'p, iltimos ko'proq belgi kiriting"
-          );
-        }
-        let messageText = ``;
-        abonent.forEach((doc, i) => {
-          messageText += `${i + 1}. <code>${doc.licshet}</code> <b>${
-            doc.fio
-          }</b> ${doc.streets_name}\n`;
-        });
-        ctx.replyWithHTML(
-          messageText,
-          keyboards[ctx.session.til].cancelBtn.resize()
-        );
-      } else {
-        ctx.reply(
+      if (abonent.length < 1)
+        return ctx.reply(
           messages.notFoundData,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
+      if (abonent.length > 50) {
+        return ctx.reply(
+          "Qidiruv natijalari juda ko'p, iltimos ko'proq belgi kiriting"
+        );
       }
+      let messageText = ``;
+      abonent.forEach((doc, i) => {
+        messageText += `${i + 1}. <code>${doc.licshet}</code> <b>${
+          doc.fio
+        }</b> ${doc.streets_name}\n`;
+      });
+      ctx.replyWithHTML(
+        messageText,
+        keyboards[ctx.session.til].cancelBtn.resize()
+      );
     } catch (error) {
       console.log(error);
       ctx.scene.leave();

@@ -84,10 +84,11 @@ router.get(
 
 router.post("/cancel-ariza-by-id", async (req, res) => {
   try {
-    const ariza = await Ariza.findByIdAndUpdate(req.body._id, {
+    const { _id, canceling_description } = req.body;
+    const ariza = await Ariza.findByIdAndUpdate(_id, {
       $set: {
         status: "bekor qilindi",
-        canceling_description: req.body.canceling_description,
+        canceling_description,
         is_canceled: true,
       },
     });
