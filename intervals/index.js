@@ -3,7 +3,7 @@
 // require("./updateArizalarStatus");
 // require("./sendMFYIncomeReport");
 // require("./sendPinflMfyReport");
-require("./kunlikEtkReports");
+// require("./kunlikEtkReports");
 // require("./kunlikPinflReports");
 // require("./nazoratchilarKunlikTushum");
 // require("./checkMailExpires");
