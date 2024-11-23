@@ -86,7 +86,7 @@ async function sendKunlikEtkReports() {
           selector: "div",
         });
         const buffer = Buffer.from(binaryData, "binary");
-        console.log(inspectors);
+        // console.log(inspectors);
         bot.telegram.sendPhoto(
           process.env.NAZORATCHILAR_GURUPPASI,
           { source: buffer },

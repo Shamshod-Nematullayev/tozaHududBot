@@ -3,6 +3,7 @@ const {
   getOneMailById,
   createMail,
 } = require("../api/hybrid.pochta.uz/");
+const { tozaMakonApi } = require("../api/tozaMakon");
 const { NOTIFICATIONS_CHANNEL_ID } = require("../constants");
 const {
   nazoratchilarKunlikTushum,
@@ -180,51 +181,54 @@ composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
 });
 
 // yashovchi soni ko'paytirish so'rovini tasdiqlash funksiyasi
-composer.action(/done_\w+/g, async (ctx) => {
-  try {
-    if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+// composer.action(/done_\w+/g, async (ctx) => {
+//   try {
+//     if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 
-    const doneCb = ctx.update.callback_query.data;
-    const req = await MultiplyRequest.findById(doneCb.split("_")[1]);
+//     const doneCb = ctx.update.callback_query.data;
+//     const req = await MultiplyRequest.findById(doneCb.split("_")[1]);
 
-    const cleancityResponse = await yashovchiSoniKopaytirish(
-      req.abonent.licshet,
-      req.YASHOVCHILAR
-    );
-    if (!cleancityResponse.success) {
-      await ctx.telegram.sendMessage(
-        req.from.id,
-        `<code>${req.abonent.licshet}</code>\n ${req.YASHOVCHILAR} kishi \n 🟥🟥 Bekor qilindi. \n Asos: ${cleancityResponse.msg}`,
-        { parse_mode: "HTML" }
-      );
-      await req.updateOne({
-        $set: {
-          confirm: false,
-        },
-      });
-      await ctx.answerCbQuery(cleancityResponse.msg);
-    } else {
-      await ctx.answerCbQuery(JSON.stringify(cleancityResponse));
-      await ctx.telegram.sendMessage(
-        req.from.id,
-        `<code>${req.licshet}</code>\n ${req.YASHOVCHILAR} kishi \n ✅✅ Tasdiqlandi`,
-        { parse_mode: "HTML" }
-      );
-      await ctx.editMessageText(
-        `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.abonent.licshet}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
-        { parse_mode: "HTML", disable_web_page_preview: true }
-      );
-      await ctx.telegram.forwardMessage(
-        process.env.NAZORATCHILAR_GURUPPASI,
-        process.env.CHANNEL,
-        ctx.callbackQuery.message.message_id
-      );
-      await ctx.deleteMessage(ctx.callbackQuery.message.message_id);
-    }
-  } catch (error) {
-    console.log(error);
-  }
-});
+//     const response = await tozaMakonApi.patch(
+//       "/user-service/residents/inhabitant/" + req.abonent.id,
+//       {
+//         inhabitantCount: req.YASHOVCHILAR,
+//       }
+//     );
+//     if (response.status !== 200) {
+//       await ctx.telegram.sendMessage(
+//         req.from.id,
+//         `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n 🟥🟥 Bekor qilindi. \n Asos: ${cleancityResponse.msg}`,
+//         { parse_mode: "HTML" }
+//       );
+//       await req.updateOne({
+//         $set: {
+//           confirm: false,
+//         },
+//       });
+//       console.error(response.data);
+//       await ctx.answerCbQuery("Tizimga kiritda xatolik kuzatildi");
+//     } else {
+//       await ctx.answerCbQuery("Tizimga kiritildi");
+//       await ctx.telegram.sendMessage(
+//         req.from.id,
+//         `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n ✅✅ Tasdiqlandi`,
+//         { parse_mode: "HTML" }
+//       );
+//       await ctx.editMessageText(
+//         `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.KOD}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+//         { parse_mode: "HTML", disable_web_page_preview: true }
+//       );
+//       await ctx.telegram.forwardMessage(
+//         process.env.NAZORATCHILAR_GURUPPASI,
+//         process.env.CHANNEL,
+//         ctx.callbackQuery.message.message_id
+//       );
+//       await ctx.deleteMessage(ctx.callbackQuery.message.message_id);
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 
 composer.action(/notification_\w+/g, async (ctx) => {
   const notificationCb = ctx.update.callback_query.data;

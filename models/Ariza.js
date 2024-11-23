@@ -26,6 +26,12 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  aktSummCounts: {
+    type: Object,
+    default: {
+      total: 0,
+    },
+  },
   current_prescribed_cnt: {
     type: Number,
   },
@@ -34,20 +40,14 @@ const schema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["yangi", "qabul qilindi", "tasdiqlangan", "bekor qilindi"],
-    default: "yangi",
-  },
-  akt_statuses_name: {
-    type: String,
     enum: [
-      "",
-      "Tasdiqlangan bekor qilindi",
-      "Yangi",
-      "Камчилик тўғирланди",
-      "Огоҳлантирилди",
-      "Tasdiqlandi",
+      "yangi",
+      "qabul qilindi",
+      "tasdiqlangan",
+      "bekor qilindi",
+      "akt_kiritilgan",
     ],
-    default: "",
+    default: "yangi",
   },
   is_canceled: {
     type: Boolean,

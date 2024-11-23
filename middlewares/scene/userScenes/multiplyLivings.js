@@ -50,10 +50,17 @@ const multiplyLivingsScene = new Scenes.WizardScene(
         );
       } else {
         ctx.scene.state.YASHOVCHILAR = parseInt(ctx.message.text);
+        const { abonent, ...states } = ctx.wizard.state;
         const request = new MultiplyRequest({
-          ...ctx.wizard.state,
+          ...states,
           date: Date.now(),
           from: ctx.from,
+          abonent: {
+            id: abonent.id,
+            fio: abonent.fio,
+            mahalla_name: abonent.mahalla_name,
+            mfy_id: abonent.mahallas_id,
+          },
         });
         await request.save();
         ctx.reply(messages.accepted);

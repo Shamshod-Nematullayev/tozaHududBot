@@ -1,6 +1,6 @@
 const enterQaytaHisobAkt = require("../api/cleancity/dxsh/enterQaytaHisobAkt");
 const { enterYashovchiSoniAkt } = require("../api/cleancity/dxsh");
-const { upload } = require("../middlewares/multer");
+const { upload, uploadAsBlob } = require("../middlewares/multer");
 const { Mahalla } = require("../models/Mahalla");
 const { Ariza } = require("../models/Ariza");
 const { Counter } = require("../models/Counter");
@@ -14,13 +14,15 @@ const getAbonents = require("../api/cleancity/dxsh/getAbonents");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { dvaynikUchirish } = require("../api/cleancity/dxsh/dvaynikUchirish");
 const { Abonent } = require("../requires");
+const { tozaMakonApi } = require("../api/tozaMakon");
+const FormData = require("form-data");
 const akt_pachka_id = {
-  viza: "4442831",
-  odam_soni: "4442830",
-  dvaynik: "4442829",
-  pul_kuchirish: "4442828",
-  death: "4442827",
-  boshqa: "4442832",
+  viza: "4444086",
+  odam_soni: "4443772",
+  dvaynik: "",
+  pul_kuchirish: "4444112",
+  death: "4444111",
+  boshqa: "4444109",
 };
 
 const router = require("express").Router();
@@ -32,25 +34,47 @@ router.get("/next-incoming-document-number", async (req, res) => {
   res.json({ ok: true, value: counter.value + 1 });
 });
 
-router.post("/create-full-akt", upload.single("file"), async (req, res) => {
-  try {
-    let counter = {};
-    if (req.body.autoAktNumber === "true") {
-      counter = await Counter.findOne({ name: "incoming_document_number" });
+router.post(
+  "/create-full-akt",
+  uploadAsBlob.single("file"),
+  async (req, res) => {
+    try {
+      const {
+        next_inhabitant_count,
+        akt_sum,
+        licshet,
+        ariza_id,
+        document_type,
+        description,
+      } = req.body;
+      if (isNaN(next_inhabitant_count) && isNaN(akt_sum)) {
+        return res.status(400).json({
+          ok: false,
+          message: "yashovchi soni yoki akt summasi bo'lishi kerak",
+        });
+      }
+      const abonent = await Abonent.findOne({ licshet });
+      if (!abonent)
+        return res.status(404).json({
+          ok: false,
+          message: "Abonent mavjud emas",
+        });
+      let counter = await Counter.findOne({ name: "incoming_document_number" });
 
+      // akt faylini telegram bazaga saqlash
       const documentOnTelegram = await bot.telegram.sendDocument(
         process.env.TEST_BASE_CHANNEL_ID,
         {
-          source: path.join(__dirname, "../uploads/", req.file.filename),
+          source: req.file.buffer,
+          filename: req.file.originalname,
         }
       );
-      const document = await IncomingDocument.create({
-        abonent: req.body.licshet,
-        doc_type: req.body.doc_type,
-        inspector: req.body.inspector,
+      await IncomingDocument.create({
+        abonent: licshet,
+        doc_type: document_type,
         file_id: documentOnTelegram.document.file_id,
-        file_name: req.file.filename + ".pdf",
-        comment: req.body.comment,
+        file_name: req.file.originalname,
+        comment: description,
         date: Date.now(),
         doc_num: counter.value + 1,
       });
@@ -60,78 +84,111 @@ router.post("/create-full-akt", upload.single("file"), async (req, res) => {
           last_update: Date.now(),
         },
       });
-    } else {
-      counter.value = Number(req.body.akt_number) - 1;
-    }
 
-    let yashovchi = { success: true };
+      // akt faylini tozaMakon ga saqlash
+      const formData = new FormData();
+      formData.append("file", req.file.buffer, req.file.originalname);
 
-    if (req.body.yashovchilarUzgartirish == "true") {
-      yashovchi = await enterYashovchiSoniAkt({
-        akt_number: counter.value + 1,
-        comment: req.body.comment,
-        filepath: path.join(__dirname, "../uploads/", req.file.filename),
-        licshet: req.body.licshet,
-        prescribed_cnt: req.body.prescribed_cnt,
-        stack_prescribed_akts_id: "8778", // yashovchi soni akt pachkasi har oy o'zgartiriladi
-      });
-    }
-    let qaytahisob = { success: true };
-    if (req.body.qaytaHisobBuladi == "true") {
-      qaytahisob = await enterQaytaHisobAkt({
-        akt_number: counter.value + 1,
-        comment: req.body.comment,
-        amount: req.body.amount,
-        filepath: path.join(__dirname, "../uploads/", req.file.filename),
-        licshet: req.body.licshet,
-        nds_summ: req.body.nds_summ ? req.body.nds_summ : 0,
-        stack_akts_id: req.body.ariza_id
-          ? akt_pachka_id[req.body.ariza.document_type]
-          : akt_pachka_id.boshqa,
-      });
-      if (!qaytahisob.success) {
+      const fileUploadResponse = await tozaMakonApi.post(
+        "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (!isNaN(akt_sum)) {
+        const calculateKSaldo = (
+          await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+            params: {
+              amount: Math.abs(akt_sum),
+              residentId: abonent.id,
+              actPackId: document_type
+                ? akt_pachka_id[document_type]
+                : akt_pachka_id.boshqa,
+              actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
+            },
+          })
+        ).data;
+
+        const inhabitantCounts =
+          next_inhabitant_count && "undefined" != next_inhabitant_count
+            ? { inhabitantCount: next_inhabitant_count }
+            : {};
+        const date = new Date();
+        console.log({
+          actPackId: document_type
+            ? akt_pachka_id[document_type]
+            : akt_pachka_id.boshqa,
+          actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
+          amount: Math.abs(akt_sum),
+          amountWithQQS: 0,
+          amountWithoutQQS: Math.abs(akt_sum),
+          description,
+          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          fileId:
+            fileUploadResponse.data.fileName +
+            "*" +
+            fileUploadResponse.data.fileId,
+          kSaldo: calculateKSaldo,
+          residentId: abonent.id,
+          ...inhabitantCounts,
+        });
+        const aktResponse = await tozaMakonApi.post("/billing-service/acts", {
+          actPackId: document_type
+            ? akt_pachka_id[document_type]
+            : akt_pachka_id.boshqa,
+          actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
+          amount: Math.abs(akt_sum),
+          amountWithQQS: 0,
+          amountWithoutQQS: Math.abs(akt_sum),
+          description,
+          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          fileId:
+            fileUploadResponse.data.fileName +
+            "*" +
+            fileUploadResponse.data.fileId,
+          kSaldo: calculateKSaldo,
+          residentId: abonent.id,
+          ...inhabitantCounts,
+        });
+
+        if (aktResponse.status !== 201) {
+          console.error(
+            "Billing tizimiga akt kiritib bo'lmadi",
+            aktResponse.data
+          );
+          return res.json({
+            ok: false,
+            message: "Billing tizimiga akt kiritib bo'lmadi",
+          });
+        }
+        const ariza = await Ariza.findByIdAndUpdate(req.body.ariza_id, {
+          $set: {
+            status: "akt_kiritilgan",
+            akt_pachka_id: aktResponse.data.actPackId,
+            akt_id: aktResponse.data.id,
+            aktInfo: {
+              ...aktResponse.data,
+            },
+            akt_date: aktResponse.data.createdAt,
+          },
+        });
         return res.json({
-          ok: false,
-          ...qaytahisob,
-          message: qaytahisob.msg,
+          ok: true,
+          message: "Akt muvaffaqqiyatli qo'shildi",
+          ariza,
         });
       }
+    } catch (err) {
+      console.error(err);
+      res.json({ ok: false, message: "Internal server error 500" });
     }
-    if (req.body.ariza_id && qaytahisob.success && yashovchi.success) {
-      const ariza = await Ariza.findByIdAndUpdate(req.body.ariza_id, {
-        $set: {
-          status: "tasdiqlangan",
-          akt_pachka_id: req.body.ariza_id
-            ? akt_pachka_id[req.body.ariza.document_type]
-            : akt_pachka_id.boshqa,
-          akt_id: qaytahisob.akt_id,
-          aktInfo: {
-            akt_number: counter.value + 1,
-            comment: req.body.comment,
-            amount: req.body.amount,
-            licshet: req.body.licshet,
-            nds_summ: req.body.nds_summ,
-          },
-          akt_date: new Date(),
-        },
-      });
-      return res.json({
-        ok: qaytahisob.success && yashovchi.success ? true : false,
-        qaytahisob,
-        yashovchi,
-        ariza,
-      });
-    }
-
-    res.json({
-      ok: qaytahisob.success && yashovchi.success ? true : false,
-      qaytahisob,
-      yashovchi,
-    });
-  } catch (err) {
-    console.error(err);
   }
-});
+);
 
 router.post("/create-dvaynik-akt", upload.single("file"), async (req, res) => {
   try {
@@ -199,16 +256,14 @@ router.post("/create-dvaynik-akt", upload.single("file"), async (req, res) => {
 
 router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
   try {
-    const data = await getAbonentDXJ({ licshet: req.params.licshet });
-    const abonentData = await getAbonentDataByLicshet({
-      licshet: req.params.licshet,
-    });
+    const { data } = await tozaMakonApi.get(
+      `/billing-service/resident-balances/dhsh?accountNumber=${req.params.licshet}&page=0&size=100`
+    );
 
     res.json({
-      ok: data.success,
+      ok: true,
       message: data.msg,
-      rows: data.rows,
-      abonentData: abonentData.rows[0],
+      rows: data.content,
     });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
@@ -217,13 +272,29 @@ router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
 });
 router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
   try {
-    const abonentData = await getAbonentDataByLicshet({
-      licshet: req.params.licshet,
-    });
+    // const abonentData = await getAbonentDataByLicshet({
+    //   licshet: req.params.licshet,
+    // });
+    const abonentData = await Abonent.findOne({ licshet: req.params.licshet });
+    if (!abonentData) {
+      return res.json({
+        ok: false,
+        message: "Abonent mongodbda mavjud emas",
+      });
+    }
 
+    const response = await tozaMakonApi.get(
+      "/user-service/residents/" + abonentData.id
+    );
+    if (response.status !== 200) {
+      return response.json({
+        ok: false,
+        message: "Abonent dastlabki ma'lumotlarini oliishda xatolik",
+      });
+    }
     res.json({
       ok: true,
-      abonentData: abonentData.rows[0],
+      abonentData: response.data,
     });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
@@ -234,11 +305,26 @@ router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
 const uchirilishiKerakBulganAbonentlar = [105120350731];
 router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
   try {
-    const abonents = await Abonent.find();
+    const abonents = await Abonent.find({ mahallas_id: req.params.mfy_id });
     const { minSaldo, maxSaldo } = req.query;
-    const data = await getAbonents({ mfy_id: req.params.mfy_id });
-    let filteredData = data.filter((abonent) => {
-      const abonentSaldo = Number(abonent.saldo_k);
+    let page = 0;
+    let totalPages = 1;
+    const rows = [];
+    const { data } = await tozaMakonApi.get(
+      `/user-service/residents?districtId=47&sort=id,DESC&page=${page}&size=400&companyId=1144&mahallaId=${req.params.mfy_id}`
+    );
+    rows.push(...data.content);
+    totalPages = data.totalPages;
+    if (totalPages > 1) {
+      for (let i = 1; i < totalPages; i++) {
+        const { data } = await tozaMakonApi.get(
+          `/user-service/residents?districtId=47&sort=id,DESC&page=${i}&size=400&companyId=1144&mahallaId=${req.params.mfy_id}`
+        );
+        rows.push(...data.content);
+      }
+    }
+    let filteredData = rows.filter((abonent) => {
+      const abonentSaldo = Number(abonent.ksaldo);
 
       // Abonentlar ro'yxatidan chiqarilgan bo'lmaganini tekshirish
       const isNotExcluded = !uchirilishiKerakBulganAbonentlar.includes(
@@ -253,16 +339,18 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
     });
     filteredData = filteredData.map((abonent) => {
       let isElektrKodConfirm = false;
-      const abonentMongo = abonents.find((a) => a.licshet == abonent.licshet);
+      const abonentMongo = abonents.find(
+        (a) => a.licshet == abonent.accountNumber
+      );
       if (abonentMongo)
         isElektrKodConfirm = abonentMongo.ekt_kod_tasdiqlandi?.confirm;
       return {
         ...abonent,
         isElektrKodConfirm,
-        fio: kirillga(abonent.fio),
+        fullName: kirillga(abonent.fullName),
       };
     });
-    filteredData.sort((a, b) => a.fio.localeCompare(b.fio));
+    filteredData.sort((a, b) => a.fullName.localeCompare(b.fullName));
     res.json({ ok: true, data: filteredData });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
@@ -285,8 +373,9 @@ router.get("/get-all-active-mfy", async (req, res) => {
   }
 });
 
-router.get("/abarotka-berildi/:mfy_id", async (req, res) => {
+router.put("/abarotka-berildi/:mfy_id", async (req, res) => {
   try {
+    console.log(req.params.mfy_id);
     const result = await Mahalla.updateOne(
       { id: req.params.mfy_id },
       { $set: { abarotka_berildi: true } }
@@ -300,7 +389,7 @@ router.get("/abarotka-berildi/:mfy_id", async (req, res) => {
     console.error(error);
   }
 });
-router.get("/abarotka-berilmadi/:mfy_id", async (req, res) => {
+router.put("/abarotka-berilmadi/:mfy_id", async (req, res) => {
   try {
     const result = await Mahalla.updateOne(
       { id: req.params.mfy_id },
@@ -315,7 +404,7 @@ router.get("/abarotka-berilmadi/:mfy_id", async (req, res) => {
     console.error(error);
   }
 });
-router.get("/barchasiga-abarotka-berilmadi", async (req, res) => {
+router.put("/barchasiga-abarotka-berilmadi", async (req, res) => {
   try {
     await Mahalla.updateMany(
       { reja: { $gt: 0 } },
@@ -327,6 +416,65 @@ router.get("/barchasiga-abarotka-berilmadi", async (req, res) => {
     console.error(error);
   }
 });
+router.post(
+  "/send-abonents-list-to-telegram/",
+  uploadAsBlob.any(),
+  async (req, res) => {
+    try {
+      const { minSaldo, maxSaldo, mahalla_id, mahalla_name } = req.query;
+      const files = req.files;
+
+      if (!files || files.length === 0) {
+        return res.status(400).send("Hech qanday fayl yuklanmadi!");
+      }
+
+      // Yuklangan fayllarni Telegram media group formatiga o‘tkazish
+
+      const mediaGroup = files.map((file) => ({
+        type: "photo",
+        media: { source: file.buffer }, // Faylni `buffer` orqali yuboramiz
+      }));
+
+      // Media groupni Telegram guruhiga yuborish
+      await bot.telegram.sendMediaGroup(
+        process.env.NAZORATCHILAR_GURUPPASI,
+        mediaGroup
+      );
+      await bot.telegram.sendMessage(
+        process.env.NAZORATCHILAR_GURUPPASI,
+        `${mahalla_name} ${minSaldo ? minSaldo + " dan yuqori" : ""} ${
+          maxSaldo ? maxSaldo + " dan past" : ""
+        } qarzdorligi mavjud abonentlar ro'yxati biriktirilgan aholi nazoratchisi uchun`
+      );
+
+      res.status(200).send("Rasmlar muvaffaqiyatli yuborildi!");
+    } catch (error) {
+      console.error("Xatolik yuz berdi:", error.message);
+      res.status(500).json({
+        ok: false,
+        message: "Internal server error 500",
+      });
+    }
+  }
+);
+
+router.post(
+  "/send-abonents-list-to-telegram-as-pdf",
+  uploadAsBlob.single("file"),
+  (req, res) => {
+    try {
+      // TODO: PDF yaratish
+      bot.telegram.sendDocument(process.env.ME, { source: req.file.buffer });
+    } catch (error) {
+      console.error("Xatolik yuz berdi:", error.message);
+      res.status(500).json({
+        ok: false,
+        message: "Internal server error 500",
+      });
+    }
+  }
+);
+
 router.get("/get-mfy-by-id/:mfy_id", async (req, res) => {
   try {
     const mahalla = await Mahalla.findOne({ id: req.params.mfy_id });

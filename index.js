@@ -1,11 +1,15 @@
 // Bismillah
 require("dotenv").config();
+if (!process.env.SECRET_JWT_KEY) {
+  console.error("SECRET_JWT_KEY environment variable is not defined");
+  process.exit(1);
+}
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 const { default: mongoose } = require("mongoose");
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const { isLimitFileSize } = require("./middlewares/multer");
+const isAuth = require("./middlewares/isAuth");
 
 // App middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -14,16 +18,15 @@ app.use(cors());
 
 // use routers
 app.use("/api/auth", require("./routers/auth"));
-app.use("/api/sudAkts", require("./routers/sudRouter"));
-app.use("/api/bildirgilar", require("./routers/bildirgilarRouter"));
-app.use("/api/forma1lar", require("./routers/forma1Router"));
-app.use("/api/fetchTelegram", require("./routers/fetchTelegramRouter"));
-app.use("/api/pachkalar", require("./routers/aktPachka"));
-app.use("/api/documents", require("./routers/kiruvchiXujjatlar"));
-app.use("/api/inspectors", require("./routers/inspectorsRouter"));
-app.use("/api/abonents", require("./routers/abonentsRouter"));
-app.use("/api/billing", require("./routers/billing"));
-app.use("/api/arizalar", require("./routers/arizalarRouter"));
+app.use("/api/sudAkts", isAuth, require("./routers/sudRouter"));
+app.use("/api/bildirgilar", isAuth, require("./routers/bildirgilarRouter"));
+app.use("/api/fetchTelegram", isAuth, require("./routers/fetchTelegramRouter"));
+app.use("/api/pachkalar", isAuth, require("./routers/aktPachka"));
+app.use("/api/documents", isAuth, require("./routers/kiruvchiXujjatlar"));
+app.use("/api/inspectors", isAuth, require("./routers/inspectorsRouter"));
+app.use("/api/abonents", isAuth, require("./routers/abonentsRouter"));
+app.use("/api/billing", isAuth, require("./routers/billing"));
+app.use("/api/arizalar", isAuth, require("./routers/arizalarRouter"));
 process.on("warning", (warning) => {
   console.warn(warning.stack);
 });
@@ -34,13 +37,13 @@ app.listen(PORT, async () => {
 });
 
 // telegram bot
-function useTelegramBot() {
-  require("./core/bot");
-  require("./middlewares");
-  require("./actions");  
-  require("./intervals");
-}
-useTelegramBot();
+// function useTelegramBot() {
+//   require("./core/bot");
+//   require("./middlewares");
+//   require("./actions");
+//   require("./intervals");
+// }
+// useTelegramBot();
 // require("./test");
 
 mongoose

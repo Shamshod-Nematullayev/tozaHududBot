@@ -5,6 +5,7 @@ const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { changeAbonentDates } = require("../../../requires");
 const isCancel = require("../../smallFunctions/isCancel");
 const { EtkKodRequest } = require("../../../models/EtkKodRequest");
+const { tozaMakonApi } = require("../../../api/tozaMakon");
 
 const updateElektrKod = new Scenes.WizardScene(
   "updateElektrKod",
@@ -121,6 +122,25 @@ const updateElektrKod = new Scenes.WizardScene(
           phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE,
           inspector_id: ctx.wizard.state.inspector_id,
           update_at: new Date(),
+        });
+        const result = await tozaMakonApi.patch(
+          "/user-service/residents/" + abonent.id,
+          {
+            electricityAccountNumber: ctx.wizard.state.ETK,
+            electricityCoato: "18214",
+            id: abonent.id,
+          }
+        );
+        await Abonent.findByIdAndUpdate(abonent._id, {
+          $set: {
+            ekt_kod_tasdiqlandi: {
+              confirm: true,
+              inspector_id: ctx.wizard.state.inspector_id,
+              inspector_name: ctx.wizard.state.inspector_name,
+              updated_at: new Date(),
+            },
+            energy_licshet: ctx.wizard.state.ETK,
+          },
         });
         ctx.editMessageText(ctx.callbackQuery.message.text);
         ctx.replyWithHTML(

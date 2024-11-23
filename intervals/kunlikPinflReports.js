@@ -87,14 +87,14 @@ async function sendKunlikPinflReports() {
         });
         const buffer = Buffer.from(binaryData, "binary");
 
-        // bot.telegram.sendPhoto(
-        //   process.env.NAZORATCHILAR_GURUPPASI,
-        //   { source: buffer },
-        //   {
-        //     caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
-        //     parse_mode: "HTML",
-        //   }
-        // );
+        bot.telegram.sendPhoto(
+          process.env.NAZORATCHILAR_GURUPPASI,
+          { source: buffer },
+          {
+            caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
+            parse_mode: "HTML",
+          }
+        );
       }
     );
   } catch (error) {
