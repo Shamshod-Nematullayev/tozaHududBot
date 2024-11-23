@@ -276,14 +276,25 @@ router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
     //   licshet: req.params.licshet,
     // });
     const abonentData = await Abonent.findOne({ licshet: req.params.licshet });
-    if (!abonentData)
+    if (!abonentData) {
       return res.json({
         ok: false,
-        message: "Abonent mavjud emas",
+        message: "Abonent mongodbda mavjud emas",
       });
+    }
+
+    const response = await tozaMakonApi.get(
+      "/user-service/residents/" + abonentData.id
+    );
+    if (response.status !== 200) {
+      return response.json({
+        ok: false,
+        message: "Abonent dastlabki ma'lumotlarini oliishda xatolik",
+      });
+    }
     res.json({
       ok: true,
-      abonentData: abonentData,
+      abonentData: response.data,
     });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });

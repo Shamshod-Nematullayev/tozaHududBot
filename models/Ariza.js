@@ -26,6 +26,12 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  aktSummCounts: {
+    type: Object,
+    default: {
+      total: 0,
+    },
+  },
   current_prescribed_cnt: {
     type: Number,
   },

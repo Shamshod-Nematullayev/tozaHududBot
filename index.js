@@ -20,7 +20,6 @@ app.use(cors());
 app.use("/api/auth", require("./routers/auth"));
 app.use("/api/sudAkts", isAuth, require("./routers/sudRouter"));
 app.use("/api/bildirgilar", isAuth, require("./routers/bildirgilarRouter"));
-app.use("/api/forma1lar", isAuth, require("./routers/forma1Router"));
 app.use("/api/fetchTelegram", isAuth, require("./routers/fetchTelegramRouter"));
 app.use("/api/pachkalar", isAuth, require("./routers/aktPachka"));
 app.use("/api/documents", isAuth, require("./routers/kiruvchiXujjatlar"));
