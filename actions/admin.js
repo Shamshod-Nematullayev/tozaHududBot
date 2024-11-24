@@ -66,7 +66,6 @@ const ADMIN_ACTIONS = [
   "generateSavdoSanoatAriza",
   "import_plan_for_inspectors",
   "confirm_game_over",
-  "show_abonent_pic",
   "generate_alert_letter",
   "add_notification",
   "new_abonent",

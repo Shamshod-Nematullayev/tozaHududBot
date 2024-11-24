@@ -1,9 +1,7 @@
 const { SudAktPachka } = require("../models/SudAktPachka");
 const { SudAkt } = require("../models/SudAkt");
-const { response } = require("express");
 const compresser = require("compressing");
 const { bot } = require("../core/bot");
-const { Picture } = require("../models/Picture");
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
