@@ -1,21 +1,27 @@
 const { Scenes, Markup } = require("telegraf");
 const { find_one_by_pinfil_from_mvd } = require("../../../api/mvd-pinfil");
 const isCancel = require("../../smallFunctions/isCancel");
-const isPinfl = require("../../smallFunctions/isPinfl");
+const isRealPinflValidate = require("../../smallFunctions/isPinfl");
 const { CleanCitySession } = require("../../../models/CleanCitySession");
 const { kirillga } = require("../../smallFunctions/lotinKiril");
 const { yangiAbonent } = require("../adminActions/cleancity/dxsh/yangiAbonent");
 const { messages } = require("../../../lib/messages");
-const { keyboards } = require("../../../lib/keyboards");
+const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
 const { Abonent } = require("../../../models/Abonent");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { Mahalla } = require("../../../models/Mahalla");
 const { NewAbonent } = require("../../../models/NewAbonents");
+const { tozaMakonApi } = require("../../../api/tozaMakon");
 const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {
-  ctx.reply("Fuqoro pinfl raqamini kiriting");
+  ctx.reply("Xonadon egasining jshshir raqamini kiriting!");
 };
+// 0 - jshshir
+// 1 - xonadon kadastr raqami
+// 2 - mahalla
+// 3 - ko'cha/qishloq
+// 4 - yashovchilar soni
 const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   "new_abonent_request",
   async (ctx) => {
@@ -28,69 +34,107 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         return ctx.scene.leave();
       }
       ctx.wizard.state.inspektor = inspektor;
-      if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
-      if (!isPinfl(ctx.message.text)) {
+
+      if (!isRealPinflValidate(ctx.message.text)) {
         ctx.replyWithPhoto(
           "https://scontent.fbhk1-4.fna.fbcdn.net/v/t39.30808-6/245114763_1689005674643325_574715679907072430_n.jpg?cstp=mx960x540&ctp=s960x540&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=UuAJ9wX9hRUQ7kNvgFH6cIS&_nc_ht=scontent.fbhk1-4.fna&oh=00_AYBErDlZHdtXHYwOa1n9AicX7rhWP63Hkf8COiCnTKAlUw&oe=669E7F35",
           {
             caption: messages.enterReallyPinfl,
-            reply_markup: keyboards.lotin.cancelBtn.resize().reply_markup,
+            reply_markup: keyboards.cancelBtn.reply_markup,
           }
         );
-      } else {
-        const abonent = await Abonent.findOne({
-          pinfl: parseInt(ctx.message.text),
-        });
-        if (abonent && abonent.shaxsi_tasdiqlandi?.confirm) {
-          return ctx.reply(
-            `Ushbu abonentga ${abonent.licshet} hisob raqami ochilgan`
-          );
-        }
-
-        const customDates = await find_one_by_pinfil_from_mvd(ctx.message.text);
-        if (!customDates.success) {
-          return ctx.reply(
-            customDates.message,
-            keyboards.lotin.cancelBtn.resize()
-          );
-        }
-        let filename = "fuqoro" + Date.now() + ".png";
-
-        await ctx.reply(
-          `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
-        );
-        const mahallalar = await Mahalla.find({
-          "biriktirilganNazoratchi.inspactor_id": inspektor.id,
-        });
-        if (mahallalar.length == 0) {
-          return ctx.reply(
-            "Sizga biriktirilgan mahallalar yo'q!",
-            keyboards.lotin.cancelBtn.resize()
-          );
-        }
-        const sortedMahallalar = mahallalar.sort((a, b) =>
-          a.name.localeCompare(b.name)
-        );
-        const buttons = sortedMahallalar.map((mfy) => [
-          Markup.button.callback(mfy.name, "mahalla_" + mfy.id),
-        ]);
-        await ctx.reply("Mahallasini tanlang", Markup.inlineKeyboard(buttons));
-        ctx.wizard.state.customDates = {
-          fullname: kirillga(
-            `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
-          ),
-          pinfl: ctx.message.text,
-          ...customDates,
-        };
-        ctx.wizard.next();
+        return;
       }
+
+      const existAbonent = await Abonent.findOne({
+        pinfl: parseInt(ctx.message.text),
+        "shaxsi_tasdiqlandi.confirm": true,
+      });
+      if (existAbonent) {
+        ctx.reply(
+          `Ushbu abonentga allaqachon ${existAbonent.licshet} hisob raqami ochilgan`
+        );
+        return;
+      }
+
+      const mahallalarButtons = keyboards.nazoratchigaBiriktirilganMahallalar(
+        inspektor.id
+      );
+      if (!mahallalarButtons) {
+        return ctx.reply(
+          "Sizga biriktirilgan mahallalar yo'q!",
+          keyboards.lotin.cancelBtn.resize()
+        );
+      }
+      ctx.wizard.state.mahallalarButtons = mahallalarButtons;
+      const customDates = await find_one_by_pinfil_from_mvd(ctx.message.text);
+      if (!customDates.success) {
+        ctx.reply(customDates.message, keyboards.cancelBtn);
+        return;
+      }
+      customDates.photo = undefined;
+      ctx.wizard.state.customDates = {
+        fullname: `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`,
+        pinfl: ctx.message.text,
+        ...customDates,
+      };
+      // 61206035500020;AD8815043;
+      const houses = await tozaMakonApi.get(
+        "/user-service/houses/pinfl/" + ctx.message.text
+      );
+      await ctx.reply(
+        `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
+      );
+      if (houses.status !== 200) {
+        ctx.reply(
+          houses.data.message ||
+            "Kadastr tizimidan ma'lumotlarni olishda xatolik yuz berdi"
+        );
+        ctx.reply("Mahallani tanlang", Markup.keyboard(mahallalarButtons));
+        ctx.wizard.selectStep(2);
+        return;
+      }
+      if (houses.data.length < 1) {
+        ctx.replyWithHTML(
+          "Ushbu fuqaroga tegishli xonadon (kadastr) yo'q!\n <b>Diqqat xonadon egasi bo'lmagan shaxsga abonent ochish tavsiya etilmaydi</b>"
+        );
+        ctx.reply("Mahallani tanlang", Markup.keyboard(mahallalarButtons));
+        ctx.wizard.selectStep(2);
+        return;
+      }
+      if (houses.data.length == 1) {
+        ctx.reply("Mahallani tanlang", Markup.keyboard(mahallalarButtons));
+        ctx.wizard.state.cadastr = houses.data.cadastr_list[0];
+        ctx.wizard.selectStep(2);
+        return;
+      }
+      const housesButtons = houses.data.cadastr_list.map((cadastr) => [
+        Markup.button.callback(cadastr, "cadastr_" + cadastr),
+      ]);
+      ctx.reply(
+        "Xonadonni kadastr raqamini tanlang",
+        Markup.inlineKeyboard(housesButtons)
+      );
+      ctx.wizard.next();
     } catch (error) {
       console.log(error);
     }
   },
   async (ctx) => {
     try {
-      if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
+      const data = ctx.callbackQuery.data.split("_");
+      if (data[0] !== "cadastr") {
+        throw "bad request";
+      }
+      ctx.wizard.state.cadastr = data[1];
+      ctx.reply("Mahallani tanlang", ctx.wizard.state.mahallalarButtons);
+    } catch (error) {
+      ctx.reply("Noto'g'ri so'rov");
+      console.error(error);
+    }
+  },
+  async (ctx) => {
+    try {
       const session = await CleanCitySession.findOne({ type: "dxsh" });
       const data = ctx.update.callback_query.data;
       if (data.split("_")[0] != "mahalla") {
@@ -136,7 +180,6 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       ctx.wizard.state.street_id = ctx.update.callback_query.data;
       ctx.deleteMessage();
       ctx.reply(
@@ -158,7 +201,6 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       if (!ctx.message)
         return ctx.reply(
           "Yashovchi yoki kiriting",
@@ -209,6 +251,13 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
     }
   }
 );
+
+new_abonent_request_by_pinfl_scene.on("text", (ctx, next) => {
+  if (isCancel(ctx.message.text)) {
+    ctx.reply("Amaliyot bekor qilindi", keyboards.mainKeyboard);
+  }
+  next();
+});
 new_abonent_request_by_pinfl_scene.leave((ctx) =>
   ctx.reply("Bekor qilindi", keyboards.lotin.mainKeyboard.resize())
 );

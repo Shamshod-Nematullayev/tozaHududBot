@@ -37,13 +37,13 @@ app.listen(PORT, async () => {
 });
 
 // telegram bot
-// function useTelegramBot() {
-//   require("./core/bot");
-//   require("./middlewares");
-//   require("./actions");
-//   require("./intervals");
-// }
-// useTelegramBot();
+function useTelegramBot() {
+  require("./core/bot");
+  require("./middlewares");
+  require("./actions");
+  // require("./intervals");
+}
+useTelegramBot();
 // require("./test");
 
 mongoose
