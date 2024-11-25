@@ -15,7 +15,7 @@ const { tozaMakonApi } = require("../../../api/tozaMakon");
 const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {
-  ctx.reply("Xonadon egasining jshshir raqamini kiriting!");
+  ctx.reply("Xonadon egasining PINFL raqamini kiriting!");
 };
 // 0 - jshshir
 // 1 - xonadon kadastr raqami
@@ -57,9 +57,9 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         return;
       }
 
-      const mahallalarButtons = keyboards.nazoratchigaBiriktirilganMahallalar(
-        inspektor.id
-      );
+      const mahallalarButtons =
+        await keyboards.nazoratchigaBiriktirilganMahallalar(inspektor.id);
+
       if (!mahallalarButtons) {
         return ctx.reply(
           "Sizga biriktirilgan mahallalar yo'q!",
@@ -82,28 +82,39 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       const houses = await tozaMakonApi.get(
         "/user-service/houses/pinfl/" + ctx.message.text
       );
+      console.log(houses.data);
       await ctx.reply(
         `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
       );
       if (houses.status !== 200) {
+        console.error(houses.status, houses.data);
         ctx.reply(
           houses.data.message ||
             "Kadastr tizimidan ma'lumotlarni olishda xatolik yuz berdi"
         );
-        ctx.reply("Mahallani tanlang", Markup.keyboard(mahallalarButtons));
+        ctx.reply(
+          "Mahallani tanlang",
+          Markup.inlineKeyboard(mahallalarButtons)
+        );
         ctx.wizard.selectStep(2);
         return;
       }
-      if (houses.data.length < 1) {
-        ctx.replyWithHTML(
+      if (houses.data.cadastr_list.length < 1) {
+        await ctx.replyWithHTML(
           "Ushbu fuqaroga tegishli xonadon (kadastr) yo'q!\n <b>Diqqat xonadon egasi bo'lmagan shaxsga abonent ochish tavsiya etilmaydi</b>"
         );
-        ctx.reply("Mahallani tanlang", Markup.keyboard(mahallalarButtons));
+        ctx.reply(
+          "Mahallani tanlang",
+          Markup.inlineKeyboard(mahallalarButtons)
+        );
         ctx.wizard.selectStep(2);
         return;
       }
-      if (houses.data.length == 1) {
-        ctx.reply("Mahallani tanlang", Markup.keyboard(mahallalarButtons));
+      if (houses.data.cadastr_list.length == 1) {
+        ctx.reply(
+          "Mahallani tanlang",
+          Markup.inlineKeyboard(mahallalarButtons)
+        );
         ctx.wizard.state.cadastr = houses.data.cadastr_list[0];
         ctx.wizard.selectStep(2);
         return;
@@ -127,7 +138,10 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         throw "bad request";
       }
       ctx.wizard.state.cadastr = data[1];
-      ctx.reply("Mahallani tanlang", ctx.wizard.state.mahallalarButtons);
+      ctx.reply(
+        "Mahallani tanlang",
+        Markup.inlineKeyboard(ctx.wizard.state.mahallalarButtons)
+      );
     } catch (error) {
       ctx.reply("Noto'g'ri so'rov");
       console.error(error);
@@ -135,41 +149,44 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      const session = await CleanCitySession.findOne({ type: "dxsh" });
-      const data = ctx.update.callback_query.data;
-      if (data.split("_")[0] != "mahalla") {
-        ctx.reply(
-          "Mahallani tanlamadingiz",
-          keyboards.lotin.cancelBtn.resize()
-        );
-      } else {
-        let streets = await fetch(cc + "ds?DAO=StreetsDAO&ACTION=GETLISTALL", {
-          method: "POST",
-          headers: {
-            accept: "application/json, text/javascript, */*; q=0.01",
-            "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
-            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-            Cookie: session.cookie,
-          },
-          body: `mahallas_id=${data.split("_")[1]}`,
-        });
-        streets = await streets.json();
-        // if(streets.msg === "Session has expired") return
-        streets = streets.rows;
-        let keyboardsArray = [];
-        for (let i = 0; i < streets.length; i++) {
-          const street = streets[i];
-          keyboardsArray.push([Markup.button.callback(street.name, street.id)]);
-        }
-        ctx.deleteMessage();
-        console.log(keyboardsArray);
-        await ctx.reply(
-          "Ko'chani tanlang",
-          Markup.inlineKeyboard(keyboardsArray).oneTime()
-        );
-        ctx.wizard.state.mfy_id = data.split("_")[1];
-        ctx.wizard.next();
+      // mahallani o'zgaruvchiga saqlash
+      const [key, mahallaId] = ctx.update.callback_query.data.split("_");
+      if (key !== "mahalla") {
+        throw "bad request";
       }
+      ctx.deleteMessage();
+      ctx.wizard.state.mahallaId = mahallaId;
+      // tanlangan mahallaga doir qishloqlarni olish
+      let streets = (
+        await tozaMakonApi.get("/user-service/mahallas/streets", {
+          params: {
+            size: 1000,
+            mahallaId,
+          },
+        })
+      ).data;
+      if (streets.length == 1) {
+        ctx.wizard.state.street = streets[0];
+        ctx.reply(
+          "Yashovchi sonini tanlang yoki kiriting",
+          Markup.keyboard([
+            ["1", "2", "3"],
+            ["4", "5", "6"],
+            ["7", "8", "9"],
+          ])
+        );
+        ctx.wizard.selectStep(4);
+        return;
+      }
+      streets = streets.sort((a, b) => a.name.localeCompare(b.name));
+      const streetButtons = streets.map((item) => [
+        Markup.button.callback(item.name, "street_" + item.id),
+      ]);
+      ctx.reply(
+        "Ko'cha yoki qishloqni tanlang",
+        Markup.inlineKeyboard(streetButtons)
+      );
+      ctx.wizard.next();
     } catch (error) {
       ctx.reply(
         "Kutilgan amal bajarilmadi",
@@ -180,10 +197,16 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      ctx.wizard.state.street_id = ctx.update.callback_query.data;
+      //ko'cha yoki qishloqni statega olish
+      const [key, streetId] = ctx.update.callback_query.data.split("_");
+      if (key !== "street") {
+        throw "bad request";
+      }
       ctx.deleteMessage();
+      ctx.wizard.state.street_id = streetId;
+      // yashovchi soni kiritish keyboardini jo'natish
       ctx.reply(
-        "Yashovchi yoki kiriting",
+        "Yashovchi sonini tanlang yoki kiriting",
         Markup.keyboard([
           ["1", "2", "3"],
           ["4", "5", "6"],
@@ -201,9 +224,10 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
+      // yashovchi sonini o'zgaruvchiga saqlash
       if (!ctx.message)
         return ctx.reply(
-          "Yashovchi yoki kiriting",
+          "Yashovchi sonini tanlang yoki kiriting",
           Markup.keyboard([
             ["1", "2", "3"],
             ["4", "5", "6"],
@@ -215,37 +239,106 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           "Yashovchi sonini raqamda kiritish kerak",
           keyboards.lotin.cancelBtn.resize()
         );
-      ctx.wizard.state.yashovchilarSoni = parseInt(ctx.message.text);
-      const abonent = await yangiAbonent({
-        mfy_id: ctx.wizard.state.mfy_id,
-        fish: ctx.wizard.state.customDates.fullname,
-        street_id: ctx.wizard.state.street_id,
-        yashovchi_soni: ctx.message.text,
-        kadastr_number: null,
-        passport_number: `${ctx.wizard.state.customDates.passport_serial}-${ctx.wizard.state.customDates.passport_number}`,
-        pinfl: ctx.wizard.state.customDates.pinfl,
+      if (parseInt(ctx.message.text) > 15)
+        return ctx.reply(
+          "Yashovchi soni 15 dan yuqori bo'lishi mumkin emas. Iltimos tekshib ko'ring"
+        );
+      // bo'sh bo'lgan hisob raqamini olish
+      const generatedAccountNumber = (
+        await tozaMakonApi.get(
+          "/user-service/residents/account-numbers/generate",
+          {
+            params: {
+              residentType: "INDIVIDUAL",
+              mahallaId: ctx.wizard.state.mahallaId,
+            },
+          }
+        )
+      ).data;
+      // passport ma'lumotlarini tizimda ro'yxatdan o'tkazish
+      const passportData = (
+        await tozaMakonApi.get("/user-service/citizens", {
+          params: {
+            passport:
+              ctx.wizard.state.customDates.passport_serial +
+              ctx.wizard.state.customDates.passport_number,
+            pinfl: ctx.wizard.state.customDates.pinfl,
+          },
+        })
+      ).data;
+      // yangi abonent ochish
+      let newAbonent = await tozaMakonApi.post("/user-service/residents", {
+        accountNumber: generatedAccountNumber,
+        active: true,
+        citizen: passportData,
+        companyId: 1144,
+        contractDate: null,
+        contractNumber: null,
+        description:
+          "Added from telegram bot " + ctx.wizard.state.inspektor.name,
+        electricityAccountNumber: null,
+        electricityCoato: null,
+        homePhone: null,
+        house: {
+          cadastralNumber: ctx.wizard.state.cadastr
+            ? ctx.wizard.state.cadastr
+            : "00:00:00:00:00:0000",
+          flatNumber: null,
+          homeIndex: null,
+          homeNumber: 0,
+          inhabitantCnt: ctx.message.text,
+          temporaryCadastralNumber: null,
+          type: "HOUSE",
+        },
+        isCreditor: "false",
+        mahallaId: ctx.wizard.state.mahallaId,
+        nSaldo: 0,
+        residentType: "INDIVIDUAL",
+        streetId: ctx.wizard.state.street_id,
       });
-
-      if (abonent.success) {
-        await NewAbonent.create({
-          abonent_name: ctx.wizard.state.customDates.fullname,
-          licshet: abonent.litschet,
-          mahalla_id: ctx.wizard.state.mfy_id,
-          nazoratchi_id: ctx.wizard.state.inspektor.id,
-        });
-        ctx.replyWithHTML(
-          `Yangi abonent qo'shildi <code>${abonent.litschet}</code>`
-        );
-        // await Abonent.create({user: ctx.from, data: })
-        await ctx.telegram.sendMessage(
-          process.env.NAZORATCHILAR_GURUPPASI,
-          `${ctx.wizard.state.inspektor.name} тизимга янги абонент киритди 👍 <code>${abonent.litschet}</code>`,
-          { parse_mode: "HTML" }
-        );
-        ctx.scene.leave();
-      } else {
-        ctx.reply(abonent.msg);
+      if (newAbonent.status !== 201) {
+        throw new Error("Abonent qo'shishda xatolik yuz berdi");
       }
+      newAbonent = newAbonent.data;
+      // natijani ma'lumotlar bazasiga saqlash, yangi abonentlar va billing abonentlarga
+      await NewAbonent.create({
+        abonent_name: ctx.wizard.state.customDates.fullname,
+        licshet: generatedAccountNumber,
+        mahalla_id: ctx.wizard.state.mahallaId,
+        nazoratchi_id: ctx.wizard.state.inspektor.id,
+        yashovchi_soni: ctx.message.text,
+      });
+      await Abonent.create({
+        createdAt: new Date(),
+        fio: ctx.wizard.state.customDates.fullname,
+        licshet: generatedAccountNumber,
+        mahallas_id: ctx.wizard.state.mahallaId,
+        prescribed_cnt: Number(ctx.message.text),
+        id: newAbonent,
+        kadastr_number: ctx.wizard.state.cadastr,
+        pinfl: ctx.wizard.state.customDates.pinfl,
+        mahalla_name: (
+          await Mahalla.findOne({ id: ctx.wizard.state.mahallaId })
+        ).name,
+        passport_number:
+          ctx.wizard.state.customDates.passport_serial +
+          ctx.wizard.state.customDates.passport_number,
+        streets_id: ctx.wizard.state.street_id,
+        shaxsi_tasdiqlandi: {
+          confirm: true,
+          inspector: ctx.wizard.state.inspektor,
+        },
+      });
+      // so'rov yuborivchiga natijani yetkazish
+      ctx.telegram.sendMessage(
+        process.env.NAZORATCHILAR_GURUPPASI,
+        `${ctx.wizard.state.inspektor.name} тизимга янги абонент киритди 👍 <code>${generatedAccountNumber}</code>`,
+        { parse_mode: "HTML" }
+      );
+      ctx.replyWithHTML(
+        `Yangi abonent qo'shildi <code>${generatedAccountNumber}</code>`
+      );
+      ctx.scene.leave();
     } catch (error) {
       console.log(error);
     }
@@ -255,11 +348,12 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
 new_abonent_request_by_pinfl_scene.on("text", (ctx, next) => {
   if (isCancel(ctx.message.text)) {
     ctx.reply("Amaliyot bekor qilindi", keyboards.mainKeyboard);
+    return ctx.scene.leave();
   }
   next();
 });
 new_abonent_request_by_pinfl_scene.leave((ctx) =>
-  ctx.reply("Bekor qilindi", keyboards.lotin.mainKeyboard.resize())
+  ctx.reply("Yakunlandi", keyboards.lotin.mainKeyboard.resize())
 );
 new_abonent_request_by_pinfl_scene.enter(enterFunc);
 

@@ -39,6 +39,7 @@ const find_one_by_pinfil_from_mvd = async (pinfil) => {
 
     return { ...scp_data[0].entity_details, success: true };
   } catch (error) {
+    console.error(error);
     return {
       success: false,
       message: "Hozirda baza ishlamayapti, keyinroq boshqatdan urinib ko'ring",

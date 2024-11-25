@@ -16,4 +16,6 @@ Kerakli xulosalarni shu yerga yozib boraman
 Abonentlar ma'lumotlarini to'g'rilash bo'yicha reja grafik tuziladi.
 
 1. Yangi abonent qo'shilishi bilan pinfl kiritildi hisobiga o'tishi kerak.
-5. PINFL kiritganlarni hisoblash qaytadan va noto'g'ri kiritganlarni noto'g'ri kiritgan qilib o'chirish. Bunda ballidan kamaytiriladi
+2. PINFL kiritganlarni hisoblash qaytadan va noto'g'ri kiritganlarni noto'g'ri kiritgan qilib o'chirish. Bunda ballidan kamaytiriladi
+
+Orada baza yangilanib ketdi va eski kodlarni yangi bazaga moslashtirib chiqyapman. Sudga chiqarish tizimi hozirda unchalik dolzarb emas, lekin hech kim kafolat bermaydiki bu mavzu yana aktuallashib ketishi mumkin.
