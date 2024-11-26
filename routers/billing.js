@@ -1,18 +1,10 @@
-const enterQaytaHisobAkt = require("../api/cleancity/dxsh/enterQaytaHisobAkt");
-const { enterYashovchiSoniAkt } = require("../api/cleancity/dxsh");
 const { upload, uploadAsBlob } = require("../middlewares/multer");
 const { Mahalla } = require("../models/Mahalla");
 const { Ariza } = require("../models/Ariza");
 const { Counter } = require("../models/Counter");
 const { IncomingDocument } = require("../models/IncomingDocument");
-const cc = `https://cleancity.uz/`;
 const { bot } = require("../core/bot");
 const path = require("path");
-const { getAbonentDXJ } = require("../api/cleancity/dxsh");
-const { getAbonentDataByLicshet } = require("../api/cleancity/dxsh");
-const getAbonents = require("../api/cleancity/dxsh/getAbonents");
-const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
-const { dvaynikUchirish } = require("../api/cleancity/dxsh/dvaynikUchirish");
 const { Abonent } = require("../requires");
 const { tozaMakonApi } = require("../api/tozaMakon");
 const FormData = require("form-data");
@@ -190,69 +182,69 @@ router.post(
   }
 );
 
-router.post("/create-dvaynik-akt", upload.single("file"), async (req, res) => {
-  try {
-    if (Number(req.body.ikkilamchi.tushum) > 0) {
-      const res1 = await enterQaytaHisobAkt({
-        akt_number: req.body.akt_number,
-        comment: `${req.body.haqiqiy.licshet} haqiqiy hisob raqamiga pul ko'chirish`,
-        amount: req.body.ikkilamchi.tushum * -1,
-        filepath: path.join(__dirname, "../uploads/", req.file.filename),
-        licshet: req.body.ikkilamchi.licshet,
-        stack_akts_id: akt_pachka_id.pul_kuchirish,
-      });
-      if (!res1.success) {
-        return res.json({
-          ok: false,
-          message: "Qayta hisob raqamiga pul ko'chirishda xatolik",
-        });
-      }
-      const res2 = await enterQaytaHisobAkt({
-        akt_number: req.body.akt_number,
-        comment: `${req.body.ikkilamchi.licshet} ikkilamchidan hisob raqamiga pul ko'chirish`,
-        amount: req.body.ikkilamchi.tushum,
-        filepath: path.join(__dirname, "../uploads/", req.file.filename),
-        licshet: req.body.haqiqiy.licshet,
-        stack_akts_id: akt_pachka_id.pul_kuchirish,
-      });
-      if (!res2.success) {
-        return res.json({
-          ok: false,
-          message: "Qayta hisob raqamiga pul ko'chirishda xatolik",
-        });
-      }
-    }
+// router.post("/create-dvaynik-akt", upload.single("file"), async (req, res) => {
+//   try {
+//     if (Number(req.body.ikkilamchi.tushum) > 0) {
+//       const res1 = await enterQaytaHisobAkt({
+//         akt_number: req.body.akt_number,
+//         comment: `${req.body.haqiqiy.licshet} haqiqiy hisob raqamiga pul ko'chirish`,
+//         amount: req.body.ikkilamchi.tushum * -1,
+//         filepath: path.join(__dirname, "../uploads/", req.file.filename),
+//         licshet: req.body.ikkilamchi.licshet,
+//         stack_akts_id: akt_pachka_id.pul_kuchirish,
+//       });
+//       if (!res1.success) {
+//         return res.json({
+//           ok: false,
+//           message: "Qayta hisob raqamiga pul ko'chirishda xatolik",
+//         });
+//       }
+//       const res2 = await enterQaytaHisobAkt({
+//         akt_number: req.body.akt_number,
+//         comment: `${req.body.ikkilamchi.licshet} ikkilamchidan hisob raqamiga pul ko'chirish`,
+//         amount: req.body.ikkilamchi.tushum,
+//         filepath: path.join(__dirname, "../uploads/", req.file.filename),
+//         licshet: req.body.haqiqiy.licshet,
+//         stack_akts_id: akt_pachka_id.pul_kuchirish,
+//       });
+//       if (!res2.success) {
+//         return res.json({
+//           ok: false,
+//           message: "Qayta hisob raqamiga pul ko'chirishda xatolik",
+//         });
+//       }
+//     }
 
-    const response = await dvaynikUchirish({
-      ikkilamchi_id: req.body.ikkilamchi.id,
-      filepath: path.join(__dirname, "../uploads/", req.file.filename),
-      stack_akts_id: akt_pachka_id.dvaynik,
-    });
+//     const response = await dvaynikUchirish({
+//       ikkilamchi_id: req.body.ikkilamchi.id,
+//       filepath: path.join(__dirname, "../uploads/", req.file.filename),
+//       stack_akts_id: akt_pachka_id.dvaynik,
+//     });
 
-    if (!response.success) {
-      return res.json({ ok: false, message: response.message });
-    }
-    if (req.body.ariza_id) {
-      const ariza = await Ariza.findByIdAndUpdate(req.body.ariza_id, {
-        $set: {
-          status: "tasdiqlangan",
-          akt_pachka_id: akt_pachka_id.dvaynik,
-          akt_id: response.akt_id,
-          aktInfo: { akt_number: req.body.akt_number },
-          akt_date: new Date(),
-        },
-      });
-      return res.json({
-        ok: true,
-        ariza,
-      });
-    }
-    return res.json({ ok: true, message: response.message });
-  } catch (err) {
-    console.error(err);
-    res.json({ ok: false, message: "Internal server error 500" });
-  }
-});
+//     if (!response.success) {
+//       return res.json({ ok: false, message: response.message });
+//     }
+//     if (req.body.ariza_id) {
+//       const ariza = await Ariza.findByIdAndUpdate(req.body.ariza_id, {
+//         $set: {
+//           status: "tasdiqlangan",
+//           akt_pachka_id: akt_pachka_id.dvaynik,
+//           akt_id: response.akt_id,
+//           aktInfo: { akt_number: req.body.akt_number },
+//           akt_date: new Date(),
+//         },
+//       });
+//       return res.json({
+//         ok: true,
+//         ariza,
+//       });
+//     }
+//     return res.json({ ok: true, message: response.message });
+//   } catch (err) {
+//     console.error(err);
+//     res.json({ ok: false, message: "Internal server error 500" });
+//   }
+// });
 
 router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
   try {

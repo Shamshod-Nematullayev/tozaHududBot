@@ -1,16 +1,7 @@
-const {
-  getAllMails,
-  getOneMailById,
-  createMail,
-} = require("../api/hybrid.pochta.uz/");
-const { tozaMakonApi } = require("../api/tozaMakon");
 const { NOTIFICATIONS_CHANNEL_ID } = require("../constants");
 const {
   nazoratchilarKunlikTushum,
 } = require("../intervals/nazoratchilarKunlikTushum");
-const {
-  mfyIncomeReport,
-} = require("../middlewares/scene/adminActions/cleancity/dxsh/mfyIncomeReport");
 const { Notification } = require("../models/Notification");
 const {
   // node modules
@@ -20,9 +11,7 @@ const {
   htmlPDF,
   ejs,
   // required functions
-  fetchEcoTranzaksiyalar,
   drawDebitViloyat,
-  yashovchiSoniKopaytirish,
   find_address_by_pinfil_from_mvd,
   getAbonentCardHtml,
   // telegraf resourses
@@ -32,12 +21,10 @@ const {
   messages,
   // mongo models
   Admin,
-  CleanCitySession,
   Counter,
   Guvohnoma,
   Abonent,
   Bildirishnoma,
-  MultiplyRequest,
 } = require("./../requires");
 
 // small required functions =========================================================================
@@ -99,28 +86,10 @@ composer.command("admin", async (ctx) => {
   if (admins.length === 0) ctx.scene.enter("newAdmin");
 });
 
-composer.action("mfy_income_report", async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-  mfyIncomeReport(ctx);
-});
-
 composer.hears(["👨‍💻 Ish maydoni", "👨‍💻 Иш майдони"], async (ctx) => {
   if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 
   ctx.reply(messages.chooseMenu, keyboards[ctx.session.til].adminWorkSpace);
-});
-
-composer.action("CHARGE_VILOYAT_LOGIN", async (ctx) => {
-  await ctx.deleteMessage();
-  const session = await CleanCitySession.findOne({
-    type: "stm_reports",
-  });
-  if (!session) {
-    ctx.scene.enter("login_clean_city_viloyat");
-  } else {
-    ctx.session.session_type = "stm_reports";
-    ctx.scene.enter("recover_clean_city_session");
-  }
 });
 
 composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {

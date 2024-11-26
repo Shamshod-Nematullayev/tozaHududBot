@@ -9,17 +9,6 @@ const ejs = require("ejs");
 // required functions
 const { fetchEcoTranzaksiyalar } = require("./middlewares/fetchEcopay");
 const { find_address_by_pinfil_from_mvd } = require("./api/mvd-pinfil");
-const getAbonentCardHtml = require("./api/cleancity/dxsh/getAbonentCardHTML");
-const getAbonentSaldoData = require("./api/cleancity/dxsh/getAbonentSaldoData");
-const {
-  drawDebitViloyat,
-} = require("./middlewares/scene/adminActions/cleancity/viloyat/toSendDebitorReport");
-const {
-  yashovchiSoniKopaytirish,
-} = require("./middlewares/scene/adminActions/cleancity/dxsh/yashovchiSoniKopaytirish");
-const {
-  changeAbonentDates,
-} = require("./api/cleancity/dxsh/changeAbonentDatas");
 
 // telegraf resources
 const { Composer } = require("telegraf");
@@ -48,12 +37,7 @@ module.exports = {
   ejs,
   // required functions
   fetchEcoTranzaksiyalar,
-  drawDebitViloyat,
-  yashovchiSoniKopaytirish,
   find_address_by_pinfil_from_mvd,
-  getAbonentCardHtml,
-  getAbonentSaldoData,
-  changeAbonentDates,
   // telegraf resourses
   Composer,
   bot,

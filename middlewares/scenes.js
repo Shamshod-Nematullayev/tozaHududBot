@@ -15,7 +15,7 @@ const {
 } = require("./scene/adminActions/completeGuvohnoma");
 const importPlanForInspectors = require("./scene/adminActions/importPlanForInspectors");
 const { connectPhoneNumber } = require("./scene/userScenes/connectPhoneNumber");
-const { importAbonentsScene } = require("./scene/adminActions/importAbonents");
+// const { importAbonentsScene } = require("./scene/adminActions/importAbonents");
 const { generateSBuyruq } = require("./scene/adminActions/generateSudBuyruq");
 const {
   connect_mfy_tg_group_scene,
@@ -23,16 +23,6 @@ const {
 const {
   generateSavdoSanoatAriza,
 } = require("./scene/adminActions/generateSavdoSanoatAriza");
-const { loginCleanCityScene } = require("./scene/adminActions/cleancity/login");
-const {
-  recoverCleanCitySession,
-} = require("./scene/adminActions/cleancity/recoverSession");
-const {
-  loginCleanCityViloyatScene,
-} = require("./scene/adminActions/cleancity/viloyat/login");
-const {
-  new_abonent_by_pinfl_scene,
-} = require("./scene/adminActions/newAbonentByPinfl");
 const {
   personConfirm,
 } = require("./scene/adminActions/addNotificationPersonConfirm");
@@ -48,15 +38,6 @@ const {
   generateProkuraturaSudAriza,
 } = require("./scene/adminActions/generateProkraturaSudAriza");
 const {
-  exportAbonentCards,
-} = require("./scene/adminActions/exportAbonentCardsZip");
-const {
-  exportWarningLettersZip,
-} = require("./scene/adminActions/exportWarningLettersZip");
-const {
-  importAlertLetters,
-} = require("./scene/adminActions/cleancity/dxsh/importAlertLetter");
-const {
   pochtaHarajatiniTekshirishScene,
 } = require("./scene/adminActions/pochtaHarajatlariniTekshirish");
 const {
@@ -68,12 +49,9 @@ const {
 const {
   vaqtinchalikFunc,
 } = require("./scene/adminActions/vaqtinchalikFunksiya");
-const {
-  set_monthly_plan,
-} = require("./scene/adminActions/cleancity/viloyat/setMonthlyPlan");
-const {
-  sendWarningLettersByHybrid,
-} = require("./scene/adminActions/sendWarningLettersByHybrid");
+// const {
+//   sendWarningLettersByHybrid,
+// } = require("./scene/adminActions/sendWarningLettersByHybrid");
 const { updateElektrKod } = require("./scene/userScenes/updateElektrKod");
 const {
   changeAbonentStreet,
@@ -90,29 +68,21 @@ const stage = new Scenes.Stage([
   confirmGuvohnomaScene,
   importPlanForInspectors,
   connectPhoneNumber,
-  importAbonentsScene,
+  // importAbonentsScene,
   generateSBuyruq,
   connect_mfy_tg_group_scene,
   generateSavdoSanoatAriza,
-  loginCleanCityScene,
-  loginCleanCityViloyatScene,
-  recoverCleanCitySession,
-  new_abonent_by_pinfl_scene,
   personConfirm,
   userToInspektor,
   updateAbonentDatesByPinfl,
   getSudMaterial,
   ommaviyShartnomaBiriktirish,
   generateProkuraturaSudAriza,
-  exportAbonentCards,
-  exportWarningLettersZip,
-  importAlertLetters,
   pochtaHarajatiniTekshirishScene,
   new_abonent_request_by_pinfl_scene,
   sudBuyruqlariYaratish,
-  set_monthly_plan,
   vaqtinchalikFunc,
-  sendWarningLettersByHybrid,
+  // sendWarningLettersByHybrid,
   updateElektrKod,
   changeAbonentStreet,
 ]);

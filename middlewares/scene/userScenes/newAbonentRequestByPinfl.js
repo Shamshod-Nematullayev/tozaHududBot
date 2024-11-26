@@ -2,16 +2,14 @@ const { Scenes, Markup } = require("telegraf");
 const { find_one_by_pinfil_from_mvd } = require("../../../api/mvd-pinfil");
 const isCancel = require("../../smallFunctions/isCancel");
 const isRealPinflValidate = require("../../smallFunctions/isPinfl");
-const { CleanCitySession } = require("../../../models/CleanCitySession");
-const { kirillga } = require("../../smallFunctions/lotinKiril");
-const { yangiAbonent } = require("../adminActions/cleancity/dxsh/yangiAbonent");
 const { messages } = require("../../../lib/messages");
-const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
+const { keyboards } = require("../../../lib/keyboards");
 const { Abonent } = require("../../../models/Abonent");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { Mahalla } = require("../../../models/Mahalla");
 const { NewAbonent } = require("../../../models/NewAbonents");
 const { tozaMakonApi } = require("../../../api/tozaMakon");
+const { Admin } = require("../../../requires");
 const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {
@@ -26,8 +24,9 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   "new_abonent_request",
   async (ctx) => {
     try {
+      const admin = await Admin.findOne({ user_id: ctx.from.id });
       const inspektor = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
-      if (!inspektor) {
+      if (!inspektor && !admin) {
         ctx.reply(
           "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!"
         );
@@ -57,8 +56,9 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         return;
       }
 
-      const mahallalarButtons =
-        await keyboards.nazoratchigaBiriktirilganMahallalar(inspektor.id);
+      const mahallalarButtons = admin
+        ? await keyboards.nazoratchigaBiriktirilganMahallalar()
+        : await keyboards.nazoratchigaBiriktirilganMahallalar(inspektor.id);
 
       if (!mahallalarButtons) {
         return ctx.reply(
@@ -142,6 +142,8 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         "Mahallani tanlang",
         Markup.inlineKeyboard(ctx.wizard.state.mahallalarButtons)
       );
+      ctx.deleteMessage();
+      ctx.wizard.next();
     } catch (error) {
       ctx.reply("Noto'g'ri so'rov");
       console.error(error);

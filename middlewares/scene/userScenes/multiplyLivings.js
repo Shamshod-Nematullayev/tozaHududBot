@@ -1,33 +1,32 @@
-const { Scenes, Markup } = require("telegraf");
+const { Scenes } = require("telegraf");
 const { keyboards } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
 const { MultiplyRequest } = require("../../../models/MultiplyRequest");
 const isCancel = require("../../smallFunctions/isCancel");
 const { Abonent } = require("../../../models/Abonent");
+const { tozaMakonApi } = require("../../../api/tozaMakon");
 
 const multiplyLivingsScene = new Scenes.WizardScene(
   "multiply_livings",
   async (ctx) => {
     try {
-      if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
-      if (isNaN(ctx.message.text))
-        return ctx.reply(
-          messages.enterOnlyNumber,
-          keyboards[ctx.session.til].cancelBtn.resize()
-        );
+      // validate
       if (ctx.message.text.length != 12)
         return ctx.reply(
           messages.enterFullNamber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
-
+      // main logic
       const abonent = await Abonent.findOne({ licshet: ctx.message.text });
-
       if (!abonent) {
         return ctx.reply(messages.abonentNotFound);
       }
-
-      ctx.wizard.state.abonent = abonent;
+      ctx.wizard.state.abonent = {
+        id: abonent.id,
+        fio: abonent.fio,
+        mahalla_name: abonent.mahalla_name,
+        mfy_id: abonent.mahallas_id,
+      };
       ctx.wizard.state.KOD = ctx.message.text;
       ctx.replyWithHTML(
         `<b>${abonent.fio}</b> ${abonent.mahalla_name} MFY\n` +
@@ -42,41 +41,25 @@ const multiplyLivingsScene = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      if (isCancel(ctx.message.text)) return ctx.scene.leave();
-      if (isNaN(ctx.message.text)) {
-        ctx.reply(
-          messages.enterYashovchiSoni,
-          keyboards[ctx.session.til].cancelBtn.resize()
-        );
-      } else {
-        ctx.scene.state.YASHOVCHILAR = parseInt(ctx.message.text);
-        const { abonent, ...states } = ctx.wizard.state;
-        const request = new MultiplyRequest({
-          ...states,
-          date: Date.now(),
-          from: ctx.from,
-          abonent: {
-            id: abonent.id,
-            fio: abonent.fio,
-            mahalla_name: abonent.mahalla_name,
-            mfy_id: abonent.mahallas_id,
-          },
-        });
-        await request.save();
-        ctx.reply(messages.accepted);
-        ctx.telegram.sendMessage(
-          process.env.CHANNEL,
-          `#yashovchisoni by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>\n<code>${ctx.wizard.state.abonent.licshet}</code>\n${ctx.message.text} kishi`,
-          {
-            parse_mode: "HTML",
-            reply_markup: Markup.inlineKeyboard([
-              [Markup.button.callback("✅✅✅", "done_" + request._id)],
-            ]).reply_markup,
-            disable_web_page_preview: true,
-          }
-        );
-        ctx.scene.leave();
-      }
+      const abonentData = (
+        await tozaMakonApi.get(
+          "/user-service/residents/" + ctx.wizard.state.abonent.id
+        )
+      ).data;
+      if (abonentData.house.inhabitantCnt >= parseInt(ctx.message.text))
+        return ctx.reply("yashovchi soni joriy holatdan koʻra katta emas!");
+
+      ctx.scene.state.YASHOVCHILAR = parseInt(ctx.message.text);
+      const { abonent, ...states } = ctx.wizard.state;
+      const request = new MultiplyRequest({
+        ...states,
+        date: Date.now(),
+        from: ctx.from,
+        abonent,
+      });
+      await request.save();
+      ctx.reply(messages.accepted);
+      ctx.scene.leave();
     } catch (error) {
       console.log(error);
     }
@@ -87,6 +70,16 @@ multiplyLivingsScene.enter((ctx) => {
     messages.enterAbonentKod,
     keyboards[ctx.session.til].cancelBtn.resize()
   );
+});
+multiplyLivingsScene.on("text", (ctx, next) => {
+  if (isCancel(ctx.message?.text)) {
+    ctx.scene.leave();
+    return;
+  }
+  if (isNaN(ctx.message.text)) {
+    return ctx.reply(messages.enterYashovchiSoni, keyboards.cancelBtn);
+  }
+  next();
 });
 multiplyLivingsScene.leave((ctx) => {
   ctx.reply(
