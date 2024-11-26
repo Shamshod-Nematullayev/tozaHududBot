@@ -55,7 +55,10 @@ const multiplyLivingsScene = new Scenes.WizardScene(
         ...states,
         date: Date.now(),
         from: ctx.from,
-        abonent,
+        abonentId: abonent.id,
+        mahallaId: abonent.mfy_id,
+        fio: abonent.fio,
+        mahallaName: abonent.mahalla_name,
       });
       await request.save();
       ctx.reply(messages.accepted);

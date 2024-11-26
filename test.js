@@ -1,6 +1,6 @@
 const { tozaMakonApi } = require("./api/tozaMakon");
 const { EtkKodRequest } = require("./models/EtkKodRequest");
-const { Abonent, Nazoratchi } = require("./requires");
+const { Abonent, Nazoratchi, MultiplyRequest } = require("./requires");
 
 async () => {
   const abonents = await EtkKodRequest.find();

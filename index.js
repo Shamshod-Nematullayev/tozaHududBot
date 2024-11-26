@@ -4,7 +4,7 @@ if (!process.env.SECRET_JWT_KEY) {
   console.error("SECRET_JWT_KEY environment variable is not defined");
   process.exit(1);
 }
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+// process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 const { default: mongoose } = require("mongoose");
 const express = require("express");
 const app = express();
@@ -27,6 +27,11 @@ app.use("/api/inspectors", isAuth, require("./routers/inspectorsRouter"));
 app.use("/api/abonents", isAuth, require("./routers/abonentsRouter"));
 app.use("/api/billing", isAuth, require("./routers/billing"));
 app.use("/api/arizalar", isAuth, require("./routers/arizalarRouter"));
+app.use(
+  "/api/yashovchi-soni-xatlov",
+  isAuth,
+  require("./routers/yashovchiSoniXatlov")
+);
 process.on("warning", (warning) => {
   console.warn(warning.stack);
 });
@@ -44,7 +49,7 @@ function useTelegramBot() {
   // require("./intervals");
 }
 useTelegramBot();
-// require("./test");
+require("./test");
 
 mongoose
   .connect(process.env.MONGO)

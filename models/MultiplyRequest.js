@@ -6,7 +6,10 @@ const schema = new mongoose.Schema({
   date: Date,
   from: Object,
   confirm: Boolean,
-  abonent: Object,
+  mahallaId: String,
+  abonentId: String,
+  mahallaName: String,
+  fio: String,
 });
 
 const MultiplyRequest = mongoose.model("multipy_request", schema);
