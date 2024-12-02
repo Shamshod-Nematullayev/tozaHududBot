@@ -1,13 +1,13 @@
-const { upload, uploadAsBlob } = require("../middlewares/multer");
+const { uploadAsBlob } = require("../middlewares/multer");
 const { Mahalla } = require("../models/Mahalla");
 const { Ariza } = require("../models/Ariza");
 const { Counter } = require("../models/Counter");
 const { IncomingDocument } = require("../models/IncomingDocument");
 const { bot } = require("../core/bot");
-const path = require("path");
 const { Abonent } = require("../requires");
 const { tozaMakonApi } = require("../api/tozaMakon");
 const FormData = require("form-data");
+const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const akt_pachka_id = {
   viza: "4444086",
   odam_soni: "4443772",

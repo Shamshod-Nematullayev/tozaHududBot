@@ -50,3 +50,14 @@ async () => {
   }
   loop();
 }; //();
+
+async () => {
+  const datas = await MultiplyRequest.find();
+  for (const [i, data] of datas.entries()) {
+    // for...of bilan navbatma-navbat ishlash
+    if (data.YASHOVCHILAR <= data.currentInhabitantCount) {
+      console.log(i);
+      await data.deleteOne(); // Asinxron operatsiya
+    }
+  }
+}; //();

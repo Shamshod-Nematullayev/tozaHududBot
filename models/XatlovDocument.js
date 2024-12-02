@@ -5,7 +5,7 @@ const schema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  abonents: {
+  request_ids: {
     type: Array,
     default: [],
     required: true,

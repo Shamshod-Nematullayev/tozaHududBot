@@ -55,7 +55,7 @@ const ADMIN_ACTIONS = [
   "confirm_game_over",
   "generate_alert_letter",
   "add_notification",
-  "new_abonent",
+  // "new_abonent",
   "shaxsi_tashdiqlandi_bildirish_xati",
   "user_to_inspektor",
   "get_sud_material",

@@ -1,46 +1,82 @@
 const nodeHtmlToImage = require("node-html-to-image");
-const { getTransactionMFY } = require("../api/ekopay.uz/getTransactionsMFY");
 const { Mahalla } = require("../models/Mahalla");
 const ejs = require("ejs");
 const { bot } = require("../requires");
+const { tozaMakonApi } = require("../api/tozaMakon");
+const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
-async function sendMFYIncomeReport(ctx = false) {
+async function sendMFYIncomeReport(ctx = false, companyId = 1144) {
   try {
-    const incomesFromEkopay = await getTransactionMFY();
-    const mahallalar = await Mahalla.find();
-    const datas = [];
+    console.log("FIRE");
     const now = new Date();
-    mahallalar.forEach((mahalla) => {
-      const row = incomesFromEkopay.find((a) => a.id == mahalla.id);
-      if (mahalla?.reja > 0) {
-        datas.push({
-          id: mahalla.id,
-          xisoblandi: mahalla.reja,
-          name: mahalla.name,
-          tushum: row ? Number(row.all_transactions_sum) : 0,
-          nazoratchi: mahalla.biriktirilganNazoratchi,
-        });
-      }
+    const incomesFromEkopay = (
+      await tozaMakonApi.get(
+        "/billing-service/reports/payment-partners/incomes",
+        {
+          params: {
+            reportType: "MAHALLA",
+            companyId: companyId, // hozircha hard kod
+            regionId: 5,
+            districtId: 47,
+            fromDate: formatDate(
+              new Date(now.getFullYear(), now.getMonth(), 1)
+            ),
+            toDate: formatDate(now),
+          },
+        }
+      )
+    ).data;
+
+    let allAccrual = 0;
+    let allTransactionAmount = 0;
+    const sana = `${now.getDate()} ${
+      now.getMonth() + 1
+    } ${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`;
+    let mahallas = (
+      await tozaMakonApi.get("/billing-service/reports/mfa-16", {
+        params: {
+          companyId: companyId,
+          regionId: 5,
+          districtId: 47,
+          dateFrom: formatDate(new Date(now.getFullYear(), now.getMonth(), 1)),
+          dateTo: formatDate(now),
+          period: `${now.getMonth() + 1}.${now.getFullYear()}`,
+        },
+      })
+    ).data;
+    mahallas = mahallas.map((mfy) => {
+      allAccrual += mfy.totalAccrual;
+      allTransactionAmount += incomesFromEkopay.find(
+        (item) => item.id == mfy.id
+      ).partnerTransactions[3].transactionAmount;
+      return {
+        id: mfy.id,
+        xisoblandi: mfy.totalAccrual,
+        name: kirillga(mfy.name.split("(")[0]),
+        tushum: incomesFromEkopay.find((item) => item.id == mfy.id)
+          .partnerTransactions[3].transactionAmount,
+      };
     });
-    // Tayyor array bilan hisobotni chizish
-    let jamiXisoblandi = 0;
-    let jamiTushum = 0;
-    datas.sort(
+    mahallas = mahallas.filter((item) => item.xisoblandi);
+    mahallas.sort(
       (a, b) =>
         parseFloat(b.tushum / b.xisoblandi) -
         parseFloat(a.tushum / a.xisoblandi)
     );
-    datas.forEach((mfy) => {
-      jamiXisoblandi += mfy.xisoblandi;
-      jamiTushum += mfy.tushum;
-    });
-    const sana = `${now.getDate()} ${
-      now.getMonth() + 1
-    } ${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`;
-
     ejs.renderFile(
       "./views/mfyIncome.ejs",
-      { data: datas, jamiTushum, jamiXisoblandi, sana },
+      {
+        data: mahallas,
+        jamiTushum: allTransactionAmount,
+        jamiXisoblandi: allAccrual,
+        sana,
+      },
       {},
       async (err, res) => {
         if (err) throw err;
@@ -75,8 +111,8 @@ setInterval(() => {
   const hour = now.getHours();
   const minut = now.getMinutes();
   if (minut === 0) {
-    // if (hour == 9 || hour == 10 || hour == 13 || hour == 16 || hour == 17) {
-    sendMFYIncomeReport();
-    // }
+    if (hour == 9 || hour == 12 || hour == 17) {
+      sendMFYIncomeReport();
+    }
   }
 }, 1000 * 60);

@@ -1,7 +1,7 @@
 // require("./yuqoriQarzdorliklar");
 // require("./cleanCitySessionSaver");
 // require("./updateArizalarStatus");
-// require("./sendMFYIncomeReport");
+require("./sendMFYIncomeReport");
 // require("./sendPinflMfyReport");
 // require("./kunlikEtkReports");
 // require("./kunlikPinflReports");
