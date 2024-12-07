@@ -49,7 +49,7 @@ function useTelegramBot() {
   require("./intervals");
 }
 useTelegramBot();
-require("./test");
+// require("./test");
 
 mongoose
   .connect(process.env.MONGO)

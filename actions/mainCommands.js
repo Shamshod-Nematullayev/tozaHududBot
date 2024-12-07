@@ -127,8 +127,12 @@ const actions = [
 
 actions.forEach((action) => {
   composer.action(action, (ctx) => {
-    ctx.scene.enter(action);
-    ctx.deleteMessage();
+    try {
+      ctx.scene.enter(action);
+      ctx.deleteMessage();
+    } catch (error) {
+      console.error(error);
+    }
   });
 });
 

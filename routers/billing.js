@@ -9,11 +9,11 @@ const { tozaMakonApi } = require("../api/tozaMakon");
 const FormData = require("form-data");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const akt_pachka_id = {
-  viza: "4444086",
-  odam_soni: "4443772",
-  dvaynik: "",
-  pul_kuchirish: "4444112",
-  death: "4444111",
+  viza: "4444946",
+  odam_soni: "4444949",
+  dvaynik: "4444950",
+  pul_kuchirish: "4445046",
+  death: "4444947",
   boshqa: "4444109",
 };
 
@@ -109,25 +109,6 @@ router.post(
             ? { inhabitantCount: next_inhabitant_count }
             : {};
         const date = new Date();
-        console.log({
-          actPackId: document_type
-            ? akt_pachka_id[document_type]
-            : akt_pachka_id.boshqa,
-          actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
-          amount: Math.abs(akt_sum),
-          amountWithQQS: 0,
-          amountWithoutQQS: Math.abs(akt_sum),
-          description,
-          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          fileId:
-            fileUploadResponse.data.fileName +
-            "*" +
-            fileUploadResponse.data.fileId,
-          kSaldo: calculateKSaldo,
-          residentId: abonent.id,
-          ...inhabitantCounts,
-        });
         const aktResponse = await tozaMakonApi.post("/billing-service/acts", {
           actPackId: document_type
             ? akt_pachka_id[document_type]
@@ -182,69 +163,144 @@ router.post(
   }
 );
 
-// router.post("/create-dvaynik-akt", upload.single("file"), async (req, res) => {
-//   try {
-//     if (Number(req.body.ikkilamchi.tushum) > 0) {
-//       const res1 = await enterQaytaHisobAkt({
-//         akt_number: req.body.akt_number,
-//         comment: `${req.body.haqiqiy.licshet} haqiqiy hisob raqamiga pul ko'chirish`,
-//         amount: req.body.ikkilamchi.tushum * -1,
-//         filepath: path.join(__dirname, "../uploads/", req.file.filename),
-//         licshet: req.body.ikkilamchi.licshet,
-//         stack_akts_id: akt_pachka_id.pul_kuchirish,
-//       });
-//       if (!res1.success) {
-//         return res.json({
-//           ok: false,
-//           message: "Qayta hisob raqamiga pul ko'chirishda xatolik",
-//         });
-//       }
-//       const res2 = await enterQaytaHisobAkt({
-//         akt_number: req.body.akt_number,
-//         comment: `${req.body.ikkilamchi.licshet} ikkilamchidan hisob raqamiga pul ko'chirish`,
-//         amount: req.body.ikkilamchi.tushum,
-//         filepath: path.join(__dirname, "../uploads/", req.file.filename),
-//         licshet: req.body.haqiqiy.licshet,
-//         stack_akts_id: akt_pachka_id.pul_kuchirish,
-//       });
-//       if (!res2.success) {
-//         return res.json({
-//           ok: false,
-//           message: "Qayta hisob raqamiga pul ko'chirishda xatolik",
-//         });
-//       }
-//     }
+router.post(
+  "/create-dvaynik-akt-by-ariza",
+  uploadAsBlob.single("file"),
+  async (req, res) => {
+    try {
+      const { ariza_id, akt_sum } = req.body;
+      const ariza = await Ariza.findById(ariza_id);
+      const abonent = await Abonent.findOne({ licshet: ariza.licshet });
+      const fake_account = await Abonent.findOne({
+        licshet: ariza.ikkilamchi_licshet,
+      });
+      const date = new Date();
+      // upload file to billing service
+      const formData = new FormData();
+      formData.append("file", req.file.buffer, req.file.originalname);
+      const fileUploadResponse = await tozaMakonApi.post(
+        "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-//     const response = await dvaynikUchirish({
-//       ikkilamchi_id: req.body.ikkilamchi.id,
-//       filepath: path.join(__dirname, "../uploads/", req.file.filename),
-//       stack_akts_id: akt_pachka_id.dvaynik,
-//     });
+      if (akt_sum > 0) {
+        // monay transfer to real account
+        const calculateKSaldo = (
+          await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+            params: {
+              amount: Math.abs(akt_sum),
+              residentId: abonent.id,
+              actPackId: akt_pachka_id.pul_kuchirish,
+              actType: "CREDIT",
+            },
+          })
+        ).data;
+        (
+          await tozaMakonApi.post("/billing-service/acts", {
+            actPackId: akt_pachka_id.pul_kuchirish,
+            actType: "CREDIT",
+            amount: Math.abs(akt_sum),
+            amountWithQQS: 0,
+            amountWithoutQQS: Math.abs(akt_sum),
+            description: `${ariza.ikkilamchi_licshet} ikkilamchi hisob raqamidan pul ko'chirish`,
+            endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+            startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+            fileId:
+              fileUploadResponse.data.fileName +
+              "*" +
+              fileUploadResponse.data.fileId,
+            kSaldo: calculateKSaldo,
+            residentId: abonent.id,
+          })
+        ).data;
+        // monay transfer from fake account
+        const calculateKSaldo2 = (
+          await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+            params: {
+              amount: Math.abs(akt_sum),
+              residentId: abonent.id,
+              actPackId: akt_pachka_id.pul_kuchirish,
+              actType: "DEBIT",
+            },
+          })
+        ).data;
+        (
+          await tozaMakonApi.post("/billing-service/acts", {
+            actPackId: akt_pachka_id.pul_kuchirish,
+            actType: "DEBIT",
+            amount: Math.abs(akt_sum),
+            amountWithQQS: 0,
+            amountWithoutQQS: Math.abs(akt_sum),
+            description: `${fake_account.licshet} haqiqiy hisob raqamiga pul ko'chirish`,
+            endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+            startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+            fileId:
+              fileUploadResponse.data.fileName +
+              "*" +
+              fileUploadResponse.data.fileId,
+            kSaldo: calculateKSaldo2,
+            residentId: abonent.id,
+          })
+        ).data;
+      }
 
-//     if (!response.success) {
-//       return res.json({ ok: false, message: response.message });
-//     }
-//     if (req.body.ariza_id) {
-//       const ariza = await Ariza.findByIdAndUpdate(req.body.ariza_id, {
-//         $set: {
-//           status: "tasdiqlangan",
-//           akt_pachka_id: akt_pachka_id.dvaynik,
-//           akt_id: response.akt_id,
-//           aktInfo: { akt_number: req.body.akt_number },
-//           akt_date: new Date(),
-//         },
-//       });
-//       return res.json({
-//         ok: true,
-//         ariza,
-//       });
-//     }
-//     return res.json({ ok: true, message: response.message });
-//   } catch (err) {
-//     console.error(err);
-//     res.json({ ok: false, message: "Internal server error 500" });
-//   }
-// });
+      // ikkilamchi hisob raqamini o'chirish kodlari
+      const calculateAmount = (
+        await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
+          params: {
+            actPackId: akt_pachka_id.dvaynik,
+            residentId: abonent.id,
+            inhabitantCount: 0,
+            kSaldo: 0,
+            endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+            startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          },
+        })
+      ).data;
+      const dvaynikAkt = (
+        await tozaMakonApi.post("/billing-service/acts", {
+          actPackId: akt_pachka_id.dvaynik,
+          actType: "CREDIT",
+          amount: calculateAmount.amount,
+          amountWithQQS: 0,
+          amountWithoutQQS: calculateAmount.amount,
+          description: `ikkilamchi hisob raqamini o'chirish`,
+          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          fileId:
+            fileUploadResponse.data.fileName +
+            "*" +
+            fileUploadResponse.data.fileId,
+          kSaldo: calculateAmount.kSaldo,
+          residentId: abonent.id,
+          inhabitantCount: 0,
+        })
+      ).data;
+
+      await ariza.updateOne({
+        $set: {
+          status: "akt_kiritilgan",
+          akt_pachka_id: akt_pachka_id.dvaynik,
+          akt_id: dvaynikAkt.akt_id,
+          aktInfo: dvaynikAkt,
+          akt_date: new Date(),
+        },
+      });
+      return res.json({
+        ok: true,
+        message: "muvaffaqqiyatli akt qilindi",
+      });
+    } catch (err) {
+      console.error(err);
+      res.json({ ok: false, message: "Internal server error 500" });
+    }
+  }
+);
 
 router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
   try {

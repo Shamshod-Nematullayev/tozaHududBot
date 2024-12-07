@@ -49,12 +49,12 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         pinfl: parseInt(ctx.message.text),
         "shaxsi_tasdiqlandi.confirm": true,
       });
-      if (existAbonent) {
-        ctx.reply(
-          `Ushbu abonentga allaqachon ${existAbonent.licshet} hisob raqami ochilgan`
-        );
-        return;
-      }
+      // if (existAbonent) {
+      //   ctx.reply(
+      //     `Ushbu abonentga allaqachon ${existAbonent.licshet} hisob raqami ochilgan`
+      //   );
+      //   return;
+      // }
 
       const mahallalarButtons = admin
         ? await keyboards.nazoratchigaBiriktirilganMahallalar()
@@ -86,7 +86,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       await ctx.reply(
         `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
       );
-      if (houses.status !== 200) {
+      if (houses.status !== 200 || !houses.data.cadastr_list) {
         console.error(houses.status, houses.data);
         ctx.reply(
           houses.data.message ||
@@ -298,7 +298,8 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         residentType: "INDIVIDUAL",
         streetId: ctx.wizard.state.street_id,
       });
-      if (newAbonent.status !== 201) {
+      if (!newAbonent || newAbonent.status !== 201) {
+        ctx.reply("Abonent qo'shishda xatolik yuz berdi");
         throw new Error("Abonent qo'shishda xatolik yuz berdi");
       }
       newAbonent = newAbonent.data;

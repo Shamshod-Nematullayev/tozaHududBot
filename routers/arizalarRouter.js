@@ -4,6 +4,36 @@ const { Abonent } = require("../models/Abonent");
 
 const router = require("express").Router();
 
+router.get("/", async (req, res) => {
+  try {
+    const { page = 1, limit = 10, sort = "", ...filters } = req.query;
+    const skip = (parseInt(page) - 1) * limit; // Nechta elementni o'tkazib yuborish
+    const data = await Ariza.find({
+      ...filters,
+    }) // Filtrlash
+      .sort(sort)
+      .skip(skip) // Paging
+      .limit(parseInt(limit)) // Limit
+      .lean(); // Faqatgina "plain" obyekt qaytarish uchun (performance uchun yaxshi)
+    const totalCount = await Ariza.countDocuments({
+      ...filters,
+    });
+
+    res.status(200).json({
+      ok: true,
+      data: data,
+      meta: {
+        total: totalCount,
+        page: page,
+        limit: limit,
+        totalPages: Math.ceil(totalCount / limit),
+      },
+    });
+  } catch (error) {
+    res.json({ ok: false, message: `internal error: ${error.message}` });
+  }
+});
+
 router.get("/get-ariza-by-id/:_id", async (req, res) => {
   try {
     const ariza = await Ariza.findById(req.params._id);
@@ -30,6 +60,7 @@ router.get("/get-ariza-by-id/:_id", async (req, res) => {
         status: ariza.status,
         akt_statuses_name: ariza.akt_statuses_name,
         is_canceled: ariza.is_canceled,
+        ikkilamchi_licshet: ariza.ikkilamchi_licshet,
       },
     });
   } catch (error) {
@@ -50,7 +81,6 @@ router.get(
           ok: false,
           message: "Ariza topilmadi",
         });
-      console.log(ariza);
       res.json({
         ok: true,
         ariza: {
@@ -67,6 +97,7 @@ router.get(
           status: ariza.status,
           akt_statuses_name: ariza.akt_statuses_name,
           is_canceled: ariza.is_canceled,
+          ikkilamchi_licshet: ariza.ikkilamchi_licshet,
         },
       });
     } catch (error) {

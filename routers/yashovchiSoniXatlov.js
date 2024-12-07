@@ -84,6 +84,21 @@ router.patch("/update-from-tozamakon/:_id", async (req, res) => {
   }
 });
 
+router.put("/:_id", async (req, res) => {
+  try {
+    const { _id } = req.params;
+    const result = await MultiplyRequest.findByIdAndUpdate(_id, {
+      $set: req.body,
+    });
+    if (!result) {
+      return res.status(404).json({ ok: false, message: "Not Found" });
+    }
+    res.status(200).json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Internal Server Error" });
+  }
+});
+
 router.get("/get-one-dalolatnoma", async (req, res) => {
   try {
     const dalolatnoma = await XatlovDocument.findOne(req.query);

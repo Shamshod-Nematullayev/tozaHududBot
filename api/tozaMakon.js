@@ -6,6 +6,7 @@ const tozaMakonApi = axios.create({
   headers: {
     Accept: "application/json, text/plain, */*",
     "accept-language": "UZ",
+    "x-channel": "WEB",
   },
 });
 
@@ -26,7 +27,11 @@ tozaMakonApi.interceptors.response.use(
   (response) => response,
   async (error) => {
     const session = await CleanCitySession.findOne({ login: "dxsh24107" });
-    console.error(error.response);
+    console.error({
+      method: error.response.config.method,
+      url: error.response.config.url,
+      data: error.response.data,
+    });
     if (error.response && error.response.status === 401) {
       const { data } = await axios.post(
         "https://api.tozamakon.eco/user-service/users/login",
