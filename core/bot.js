@@ -21,6 +21,9 @@ bot.catch((error, ctx) => {
 //   { command: "settings", description: "Configure your settings" },
 // ]);
 
+module.exports = { bot };
+process.once("SIGINT", () => bot.stop("SIGINT"));
+process.once("SIGTERM", () => bot.stop("SIGTERM"));
 bot
   .launch(() => {
     console.log("Bot has been started.");
@@ -28,7 +31,3 @@ bot
   .catch((err) => {
     console.log(err);
   });
-
-process.once("SIGINT", () => bot.stop("SIGINT"));
-process.once("SIGTERM", () => bot.stop("SIGTERM"));
-module.exports = { bot };

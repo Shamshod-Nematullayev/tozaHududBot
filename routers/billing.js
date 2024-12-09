@@ -254,11 +254,11 @@ router.post(
         await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
           params: {
             actPackId: akt_pachka_id.dvaynik,
-            residentId: abonent.id,
+            residentId: fake_account.id,
             inhabitantCount: 0,
             kSaldo: 0,
-            endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-            startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+            // endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+            // startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
           },
         })
       ).data;
@@ -276,8 +276,8 @@ router.post(
             fileUploadResponse.data.fileName +
             "*" +
             fileUploadResponse.data.fileId,
-          kSaldo: calculateAmount.kSaldo,
-          residentId: abonent.id,
+          kSaldo: 0,
+          residentId: fake_account.id,
           inhabitantCount: 0,
         })
       ).data;
@@ -286,7 +286,7 @@ router.post(
         $set: {
           status: "akt_kiritilgan",
           akt_pachka_id: akt_pachka_id.dvaynik,
-          akt_id: dvaynikAkt.akt_id,
+          akt_id: dvaynikAkt.id,
           aktInfo: dvaynikAkt,
           akt_date: new Date(),
         },
@@ -302,10 +302,10 @@ router.post(
   }
 );
 
-router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
+router.get(`/get-abonent-dxj-by-id/:abonent_id`, async (req, res) => {
   try {
     const { data } = await tozaMakonApi.get(
-      `/billing-service/resident-balances/dhsh?accountNumber=${req.params.licshet}&page=0&size=100`
+      `/billing-service/resident-balances/dhsh?residentId=${req.params.abonent_id}&page=0&size=100`
     );
 
     res.json({

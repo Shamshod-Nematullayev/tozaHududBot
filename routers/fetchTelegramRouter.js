@@ -2,6 +2,8 @@ const { bot } = require("../core/bot");
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
+const { uploadAsBlob } = require("../middlewares/multer");
+const { TEST_BASE_CHANNEL_ID } = require("../constants");
 
 const router = require("express").Router();
 
@@ -53,6 +55,20 @@ router.get("/:file_id", async (req, res, next) => {
   }
 });
 
-module.exports = router;
+router.post(
+  "/create-document",
+  uploadAsBlob.single("file"),
+  async (req, res) => {
+    try {
+      const document = await bot.telegram.sendDocument(TEST_BASE_CHANNEL_ID, {
+        source: req.file.buffer,
+      });
+      res.json({ ok: true, document_id: document.document.file_id });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ ok: false, message: "Internal server error 500" });
+    }
+  }
+);
 
 module.exports = router;

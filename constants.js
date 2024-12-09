@@ -13,3 +13,4 @@ module.exports.SudBuyruqInputExcel = `BQACAgIAAxkBAAEEDelmDRB_CbUC0r05dRbh_I9jzz
 module.exports.OylikRejaBelgilashViloyat = `BQACAgIAAxkBAAEE2q5mb_GENCndgaODnaWEJQY_r240sgACd0cAAgRogUtPOm2fnU1PYjUE`;
 module.exports.INPUT_ABONENTS_LICSHET = `BQACAgIAAxkBAAEE9QABZn-1q0Qj4i1UThSKcirrbiLJ834AAo9DAAIfCQFIEb1x-j_e2t01BA`;
 module.exports.NOTIFICATIONS_CHANNEL_ID = -1002429873864;
+module.exports.TEST_BASE_CHANNEL_ID = -1001567163110;

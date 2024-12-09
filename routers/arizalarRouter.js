@@ -139,6 +139,7 @@ router.post("/create", async (req, res) => {
       current_prescribed_cnt,
       next_prescribed_cnt,
       comment,
+      photos,
     } = req.body;
     // validate the request
     if (!licshet) return res.json({ ok: false, message: "Licshet not found" });
@@ -146,7 +147,8 @@ router.post("/create", async (req, res) => {
       document_type !== "dvaynik" &&
       document_type !== "viza" &&
       document_type !== "odam_soni" &&
-      document_type !== "death"
+      document_type !== "death" &&
+      document_type !== "gps"
     )
       return res.json({ ok: false, message: "Noma'lum xujjat turi kiritildi" });
     if (
@@ -196,6 +198,7 @@ router.post("/create", async (req, res) => {
       aktSummasi: parseInt(akt_summasi.total),
       aktSummCounts: akt_summasi,
       sana: Date.now(),
+      photos: photos,
     });
     await counter.updateOne({ $set: { value: counter.value + 1 } });
     res.json({ ok: true, ariza: newAriza });

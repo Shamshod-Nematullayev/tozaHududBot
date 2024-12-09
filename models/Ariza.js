@@ -6,7 +6,7 @@ const schema = new mongoose.Schema({
   sana: Date,
   document_type: {
     type: String,
-    enum: ["dvaynik", "odam_soni", "viza", "death"],
+    enum: ["dvaynik", "odam_soni", "viza", "death", "gps"],
     required: true,
   },
   document_number: {
@@ -58,5 +58,9 @@ const schema = new mongoose.Schema({
   akt_pachka_id: String,
   akt_id: String,
   aktInfo: Object,
+  photos: {
+    type: Array,
+    default: [],
+  },
 });
 module.exports.Ariza = mongoose.model("ariza", schema, "arizalar");
