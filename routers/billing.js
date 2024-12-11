@@ -244,7 +244,7 @@ router.post(
               "*" +
               fileUploadResponse.data.fileId,
             kSaldo: calculateKSaldo2,
-            residentId: abonent.id,
+            residentId: fake_account.id,
           })
         ).data;
       }
@@ -306,6 +306,23 @@ router.get(`/get-abonent-dxj-by-id/:abonent_id`, async (req, res) => {
   try {
     const { data } = await tozaMakonApi.get(
       `/billing-service/resident-balances/dhsh?residentId=${req.params.abonent_id}&page=0&size=100`
+    );
+
+    res.json({
+      ok: true,
+      message: data.msg,
+      rows: data.content,
+    });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
+router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
+  try {
+    const abonent = await Abonent.findOne({ licshet: req.params.licshet });
+    const { data } = await tozaMakonApi.get(
+      `/billing-service/resident-balances/dhsh?residentId=${abonent.id}&page=0&size=100`
     );
 
     res.json({
