@@ -7,8 +7,7 @@ const {
 const { INPUT_ABONENTS_LICSHET } = require("../../../constants");
 const { createInlineKeyboard } = require("../../../lib/keyboards");
 const { HybridMail } = require("../../../models/HybridMail");
-const getAbonentSaldoData = require("../../../api/cleancity/dxsh/getAbonentSaldoData");
-const { keyboards } = require("../../../requires");
+const { keyboards, Abonent } = require("../../../requires");
 const {
   handleTelegramExcel,
 } = require("../../smallFunctions/handleTelegramExcel");
@@ -17,14 +16,10 @@ const ejs = require("ejs");
 const path = require("path");
 
 const htmlPDF = require("html-pdf");
-const {
-  enterWarningLetterToBilling,
-  confirmNewWarningLetterByLicshet,
-} = require("../../../api/cleancity/dxsh");
 const PDFMerger = require("pdf-merger-js");
-const {
-  getLastProccesIdByLicshet,
-} = require("../../../api/cleancity/dxsh/getLastProccesIdByLicshet");
+const { tozaMakonApi } = require("../../../api/tozaMakon");
+const { hybridPochtaApi } = require("../../../api/hybridPochta");
+const FormData = require("form-data");
 
 // required small functions
 function bugungiSana() {
@@ -34,21 +29,38 @@ function bugungiSana() {
   }.${date.getFullYear()}`;
 }
 
-async function createWarningLetterPDF(licshet, abonentData) {
-  if (!abonentData)
-    return { success: false, message: "Abonent data not found" };
-  const data = {
-    FISH: abonentData.fio,
-    MFY: abonentData.mahalla_name,
-    STREET: abonentData.streets_name,
-    KOD: abonentData.licshet,
-    SALDO: abonentData.saldo_k,
-    SANA: bugungiSana(),
-  };
+async function createWarningLetterPDF(abonentData) {
+  const now = new Date();
+  await tozaMakonApi.post("/user-service/court-warnings/batch", {
+    oneWarningInOnePage: true,
+    residentIds: [abonentData.id],
+    warningBasis: `${abonentData.balance.kSaldo.toLocaleString()} soʻm qarzdor`,
+    warningDate: `${now.getFullYear()}-${
+      now.getMonth() < 9 ? "0" + (now.getMonth() + 1) : now.getMonth() + 1
+    }-${now.getDate()}`,
+  });
+  const courtWarning = (
+    await tozaMakonApi.get("/user-service/court-warnings", {
+      params: {
+        litigationStatus: "NEW",
+        status: "NEW",
+        districtId: 47,
+        page: 0,
+        size: 1,
+        accountNumber: abonentData.accountNumber,
+      },
+    })
+  ).data.content[0];
+  const warningDataPrint = (
+    await tozaMakonApi.get(
+      "/user-service/court-warnings/" + courtWarning.id + "/print"
+    )
+  ).data;
+
   const createHtmlString = new Promise((resolve, reject) => {
     ejs.renderFile(
       path.join(__dirname, "../../../", "views", "gibrid.ogohlantirish.ejs"),
-      { data },
+      { warningDataPrint },
       {},
       (err, str) => {
         if (err) return reject(err);
@@ -56,15 +68,14 @@ async function createWarningLetterPDF(licshet, abonentData) {
       }
     );
   });
-
   const html = await createHtmlString;
   const convertPDF = new Promise((resolve, reject) => {
     htmlPDF
-      .create(html, { format: "A4", orientation: "portrait" })
+      .create(html, { format: "letter", orientation: "portrait" })
       .toBuffer((err, str) => {
         if (err) return reject(err);
-        const base64PDF = str.toString("base64");
-        resolve({ success: true, data: base64PDF });
+
+        resolve({ base64: str.toString("base64"), courtWarning });
       });
   });
   return await convertPDF;
@@ -76,62 +87,97 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
     try {
       const jsonData = await handleTelegramExcel(ctx);
       const arrayMails = [];
+      // validations
+      if (!jsonData.length) {
+        return ctx.replyWithHTML(`Xatolik! Faylda hisob raqamlar topilmadi`);
+      }
+      async function validate() {
+        let qator = 1;
+        for (const row of jsonData) {
+          qator++;
+          const licshet = row[Object.keys(row)[1]];
+          if (licshet === undefined) {
+            ctx.reply(`${qator}-qatorda licshet topilmadi`);
+            return false;
+          }
+          const abonent = await Abonent.findOne({ licshet });
+          if (!abonent) {
+            ctx.reply(`${licshet} licshet abonent topilmadi`);
+            return false;
+          }
+          const now = new Date();
+          const oltiOyAvval = new Date(now.getFullYear(), now.getMonth(), 1);
+          const mail = await HybridMail.findOne({
+            licshet,
+            warning_date_billing: {
+              $gte: oltiOyAvval,
+              $lt: now,
+            },
+          });
+          if (mail) {
+            ctx.reply(
+              `${mail.licshet} hisob raqamiga allaqachon xabar yuborilgan`
+            );
+            return false;
+          }
+        }
+        return true;
+      }
+      if (!(await validate())) {
+        return;
+      }
       let i = 0;
       const loop = async () => {
-        if (i == jsonData.length) {
-          ctx.replyWithHTML(
-            `Xatlar gibrit pochta bazasiga jo'natildi. <a href="https://hybrid.pochta.uz/#/main/mails/listing/draft?sortBy=createdOn&sortDesc=true&page=1&itemsPerPage=50">Saytga</a> kirib ularni tasdiqlashingiz kerak`,
-            createInlineKeyboard([[["Tekshirish 🔄", "refresh"]]])
+        try {
+          if (i == jsonData.length) {
+            ctx.replyWithHTML(
+              `Xatlar gibrit pochta bazasiga jo'natildi. <a href="https://hybrid.pochta.uz/#/main/mails/listing/draft?sortBy=createdOn&sortDesc=true&page=1&itemsPerPage=50">Saytga</a> kirib ularni tasdiqlashingiz kerak`,
+              createInlineKeyboard([[["Tekshirish 🔄", "refresh"]]])
+            );
+            ctx.wizard.state.arrayMails = arrayMails;
+            ctx.wizard.next();
+            return;
+          }
+          const row = jsonData[i];
+          const licshet = row[Object.keys(row)[1]];
+          const abonent = await Abonent.findOne({ licshet });
+
+          const abonentData = (
+            await tozaMakonApi.get("/user-service/residents/" + abonent.id)
+          ).data;
+          const { base64, courtWarning } = await createWarningLetterPDF(
+            abonentData
           );
-          ctx.wizard.state.arrayMails = arrayMails;
-          ctx.wizard.next();
-          return;
-        }
-        const row = jsonData[i];
-        const licshet = row[Object.keys(row)[1]];
-        if (licshet === undefined) {
-          return ctx.reply(`${i + 2}-qatorda licshet topilmadi`);
-        }
-        const now = new Date();
-        const oltiOyAvval = new Date(now.getFullYear(), now.getMonth(), 1);
-        const mail = await HybridMail.findOne({
-          licshet,
-          warning_date_billing: {
-            $gte: oltiOyAvval,
-            $lt: now,
-          },
-        });
-        if (mail) {
-          console.log({ ok: false, message: "Mail already exists" });
+          ctx.wizard.state.courtWarning = courtWarning;
+          const newMail = (
+            await hybridPochtaApi.post("/PdfMail", {
+              Address: `${abonentData.mahallaName} ${abonentData.streetName}`,
+              Receiver: abonentData.fullName,
+              Document64: base64,
+              Region: 3, //Samarqand viloyati
+              Area: 41, // Kattaqo'rg'on tumani
+            })
+          ).data;
+          const newMailOnDB = await HybridMail.create({
+            licshet: licshet,
+            type: "ogohlantirish_by_tg_bot",
+            hybridMailId: newMail.Id,
+            createdOn: new Date(),
+            receiver: abonentData.fullName,
+            warning_date_billing: new Date(),
+            warning_amount: abonentData.balance.kSaldo,
+          });
+          arrayMails.push({
+            hybridMailId: newMail.Id,
+            _id: newMailOnDB._id,
+            licshet: licshet,
+          });
           i++;
-          return loop();
+          loop();
+        } catch (error) {
+          ctx.reply(error.message);
+          console.error(error);
         }
-        const abonentData = await getAbonentSaldoData(licshet);
-        const base64PDF = await createWarningLetterPDF(licshet, abonentData);
-        if (!base64PDF.success) {
-          return ctx.reply(base64PDF.message);
-        }
-        const newMail = await createMail(
-          `${abonentData.mahalla_name}, ${abonentData.streets_name}`,
-          abonentData.fio,
-          base64PDF.data
-        );
-        const newMailOnDB = await HybridMail.create({
-          licshet: licshet,
-          type: "ogohlantirish_by_tg_bot",
-          hybridMailId: newMail.Id,
-          createdOn: new Date(),
-          receiver: abonentData.fio,
-          warning_date_billing: new Date(),
-          warning_amount: abonentData.saldo_k,
-        });
-        arrayMails.push({
-          hybridMailId: newMail.Id,
-          _id: newMailOnDB._id,
-          licshet: licshet,
-        });
-        i++;
-        loop();
       };
       loop();
     } catch (e) {
@@ -155,9 +201,15 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
         return;
       }
       const row = ctx.wizard.state.arrayMails[counter];
-      const response = await getOneMailById(row.hybridMailId);
-      results.push(response);
-      if (response.IsSent) {
+      const mail = (
+        await hybridPochtaApi.get("/mail", {
+          params: {
+            id: row.hybridMailId,
+          },
+        })
+      ).data;
+      results.push(mail);
+      if (mail.IsSent) {
         await HybridMail.findByIdAndUpdate(row._id, {
           $set: { isSent: true, sentOn: response.SentOn },
         });
@@ -197,87 +249,83 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
         return ctx.scene.leave();
       }
       const row = ctx.wizard.state.arrayMails[counter];
-      const mail = await HybridMail.findById(row._id);
-      if (mail.isSavedBilling) {
+      const existMail = await HybridMail.findById(row._id);
+      if (existMail.isSavedBilling) {
         counter++;
         loop();
         return;
       }
       console.log({ row });
-      const response = await getOneMailById(row.hybridMailId);
-      const pdf = await getPdf(row.hybridMailId);
-      if (!pdf.ok) return { success: false, message: pdf.err };
+      const pdf = await hybridPochtaApi.get(`/PdfMail/` + row.hybridMailId, {
+        responseType: "arraybuffer",
+      });
+      const buffer = Buffer.from(pdf.data);
+      const mail = (
+        await hybridPochtaApi.get("/mail", {
+          params: {
+            id: row.hybridMailId,
+          },
+        })
+      ).data;
+      ejs.renderFile("./views/hybridPochtaCash.ejs", { mail }, (err, str) => {
+        if (err) return console.error(err);
 
-      ejs.renderFile(
-        "./views/hybridPochtaCash.ejs",
-        { mail: { ...response } },
-        (err, str) => {
-          if (err) return console.error(err);
+        htmlPDF
+          .create(str, { format: "A4", orientation: "portrait" })
+          .toBuffer(async (err, bufferCash) => {
+            if (err) return console.error(err);
 
-          htmlPDF
-            .create(str, { format: "A4", orientation: "portrait" })
-            .toFile(
-              "./uploads/cash" + row.hybridMailId + ".pdf",
-              async (err, res) => {
-                if (err) return console.error(err);
-
-                const filePath = `./uploads/ogohlantirish_xati${row.licshet}.PDF`;
-                let merger = new PDFMerger();
-                const convert = async () => {
-                  await merger.add(pdf.filename);
-
-                  await merger.add(
-                    "./uploads/cash" + row.hybridMailId + ".pdf"
-                  );
-                  // Set metadata
-                  await merger.setMetadata({
-                    producer: "oliy ong",
-                    author: "Shamshod Nematullayev",
-                    creator: "Toza Hudud bot",
-                    title: "Ogohlantirish xati",
-                  });
-                  await merger.save(filePath);
-                };
-                await convert();
-                const abonentData = await getAbonentSaldoData(row.licshet);
-                if (!abonentData) {
-                  ctx.reply(row.licshet + ": " + "Abonent topilmadi");
-                  counter++;
-                  return loop();
+            const filePath = `./uploads/ogohlantirish_xati${row.licshet}.PDF`;
+            let merger = new PDFMerger();
+            await merger.add(buffer);
+            await merger.add(bufferCash);
+            // Set metadata
+            await merger.setMetadata({
+              producer: "oliy ong",
+              author: "Shamshod Nematullayev",
+              creator: "Toza Hudud bot",
+              title: "Ogohlantirish xati",
+            });
+            const bufferWarningWithCash = await merger.saveAsBuffer();
+            const formData = new FormData();
+            formData.append(
+              "file",
+              bufferWarningWithCash,
+              row.hybridMailId + `.pdf`
+            );
+            const fileUploadBilling = (
+              await tozaMakonApi.post(
+                "/file-service/buckets/upload",
+                formData,
+                {
+                  params: {
+                    folderType: "SUD_PROCESS",
+                  },
+                  headers: { "Content-Type": "multipart/form-data" },
                 }
-                const response = await enterWarningLetterToBilling({
-                  lischet: row.licshet,
-                  comment: "Gibrit pochta orqali yuborilgan ogohlantirish xati",
-                  qarzdorlik: abonentData.saldo_k,
-                  sana: bugungiSana(),
-                  file_path: filePath,
-                });
-
-                if (response.success) {
-                  const res = await confirmNewWarningLetterByLicshet(
-                    row.licshet
-                  );
-                  await getLastProccesIdByLicshet({ mail, session });
-
-                  if (res.success) {
-                    await HybridMail.findByIdAndUpdate(row._id, {
-                      $set: { isSavedBilling: true },
-                    });
-                    counter++;
-                    loop();
-                  }
-                } else {
-                  console.error(response);
-                  ctx.reply(row.licshet + ": " + response.msg);
-                  if (response.msg == "Сумма не корректно") {
-                    counter++;
-                    loop();
-                  }
-                }
+              )
+            ).data;
+            await tozaMakonApi.post(
+              "/user-service/court-processes/" +
+                row.courtWarning.id +
+                "/add-file",
+              {
+                description: `warning letter by hybrid`,
+                fileName: `${fileUploadBilling.fileName}*${fileUploadBilling.fileId}`,
+                fileType: "WARNING_FILE",
               }
             );
-        }
-      );
+
+            await HybridMail.findByIdAndUpdate(row._id, {
+              $set: {
+                isSavedBilling: true,
+                sud_process_id_billing: row.courtWarning.id,
+              },
+            });
+            counter++;
+            loop();
+          });
+      });
     }
     await loop();
   }

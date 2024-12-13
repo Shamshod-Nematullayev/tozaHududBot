@@ -7,6 +7,9 @@ const schema = new Schema(
     login: String,
     password: String,
     authorization: String,
+    hybridToken: String,
+    hybridLogin: String,
+    hybridPassword: String,
     type: {
       type: String,
       enum: ["dxsh", "ekopay"],

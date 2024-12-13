@@ -4,6 +4,6 @@
 require("./sendMFYIncomeReport");
 // require("./sendPinflMfyReport");
 // require("./kunlikEtkReports");
-// require("./kunlikPinflReports");
+require("./kunlikPinflReports");
 // require("./nazoratchilarKunlikTushum");
 // require("./checkMailExpires");

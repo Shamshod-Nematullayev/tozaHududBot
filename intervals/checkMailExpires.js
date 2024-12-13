@@ -52,9 +52,9 @@ const checkMails = async () => {
         }
       }
 
-      counter++;
-      console.log(counter);
-      loop();
+      // counter++;
+      // console.log(counter);
+      // loop();
     } catch (err) {
       console.error(abonentData);
       console.error(err);

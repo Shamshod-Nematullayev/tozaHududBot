@@ -56,6 +56,9 @@ const { updateElektrKod } = require("./scene/userScenes/updateElektrKod");
 const {
   changeAbonentStreet,
 } = require("./scene/userScenes/changeAbonentStreet");
+const {
+  sendWarningLettersByHybrid,
+} = require("./scene/adminActions/sendWarningLettersByHybrid");
 
 const stage = new Scenes.Stage([
   newAdminScene,
@@ -82,7 +85,7 @@ const stage = new Scenes.Stage([
   new_abonent_request_by_pinfl_scene,
   sudBuyruqlariYaratish,
   vaqtinchalikFunc,
-  // sendWarningLettersByHybrid,
+  sendWarningLettersByHybrid,
   updateElektrKod,
   changeAbonentStreet,
 ]);
