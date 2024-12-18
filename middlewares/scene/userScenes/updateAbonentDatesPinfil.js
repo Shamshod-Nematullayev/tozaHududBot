@@ -206,7 +206,7 @@ updateAbonentDatesByPinfl.enter((ctx) => {
 
 updateAbonentDatesByPinfl.on("text", (ctx, next) => {
   if (isCancel(ctx.message.text)) {
-    ctx.reply("Bekor qilindi");
+    ctx.reply("Bekor qilindi", keyboards.mainKeyboard);
     return ctx.scene.leave();
   } else next();
 });

@@ -9,6 +9,7 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  fullName: String,
   mahalla_id: String,
   inspector_id: String,
   inspector_name: String,
@@ -24,4 +25,4 @@ const schema = new mongoose.Schema({
   },
 });
 
-module.exports.Target = mongoose.model("sudBildirishnoma", schema);
+module.exports.Target = mongoose.model("target", schema);

@@ -145,7 +145,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       ctx.deleteMessage();
       ctx.wizard.next();
     } catch (error) {
-      ctx.reply("Noto'g'ri so'rov");
+      ctx.reply("Noto'g'ri so'rov", ctx.scene.leave());
       console.error(error);
     }
   },

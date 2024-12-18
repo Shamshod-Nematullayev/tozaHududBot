@@ -59,6 +59,7 @@ const {
 const {
   sendWarningLettersByHybrid,
 } = require("./scene/adminActions/sendWarningLettersByHybrid");
+const { createTargetScene } = require("./scene/userScenes/createTarget");
 
 const stage = new Scenes.Stage([
   newAdminScene,
@@ -88,6 +89,7 @@ const stage = new Scenes.Stage([
   sendWarningLettersByHybrid,
   updateElektrKod,
   changeAbonentStreet,
+  createTargetScene,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

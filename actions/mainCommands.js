@@ -9,6 +9,7 @@ const {
   keyboards,
   Nazoratchi,
 } = require("../requires");
+const { Target } = require("../models/TargetAbonent");
 
 const composer = new Composer();
 composer.hears(["👤Yangi abonent ochish", "👤Янги абонент"], (ctx) => {
@@ -116,6 +117,58 @@ composer.hears(["⚙Sozlamalar", "⚙Созламалар"], (ctx) => {
   ctx.reply(messages.chooseMenu, keyboards[ctx.session.til].settings);
 });
 
+composer.hears(["✒️Судга хат✒️", "✒️Sudga xat✒️"], (ctx) => {
+  ctx.reply(
+    `To'lov qilishdan bosh tortgan abonentlarni majburiy undiruvga qaratish bo'limi`,
+    keyboards.targetMenuKeyboard
+  );
+});
+
+composer.action("getTargets", async (ctx) => {
+  try {
+    ctx.deleteMessage();
+    const inspector = await Nazoratchi.findOne({
+      telegram_id: ctx.from.id,
+    });
+    if (!inspector || !inspector.activ)
+      return ctx.reply("Sizga ruxsat berilmagan!", keyboards.cancelBtn);
+
+    const mahallalar = await Mahalla.find({
+      "biriktirilganNazoratchi.inspactor_id": inspector.id,
+    });
+    if (!mahallalar.length)
+      return ctx.reply("Sizga biriktirilgan mahallalar yo'q!");
+
+    const keys = mahallalar.map((mfy) => [
+      Markup.button.callback(mfy.name, `getTargets_${mfy.id}`),
+    ]);
+    ctx.reply("Mahallani tanlang!", Markup.inlineKeyboard(keys));
+  } catch (error) {
+    ctx.reply("Xatolik mainCommands.js");
+    console.error(error);
+  }
+});
+
+composer.action(/getTargets_/, async (ctx) => {
+  try {
+    ctx.deleteMessage();
+    const mahalla_id = ctx.callbackQuery.data.split("_")[1];
+    const targets = await Target.find({ mahalla_id });
+    if (!targets.length) return ctx.reply("Ro'yxat bo'sh");
+
+    let text = ``;
+    targets.forEach((target, index) => {
+      text += `${index + 1}. <code>${target.accountNumber}</code> <b>${
+        target.fullName
+      }</b>\n`;
+    });
+    ctx.replyWithHTML(text);
+  } catch (error) {
+    ctx.reply("Xatolik mainCommands.js");
+    console.error(error);
+  }
+});
+
 // Entering to scene by inline buttons
 const actions = [
   "GUVOHNOMA_KIRITISH",
@@ -123,6 +176,7 @@ const actions = [
   "update_abonent_date_by_pinfil",
   "connect_phone_number",
   "changeAbonentStreet",
+  "createTarget",
 ];
 
 actions.forEach((action) => {

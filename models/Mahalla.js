@@ -34,6 +34,7 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  publicOfferFileId: String,
 });
 
 module.exports.Mahalla = mongoose.model("mahalla", schema);
