@@ -217,20 +217,50 @@ router.post(
 
 router.get("/hybrid-mails", async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const { sortField = "createdAt", sortDirection = "asc" } = req.query;
+    let {
+      page = 1,
+      limit = 10,
+      sortField = "createdAt",
+      sortDirection = "asc",
+      fromDate,
+      toDate,
+      ...filters
+    } = req.query;
     const sortOptions = {};
     sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
 
     const skip = (page - 1) * limit;
-
-    const mails = await HybridMail.find()
+    fromDate = new Date(fromDate);
+    toDate = new Date(toDate);
+    const startDate = new Date(fromDate.getFullYear(), fromDate.getMonth(), 1); // JavaScript oylari 0-indeksli
+    const endDate = new Date(
+      toDate.getFullYear(),
+      toDate.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999
+    ); // Oy oxiri
+    console.log({ startDate, endDate, filters });
+    const mails = await HybridMail.find({
+      createdOn: {
+        $gt: startDate,
+        $lt: endDate,
+      },
+      // ...filters,
+    })
       .limit(limit)
       .skip(skip)
       .sort(sortOptions);
 
-    const total = await HybridMail.countDocuments();
+    const total = await HybridMail.countDocuments({
+      createdOn: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+      ...filters,
+    });
     res.json({
       ok: true,
       rows: mails,

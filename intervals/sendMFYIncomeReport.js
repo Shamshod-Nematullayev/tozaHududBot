@@ -52,15 +52,19 @@ async function sendMFYIncomeReport(ctx = false, companyId = 1144) {
     ).data;
     mahallas = mahallas.map((mfy) => {
       allAccrual += mfy.totalAccrual;
-      allTransactionAmount += incomesFromEkopay.find(
-        (item) => item.id == mfy.id
-      ).partnerTransactions[1].transactionAmount;
+      allTransactionAmount += incomesFromEkopay
+        .find((item) => item.id == mfy.id)
+        .partnerTransactions.find(
+          (elem) => elem.partnerName == "EcoPay"
+        ).transactionAmount;
       return {
         id: mfy.id,
         xisoblandi: mfy.totalAccrual,
         name: kirillga(mfy.name.split("(")[0]),
-        tushum: incomesFromEkopay.find((item) => item.id == mfy.id)
-          .partnerTransactions[1].transactionAmount,
+        tushum: incomesFromEkopay
+          .find((item) => item.id == mfy.id)
+          .partnerTransactions.find((elem) => elem.partnerName == "EcoPay")
+          .transactionAmount,
       };
     });
     mahallas = mahallas.filter((item) => item.xisoblandi);

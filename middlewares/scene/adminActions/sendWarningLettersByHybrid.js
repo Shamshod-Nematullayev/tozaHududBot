@@ -148,7 +148,6 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           const { base64, courtWarning } = await createWarningLetterPDF(
             abonentData
           );
-          ctx.wizard.state.courtWarning = courtWarning;
           const newMail = (
             await hybridPochtaApi.post("/PdfMail", {
               Address: `${abonentData.mahallaName} ${abonentData.streetName}`,
@@ -171,8 +170,10 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
             hybridMailId: newMail.Id,
             _id: newMailOnDB._id,
             licshet: licshet,
+            courtWarning_id: courtWarning.id,
           });
           i++;
+          console.log(i);
           loop();
         } catch (error) {
           ctx.reply(error.message);
@@ -215,6 +216,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
         });
       }
       counter++;
+      console.log(counter);
       await loop();
     }
     await loop();
@@ -275,7 +277,6 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           .toBuffer(async (err, bufferCash) => {
             if (err) return console.error(err);
 
-            const filePath = `./uploads/ogohlantirish_xati${row.licshet}.PDF`;
             let merger = new PDFMerger();
             await merger.add(buffer);
             await merger.add(bufferCash);
@@ -307,7 +308,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
             ).data;
             await tozaMakonApi.post(
               "/user-service/court-processes/" +
-                row.courtWarning.id +
+                row.courtWarning_id +
                 "/add-file",
               {
                 description: `warning letter by hybrid`,
@@ -319,7 +320,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
             await HybridMail.findByIdAndUpdate(row._id, {
               $set: {
                 isSavedBilling: true,
-                sud_process_id_billing: row.courtWarning.id,
+                sud_process_id_billing: row.courtWarning_id,
               },
             });
             counter++;

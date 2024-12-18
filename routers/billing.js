@@ -11,7 +11,8 @@ const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const akt_pachka_id = {
   viza: "4444946",
   odam_soni: "4444949",
-  dvaynik: "4444950",
+  dvaynik: "4445290",
+  // dvaynik: "4444950",
   pul_kuchirish: "4445046",
   death: "4444947",
   boshqa: "4444109",
@@ -188,7 +189,7 @@ router.post(
         }
       );
 
-      if (akt_sum > 0) {
+      if (akt_sum > 0 && false) {
         // monay transfer to real account
         const calculateKSaldo = (
           await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {

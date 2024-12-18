@@ -64,7 +64,6 @@ const ADMIN_ACTIONS = [
   "sudBuyruqlariYaratish",
   "Ogohlantish xati yuborish",
   "upload_execution_to_billing",
-  "getMalumotnomalar",
 ];
 
 function enterAdminAction(actionType) {
