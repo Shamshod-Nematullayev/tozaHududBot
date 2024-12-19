@@ -36,7 +36,7 @@ router.post(
         next_inhabitant_count,
         akt_sum,
         licshet,
-        ariza_id,
+        amountWithoutQQS,
         document_type,
         description,
       } = req.body;
@@ -115,9 +115,9 @@ router.post(
             ? akt_pachka_id[document_type]
             : akt_pachka_id.boshqa,
           actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
-          amount: Math.abs(akt_sum),
-          amountWithQQS: 0,
-          amountWithoutQQS: Math.abs(akt_sum),
+          amount: Number(akt_sum),
+          amountWithQQS: Number(akt_sum) - Number(amountWithoutQQS),
+          amountWithoutQQS: Number(amountWithoutQQS),
           description,
           endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
           startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,

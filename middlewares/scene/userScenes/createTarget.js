@@ -112,7 +112,7 @@ const createTargetScene = new WizardScene(
         }
       }
       if (ctx.wizard.state.request === "yana kiritasizmi") {
-        ctx.deleteMessage();
+        // ctx.deleteMessage();
         switch (ctx.update.callback_query.data) {
           case "no":
             ctx.reply("Asosiy menyu", keyboards.mainKeyboard);

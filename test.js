@@ -61,6 +61,49 @@ const { Abonent } = require("./requires");
 //   loop();
 // });
 
+const datas = require("./main.json");
+const { tozaMakonApi } = require("./api/tozaMakon");
+
+let init = 50000;
+Abonent.find().then((abonents) => {
+  let counter = init;
+  const loop = async () => {
+    if (counter == datas.length || counter >= init + 5000)
+      return console.log("jarayon yakullandi");
+    const kod = datas[counter];
+    const finded = abonents.find(
+      (abonent) => abonent.licshet == kod.accountNumber
+    );
+    if (!finded) {
+      const { data } = await tozaMakonApi.get(
+        "/user-service/residents/" + kod.id
+      );
+      await Abonent.create({
+        createdAt: new Date(),
+        energy_licshet: "",
+        fio: data.fullName,
+        id: data.id,
+        licshet: kod.accountNumber,
+        kadastr_number: data.house.cadastralNumber,
+        mahallas_id: data.mahallaId,
+        mahalla_name: data.mahallaName,
+        passport_number: data.passportNumber,
+        pinfl: data.citizen.pnfl,
+        streets_id: data.streetId,
+        streets_name: data.streetName,
+        phone: data.house.phone,
+      });
+      counter++;
+      return loop();
+    }
+    // console.log(finded);
+    counter++;
+    console.log(counter);
+    loop();
+  };
+  loop();
+});
+
 // Nazoratchi.find().then((inspectors) => {
 //   inspectors.forEach(async (inspector) => {
 //     try {
@@ -95,5 +138,3 @@ const { Abonent } = require("./requires");
 //     }
 //   });
 // });
-
-
