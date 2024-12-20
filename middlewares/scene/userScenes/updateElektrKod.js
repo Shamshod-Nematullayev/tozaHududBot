@@ -1,4 +1,4 @@
-const { Scenes } = require("telegraf");
+const { Scenes, Markup } = require("telegraf");
 const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
 const { Abonent } = require("../../../models/Abonent");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
@@ -6,6 +6,17 @@ const { changeAbonentDates } = require("../../../requires");
 const isCancel = require("../../smallFunctions/isCancel");
 const { EtkKodRequest } = require("../../../models/EtkKodRequest");
 const { tozaMakonApi } = require("../../../api/tozaMakon");
+
+const caotoNames = [
+  {
+    title: "Qoradaryo TETK",
+    caoto: 18214,
+  },
+  {
+    title: "Xatirchi TETK",
+    caoto: 12345, // to'g'ri variant qo'yiladi
+  },
+];
 
 const updateElektrKod = new Scenes.WizardScene(
   "updateElektrKod",
@@ -48,9 +59,6 @@ const updateElektrKod = new Scenes.WizardScene(
       const etkReq = await EtkKodRequest.findOne({
         licshet: ctx.wizard.state.KOD,
       });
-      if (etkReq) {
-        return ctx.reply("Bu abonent ma'lumoti kiritilib bo'lingan..");
-      }
       if (abonent.ekt_kod_tasdiqlandi?.confirm) {
         return ctx.reply(
           "Bu abonent ma'lumoti kiritilib bo'lingan",
@@ -79,16 +87,29 @@ const updateElektrKod = new Scenes.WizardScene(
         return;
       }
       const etk_abonents = require("../../../lib/etk_baza.json");
-      const etk_abonent = etk_abonents.filter((a) => {
+      const findedETKAbonents = etk_abonents.filter((a) => {
         return a.CUSTOMER_CODE == ctx.message.text;
-      })[0];
-      if (!etk_abonent) {
+      });
+      if (!findedETKAbonents.length < 0) {
         ctx.reply(
           "Siz kiritgan ETK kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
           keyboards.lotin.cancelBtn.resize()
         );
         return;
       }
+      if (findedETKAbonents.length > 1) {
+        const buttons = [];
+        findedETKAbonents.forEach((abonent) => {
+          const caoto = caotoNames.find((c) => c.caoto == abonent.CAOTO);
+          buttons.push([Markup.button.callback(caoto.title, abonent.caoto)]);
+        });
+        ctx.reply("Hududni tanlang", Markup.inlineKeyboard(buttons));
+        ctx.wizard.state.findedETKAbonents = findedETKAbonents;
+        ctx.wizard.state.ETK = ctx.message.text;
+        ctx.wizard.selectStep(3);
+        return;
+      }
+      const etk_abonent = findedETKAbonents[0];
       ctx.replyWithHTML(
         `Abonent: <code>${etk_abonent.CUSTOMER_NAME}</code> \nTelefon: <b>${etk_abonent.MOBILE_PHONE}</b>Ushbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
         createInlineKeyboard([
@@ -114,23 +135,21 @@ const updateElektrKod = new Scenes.WizardScene(
     switch (ctx.callbackQuery?.data) {
       case "yes":
         const abonent = ctx.wizard.state.abonent;
+        const etkAbonent = ctx.wizard.state.etk_abonent;
         await EtkKodRequest.create({
           licshet: abonent.licshet,
           abonent_id: abonent.id,
           etk_kod: ctx.wizard.state.ETK,
-          etk_saoto: "18214",
+          etk_saoto: etkAbonent.CAOTO,
           phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE,
           inspector_id: ctx.wizard.state.inspector_id,
           update_at: new Date(),
         });
-        const result = await tozaMakonApi.patch(
-          "/user-service/residents/" + abonent.id,
-          {
-            electricityAccountNumber: ctx.wizard.state.ETK,
-            electricityCoato: "18214",
-            id: abonent.id,
-          }
-        );
+        await tozaMakonApi.patch("/user-service/residents/" + abonent.id, {
+          electricityAccountNumber: ctx.wizard.state.ETK,
+          electricityCoato: etkAbonent.CAOTO,
+          id: abonent.id,
+        });
         await Abonent.findByIdAndUpdate(abonent._id, {
           $set: {
             ekt_kod_tasdiqlandi: {
@@ -148,61 +167,37 @@ const updateElektrKod = new Scenes.WizardScene(
           keyboards.lotin.mainKeyboard.resize()
         );
         return ctx.scene.leave();
-        // bu funksiya vaqtinchalik to'xtatib qo'yildi billing ishlagunicha
-        // const abonent = ctx.wizard.state.abonent;
-        // let res = await changeAbonentDates({
-        //   abonent_id: abonent.id,
-        //   abo_data: {
-        //     description: `${ctx.wizard.state.inspector_id} ${ctx.wizard.state.inspector_name} ma'lumotiga asosan ETK hisob raqami va telefoni kiritildi.`,
-        //     energy_licshet: ctx.wizard.state.ETK,
-        //     energy_coato: "18214",
-        //     phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE
-        //       ? ctx.wizard.state.etk_abonent.MOBILE_PHONE
-        //       : undefined,
-        //   },
-        // });
-        // if (res.msg == "Кадастр рақам формати нотоғри киритилди") {
-        //   res = await changeAbonentDates({
-        //     abonent_id: abonent.id,
-        //     abo_data: {
-        //       description: `${ctx.wizard.state.inspector_id} ${ctx.wizard.state.inspector_name} ma'lumotiga asosan ETK hisob raqami va telefoni kiritildi.`,
-        //       energy_licshet: ctx.wizard.state.ETK,
-        //       energy_coato: "18214",
-        //       phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE
-        //         ? ctx.wizard.state.etk_abonent.MOBILE_PHONE
-        //         : undefined,
-        //       kadastr_number: "",
-        //     },
-        //   });
-        // }
-        // if (!res.success) {
-        //   return ctx.answerCbQuery(res.msg);
-        // }
-
-        // await Abonent.findByIdAndUpdate(abonent._id, {
-        //   $set: {
-        //     ekt_kod_tasdiqlandi: {
-        //       confirm: true,
-        //       inspector_id: ctx.wizard.state.inspector_id,
-        //       inspector_name: ctx.wizard.state.inspector_name,
-        //       updated_at: new Date(),
-        //     },
-        //     energy_licshet: ctx.wizard.state.ETK,
-        //   },
-        // });
-        // await ctx.deleteMessage();
-        // ctx.reply(
-        //   "Etk hisob raqami muvaffaqqiyatli kiritildi",
-        //   keyboards.lotin.mainKeyboard.resize()
-        // );
-        // ctx.scene.leave();
-        break;
-      // copy
       case "no":
         ctx.deleteMessage();
         ctx.reply("Bekor qilindi.", keyboards.lotin.mainKeyboard.resize());
         ctx.scene.leave();
         break;
+    }
+  },
+  (ctx) => {
+    try {
+      const findedETKAbonents = ctx.wizard.state.findedETKAbonents;
+      const etk_abonent = findedETKAbonents.find(
+        (a) => a.CAOTO == ctx.update.callback_query.data
+      );
+      if (!etk_abonent) {
+        ctx.reply("Xatolik");
+        return ctx.scene.leave();
+      }
+      ctx.replyWithHTML(
+        `Abonent: <code>${etk_abonent.CUSTOMER_NAME}</code> \nTelefon: <b>${etk_abonent.MOBILE_PHONE}</b>Ushbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
+        createInlineKeyboard([
+          [
+            ["Xa 👌", "yes"],
+            ["Yo'q 🙅‍♂️", "no"],
+          ],
+        ])
+      );
+      ctx.wizard.state.etk_abonent = etk_abonent;
+      ctx.wizard.selectStep(2);
+    } catch (error) {
+      console.error(error);
+      ctx.reply("Error: " + error.message);
     }
   }
 );
