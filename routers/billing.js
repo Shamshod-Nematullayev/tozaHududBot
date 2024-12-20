@@ -11,8 +11,7 @@ const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const akt_pachka_id = {
   viza: "4444946",
   odam_soni: "4444949",
-  dvaynik: "4445290",
-  // dvaynik: "4444950",
+  dvaynik: "4444950",
   pul_kuchirish: "4445046",
   death: "4444947",
   boshqa: "4444109",
@@ -189,7 +188,7 @@ router.post(
         }
       );
 
-      if (akt_sum > 0 && false) {
+      if (akt_sum > 0) {
         // monay transfer to real account
         const calculateKSaldo = (
           await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
@@ -302,6 +301,123 @@ router.post(
     }
   }
 );
+
+router.post("/create-dvaynik-akt", async (req, res) => {
+  try {
+    const { realAccountNumber, fakeAccountNumber, fakeAccountIncomeAmount } =
+      req.body;
+    const abonentReal = await Abonent.findOne({ licshet: realAccountNumber });
+    const abonentFake = await Abonent.findOne({ licshet: fakeAccountNumber });
+    const formData = new FormData();
+    formData.append("file", req.file.buffer, req.file.originalname);
+    const fileUploadResponse = await tozaMakonApi.post(
+      "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    if (fakeAccountIncomeAmount > 0) {
+      const calculateKSaldo = (
+        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+          params: {
+            amount: Math.abs(fakeAccountIncomeAmount),
+            residentId: abonentReal.id,
+            actPackId: akt_pachka_id.pul_kuchirish,
+            actType: "CREDIT",
+          },
+        })
+      ).data;
+      (
+        await tozaMakonApi.post("/billing-service/acts", {
+          actPackId: akt_pachka_id.pul_kuchirish,
+          actType: "CREDIT",
+          amount: Math.abs(akt_sum),
+          amountWithQQS: Math.abs(akt_sum),
+          amountWithoutQQS: 0,
+          description: `${fakeAccountNumber} ikkilamchi hisob raqamidan pul ko'chirish`,
+          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          fileId:
+            fileUploadResponse.data.fileName +
+            "*" +
+            fileUploadResponse.data.fileId,
+          kSaldo: calculateKSaldo,
+          residentId: abonentReal.id,
+        })
+      ).data;
+      // monay transfer from fake account
+      const calculateKSaldo2 = (
+        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+          params: {
+            amount: akt_sum,
+            residentId: abonentFake.id,
+            actPackId: akt_pachka_id.pul_kuchirish,
+            actType: "DEBIT",
+          },
+        })
+      ).data;
+      (
+        await tozaMakonApi.post("/billing-service/acts", {
+          actPackId: akt_pachka_id.pul_kuchirish,
+          actType: "DEBIT",
+          amount: akt_sum,
+          amountWithQQS: akt_sum,
+          amountWithoutQQS: 0,
+          description: `${abonentReal.licshet} haqiqiy hisob raqamiga pul ko'chirish`,
+          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          fileId:
+            fileUploadResponse.data.fileName +
+            "*" +
+            fileUploadResponse.data.fileId,
+          kSaldo: calculateKSaldo2,
+          residentId: abonentFake.id,
+        })
+      ).data;
+    }
+    // ikkilamchi hisob raqamini o'chirish kodlari
+    const calculateAmount = (
+      await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
+        params: {
+          actPackId: akt_pachka_id.dvaynik,
+          residentId: fake_account.id,
+          inhabitantCount: 0,
+          kSaldo: 0,
+        },
+      })
+    ).data;
+    const dvaynikAkt = (
+      await tozaMakonApi.post("/billing-service/acts", {
+        actPackId: akt_pachka_id.dvaynik,
+        actType: "CREDIT",
+        amount: calculateAmount.amount - fakeAccountIncomeAmount,
+        amountWithQQS: calculateAmount.amount,
+        amountWithoutQQS: 0,
+        description: `ikkilamchi hisob raqamini o'chirish`,
+        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        fileId:
+          fileUploadResponse.data.fileName +
+          "*" +
+          fileUploadResponse.data.fileId,
+        kSaldo: 0,
+        residentId: abonentFake.id,
+        inhabitantCount: 0,
+      })
+    ).data;
+
+    return res.json({
+      ok: true,
+      message: "muvaffaqqiyatli akt qilindi",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, message: "Internal server error 500" });
+  }
+});
 
 router.get(`/get-abonent-dxj-by-id/:abonent_id`, async (req, res) => {
   try {
