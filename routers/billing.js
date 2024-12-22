@@ -8,6 +8,8 @@ const { Abonent } = require("../requires");
 const { tozaMakonApi } = require("../api/tozaMakon");
 const FormData = require("form-data");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
+const { PDFDocument } = require("pdf-lib");
+const PDFMerger = require("pdf-merger-js");
 const akt_pachka_id = {
   viza: "4444946",
   odam_soni: "4444949",
@@ -38,6 +40,8 @@ router.post(
         amountWithoutQQS,
         document_type,
         description,
+        ariza_id,
+        photos,
       } = req.body;
       if (isNaN(next_inhabitant_count) && isNaN(akt_sum)) {
         return res.status(400).json({
@@ -53,6 +57,35 @@ router.post(
         });
       let counter = await Counter.findOne({ name: "incoming_document_number" });
 
+      if (photos?.length > 0) {
+        // endi pdf va rasmlarni birlashtirish kodi kerak
+        const photosBuffer = [];
+        for (let file_id of photos) {
+          const file = await bot.telegram.getFile(file_id);
+          const photoBuffer = await bot.telegram.getFileLink(file.file_id);
+          const response = await axios.get(photoBuffer, {
+            responseType: "arraybuffer",
+          });
+          photosBuffer.push(response.data);
+        }
+        const pdfDoc = await PDFDocument.create();
+        for (let photoBuffer of photosBuffer) {
+          const image = await pdfDoc.embedPng(photoBuffer);
+          const page = pdfDoc.addPage([image.width, image.height]);
+          page.drawImage(image, {
+            x: 0,
+            y: 0,
+            width: image.width,
+            height: image.height,
+          });
+        }
+        const pdfBuffer = await pdfDoc.save();
+        const merger = new PDFMerger();
+        merger.add(req.file.buffer);
+        merger.add(pdfBuffer);
+        const bufferAktFile = await merger.saveAsBuffer();
+        req.file.buffer = bufferAktFile;
+      }
       // akt faylini telegram bazaga saqlash
       const documentOnTelegram = await bot.telegram.sendDocument(
         process.env.TEST_BASE_CHANNEL_ID,
@@ -139,21 +172,22 @@ router.post(
             message: "Billing tizimiga akt kiritib bo'lmadi",
           });
         }
-        const ariza = await Ariza.findByIdAndUpdate(req.body.ariza_id, {
-          $set: {
-            status: "akt_kiritilgan",
-            akt_pachka_id: aktResponse.data.actPackId,
-            akt_id: aktResponse.data.id,
-            aktInfo: {
-              ...aktResponse.data,
+        if (ariza_id) {
+          const ariza = await Ariza.findByIdAndUpdate(ariza_id, {
+            $set: {
+              status: "akt_kiritilgan",
+              akt_pachka_id: aktResponse.data.actPackId,
+              akt_id: aktResponse.data.id,
+              aktInfo: {
+                ...aktResponse.data,
+              },
+              akt_date: aktResponse.data.createdAt,
             },
-            akt_date: aktResponse.data.createdAt,
-          },
-        });
+          });
+        }
         return res.json({
           ok: true,
           message: "Akt muvaffaqqiyatli qo'shildi",
-          ariza,
         });
       }
     } catch (err) {
