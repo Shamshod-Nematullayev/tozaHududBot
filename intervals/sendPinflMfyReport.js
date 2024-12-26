@@ -13,9 +13,13 @@ function bugungiSana() {
 async function sendPinflMfyReport() {
   try {
     const abonents = await Abonent.find({ "shaxsi_tasdiqlandi.confirm": true });
+    const countOfAbonents = await Abonent.find().select(["mahallas_id"]);
     let mahallalar = await Mahalla.find({ reja: { $gt: 0 } });
     mahallalar.forEach(async (mfy) => {
       mfy.counterOfConfirm = 0;
+      mfy.shaxsi_tasdiqlandi_reja = countOfAbonents.filter(
+        (item) => item.mahallas_id == mfy.id
+      ).length;
     });
     abonents.forEach((abonent) => {
       const mfy = mahallalar.find((mfy) => mfy.id === abonent.mahallas_id);

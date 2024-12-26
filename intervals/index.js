@@ -2,7 +2,7 @@
 // require("./cleanCitySessionSaver");
 // require("./updateArizalarStatus");
 require("./sendMFYIncomeReport");
-// require("./sendPinflMfyReport");
+require("./sendPinflMfyReport");
 // require("./kunlikEtkReports");
 require("./kunlikPinflReports");
 // require("./nazoratchilarKunlikTushum");

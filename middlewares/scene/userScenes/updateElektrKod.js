@@ -2,7 +2,6 @@ const { Scenes, Markup } = require("telegraf");
 const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
 const { Abonent } = require("../../../models/Abonent");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
-const { changeAbonentDates } = require("../../../requires");
 const isCancel = require("../../smallFunctions/isCancel");
 const { EtkKodRequest } = require("../../../models/EtkKodRequest");
 const { tozaMakonApi } = require("../../../api/tozaMakon");
@@ -14,7 +13,7 @@ const caotoNames = [
   },
   {
     title: "Xatirchi TETK",
-    caoto: 12345, // to'g'ri variant qo'yiladi
+    caoto: 12251,
   },
 ];
 
@@ -56,7 +55,7 @@ const updateElektrKod = new Scenes.WizardScene(
         return;
       }
       // =======================VAQTINCHA BILLING ISHLAGUNCHA
-      const etkReq = await EtkKodRequest.findOne({
+      await EtkKodRequest.findOne({
         licshet: ctx.wizard.state.KOD,
       });
       if (abonent.ekt_kod_tasdiqlandi?.confirm) {
@@ -101,7 +100,7 @@ const updateElektrKod = new Scenes.WizardScene(
         const buttons = [];
         findedETKAbonents.forEach((abonent) => {
           const caoto = caotoNames.find((c) => c.caoto == abonent.CAOTO);
-          buttons.push([Markup.button.callback(caoto.title, abonent.caoto)]);
+          buttons.push(Markup.button.callback(caoto.title, abonent.CAOTO));
         });
         ctx.reply("Hududni tanlang", Markup.inlineKeyboard(buttons));
         ctx.wizard.state.findedETKAbonents = findedETKAbonents;
@@ -111,7 +110,7 @@ const updateElektrKod = new Scenes.WizardScene(
       }
       const etk_abonent = findedETKAbonents[0];
       ctx.replyWithHTML(
-        `Abonent: <code>${etk_abonent.CUSTOMER_NAME}</code> \nTelefon: <b>${etk_abonent.MOBILE_PHONE}</b>Ushbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
+        `Abonent: <code>${etk_abonent.CUSTOMER_NAME}</code> \nUshbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
         createInlineKeyboard([
           [
             ["Xa 👌", "yes"],

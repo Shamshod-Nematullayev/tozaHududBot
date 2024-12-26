@@ -115,8 +115,8 @@ router.post(
             : akt_pachka_id.boshqa,
           actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
           amount: Number(akt_sum),
-          amountWithQQS: Number(akt_sum) - Number(amountWithoutQQS),
-          amountWithoutQQS: Number(amountWithoutQQS),
+          amountWithQQS: Number(akt_sum) - (Number(amountWithoutQQS) || 0),
+          amountWithoutQQS: Number(amountWithoutQQS) || 0,
           description,
           endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
           startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
@@ -233,9 +233,9 @@ router.post(
           await tozaMakonApi.post("/billing-service/acts", {
             actPackId: akt_pachka_id.pul_kuchirish,
             actType: "DEBIT",
-            amount: Math.abs(akt_sum),
+            amount: akt_sum,
             amountWithQQS: 0,
-            amountWithoutQQS: Math.abs(akt_sum),
+            amountWithoutQQS: akt_sum,
             description: `${fake_account.licshet} haqiqiy hisob raqamiga pul ko'chirish`,
             endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
             startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
@@ -266,9 +266,9 @@ router.post(
         await tozaMakonApi.post("/billing-service/acts", {
           actPackId: akt_pachka_id.dvaynik,
           actType: "CREDIT",
-          amount: calculateAmount.amount,
+          amount: Number(calculateAmount.amount) + Number(akt_sum),
           amountWithQQS: 0,
-          amountWithoutQQS: calculateAmount.amount,
+          amountWithoutQQS: Number(calculateAmount.amount) + Number(akt_sum),
           description: `ikkilamchi hisob raqamini o'chirish`,
           endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
           startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
@@ -297,127 +297,134 @@ router.post(
       });
     } catch (err) {
       console.error(err);
-      res.json({ ok: false, message: "Internal server error 500" });
+      res.json({ ok: false, message: err.message });
     }
   }
 );
 
-router.post("/create-dvaynik-akt", async (req, res) => {
-  try {
-    const { realAccountNumber, fakeAccountNumber, fakeAccountIncomeAmount } =
-      req.body;
-    const abonentReal = await Abonent.findOne({ licshet: realAccountNumber });
-    const abonentFake = await Abonent.findOne({ licshet: fakeAccountNumber });
-    const formData = new FormData();
-    formData.append("file", req.file.buffer, req.file.originalname);
-    const fileUploadResponse = await tozaMakonApi.post(
-      "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    if (fakeAccountIncomeAmount > 0) {
-      const calculateKSaldo = (
-        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
-          params: {
-            amount: Math.abs(fakeAccountIncomeAmount),
-            residentId: abonentReal.id,
+router.post(
+  "/create-dvaynik-akt",
+  uploadAsBlob.single("file"),
+  async (req, res) => {
+    try {
+      const { realAccountNumber, fakeAccountNumber, fakeAccountIncomeAmount } =
+        req.body;
+      const date = new Date();
+      const abonentReal = await Abonent.findOne({ licshet: realAccountNumber });
+      const abonentFake = await Abonent.findOne({ licshet: fakeAccountNumber });
+      const formData = new FormData();
+      formData.append("file", req.file.buffer, req.file.originalname);
+      const fileUploadResponse = await tozaMakonApi.post(
+        "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (fakeAccountIncomeAmount > 0) {
+        const calculateKSaldo = (
+          await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+            params: {
+              amount: Math.abs(fakeAccountIncomeAmount),
+              residentId: abonentReal.id,
+              actPackId: akt_pachka_id.pul_kuchirish,
+              actType: "CREDIT",
+            },
+          })
+        ).data;
+        (
+          await tozaMakonApi.post("/billing-service/acts", {
             actPackId: akt_pachka_id.pul_kuchirish,
             actType: "CREDIT",
-          },
-        })
-      ).data;
-      (
-        await tozaMakonApi.post("/billing-service/acts", {
-          actPackId: akt_pachka_id.pul_kuchirish,
-          actType: "CREDIT",
-          amount: Math.abs(akt_sum),
-          amountWithQQS: Math.abs(akt_sum),
-          amountWithoutQQS: 0,
-          description: `${fakeAccountNumber} ikkilamchi hisob raqamidan pul ko'chirish`,
-          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          fileId:
-            fileUploadResponse.data.fileName +
-            "*" +
-            fileUploadResponse.data.fileId,
-          kSaldo: calculateKSaldo,
-          residentId: abonentReal.id,
-        })
-      ).data;
-      // monay transfer from fake account
-      const calculateKSaldo2 = (
-        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
-          params: {
-            amount: akt_sum,
-            residentId: abonentFake.id,
+            amount: Math.abs(fakeAccountIncomeAmount),
+            amountWithQQS: Math.abs(fakeAccountIncomeAmount),
+            amountWithoutQQS: 0,
+            description: `${fakeAccountNumber} ikkilamchi hisob raqamidan pul ko'chirish`,
+            endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+            startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+            fileId:
+              fileUploadResponse.data.fileName +
+              "*" +
+              fileUploadResponse.data.fileId,
+            kSaldo: calculateKSaldo,
+            residentId: abonentReal.id,
+          })
+        ).data;
+        // monay transfer from fake account
+        const calculateKSaldo2 = (
+          await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+            params: {
+              amount: fakeAccountIncomeAmount,
+              residentId: abonentFake.id,
+              actPackId: akt_pachka_id.pul_kuchirish,
+              actType: "DEBIT",
+            },
+          })
+        ).data;
+        (
+          await tozaMakonApi.post("/billing-service/acts", {
             actPackId: akt_pachka_id.pul_kuchirish,
             actType: "DEBIT",
+            amount: fakeAccountIncomeAmount,
+            amountWithQQS: fakeAccountIncomeAmount,
+            amountWithoutQQS: 0,
+            description: `${abonentReal.licshet} haqiqiy hisob raqamiga pul ko'chirish`,
+            endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+            startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+            fileId:
+              fileUploadResponse.data.fileName +
+              "*" +
+              fileUploadResponse.data.fileId,
+            kSaldo: calculateKSaldo2,
+            residentId: abonentFake.id,
+          })
+        ).data;
+      }
+      // ikkilamchi hisob raqamini o'chirish kodlari
+      const calculateAmount = (
+        await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
+          params: {
+            actPackId: akt_pachka_id.dvaynik,
+            residentId: abonentFake.id,
+            inhabitantCount: 0,
+            kSaldo: 0,
           },
         })
       ).data;
-      (
+      const dvaynikAkt = (
         await tozaMakonApi.post("/billing-service/acts", {
-          actPackId: akt_pachka_id.pul_kuchirish,
-          actType: "DEBIT",
-          amount: akt_sum,
-          amountWithQQS: akt_sum,
+          actPackId: akt_pachka_id.dvaynik,
+          actType: "CREDIT",
+          amount:
+            Number(calculateAmount.amount) + Number(fakeAccountIncomeAmount),
+          amountWithQQS:
+            Number(calculateAmount.amount) + Number(fakeAccountIncomeAmount),
           amountWithoutQQS: 0,
-          description: `${abonentReal.licshet} haqiqiy hisob raqamiga pul ko'chirish`,
+          description: `ikkilamchi hisob raqamini o'chirish`,
           endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
           startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
           fileId:
             fileUploadResponse.data.fileName +
             "*" +
             fileUploadResponse.data.fileId,
-          kSaldo: calculateKSaldo2,
+          kSaldo: 0,
           residentId: abonentFake.id,
+          inhabitantCount: 0,
         })
       ).data;
-    }
-    // ikkilamchi hisob raqamini o'chirish kodlari
-    const calculateAmount = (
-      await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
-        params: {
-          actPackId: akt_pachka_id.dvaynik,
-          residentId: fake_account.id,
-          inhabitantCount: 0,
-          kSaldo: 0,
-        },
-      })
-    ).data;
-    const dvaynikAkt = (
-      await tozaMakonApi.post("/billing-service/acts", {
-        actPackId: akt_pachka_id.dvaynik,
-        actType: "CREDIT",
-        amount: calculateAmount.amount - fakeAccountIncomeAmount,
-        amountWithQQS: calculateAmount.amount,
-        amountWithoutQQS: 0,
-        description: `ikkilamchi hisob raqamini o'chirish`,
-        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        fileId:
-          fileUploadResponse.data.fileName +
-          "*" +
-          fileUploadResponse.data.fileId,
-        kSaldo: 0,
-        residentId: abonentFake.id,
-        inhabitantCount: 0,
-      })
-    ).data;
 
-    return res.json({
-      ok: true,
-      message: "muvaffaqqiyatli akt qilindi",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ ok: false, message: "Internal server error 500" });
+      return res.json({
+        ok: true,
+        message: "muvaffaqqiyatli akt qilindi",
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ ok: false, message: "Internal server error 500" });
+    }
   }
-});
+);
 
 router.get(`/get-abonent-dxj-by-id/:abonent_id`, async (req, res) => {
   try {

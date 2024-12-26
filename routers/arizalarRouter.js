@@ -61,6 +61,7 @@ router.get("/get-ariza-by-id/:_id", async (req, res) => {
         akt_statuses_name: ariza.akt_statuses_name,
         is_canceled: ariza.is_canceled,
         ikkilamchi_licshet: ariza.ikkilamchi_licshet,
+        aktSummCounts: ariza.aktSummCounts,
       },
     });
   } catch (error) {
@@ -98,6 +99,7 @@ router.get(
           akt_statuses_name: ariza.akt_statuses_name,
           is_canceled: ariza.is_canceled,
           ikkilamchi_licshet: ariza.ikkilamchi_licshet,
+          aktSummCounts: ariza.aktSummCounts,
         },
       });
     } catch (error) {
