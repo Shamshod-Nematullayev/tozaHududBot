@@ -61,7 +61,12 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
           active: data.active,
           description: `${inspector.id} ${inspector.name} ma'lumotiga asosan shaxsi tasdiqlandi o'zgartirildi.`,
           citizen: pasportData.data,
-          house: data.house,
+          house: {
+            ...data.house,
+            cadastralNumber: data.house.cadastralNumber
+              ? data.house.cadastralNumber
+              : "00:00:00:00:00:0000:0000",
+          },
         }
       );
       if (!updateResponse || updateResponse.status !== 200) {

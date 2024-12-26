@@ -53,6 +53,7 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  acceptedDate: Date,
   canceling_description: String,
   akt_date: Date,
   akt_pachka_id: String,
@@ -62,5 +63,7 @@ const schema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  recalculationPeriods: Array,
+  muzlatiladi: Boolean,
 });
 module.exports.Ariza = mongoose.model("ariza", schema, "arizalar");

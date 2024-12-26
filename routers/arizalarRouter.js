@@ -36,7 +36,7 @@ router.get("/", async (req, res) => {
 
 router.get("/get-ariza-by-id/:_id", async (req, res) => {
   try {
-    const ariza = await Ariza.findById(req.params._id);
+    const ariza = await Ariza.findById(req.params._id).lean();
     const abonent = await Abonent.findOne({ licshet: ariza.licshet });
     if (!ariza)
       return res.json({
@@ -46,23 +46,7 @@ router.get("/get-ariza-by-id/:_id", async (req, res) => {
     ariza.fio = abonent.fio;
     res.json({
       ok: true,
-      ariza: {
-        _id: ariza._id,
-        sana: ariza.sana,
-        document_type: ariza.document_type,
-        document_number: ariza.document_number,
-        licshet: ariza.licshet,
-        fio: abonent.fio,
-        comment: ariza.comment,
-        current_prescribed_cnt: ariza.current_prescribed_cnt,
-        next_prescribed_cnt: ariza.next_prescribed_cnt,
-        aktSummasi: ariza.aktSummasi,
-        status: ariza.status,
-        akt_statuses_name: ariza.akt_statuses_name,
-        is_canceled: ariza.is_canceled,
-        ikkilamchi_licshet: ariza.ikkilamchi_licshet,
-        aktSummCounts: ariza.aktSummCounts,
-      },
+      ariza,
     });
   } catch (error) {
     console.error(error);
@@ -75,32 +59,18 @@ router.get(
     try {
       const ariza = await Ariza.findOne({
         document_number: parseInt(req.params.document_number),
-      });
+      }).lean();
       const abonent = await Abonent.findOne({ licshet: ariza.licshet });
       if (!ariza)
         return res.json({
           ok: false,
           message: "Ariza topilmadi",
         });
+
+      ariza.fio = abonent.fio;
       res.json({
         ok: true,
-        ariza: {
-          _id: ariza._id,
-          sana: ariza.sana,
-          document_type: ariza.document_type,
-          document_number: ariza.document_number,
-          licshet: ariza.licshet,
-          fio: abonent.fio,
-          comment: ariza.comment,
-          current_prescribed_cnt: ariza.current_prescribed_cnt,
-          next_prescribed_cnt: ariza.next_prescribed_cnt,
-          aktSummasi: ariza.aktSummasi,
-          status: ariza.status,
-          akt_statuses_name: ariza.akt_statuses_name,
-          is_canceled: ariza.is_canceled,
-          ikkilamchi_licshet: ariza.ikkilamchi_licshet,
-          aktSummCounts: ariza.aktSummCounts,
-        },
+        ariza: ariza,
       });
     } catch (error) {
       console.error(error);
@@ -142,6 +112,8 @@ router.post("/create", async (req, res) => {
       next_prescribed_cnt,
       comment,
       photos,
+      recalculationPeriods,
+      muzlatiladi,
     } = req.body;
     // validate the request
     if (!licshet) return res.json({ ok: false, message: "Licshet not found" });
@@ -201,9 +173,28 @@ router.post("/create", async (req, res) => {
       aktSummCounts: akt_summasi,
       sana: Date.now(),
       photos: photos,
+      recalculationPeriods: recalculationPeriods,
+      muzlatiladi: muzlatiladi,
     });
     await counter.updateOne({ $set: { value: counter.value + 1 } });
     res.json({ ok: true, ariza: newAriza });
+  } catch (error) {
+    console.error(error);
+    res.json({ ok: false, message: `internal error: ${error.message}` });
+  }
+});
+
+router.patch("/move-to-inbox/:ariza_id", async (req, res) => {
+  try {
+    await Ariza.findByIdAndUpdate(req.params.ariza_id, {
+      $set: {
+        acceptedDate: new Date(),
+        status: "qabul qilindi",
+      },
+    });
+    res.status(200).json({
+      ok: true,
+    });
   } catch (error) {
     console.error(error);
     res.json({ ok: false, message: `internal error: ${error.message}` });
