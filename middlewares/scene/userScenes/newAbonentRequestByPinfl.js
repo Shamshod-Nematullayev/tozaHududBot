@@ -333,11 +333,12 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         },
       });
       // so'rov yuborivchiga natijani yetkazish
-      ctx.telegram.sendMessage(
-        process.env.NAZORATCHILAR_GURUPPASI,
-        `${ctx.wizard.state.inspektor.name} тизимга янги абонент киритди 👍 <code>${generatedAccountNumber}</code>`,
-        { parse_mode: "HTML" }
-      );
+      if (ctx.wizard.state.inspektor.id !== 17413)
+        ctx.telegram.sendMessage(
+          process.env.NAZORATCHILAR_GURUPPASI,
+          `${ctx.wizard.state.inspektor.name} тизимга янги абонент киритди 👍 <code>${generatedAccountNumber}</code>`,
+          { parse_mode: "HTML" }
+        );
       ctx.replyWithHTML(
         `Yangi abonent qo'shildi <code>${generatedAccountNumber}</code>`
       );

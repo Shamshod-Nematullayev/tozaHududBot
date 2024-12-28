@@ -19,14 +19,16 @@ router.post("/", async (req, res) => {
       documentNumber: countDocuments + 1,
     });
     const mahalla = await Mahalla.findOne({ id: parseInt(mahallaId) });
-    res.status(201).json({ ok: true, data: document, mahalla });
     for (let _id of request_ids) {
+      console.log(_id, request_ids);
       await MultiplyRequest.findByIdAndUpdate(_id, {
         $set: { document_id: document._id },
       });
     }
+    res.status(201).json({ ok: true, data: document, mahalla });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ ok: false, message: "Internal Server Error" });
+    console.error(error);
   }
 });
 router.get("/", async (req, res) => {

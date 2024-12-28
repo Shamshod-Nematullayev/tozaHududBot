@@ -167,7 +167,7 @@ router.post(
             "Billing tizimiga akt kiritib bo'lmadi",
             aktResponse.data
           );
-          return res.json({
+          return res.status(500).json({
             ok: false,
             message: "Billing tizimiga akt kiritib bo'lmadi",
           });
@@ -192,7 +192,7 @@ router.post(
       }
     } catch (err) {
       console.error(err);
-      res.json({ ok: false, message: "Internal server error 500" });
+      res.status(500).json({ ok: false, message: "Internal server error 500" });
     }
   }
 );
@@ -331,7 +331,7 @@ router.post(
       });
     } catch (err) {
       console.error(err);
-      res.json({ ok: false, message: err.message });
+      res.status(500).json({ ok: false, message: err.message });
     }
   }
 );
@@ -500,7 +500,7 @@ router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
     // });
     const abonentData = await Abonent.findOne({ licshet: req.params.licshet });
     if (!abonentData) {
-      return res.json({
+      return res.status(404).json({
         ok: false,
         message: "Abonent mongodbda mavjud emas",
       });
@@ -604,7 +604,7 @@ router.put("/abarotka-berildi/:mfy_id", async (req, res) => {
       { $set: { abarotka_berildi: true } }
     );
     if (!result.modifiedCount) {
-      return res.json({ ok: false, message: "Mahalla topilmadi" });
+      return res.status(404).json({ ok: false, message: "Mahalla topilmadi" });
     }
     res.json({ ok: true, message: "Updated" });
   } catch (error) {
@@ -619,7 +619,7 @@ router.put("/abarotka-berilmadi/:mfy_id", async (req, res) => {
       { $set: { abarotka_berildi: false } }
     );
     if (!result.modifiedCount) {
-      return res.json({ ok: false, message: "Mahalla topilmadi" });
+      return res.status(404).json({ ok: false, message: "Mahalla topilmadi" });
     }
     res.json({ ok: true, message: "Updated" });
   } catch (error) {
