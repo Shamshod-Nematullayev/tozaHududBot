@@ -66,42 +66,6 @@ composer.action(/newAbonentsList_/, async (ctx) => {
     ctx.reply("Xatolik");
   }
 });
-// async (ctx) => {
-//   const abonents = await Abonent.find({ ["user.id"]: ctx.from.id });
-//   let str = "";
-//   if (abonents.length > 0) {
-//     let counter = 0;
-//     if (abonents.length > 50) {
-//       abonents.forEach((elem, i) => {
-//         str += `${i + 1}. ${qaysiMahalla(elem.data.MFY_ID)}  ${
-//           elem.isCancel
-//             ? "*" + elem.data.FISH + "*"
-//             : "*" + elem.data.FISH + "*"
-//         }: \`${elem.kod}\`\n`;
-//         if (i % 50 == 0) {
-//           ctx.reply(str, { parse_mode: "Markdown" });
-//           counter++;
-//           str = "";
-//         }
-//       });
-//       if ((counter - 1) % 50 !== 0) {
-//         ctx.reply(str, { parse_mode: "Markdown" });
-//       }
-//     } else {
-//       abonents.forEach((elem, i) => {
-//         const mahallaName = qaysiMahalla(elem.data.MFY_ID);
-//         const fishName = elem.isCancel
-//           ? `*${elem.data.FISH}*`
-//           : `*${elem.data.FISH}*`;
-//         const kodValue = `\`${elem.kod}\``;
-//         str += `${i + 1}. ${mahallaName} ${fishName}: ${kodValue}\n`;
-//       });
-//       ctx.replyWithMarkdownV2(str);
-//     }
-//   } else {
-//     ctx.reply(messages.noAbonent);
-//   }
-// }
 
 composer.hears(["📓Qo`llanma", "📓Қўлланма"], (ctx) => {
   ctx.reply("Hozircha video qo'llanma mavjud emas. 🧠 Ishlatish kifoya");

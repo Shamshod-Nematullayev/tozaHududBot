@@ -3,7 +3,11 @@ const { default: mongoose } = require("mongoose");
 const schema = new mongoose.Schema({
   asosiy_licshet: String,
   ikkilamchi_licshet: String,
-  sana: Date,
+  sana: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
   document_type: {
     type: String,
     enum: ["dvaynik", "odam_soni", "viza", "death", "gps"],
@@ -17,6 +21,7 @@ const schema = new mongoose.Schema({
   licshet: {
     type: String,
     required: true,
+    unique: true,
   },
   comment: {
     type: String,

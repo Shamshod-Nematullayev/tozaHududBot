@@ -10,7 +10,6 @@ const { Mahalla } = require("../../../models/Mahalla");
 const { NewAbonent } = require("../../../models/NewAbonents");
 const { tozaMakonApi } = require("../../../api/tozaMakon");
 const { Admin } = require("../../../requires");
-const cc = "https://cleancity.uz/";
 
 const enterFunc = (ctx) => {
   ctx.reply("Xonadon egasining PINFL raqamini kiriting!");

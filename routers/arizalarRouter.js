@@ -200,5 +200,24 @@ router.patch("/move-to-inbox/:ariza_id", async (req, res) => {
     res.json({ ok: false, message: `internal error: ${error.message}` });
   }
 });
+router.patch("/:ariza_id", async (req, res) => {
+  try {
+    await Ariza.findByIdAndUpdate(
+      req.params.ariza_id,
+      {
+        $set: {
+          ...req.body,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json({
+      ok: true,
+    });
+  } catch (error) {
+    console.error(error);
+    res.json({ ok: false, message: `internal error: ${error.message}` });
+  }
+});
 
 module.exports = router;
