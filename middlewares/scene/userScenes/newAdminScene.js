@@ -1,6 +1,7 @@
 const { Scenes } = require("telegraf");
 const { Admin } = require("../../../models/Admin");
 const { messages } = require("../../../requires");
+const bcrypt = require("bcrypt");
 
 const newAdminScene = new Scenes.WizardScene(
   "newAdmin",
@@ -16,7 +17,7 @@ const newAdminScene = new Scenes.WizardScene(
   },
   async (ctx) => {
     if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
-    ctx.wizard.state.password = ctx.message.text;
+    ctx.wizard.state.password = await bcrypt.hash(ctx.message.text, 10);
     const admin = ctx.wizard.state;
     await new Admin({
       user_id: ctx.from.id,

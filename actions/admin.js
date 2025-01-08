@@ -84,6 +84,10 @@ composer.command("admin", async (ctx) => {
   const admins = await Admin.find();
   if (admins.length === 0) ctx.scene.enter("newAdmin");
 });
+composer.command("change_password", async (ctx) => {
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+  ctx.scene.enter("changePasswordScene");
+});
 
 composer.hears(["👨‍💻 Ish maydoni", "👨‍💻 Иш майдони"], async (ctx) => {
   if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);

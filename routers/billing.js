@@ -11,12 +11,13 @@ const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { PDFDocument } = require("pdf-lib");
 const PDFMerger = require("pdf-merger-js");
 const akt_pachka_id = {
-  viza: "4444946",
-  odam_soni: "4444949",
-  dvaynik: "4444950",
-  pul_kuchirish: "4445046",
-  death: "4444947",
-  boshqa: "4444109",
+  viza: "4445910",
+  odam_soni: "4445915",
+  dvaynik: "4445913",
+  pul_kuchirish: "4445914",
+  death: "4445909",
+  gps: "4445917",
+  // boshqa: "4444109",
 };
 
 const router = require("express").Router();
