@@ -1,7 +1,9 @@
 // Bismillah
 require("dotenv").config();
-if (!process.env.SECRET_JWT_KEY) {
-  console.error("SECRET_JWT_KEY environment variable is not defined");
+if (!process.env.SECRET_JWT_KEY || !process.env.REFRESH_JWT_KEY) {
+  console.error(
+    "SECRET_JWT_KEY or REFRESH_JWT_KEY environment variable is not defined"
+  );
   process.exit(1);
 }
 // process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
@@ -14,7 +16,12 @@ const isAuth = require("./middlewares/isAuth");
 // App middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true, // Cookie'larni yuborishga ruxsat
+  })
+);
 
 // use routers
 app.use("/api/auth", require("./routers/auth"));

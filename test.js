@@ -65,44 +65,44 @@ const datas = require("./main.json");
 const { tozaMakonApi } = require("./api/tozaMakon");
 
 let init = 50000;
-Abonent.find().then((abonents) => {
-  let counter = init;
-  const loop = async () => {
-    if (counter == datas.length || counter >= init + 5000)
-      return console.log("jarayon yakullandi");
-    const kod = datas[counter];
-    const finded = abonents.find(
-      (abonent) => abonent.licshet == kod.accountNumber
-    );
-    if (!finded) {
-      const { data } = await tozaMakonApi.get(
-        "/user-service/residents/" + kod.id
-      );
-      await Abonent.create({
-        createdAt: new Date(),
-        energy_licshet: "",
-        fio: data.fullName,
-        id: data.id,
-        licshet: kod.accountNumber,
-        kadastr_number: data.house.cadastralNumber,
-        mahallas_id: data.mahallaId,
-        mahalla_name: data.mahallaName,
-        passport_number: data.passportNumber,
-        pinfl: data.citizen.pnfl,
-        streets_id: data.streetId,
-        streets_name: data.streetName,
-        phone: data.house.phone,
-      });
-      counter++;
-      return loop();
-    }
-    // console.log(finded);
-    counter++;
-    console.log(counter);
-    loop();
-  };
-  loop();
-});
+// Abonent.find().then((abonents) => {
+//   let counter = init;
+//   const loop = async () => {
+//     if (counter == datas.length || counter >= init + 5000)
+//       return console.log("jarayon yakullandi");
+//     const kod = datas[counter];
+//     const finded = abonents.find(
+//       (abonent) => abonent.licshet == kod.accountNumber
+//     );
+//     if (!finded) {
+//       const { data } = await tozaMakonApi.get(
+//         "/user-service/residents/" + kod.id
+//       );
+//       await Abonent.create({
+//         createdAt: new Date(),
+//         energy_licshet: "",
+//         fio: data.fullName,
+//         id: data.id,
+//         licshet: kod.accountNumber,
+//         kadastr_number: data.house.cadastralNumber,
+//         mahallas_id: data.mahallaId,
+//         mahalla_name: data.mahallaName,
+//         passport_number: data.passportNumber,
+//         pinfl: data.citizen.pnfl,
+//         streets_id: data.streetId,
+//         streets_name: data.streetName,
+//         phone: data.house.phone,
+//       });
+//       counter++;
+//       return loop();
+//     }
+//     // console.log(finded);
+//     counter++;
+//     console.log(counter);
+//     loop();
+//   };
+//   loop();
+// });
 
 // Nazoratchi.find().then((inspectors) => {
 //   inspectors.forEach(async (inspector) => {
@@ -138,3 +138,69 @@ Abonent.find().then((abonents) => {
 //     }
 //   });
 // });
+
+async function integrtsiya() {
+  const abonents = await Abonent.find();
+  let page = 1;
+  let counter = 0;
+  const loop = async function () {
+    if (counter === abonents.length || page * 5000 === counter)
+      return console.log("Jarayon yakullandi");
+    const abonent = abonents[counter];
+    try {
+      const pasportData = await tozaMakonApi.get("/user-service/citizens", {
+        params: {
+          passport: abonent.passport_number,
+          pinfl: abonent.pinfl,
+          // birthdate: req.data.birth_date,
+        },
+      });
+      if (pasportData.status !== 200) {
+        return ctx.answerCbQuery("Pasport ma'lumotlarini olishda xatolik");
+      }
+      const abonentDatasResponse = await tozaMakonApi.get(
+        `/user-service/residents/${abonent.id}?include=translates&withPhoto=true`
+      );
+      if (!abonentDatasResponse || abonentDatasResponse.status !== 200) {
+        return ctx.answerCbQuery(
+          "Abonent dastlabki ma'lumotlarini oliishda xatolik"
+        );
+      }
+      const data = abonentDatasResponse.data;
+      const updateResponse = await tozaMakonApi.put(
+        "/user-service/residents/" + abonent.id,
+        {
+          id: abonent.id,
+          accountNumber: abonent.licshet,
+          residentType: "INDIVIDUAL",
+          electricityAccountNumber: data.electricityAccountNumber,
+          electricityCoato: data.electricityCoato,
+          companyId: data.companyId,
+          streetId: data.streetId,
+          mahallaId: data.mahallaId,
+          contractNumber: data.contractNumber,
+          contractDate: data.contractDate,
+          homePhone: null,
+          active: data.active,
+          description: `${inspector.id} ${inspector.name} ma'lumotiga asosan shaxsi tasdiqlandi o'zgartirildi.`,
+          citizen: pasportData.data,
+          house: {
+            ...data.house,
+            cadastralNumber: data.house.cadastralNumber
+              ? data.house.cadastralNumber
+              : "00:00:00:00:00:0000:0000",
+          },
+        }
+      );
+      if (!updateResponse || updateResponse.status !== 200) {
+        return ctx.answerCbQuery("Ma'lumotlarni yangilashda xatolik");
+      }
+      console.log(counter);
+      counter++;
+      await loop();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  loop();
+}

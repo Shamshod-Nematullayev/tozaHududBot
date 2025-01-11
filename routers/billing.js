@@ -10,13 +10,14 @@ const FormData = require("form-data");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { PDFDocument } = require("pdf-lib");
 const PDFMerger = require("pdf-merger-js");
+const { default: axios } = require("axios");
 const akt_pachka_id = {
   viza: "4445910",
   odam_soni: "4445915",
   dvaynik: "4445913",
   pul_kuchirish: "4445914",
   death: "4445909",
-  gps: "4445917",
+  gps: "4446034",
   // boshqa: "4444109",
 };
 
@@ -61,6 +62,7 @@ router.post(
       if (photos?.length > 0) {
         // endi pdf va rasmlarni birlashtirish kodi kerak
         const photosBuffer = [];
+        console.log(photos);
         for (let file_id of photos) {
           const file = await bot.telegram.getFile(file_id);
           const photoBuffer = await bot.telegram.getFileLink(file.file_id);
@@ -80,10 +82,12 @@ router.post(
             height: image.height,
           });
         }
-        const pdfBuffer = await pdfDoc.save();
+        let pdfBuffer = await pdfDoc.save();
         const merger = new PDFMerger();
-        merger.add(req.file.buffer);
-        merger.add(pdfBuffer);
+        await merger.add(req.file.buffer);
+        pdfBuffer = Buffer.from(pdfBuffer);
+        console.log(Buffer.isBuffer(pdfBuffer));
+        await merger.add(pdfBuffer);
         const bufferAktFile = await merger.saveAsBuffer();
         req.file.buffer = bufferAktFile;
       }

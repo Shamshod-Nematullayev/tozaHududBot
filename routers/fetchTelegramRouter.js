@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { uploadAsBlob } = require("../middlewares/multer");
 const { TEST_BASE_CHANNEL_ID } = require("../constants");
+const { default: axios } = require("axios");
 
 const router = require("express").Router();
 
@@ -16,7 +17,7 @@ router.get("/:file_id", async (req, res, next) => {
 
     https
       .get(fileLink.href, (response) => {
-        const fileName = "file.pdf";
+        const fileName = Date.now() + "file.png";
         const fileStream = fs.createWriteStream(fileName);
 
         response.pipe(fileStream);

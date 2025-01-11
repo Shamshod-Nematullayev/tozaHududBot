@@ -1,7 +1,10 @@
 const { Schema, default: mongoose } = require("mongoose");
 
 const schema = new Schema({
-  licshet: String,
+  licshet: {
+    required: true,
+    type: String,
+  },
   hybridMailId: {
     required: true,
     type: String,

@@ -24,7 +24,7 @@ router.post("/login", async (req, res, next) => {
         message: "Login yoki parol mos kelmadi",
       });
     }
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       {
         id: admin.id,
         login: admin.login,
@@ -33,13 +33,56 @@ router.post("/login", async (req, res, next) => {
       process.env.SECRET_JWT_KEY,
       { expiresIn: "1h" }
     );
+    const refreshToken = jwt.sign(
+      {
+        id: admin.id,
+        login: admin.login,
+      },
+      process.env.REFRESH_JWT_KEY,
+      { expiresIn: "12h" }
+    );
+    await admin.updateOne({
+      $set: {
+        refreshToken: refreshToken,
+      },
+    });
+
     res.status(200).json({
       ok: true,
-      token,
+      accessToken,
+      refreshToken,
     });
   } catch (ex) {
     next(ex);
   }
+});
+router.post("/refresh-token", async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) return res.status(401).json({ message: "Unauthorized" });
+
+  const admin = await Admin.findOne({ refreshToken });
+  if (!admin) return res.status(403).json({ message: "Invalid refresh token" });
+
+  jwt.verify(refreshToken, process.env.REFRESH_JWT_KEY, (err, decoded) => {
+    if (err) return res.status(403).json({ message: "Invalid refresh token" });
+
+    const accessToken = jwt.sign(
+      { id: decoded.id, login: decoded.login },
+      process.env.SECRET_JWT_KEY,
+      { expiresIn: "1h" }
+    );
+
+    res.json({ accessToken });
+  });
+});
+
+router.post("/logout", async (req, res) => {
+  const { refreshToken } = req.body;
+
+  await Admin.updateOne({ refreshToken }, { refreshToken: null });
+
+  res.status(200).json({ message: "Logged out successfully" });
 });
 
 module.exports = router;

@@ -232,6 +232,11 @@ router.get("/hybrid-mails", async (req, res) => {
     const skip = (page - 1) * limit;
     fromDate = new Date(fromDate);
     toDate = new Date(toDate);
+    if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+      return res
+        .status(400)
+        .json({ ok: false, message: "Invalid date format" });
+    }
     const startDate = new Date(fromDate.getFullYear(), fromDate.getMonth(), 1); // JavaScript oylari 0-indeksli
     const endDate = new Date(
       toDate.getFullYear(),
@@ -248,7 +253,7 @@ router.get("/hybrid-mails", async (req, res) => {
         $gt: startDate,
         $lt: endDate,
       },
-      // ...filters,
+      ...filters,
     })
       .limit(limit)
       .skip(skip)
@@ -270,7 +275,7 @@ router.get("/hybrid-mails", async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res.json({ ok: false, message: "Internal server error 500" });
+    res.json({ ok: false, message: error.message });
     console.error(error);
   }
 });
