@@ -400,6 +400,27 @@ router.put(
   }
 );
 
+router.put("/hybrid-mails/update-mail-status/:mail_id", async (req, res) => {
+  try {
+    const mail = await HybridMail.findById(req.params.mail_id);
+    if (!mail) {
+      return res.status(400).json({ ok: false, message: "Mail not found" });
+    }
+    const hybridMail = (await hybridPochtaApi.get("/mail/" + mail.hybridMailId))
+      .data;
+    const content = await mail.updateOne({
+      $set: {
+        isSent: hybridMail.IsSent && hybridMail.Perform.Type === 0,
+        sentOn: hybridMail.Perform.PerformedOn,
+      },
+    });
+    res.status(200).json({ ok: true, content });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Internal server error" });
+    console.error(error);
+  }
+});
+
 // router.put("/update-case-documents-to-billing/:case_id", async (req, res) => {
 //   try {
 //     const case_documents = await CaseDocument.find({
