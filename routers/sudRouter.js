@@ -1,26 +1,13 @@
 const router = require("express").Router();
-const { CaseDocument } = require("../models/CaseDocuments");
+const ejs = require("ejs");
 const { SudAkt } = require("../models/SudAkt");
 const { HybridMail } = require("../models/HybridMail");
-const { Counter, bot } = require("../requires");
-const {
-  upload,
-  uploadAsBlob,
-  isLimitFileSize,
-} = require("../middlewares/multer");
-
-// get all dates   GET
-// router.get("/", getAllAkts);
-// // get one data    GET
-// router.get("/:id", getAktById);
-// // create new data POST
-// router.post("/", createNewAkt);
-// // update one data PUT
-// router.put("/:id", updateAktById);
-// // update one without id PUT
-// router.put("/", updateAktByKod);
-// // delete one data DELETE
-// router.delete("/:id", deleteById);
+const { Counter, bot, htmlPDF } = require("../requires");
+const { uploadAsBlob, isLimitFileSize } = require("../middlewares/multer");
+const { hybridPochtaApi } = require("../api/hybridPochta");
+const PDFMerger = require("pdf-merger-js");
+const { tozaMakonApi } = require("../api/tozaMakon");
+const FormData = require("form-data");
 
 router.get("/", async (req, res) => {
   try {
@@ -34,7 +21,6 @@ router.get("/", async (req, res) => {
     if (req.query.status) {
       filter.status = req.query.status;
     }
-    console.log("Filter:", filter);
     const sudAkts = await SudAkt.find(filter)
       .sort(sortOptions)
       .skip(skip)
@@ -220,16 +206,25 @@ router.get("/hybrid-mails", async (req, res) => {
     let {
       page = 1,
       limit = 10,
-      sortField = "createdAt",
+      sortField = "createdOn",
       sortDirection = "asc",
       fromDate,
       toDate,
       ...filters
     } = req.query;
+    limit = parseInt(limit);
+
     const sortOptions = {};
     sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
-
     const skip = (page - 1) * limit;
+
+    if (!fromDate || !toDate) {
+      return res.json({
+        ok: false,
+        message: "fromDate and toDate fields are required",
+      });
+    }
+
     fromDate = new Date(fromDate);
     toDate = new Date(toDate);
     if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
@@ -247,7 +242,8 @@ router.get("/hybrid-mails", async (req, res) => {
       59,
       999
     ); // Oy oxiri
-    console.log({ startDate, endDate, filters });
+
+    // ma'lumotlarni olish
     const mails = await HybridMail.find({
       createdOn: {
         $gt: startDate,
@@ -279,8 +275,20 @@ router.get("/hybrid-mails", async (req, res) => {
     console.error(error);
   }
 });
+
+router.get("/hybrid-mails/:mail_id", async (req, res) => {
+  try {
+    const mail = await HybridMail.findById(req.params.mail_id);
+    if (!mail)
+      return res.status(400).json({ ok: false, message: "Mail not found" });
+    res.json({ ok: true, row: mail });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+});
 // update one mail by id
-router.put("/hybrid-mails/:mail_id", async (req, res) => {
+router.patch("/hybrid-mails/:mail_id", async (req, res) => {
   try {
     const mail = await HybridMail.findByIdAndUpdate(req.params.mail_id, {
       $set: { warning_amount: req.body.warning_amount },
@@ -292,6 +300,105 @@ router.put("/hybrid-mails/:mail_id", async (req, res) => {
     console.error(error);
   }
 });
+
+router.put(
+  "/hybrid-mails/upload-cash-to-billing/:mail_id",
+  async (req, res) => {
+    try {
+      const row = await HybridMail.findById(req.params.mail_id);
+      if (!row) {
+        return res.status(400).json({ ok: false, message: "Mail not found" });
+      }
+      const pdf = await hybridPochtaApi.get(`/PdfMail/` + row.hybridMailId, {
+        responseType: "arraybuffer",
+      });
+      const warningLetterPDF = Buffer.from(pdf.data);
+      const mail = (
+        await hybridPochtaApi.get("/mail", {
+          params: {
+            id: row.hybridMailId,
+          },
+        })
+      ).data;
+      ejs.renderFile(
+        "./views/hybridPochtaCash.ejs",
+        { mail },
+        (err, result) => {
+          if (err) throw err;
+          htmlPDF
+            .create(result, { format: "A4", orientation: "portrait" })
+            .toBuffer(async (err, cashPDF) => {
+              if (err) throw err;
+              let merger = new PDFMerger();
+              await merger.add(warningLetterPDF);
+              await merger.add(cashPDF);
+              await merger.setMetadata({
+                producer: "oliy ong",
+                author: "Shamshod Nematullayev",
+                creator: "Toza Hudud bot",
+                title: "Ogohlantirish xati",
+              });
+              const bufferWarningWithCash = await merger.saveAsBuffer();
+              const formData = new FormData();
+              formData.append(
+                "file",
+                bufferWarningWithCash,
+                row.hybridMailId + `.pdf`
+              );
+              // billingdan sudAktini topish
+              const courtWarning = (
+                await tozaMakonApi.get(
+                  `/user-service/court-warnings?accountNumber=${row.licshet}&status=NEW`
+                )
+              ).data.content[0];
+              if (!courtWarning) {
+                return res
+                  .status(400)
+                  .json({ ok: false, message: "Sud akti billingda topilmadi" });
+              }
+
+              const fileUploadBilling = (
+                await tozaMakonApi.post(
+                  "/file-service/buckets/upload",
+                  formData,
+                  {
+                    params: {
+                      folderType: "SUD_PROCESS",
+                    },
+                    headers: { "Content-Type": "multipart/form-data" },
+                  }
+                )
+              ).data;
+              await tozaMakonApi.post(
+                "/user-service/court-processes/" +
+                  courtWarning.id +
+                  "/add-file",
+                {
+                  description: `warning letter by hybrid`,
+                  fileName: `${fileUploadBilling.fileName}*${fileUploadBilling.fileId}`,
+                  fileType: "WARNING_FILE",
+                }
+              );
+
+              const content = await row.updateOne(
+                {
+                  $set: {
+                    isSavedBilling: true,
+                    sud_process_id_billing: courtWarning.id,
+                  },
+                },
+                { new: true }
+              );
+              res.status(200).json({ ok: true, content });
+            });
+        }
+      );
+    } catch (error) {
+      res.status(500).json({ ok: false, message: "Internal server error" });
+      console.error(error);
+    }
+  }
+);
 
 // router.put("/update-case-documents-to-billing/:case_id", async (req, res) => {
 //   try {
