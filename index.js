@@ -56,6 +56,8 @@ function useTelegramBot() {
   require("./intervals");
 }
 useTelegramBot();
+// useTelegramBot();
+// require("./test");
 mongoose
   .connect(process.env.MONGO)
   .then(async () => {

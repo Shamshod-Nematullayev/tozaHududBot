@@ -165,6 +165,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
             receiver: abonentData.fullName,
             warning_date_billing: new Date(),
             warning_amount: abonentData.balance.kSaldo,
+            sud_process_id_billing: courtWarning.id,
           });
           arrayMails.push({
             hybridMailId: newMail.Id,
