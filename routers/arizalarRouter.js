@@ -6,12 +6,20 @@ const router = require("express").Router();
 
 router.get("/", async (req, res) => {
   try {
-    const { page = 1, limit = 10, sort = "", ...filters } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      sortField = "sana",
+      sortDirection = "asc",
+      ...filters
+    } = req.query;
+    const sortOptions = {};
+    sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
     const skip = (parseInt(page) - 1) * limit; // Nechta elementni o'tkazib yuborish
     const data = await Ariza.find({
       ...filters,
     }) // Filtrlash
-      .sort(sort)
+      .sort(sortOptions)
       .skip(skip) // Paging
       .limit(parseInt(limit)) // Limit
       .lean(); // Faqatgina "plain" obyekt qaytarish uchun (performance uchun yaxshi)

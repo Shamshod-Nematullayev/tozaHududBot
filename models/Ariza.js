@@ -63,6 +63,19 @@ const schema = new mongoose.Schema({
   akt_date: Date,
   akt_pachka_id: String,
   akt_id: String,
+  actStatus: {
+    type: String,
+    enum: [
+      "NEW",
+      "WARNED",
+      "CONFIRMED",
+      "CANCELLED",
+      "CONFIRMED_CANCELLED",
+      "WARNED_CANCELLED",
+      "APPROVED",
+    ],
+    default: "NEW",
+  },
   aktInfo: Object,
   photos: {
     type: Array,

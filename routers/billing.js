@@ -530,7 +530,7 @@ router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
   }
 });
 
-const uchirilishiKerakBulganAbonentlar = [105120350731];
+const uchirilishiKerakBulganAbonentlar = [];
 router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
   try {
     const abonents = await Abonent.find({ mahallas_id: req.params.mfy_id });
@@ -539,14 +539,14 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
     let totalPages = 1;
     const rows = [];
     const { data } = await tozaMakonApi.get(
-      `/user-service/residents?districtId=47&sort=id,DESC&page=${page}&size=400&companyId=1144&mahallaId=${req.params.mfy_id}`
+      `/user-service/residents?districtId=47&sort=id,DESC&page=${page}&size=300&companyId=1144&mahallaId=${req.params.mfy_id}`
     );
     rows.push(...data.content);
     totalPages = data.totalPages;
     if (totalPages > 1) {
       for (let i = 1; i < totalPages; i++) {
         const { data } = await tozaMakonApi.get(
-          `/user-service/residents?districtId=47&sort=id,DESC&page=${i}&size=400&companyId=1144&mahallaId=${req.params.mfy_id}`
+          `/user-service/residents?districtId=47&sort=id,DESC&page=${i}&size=300&companyId=1144&mahallaId=${req.params.mfy_id}`
         );
         rows.push(...data.content);
       }

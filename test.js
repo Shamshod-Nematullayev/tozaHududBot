@@ -140,67 +140,73 @@ let init = 50000;
 // });
 
 async function integrtsiya() {
-  const abonents = await Abonent.find();
   let page = 1;
   let counter = 0;
+  const abonents = await Abonent.find()
+    .limit(5000)
+    .skip(5000 * (page - 1));
+  console.log("integrtsiya");
   const loop = async function () {
     if (counter === abonents.length || page * 5000 === counter)
       return console.log("Jarayon yakullandi");
     const abonent = abonents[counter];
     try {
-      const pasportData = await tozaMakonApi.get("/user-service/citizens", {
-        params: {
-          passport: abonent.passport_number,
-          pinfl: abonent.pinfl,
-          // birthdate: req.data.birth_date,
-        },
-      });
-      if (pasportData.status !== 200) {
-        return ctx.answerCbQuery("Pasport ma'lumotlarini olishda xatolik");
-      }
-      const abonentDatasResponse = await tozaMakonApi.get(
-        `/user-service/residents/${abonent.id}?include=translates&withPhoto=true`
-      );
-      if (!abonentDatasResponse || abonentDatasResponse.status !== 200) {
-        return ctx.answerCbQuery(
-          "Abonent dastlabki ma'lumotlarini oliishda xatolik"
-        );
-      }
-      const data = abonentDatasResponse.data;
-      const updateResponse = await tozaMakonApi.put(
-        "/user-service/residents/" + abonent.id,
-        {
-          id: abonent.id,
-          accountNumber: abonent.licshet,
-          residentType: "INDIVIDUAL",
-          electricityAccountNumber: data.electricityAccountNumber,
-          electricityCoato: data.electricityCoato,
-          companyId: data.companyId,
-          streetId: data.streetId,
-          mahallaId: data.mahallaId,
-          contractNumber: data.contractNumber,
-          contractDate: data.contractDate,
-          homePhone: null,
-          active: data.active,
-          description: `${inspector.id} ${inspector.name} ma'lumotiga asosan shaxsi tasdiqlandi o'zgartirildi.`,
-          citizen: pasportData.data,
-          house: {
-            ...data.house,
-            cadastralNumber: data.house.cadastralNumber
-              ? data.house.cadastralNumber
-              : "00:00:00:00:00:0000:0000",
+      if (abonent.shaxsi_tasdiqlandi?.confirm) {
+        const pasportData = await tozaMakonApi.get("/user-service/citizens", {
+          params: {
+            passport: abonent.passport_number,
+            pinfl: abonent.pinfl,
+            // birthdate: req.data.birth_date,
           },
+        });
+        if (pasportData.status !== 200) {
+          return console.log("Pasport ma'lumotlarini olishda xatolik");
         }
-      );
-      if (!updateResponse || updateResponse.status !== 200) {
-        return ctx.answerCbQuery("Ma'lumotlarni yangilashda xatolik");
+        const abonentDatasResponse = await tozaMakonApi.get(
+          `/user-service/residents/${abonent.id}?include=translates&withPhoto=true`
+        );
+        if (!abonentDatasResponse || abonentDatasResponse.status !== 200) {
+          return console.log(
+            "Abonent dastlabki ma'lumotlarini oliishda xatolik"
+          );
+        }
+        const data = abonentDatasResponse.data;
+        const updateResponse = await tozaMakonApi.put(
+          "/user-service/residents/" + abonent.id,
+          {
+            id: abonent.id,
+            accountNumber: abonent.licshet,
+            residentType: "INDIVIDUAL",
+            electricityAccountNumber: data.electricityAccountNumber,
+            electricityCoato: data.electricityCoato,
+            companyId: data.companyId,
+            streetId: data.streetId,
+            mahallaId: data.mahallaId,
+            contractNumber: data.contractNumber,
+            contractDate: data.contractDate,
+            homePhone: null,
+            active: data.active,
+            description: data.description,
+            citizen: pasportData.data,
+            house: {
+              ...data.house,
+              cadastralNumber: data.house.cadastralNumber
+                ? data.house.cadastralNumber
+                : "00:00:00:00:00:0000:0000",
+            },
+          }
+        );
+        if (!updateResponse || updateResponse.status !== 200) {
+          console.log("Ma'lumotlarni yangilashda xatolik");
+        }
       }
       console.log(counter);
       counter++;
-      await loop();
+      loop();
     } catch (error) {
       console.error(error);
     }
   };
   loop();
 }
+// integrtsiya();

@@ -33,13 +33,21 @@ router.post("/", async (req, res) => {
 });
 router.get("/", async (req, res) => {
   try {
-    const { page = 1, limit = 10, sort = "", ...filters } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      sortField = "date",
+      sortDirection = "asc",
+      ...filters
+    } = req.query;
     const skip = (parseInt(page) - 1) * limit; // Nechta elementni o'tkazib yuborish
+    const sortOptions = {};
+    sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
     const data = await MultiplyRequest.find({
       ...filters,
       confirm: false,
     }) // Filtrlash
-      .sort(sort)
+      .sort(sortOptions)
       .skip(skip) // Paging
       .limit(parseInt(limit)) // Limit
       .lean(); // Faqatgina "plain" obyekt qaytarish uchun (performance uchun yaxshi)

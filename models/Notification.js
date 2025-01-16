@@ -3,7 +3,7 @@ const { Schema, default: mongoose } = require("mongoose");
 const schema = new Schema({
   type: {
     type: String,
-    enum: ["akt_warning", "akt_canceled", "akt_deleted", "akt_not_confirmed", ],
+    enum: ["alert", "info", "task"],
     required: true,
   },
   message_id: {
@@ -19,7 +19,7 @@ const schema = new Schema({
     required: true,
     default: "new",
   },
-  params: Object
+  params: Object,
 });
 
 module.exports.Notification = mongoose.model("notification", schema);

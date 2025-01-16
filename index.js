@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:8000",
     credentials: true, // Cookie'larni yuborishga ruxsat
   })
 );
@@ -56,11 +56,11 @@ function useTelegramBot() {
   require("./intervals");
 }
 useTelegramBot();
-// require("./test");
 mongoose
   .connect(process.env.MONGO)
   .then(async () => {
     console.log(`Ma'lumotlar bazasiga ulandi`);
+    // require("./test");
   })
   .catch((err) => {
     throw err;

@@ -144,7 +144,9 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       await ctx.deleteMessage();
     }
   } catch (error) {
-    ctx.answerCbQuery("Xatolik kuzatildi");
+    try {
+      ctx.answerCbQuery("Xatolik kuzatildi");
+    } catch (error) {}
     console.error(error);
   }
 });
