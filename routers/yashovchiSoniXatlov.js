@@ -20,7 +20,6 @@ router.post("/", async (req, res) => {
     });
     const mahalla = await Mahalla.findOne({ id: parseInt(mahallaId) });
     for (let _id of request_ids) {
-      console.log(_id, request_ids);
       await MultiplyRequest.findByIdAndUpdate(_id, {
         $set: { document_id: document._id },
       });
@@ -69,6 +68,33 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ ok: false, message: err.message });
+  }
+});
+
+router.get("/mahallas", async (req, res) => {
+  try {
+    const { filters } = req.query;
+    const mahallas = await MultiplyRequest.aggregate([
+      { $match: filters },
+      {
+        $group: {
+          _id: 0,
+          mahallaId: "$mahallaId",
+          mahallaName: "$mahallaName",
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          mahallaId: 1,
+          mahallaName: 1,
+        },
+      },
+    ]);
+    res.status(200).json({ ok: true, data: mahallas });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+    console.error(error);
   }
 });
 
