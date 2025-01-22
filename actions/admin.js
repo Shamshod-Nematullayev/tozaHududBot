@@ -230,7 +230,8 @@ composer.command("help", (ctx) => {
   );
 });
 composer.command("tushum", async (ctx) => {
-  nazoratchilarKunlikTushum();
+  // nazoratchilarKunlikTushum();
+  sendMFYIncomeReport();
 });
 
 composer.hears("debit", (ctx) => {
