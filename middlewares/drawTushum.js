@@ -1,4 +1,4 @@
-const nodeHtmlToImage = require("node-html-to-image");
+const nodeHtmlToImage = require("../helpers/puppeteer-wrapper");
 const { bot } = require("../core/bot");
 const fs = require("fs");
 

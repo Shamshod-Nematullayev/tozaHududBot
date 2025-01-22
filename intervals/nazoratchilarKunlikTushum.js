@@ -1,4 +1,3 @@
-const nodeHtmlToImage = require("node-html-to-image");
 const {
   getTransactionsReportInspector,
 } = require("../api/ekopay.uz/getTransactionsReportInspector");
@@ -55,7 +54,7 @@ async function nazoratchilarKunlikTushum() {
         });
         const buffer = Buffer.from(binaryData, "binary");
         bot.telegram.sendPhoto(
-          process.env.ME,
+          process.env.NAZORATCHILAR_GURUPPASI,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,

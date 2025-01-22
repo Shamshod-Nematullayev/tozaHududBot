@@ -6,7 +6,7 @@ const excelToJson = require("convert-excel-to-json");
 const https = require("https");
 const fs = require("fs");
 const qaysiMahalla = require("../../smallFunctions/qaysiMahalla");
-const nodeHtmlToImage = require("node-html-to-image");
+const nodeHtmlToImage = require("../../../helpers/puppeteer-wrapper");
 const { Mahalla } = require("../../../models/Mahalla");
 const {
   getWeekdaysInMonth,

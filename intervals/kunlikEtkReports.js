@@ -1,4 +1,4 @@
-const nodeHtmlToImage = require("node-html-to-image");
+const nodeHtmlToImage = require("../helpers/puppeteer-wrapper");
 const { Abonent, Nazoratchi, bot } = require("../requires");
 const ejs = require("ejs");
 const { EtkKodRequest } = require("../models/EtkKodRequest");
