@@ -32,8 +32,8 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
           birthdate: req.data.birth_date,
         },
       });
-      if (pasportData.status !== 200) {
-        return ctx.answerCbQuery("Pasport ma'lumotlarini olishda xatolik");
+      if (pasportData.data.code) {
+        return ctx.answerCbQuery(pasportData.data.message);
       }
       const abonentDatasResponse = await tozaMakonApi.get(
         `/user-service/residents/${abonent.id}?include=translates&withPhoto=true`
@@ -72,6 +72,10 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       if (!updateResponse || updateResponse.status !== 200) {
         return ctx.answerCbQuery("Ma'lumotlarni yangilashda xatolik");
       }
+      await tozaMakonApi.patch("/user-service/residents/identified", {
+        identified: true,
+        residentIds: [abonent.id],
+      });
 
       //   mongodb ma'lumotlar bazada yangilanish
       await abonent.updateOne({

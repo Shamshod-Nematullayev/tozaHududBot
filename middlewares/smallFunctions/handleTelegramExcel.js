@@ -48,10 +48,10 @@ async function handleTelegramExcel(ctx) {
       console.log("Excel data:", jsonData);
 
       // Optionally, reply or perform actions with the processed data
-      ctx.reply("Excel file processed successfully!");
+      await ctx.reply("Excel file processed successfully!");
 
       // Clean up: Remove the downloaded file
-      fs.unlinkSync(filePath);
+      await fs.unlinkSync(filePath);
 
       return jsonData; // Return JSON data if needed
     } else {

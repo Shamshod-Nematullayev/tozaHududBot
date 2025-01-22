@@ -96,6 +96,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
         for (const row of jsonData) {
           qator++;
           const licshet = row[Object.keys(row)[1]];
+          console.log(licshet);
           if (licshet === undefined) {
             ctx.reply(`${qator}-qatorda licshet topilmadi`);
             return false;
@@ -124,10 +125,12 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
         return true;
       }
       if (!(await validate())) {
+        console.log("Validatsiyadan o'tmadi");
         return;
       }
       let i = 0;
       const loop = async () => {
+        console.log(i);
         try {
           if (i == jsonData.length) {
             ctx.replyWithHTML(

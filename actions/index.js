@@ -7,7 +7,6 @@ require("./mainCommands");
 require("./admin");
 require("./language");
 require("./shaxsiTasdiqlandi");
-// require("./stm_xodimi");
 bot.on("text", (ctx) => {
   ctx.reply(
     messages.startGreeting,

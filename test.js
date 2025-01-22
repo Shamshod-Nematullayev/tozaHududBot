@@ -8,59 +8,6 @@
 
 const { Abonent } = require("./requires");
 
-// Mahalla.find().then(async (mahallalar) => {
-//   let counter = 49;
-//   const loop = async () => {
-//     if (counter === mahallalar.length) {
-//       return console.log("Jarayon yakullandi");
-//     }
-//     const mahalla = mahallalar[counter];
-//     if (mahalla.ommaviy_shartnoma?.file_id) {
-//       const dataTg = await bot.telegram.getFileLink(
-//         mahalla.ommaviy_shartnoma.file_id
-//       );
-//       const data = await axios.get(dataTg.href, {
-//         responseType: "arraybuffer",
-//       });
-//       const pdfBuffer = Buffer.from(data.data, "binary");
-//       const formData = new FormData();
-//       formData.append("file", pdfBuffer, {
-//         filename: mahalla.ommaviy_shartnoma.filename,
-//         contentType: "application/pdf",
-//       });
-//       const fileDataBilling = (
-//         await tozaMakonApi.post(
-//           "file-service/buckets/upload?folderType=PUBLIC_MAHALLA_CONTRACTS",
-//           formData,
-//           {
-//             headers: {
-//               "Content-Type": "multipart/form-data",
-//             },
-//           }
-//         )
-//       ).data;
-//       await tozaMakonApi.patch("user-service/mahallas/" + mahalla.id, {
-//         id: mahalla.id,
-//         publicOfferFileId:
-//           fileDataBilling.fileName + "*" + fileDataBilling.fileId,
-//       });
-//       await mahalla.updateOne({
-//         $set: {
-//           publicOfferFileId:
-//             fileDataBilling.fileName + "*" + fileDataBilling.fileId,
-//         },
-//       });
-//       counter++;
-//       loop();
-//       console.log(counter);
-//       return;
-//     }
-//     counter++;
-//     loop();
-//   };
-//   loop();
-// });
-
 const datas = require("./main.json");
 const { tozaMakonApi } = require("./api/tozaMakon");
 

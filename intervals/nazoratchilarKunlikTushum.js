@@ -4,6 +4,7 @@ const {
 } = require("../api/ekopay.uz/getTransactionsReportInspector");
 const { Nazoratchi, bot } = require("../requires");
 const ejs = require("ejs");
+const generateImage = require("../helpers/puppeteer-wrapper");
 
 async function nazoratchilarKunlikTushum() {
   try {
@@ -46,7 +47,7 @@ async function nazoratchilarKunlikTushum() {
       },
       async (err, str) => {
         if (err) throw err;
-        const binaryData = await nodeHtmlToImage({
+        const binaryData = await generateImage({
           html: str,
           type: "png",
           encoding: "binary",
@@ -54,7 +55,7 @@ async function nazoratchilarKunlikTushum() {
         });
         const buffer = Buffer.from(binaryData, "binary");
         bot.telegram.sendPhoto(
-          process.env.NAZORATCHILAR_GURUPPASI,
+          process.env.ME,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,

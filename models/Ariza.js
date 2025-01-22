@@ -83,5 +83,9 @@ const schema = new mongoose.Schema({
   },
   recalculationPeriods: Array,
   muzlatiladi: Boolean,
+  actHistory: {
+    type: Array,
+    default: [],
+  },
 });
 module.exports.Ariza = mongoose.model("ariza", schema, "arizalar");

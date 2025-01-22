@@ -26,11 +26,6 @@ hybridPochtaApi.interceptors.response.use(
   async (err) => {
     const session = await CleanCitySession.findOne({ login: "dxsh24107" });
 
-    console.error({
-      method: err.response.config.method,
-      url: err.response.config.url,
-      data: err.response.data,
-    });
     if (err.response && err.response.status === 401) {
       const { data } = await axios.post(
         "https://hybrid.pochta.uz/token",

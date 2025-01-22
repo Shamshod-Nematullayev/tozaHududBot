@@ -301,6 +301,10 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         ctx.reply("Abonent qo'shishda xatolik yuz berdi");
         throw new Error("Abonent qo'shishda xatolik yuz berdi");
       }
+      await tozaMakonApi.patch("/user-service/residents/identified", {
+        identified: true,
+        residentIds: [newAbonent.data],
+      });
       newAbonent = newAbonent.data;
       // natijani ma'lumotlar bazasiga saqlash, yangi abonentlar va billing abonentlarga
       await NewAbonent.create({
