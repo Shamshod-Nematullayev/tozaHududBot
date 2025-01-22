@@ -120,3 +120,5 @@ setInterval(() => {
     }
   }
 }, 1000 * 60);
+
+module.exports = { sendMFYIncomeReport };

@@ -2,6 +2,7 @@ const { NOTIFICATIONS_CHANNEL_ID } = require("../constants");
 const {
   nazoratchilarKunlikTushum,
 } = require("../intervals/nazoratchilarKunlikTushum");
+const { sendMFYIncomeReport } = require("../intervals/sendMFYIncomeReport");
 const { Notification } = require("../models/Notification");
 const {
   // node modules
