@@ -96,7 +96,7 @@ async function sendMFYIncomeReport(ctx = false, companyId = 1144) {
         if (ctx) return ctx.replyWithPhoto({ source: buffer });
         else
           bot.telegram.sendPhoto(
-            process.env.NAZORATCHILAR_GURUPPASI,
+            process.env.ME,
             { source: buffer },
             {
               caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
@@ -120,4 +120,3 @@ setInterval(() => {
     }
   }
 }, 1000 * 60);
-sendMFYIncomeReport();
