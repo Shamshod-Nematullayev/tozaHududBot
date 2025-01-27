@@ -157,3 +157,41 @@ async function integrtsiya() {
   loop();
 }
 // integrtsiya();
+
+const akt_pachka_id = 4446236;
+async function shartnomaBekorQilishAktlari() {
+  const abonentlar = require("./main.json");
+  const date = new Date();
+  for (const { ID } of abonentlar) {
+    const calculateAmount = (
+      await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
+        params: {
+          actPackId: akt_pachka_id,
+          residentId: ID,
+          inhabitantCount: 0,
+          kSaldo: 0,
+          // endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          // startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        },
+      })
+    ).data;
+    const dvaynikAkt = (
+      await tozaMakonApi.post("/billing-service/acts", {
+        actPackId: akt_pachka_id,
+        actType: "CREDIT",
+        amount: Number(calculateAmount.amount),
+        amountWithQQS: 0,
+        amountWithoutQQS: Number(calculateAmount.amount),
+        description: `ikkilamchi hisob raqamini o'chirish`,
+        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        fileId: "undefined" + "*" + "undefined",
+        kSaldo: 0,
+        residentId: ID,
+        inhabitantCount: 0,
+      })
+    ).data;
+    console.log(abonentlar.indexOf({ ID: ID }) + 1);
+  }
+}
+shartnomaBekorQilishAktlari();

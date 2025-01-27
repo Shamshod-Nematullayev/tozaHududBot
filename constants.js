@@ -14,3 +14,12 @@ module.exports.OylikRejaBelgilashViloyat = `BQACAgIAAxkBAAEE2q5mb_GENCndgaODnaWE
 module.exports.INPUT_ABONENTS_LICSHET = `BQACAgIAAxkBAAEE9QABZn-1q0Qj4i1UThSKcirrbiLJ834AAo9DAAIfCQFIEb1x-j_e2t01BA`;
 module.exports.NOTIFICATIONS_CHANNEL_ID = -1002429873864;
 module.exports.TEST_BASE_CHANNEL_ID = -1001567163110;
+module.exports.akt_pachka_id = {
+  viza: "4445910",
+  odam_soni: "4445915",
+  dvaynik: "4445913",
+  pul_kuchirish: "4445914",
+  death: "4445909",
+  gps: "4446034",
+  // boshqa: "4444109",
+};

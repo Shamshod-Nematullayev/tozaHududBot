@@ -2,6 +2,9 @@ const { tozaMakonApi } = require("../api/tozaMakon");
 const { Mahalla } = require("../models/Mahalla");
 const { XatlovDocument } = require("../models/XatlovDocument");
 const { MultiplyRequest } = require("../models/MultiplyRequest");
+const { uploadAsBlob } = require("../middlewares/multer");
+const { akt_pachka_id } = require("../constants");
+const FormData = require("form-data");
 
 const router = require("express").Router();
 
@@ -75,12 +78,12 @@ router.get("/mahallas", async (req, res) => {
   try {
     const { filters } = req.query;
     const mahallas = await MultiplyRequest.aggregate([
-      { $match: filters },
+      { $match: { ...filters } },
       {
         $group: {
-          _id: 0,
-          mahallaId: "$mahallaId",
-          mahallaName: "$mahallaName",
+          _id: "$mahallaId", // Guruhlash uchun kalit
+          mahallaId: { $first: "$mahallaId" }, // Birinchi qiymatni oling
+          mahallaName: { $first: "$mahallaName" }, // Birinchi qiymatni oling
         },
       },
       {
@@ -143,6 +146,65 @@ router.get("/get-one-dalolatnoma", async (req, res) => {
     res.json({ ok: true, data: dalolatnoma });
   } catch (error) {
     res.status(500).json({ ok: false, message: "Internal server error" });
+  }
+});
+
+router.put("/confirm/:_id", uploadAsBlob.single("file"), async (req, res) => {
+  try {
+    const { _id } = req.params;
+    const date = new Date();
+    const formData = new FormData();
+    formData.append("file", req.file.buffer, req.file.originalname);
+
+    const fileUploadResponse = await tozaMakonApi.post(
+      "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    const request = await MultiplyRequest.findById(_id);
+    if (!request) {
+      return res.status(404).json({ ok: false, message: "Not Found" });
+    }
+    const responseAkt = await tozaMakonApi.post("/billing-service/acts", {
+      actPackId: akt_pachka_id.odam_soni,
+      actType: "DEBIT",
+      amount: 0,
+      amountWithQQS: 0,
+      amountWithoutQQS: 0,
+      description: `${request.from.first_name} ma'lumotiga asosan`,
+      endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+      startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+      fileId:
+        fileUploadResponse.data.fileName + "*" + fileUploadResponse.data.fileId,
+      kSaldo: (
+        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+          params: {
+            amount: 0,
+            residentId: request.abonentId,
+            actPackId: akt_pachka_id.odam_soni,
+            actType: "DEBIT",
+            inhabitantCount: request.YASHOVCHILAR,
+          },
+        })
+      ).data,
+      residentId: request.abonentId,
+      inhabitantCount: request.YASHOVCHILAR,
+    });
+    if (responseAkt.status !== 201) {
+      console.error("Failed to create act:", res.data);
+      return res
+        .status(500)
+        .json({ ok: false, message: "Failed to create act" });
+    }
+    await request.updateOne({ $set: { actId: responseAkt.data.id } });
+    res.status(200).json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Internal Server Error" });
+    console.error(error);
   }
 });
 

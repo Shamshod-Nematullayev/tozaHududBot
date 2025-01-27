@@ -31,6 +31,7 @@ const schema = new mongoose.Schema({
   },
   mahallaName: String,
   fio: String,
+  actId: String,
   document_id: String,
   isCancel: {
     type: Boolean,

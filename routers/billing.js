@@ -62,7 +62,6 @@ router.post(
       if (photos?.length > 0) {
         // endi pdf va rasmlarni birlashtirish kodi kerak
         const photosBuffer = [];
-        console.log(photos);
         for (let file_id of photos) {
           const file = await bot.telegram.getFile(file_id);
           const photoBuffer = await bot.telegram.getFileLink(file.file_id);

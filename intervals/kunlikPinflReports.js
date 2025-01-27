@@ -102,13 +102,4 @@ async function sendKunlikPinflReports() {
   }
 }
 
-setInterval(() => {
-  const now = new Date();
-  if (now.getMinutes() == 5) {
-    if (now.getHours() > 7 && now.getHours() < 23) {
-      sendKunlikPinflReports();
-    }
-  }
-}, 1000 * 60);
-
 module.exports = { sendKunlikPinflReports };

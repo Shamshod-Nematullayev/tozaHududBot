@@ -96,7 +96,7 @@ async function sendMFYIncomeReport(ctx = false, companyId = 1144) {
         if (ctx) return ctx.replyWithPhoto({ source: buffer });
         else
           bot.telegram.sendPhoto(
-            process.env.ME,
+            process.env.NAZORATCHILAR_GURUPPASI,
             { source: buffer },
             {
               caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
@@ -109,16 +109,5 @@ async function sendMFYIncomeReport(ctx = false, companyId = 1144) {
     console.error(new Error(err));
   }
 }
-
-setInterval(() => {
-  const now = new Date();
-  const hour = now.getHours();
-  const minut = now.getMinutes();
-  if (minut === 0) {
-    if (hour == 9 || hour == 12 || hour == 17) {
-      sendMFYIncomeReport();
-    }
-  }
-}, 1000 * 60);
 
 module.exports = { sendMFYIncomeReport };

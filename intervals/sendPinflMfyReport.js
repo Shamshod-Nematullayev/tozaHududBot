@@ -75,13 +75,4 @@ async function sendPinflMfyReport() {
   }
 }
 
-setInterval(() => {
-  const now = new Date();
-  const hour = now.getHours();
-  const minut = now.getMinutes();
-  if (minut === 0) {
-    if (hour > 7 && hour < 20) {
-      sendPinflMfyReport();
-    }
-  }
-}, 1000 * 60);
+module.exports = { sendPinflMfyReport };

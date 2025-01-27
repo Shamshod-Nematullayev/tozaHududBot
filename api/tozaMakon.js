@@ -27,11 +27,14 @@ tozaMakonApi.interceptors.response.use(
   (response) => response,
   async (error) => {
     const session = await CleanCitySession.findOne({ login: "dxsh24107" });
-    console.error({
-      method: error.response.config.method,
-      url: error.response.config.url,
-      data: error.response.data,
-    });
+    console.error(
+      {
+        method: error.response.config.method,
+        url: error.response.config.url,
+        data: error.response.data,
+      },
+      error.config.data
+    );
     if (error.response && error.response.status === 401) {
       const { data } = await axios.post(
         "https://api.tozamakon.eco/user-service/users/login",
