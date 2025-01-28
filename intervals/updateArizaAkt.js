@@ -11,7 +11,7 @@ const addUpdateArizaAktTask = async () => {
   const now = new Date();
   const date = new Date(now.getFullYear(), now.getMonth(), 1);
   const arizalar = await Ariza.find({
-    sana: { $lt: date },
+    // sana: { $lt: date },
   });
   for (const ariza of arizalar) {
     updateArizalarAkt.add({ ariza });
@@ -79,3 +79,5 @@ updateArizalarAkt.on("completed", (job) => {
   console.log(`Job ${job.id} completed successfully.`);
   console.log(`Tasdiqlangan arizalar: ${confirmed}`);
 });
+
+module.exports = { addUpdateArizaAktTask };

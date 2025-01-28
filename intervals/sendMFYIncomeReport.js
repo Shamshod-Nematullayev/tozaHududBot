@@ -39,7 +39,7 @@ async function sendMFYIncomeReport(ctx = false, companyId = 1144) {
       now.getMonth() + 1
     } ${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`;
     let mahallas = (
-      await tozaMakonApi.get("/billing-service/reports/mfa-16", {
+      await tozaMakonApi.get("/report-service/reports/mfa-16", {
         params: {
           companyId: companyId,
           regionId: 5,

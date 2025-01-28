@@ -1,6 +1,7 @@
 const { sendKunlikPinflReports } = require("./kunlikPinflReports");
 const { sendMFYIncomeReport } = require("./sendMFYIncomeReport");
 const { sendPinflMfyReport } = require("./sendPinflMfyReport");
+const { addUpdateArizaAktTask } = require("./updateArizaAkt");
 
 const timer = (times, callback) => {
   if (!Array.isArray(times)) {
@@ -79,6 +80,8 @@ timer(
   ],
   sendPinflMfyReport
 );
+
+timer("15:31", addUpdateArizaAktTask);
 // require("./yuqoriQarzdorliklar");
 // require("./cleanCitySessionSaver");
 // require("./updateArizalarStatus");
