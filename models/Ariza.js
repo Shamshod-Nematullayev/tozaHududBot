@@ -73,8 +73,8 @@ const schema = new mongoose.Schema({
       "CONFIRMED_CANCELLED",
       "WARNED_CANCELLED",
       "APPROVED",
+      "CORRECTED",
     ],
-    default: "NEW",
   },
   aktInfo: Object,
   photos: {
