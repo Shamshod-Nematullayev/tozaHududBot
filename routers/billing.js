@@ -11,6 +11,9 @@ const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { PDFDocument } = require("pdf-lib");
 const PDFMerger = require("pdf-merger-js");
 const { default: axios } = require("axios");
+const {
+  downloadFileFromBilling,
+} = require("../controllers/billingRouterController");
 const akt_pachka_id = {
   viza: "4445910",
   odam_soni: "4445915",
@@ -29,6 +32,8 @@ router.get("/next-incoming-document-number", async (req, res) => {
     return res.json({ ok: false, message: "Internal server error" });
   res.json({ ok: true, value: counter.value + 1 });
 });
+
+router.get("/get-file/", downloadFileFromBilling);
 
 router.post(
   "/create-full-akt",
