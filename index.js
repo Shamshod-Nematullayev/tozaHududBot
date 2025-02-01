@@ -17,10 +17,16 @@ const isAuth = require("./middlewares/isAuth");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
-  cors({
-    origin: "http://192.168.1.138:8000",
-    credentials: true, // Cookie'larni yuborishga ruxsat
-  })
+  cors(
+    {
+      origin: "https://toza-hudud-dashboard.netlify.app",
+      credentials: true,
+    },
+    {
+      origin: "http://192.168.1.138",
+      credentials: true,
+    }
+  )
 );
 
 // use routers
