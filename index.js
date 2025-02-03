@@ -23,7 +23,7 @@ app.use(
       credentials: true,
     },
     {
-      origin: "http://192.168.1.138",
+      origin: "http://192.168.1.138:8000",
       credentials: true,
     }
   )

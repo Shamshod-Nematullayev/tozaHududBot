@@ -297,6 +297,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         residentType: "INDIVIDUAL",
         streetId: ctx.wizard.state.street_id,
       });
+      console.log(newAbonent.data);
       if (!newAbonent || newAbonent.status !== 201) {
         ctx.reply("Abonent qo'shishda xatolik yuz berdi");
         throw new Error("Abonent qo'shishda xatolik yuz berdi");
