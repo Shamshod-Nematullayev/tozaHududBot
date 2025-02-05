@@ -14,7 +14,7 @@ const schema = new mongoose.Schema(
     sud_case_id: String,
     sud_case_number: String,
     judge_name: String,
-    davo_summa: Number,
+    claimAmount: Number,
     sudQaroriBillinggaYuklandi: {
       type: Boolean,
       defalt: false,

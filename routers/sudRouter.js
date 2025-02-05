@@ -8,37 +8,9 @@ const { hybridPochtaApi } = require("../api/hybridPochta");
 const PDFMerger = require("pdf-merger-js");
 const { tozaMakonApi } = require("../api/tozaMakon");
 const FormData = require("form-data");
+const { getSudAkts } = require("./controllers/sud.controller");
 
-router.get("/", async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.pageSize) || 10;
-    const { sortField = "createdAt", sortDirection = "asc" } = req.query;
-    const sortOptions = {};
-    sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
-    const skip = (page - 1) * limit;
-    const filter = {};
-    if (req.query.status) {
-      filter.status = req.query.status;
-    }
-    const sudAkts = await SudAkt.find(filter)
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(limit);
-    const total = await SudAkt.countDocuments(filter);
-    res.json({
-      ok: true,
-      rows: sudAkts,
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    });
-  } catch (error) {
-    res.json({ ok: false, message: "Internal server error 500" });
-    console.error(error);
-  }
-});
+router.get("/", getSudAkts);
 
 router.get("/search-by-licshet", async (req, res) => {
   try {
