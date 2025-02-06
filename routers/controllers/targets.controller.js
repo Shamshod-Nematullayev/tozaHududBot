@@ -83,6 +83,14 @@ module.exports.createDocumentTargets = async (req, res) => {
 module.exports.signDocumentTargets = async (req, res) => {
   try {
     const { document_id } = req.params;
+    if (!document_id) {
+      return res
+        .status(400)
+        .json({ ok: false, message: "Document ID required" });
+    }
+    if (!req.file) {
+      return res.status(400).json({ ok: false, message: "File required" });
+    }
     // upload file to telegram
     const ctx = await bot.telegram.sendDocument(process.env.CHANNEL, {
       source: req.file.buffer,
@@ -141,7 +149,10 @@ module.exports.getDocumentTargets = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
-    const totalCount = await Bildirishnoma.countDocuments(filters);
+    const totalCount = await Bildirishnoma.countDocuments({
+      ...filters,
+      type: "sudga_chiqoring",
+    });
     res.status(200).json({
       data: documents,
       meta: {
