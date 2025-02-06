@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index 2> errors.log"
+    "dev": "nodemon --no-deprecation index 2> errors.log"
   },
   "keywords": [],
   "author": "",
