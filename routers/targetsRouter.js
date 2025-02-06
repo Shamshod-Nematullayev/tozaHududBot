@@ -3,6 +3,8 @@ const {
   getTargets,
   createDocumentTargets,
   signDocumentTargets,
+  getDocumentTargetsById,
+  getDocumentTargets,
 } = require("./controllers/targets.controller");
 const { uploadAsBlob } = require("../middlewares/multer");
 const router = Router();
@@ -16,5 +18,8 @@ router.patch(
   uploadAsBlob.single("file"),
   signDocumentTargets
 );
+
+router.get("/document", getDocumentTargets);
+router.get("/document/:_id", getDocumentTargetsById);
 
 module.exports = router;

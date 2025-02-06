@@ -41,10 +41,10 @@ module.exports.getTargets = async (req, res) => {
 module.exports.createDocumentTargets = async (req, res) => {
   try {
     const { targets, abonents, inspector, mahallaId } = req.body;
-    if (!targets || targets.length === 0) {
+    if (!targets || targets.length === 0 || !inspector || !mahallaId) {
       return res
         .status(400)
-        .json({ ok: false, message: "Targets are required" });
+        .json({ ok: false, message: "All fields are required" });
     }
     const lastDocument = await Bildirishnoma.findOne({
       type: "sudga_chiqoring",
@@ -101,6 +101,55 @@ module.exports.signDocumentTargets = async (req, res) => {
       await Target.findByIdAndUpdate(target, {
         $set: { status: "tasdiqlandi" },
       });
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ ok: false, message: "Internal Server Error" });
+  }
+};
+
+module.exports.getDocumentTargetsById = async (req, res) => {
+  try {
+    const document = await Bildirishnoma.findById(req.params._id);
+    if (!document) {
+      return res.status(404).json({ ok: false, message: "Document not found" });
+    }
+    res.status(200).json({ ok: true, document });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ ok: false, message: "Internal Server Error" });
+  }
+};
+
+module.exports.getDocumentTargets = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 30,
+      doc_num,
+      mahallaId,
+      inspector_id,
+      status,
+    } = req.query;
+    const skip = (page - 1) * limit;
+    const filters = {};
+    if (doc_num) filters.doc_num = doc_num;
+    if (mahallaId) filters.mahallaId = mahallaId;
+    if (inspector_id) filters["inspector.id"] = inspector_id;
+    if (status) filters.status = status;
+    const documents = await Bildirishnoma.find(filters)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+    const totalCount = await Bildirishnoma.countDocuments(filters);
+    res.status(200).json({
+      data: documents,
+      meta: {
+        total: totalCount,
+        page: page,
+        limit: limit,
+        totalPages: Math.ceil(totalCount / limit),
+      },
     });
   } catch (error) {
     console.error(error.message);
