@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://192.168.1.138:8000",
+    origin: "http://localhost:8000",
     credentials: true,
   })
 );
@@ -26,6 +26,7 @@ app.use(
 // use routers
 app.use("/api/auth", require("./routers/auth"));
 app.use("/api/sudAkts", isAuth, require("./routers/sudRouter"));
+app.use("/api/targets", isAuth, require("./routers/targetsRouter"));
 app.use("/api/bildirgilar", isAuth, require("./routers/bildirgilarRouter"));
 app.use("/api/fetchTelegram", isAuth, require("./routers/fetchTelegramRouter"));
 app.use("/api/pachkalar", isAuth, require("./routers/aktPachka"));
@@ -55,8 +56,7 @@ function useTelegramBot() {
   require("./actions");
   require("./intervals");
 }
-useTelegramBot();
-useTelegramBot();
+// useTelegramBot();
 // require("./test");
 mongoose
   .connect(process.env.MONGO)

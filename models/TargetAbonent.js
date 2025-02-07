@@ -16,7 +16,13 @@ const schema = new mongoose.Schema({
   document_id: String,
   status: {
     type: String,
-    enum: ["yangi", "tasdiqlandi", "sudga_yuborildi", "sud_qarori_chiqarildi"],
+    enum: [
+      "yangi",
+      "xujjat_yaratildi",
+      "tasdiqlandi",
+      "sudga_yuborildi",
+      "sud_qarori_chiqarildi",
+    ],
     default: "yangi",
   },
   createdAt: {
