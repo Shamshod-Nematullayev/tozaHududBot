@@ -47,7 +47,13 @@ async function sendPinflMfyReport() {
 
     ejs.renderFile(
       "./views/pnfilKiritishHisobot.ejs",
-      { data: mahallalar, jamiKiritilgan, jamiReja, sana: bugungiSana() },
+      {
+        data: mahallalar,
+        jamiKiritilgan,
+        heading: "ПИНФЛ киритиш бўйича режа таҳлили",
+        jamiReja,
+        sana: bugungiSana(),
+      },
       {},
       async (err, res) => {
         if (err) throw err;
