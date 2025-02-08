@@ -11,9 +11,7 @@ const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { PDFDocument } = require("pdf-lib");
 const PDFMerger = require("pdf-merger-js");
 const { default: axios } = require("axios");
-const {
-  downloadFileFromBilling,
-} = require("../controllers/billingRouterController");
+const { downloadFileFromBilling } = require("./controllers/billing.controller");
 const akt_pachka_id = {
   viza: "4445910",
   odam_soni: "4445915",
