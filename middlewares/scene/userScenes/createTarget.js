@@ -17,7 +17,7 @@ const createTargetScene = new WizardScene(
     try {
       const text = ctx.message.text;
       if (isNaN(text) || text.length < 6)
-        return ctx.reply("Faqat raqam kiriting");
+        return ctx.reply("Faqat raqam kiriting", keyboards.cancelBtn);
       const abonents = await Abonent.find({ licshet: new RegExp(text) }).limit(
         2
       );

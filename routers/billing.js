@@ -537,7 +537,9 @@ router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
 const uchirilishiKerakBulganAbonentlar = [];
 router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
   try {
-    const abonents = await Abonent.find({ mahallas_id: req.params.mfy_id });
+    const abonents = await Abonent.find({
+      mahallas_id: req.params.mfy_id,
+    });
     const { minSaldo, maxSaldo } = req.query;
     let page = 0;
     let totalPages = 1;
@@ -558,6 +560,10 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
     let filteredData = rows.filter((abonent) => {
       const abonentSaldo = Number(abonent.ksaldo);
 
+      const abonentMongo = abonents.find(
+        (a) => a.licshet == abonent.accountNumber
+      );
+
       // Abonentlar ro'yxatidan chiqarilgan bo'lmaganini tekshirish
       const isNotExcluded = !uchirilishiKerakBulganAbonentlar.includes(
         Number(abonent.licshet)
@@ -567,10 +573,15 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
       const isAboveMinSaldo = minSaldo ? abonentSaldo > Number(minSaldo) : true;
       const isBelowMaxSaldo = maxSaldo ? abonentSaldo < Number(maxSaldo) : true;
 
-      return isNotExcluded && isAboveMinSaldo && isBelowMaxSaldo;
+      return (
+        isNotExcluded && isAboveMinSaldo && isBelowMaxSaldo
+        // &&
+        // !abonentMongo.shaxsi_tasdiqlandi?.confirm
+      );
     });
     filteredData = filteredData.map((abonent) => {
       let isElektrKodConfirm = false;
+
       const abonentMongo = abonents.find(
         (a) => a.licshet == abonent.accountNumber
       );
@@ -579,7 +590,9 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
       return {
         ...abonent,
         isElektrKodConfirm,
-        fullName: kirillga(abonent.fullName),
+        fullName: kirillga(
+          abonentMongo?.fio ? abonentMongo.fio : abonent.fullName
+        ),
       };
     });
     filteredData.sort((a, b) => a.fullName.localeCompare(b.fullName));
