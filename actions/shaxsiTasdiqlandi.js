@@ -36,7 +36,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         return ctx.answerCbQuery(pasportData.data.message);
       }
       const abonentDatasResponse = await tozaMakonApi.get(
-        `/user-service/residents/${abonent.id}?include=translates&withPhoto=true`
+        `/user-service/residents/${abonent.id}?include=translates`
       );
       if (!abonentDatasResponse || abonentDatasResponse.status !== 200) {
         return ctx.answerCbQuery(

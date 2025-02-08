@@ -129,7 +129,8 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       switch (ctx.callbackQuery?.data) {
         case "yes":
           ctx.deleteMessage();
-          const { photo, ...data } = ctx.wizard.state.customDates;
+          const { ...data } = ctx.wizard.state.customDates;
+          delete data.photo;
           const req = await CustomDataRequest.create({
             user: ctx.from,
             data: {

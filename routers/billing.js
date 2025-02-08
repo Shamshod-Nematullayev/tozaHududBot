@@ -11,7 +11,11 @@ const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { PDFDocument } = require("pdf-lib");
 const PDFMerger = require("pdf-merger-js");
 const { default: axios } = require("axios");
-const { downloadFileFromBilling } = require("./controllers/billing.controller");
+const {
+  downloadFileFromBilling,
+  getAbonentDHJByAbonentId,
+  getAbonentActs,
+} = require("./controllers/billing.controller");
 const akt_pachka_id = {
   viza: "4445910",
   odam_soni: "4445915",
@@ -467,22 +471,7 @@ router.post(
   }
 );
 
-router.get(`/get-abonent-dxj-by-id/:abonent_id`, async (req, res) => {
-  try {
-    const { data } = await tozaMakonApi.get(
-      `/billing-service/resident-balances/dhsh?residentId=${req.params.abonent_id}&page=0&size=100`
-    );
-
-    res.json({
-      ok: true,
-      message: data.msg,
-      rows: data.content,
-    });
-  } catch (error) {
-    res.json({ ok: false, message: "Internal server error 500" });
-    console.error(error);
-  }
-});
+router.get(`/get-abonent-dxj-by-id/:abonent_id`, getAbonentDHJByAbonentId);
 router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
   try {
     const abonent = await Abonent.findOne({ licshet: req.params.licshet });
@@ -729,5 +718,7 @@ router.get("/get-mfy-by-id/:mfy_id", async (req, res) => {
     console.error(error);
   }
 });
+
+router.get("/get-abonent-acts/:abonentId", getAbonentActs);
 
 module.exports = router;
