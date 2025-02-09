@@ -1,3 +1,4 @@
+const { tozaMakonApi } = require("../../api/tozaMakon");
 const { Ariza } = require("../../models/Ariza");
 const { Abonent } = require("../../requires");
 
@@ -97,5 +98,76 @@ module.exports.getArizaById = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.json({ ok: false, message: `internal error: ${error.message}` });
+  }
+};
+
+module.exports.updateArizaFromBillingById = async (req, res) => {
+  try {
+    const ariza = await Ariza.findById(req.params.ariza_id);
+    if (!ariza)
+      return res.status(404).json({
+        ok: false,
+        message: "Ariza topilmadi",
+      });
+
+    const acts = (
+      await tozaMakonApi.get("/billing-service/acts", {
+        params: {
+          residentId: ariza.aktInfo.residentId,
+        },
+      })
+    ).data.content;
+    const act = acts.find((a) => a.id == ariza.akt_id);
+    const updates = {
+      actStatus: act.actStatus,
+      aktInfo: act,
+    };
+    if (act.actStatus === "CONFIRMED") updates.status = "tasdiqlangan";
+    await ariza.updateOne(
+      {
+        $set: updates,
+      },
+      { new: true }
+    );
+    console.log(act);
+    res.json({
+      ok: true,
+      ariza,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ ok: false, message: `internal error: ${error.message}` });
+  }
+};
+
+module.exports.changeArizaAct = async (req, res) => {
+  try {
+    const { ariza_id } = req.params;
+    const { allAmount, inhabitantCount } = req.body;
+    const ariza = await Ariza.findById(ariza_id);
+    if (!ariza)
+      return res.status(404).json({
+        ok: false,
+        message: "Ariza topilmadi",
+      });
+    if (ariza.actStatus === "WARNED" || ariza.actStatus === "NEW") {
+      const kSaldo = (
+        await tozaMakonApi.get("billing-service/acts/calculate-k-saldo", {
+          params: {
+            amount: allAmount,
+            residentId: ariza.aktInfo.residentId,
+            actPackId: ariza.aktInfo.actPackId,
+            actType: Number(allAmount) > 0 ? "CREDIT" : "DEBIT",
+            inhabitantCount,
+          },
+        })
+      ).data;
+      const act = await tozaMakonApi.put("/billing-service/acts", {});
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, message: "Internal server error" });
   }
 };

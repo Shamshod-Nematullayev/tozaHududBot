@@ -19,6 +19,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: "http://192.168.1.138:8000",
+    // origin: "http://localhost:8000",
     credentials: true,
   })
 );
@@ -40,6 +41,13 @@ app.use(
   isAuth,
   require("./routers/yashovchiSoniXatlov")
 );
+app.use((req, res, next) => {
+  res.status(404).json({
+    ok: false,
+    message: `Cannot ${req.method} ${req.originalUrl}`,
+  });
+});
+
 process.on("warning", (warning) => {
   console.warn(warning.stack);
 });

@@ -4,6 +4,8 @@ const { Abonent } = require("../models/Abonent");
 const {
   getArizaById,
   getArizalar,
+  updateArizaFromBillingById,
+  changeArizaAct,
 } = require("./controllers/arizalar.controller");
 
 const router = require("express").Router();
@@ -153,4 +155,7 @@ router.patch("/:ariza_id", async (req, res) => {
   }
 });
 
+router.put("/updateFromBilling/:ariza_id", updateArizaFromBillingById);
+
+router.put("/change-akt/:ariza_id", changeArizaAct);
 module.exports = router;
