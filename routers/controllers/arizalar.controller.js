@@ -242,17 +242,27 @@ module.exports.changeArizaAct = async (req, res) => {
       return res
         .status(500)
         .json({ ok: false, message: "Internal server error" });
-    await ariza.updateOne({
-      $set: {
-        status: "qayta_akt_kiritilgan",
-        akt_pachka_id: act.actPackId,
-        akt_id: act.id,
-        aktInfo: {
-          ...act,
+    const updatedAriza = await ariza.updateOne(
+      {
+        $set: {
+          status: "qayta_akt_kiritilgan",
+          actStatus: "NEW",
+          akt_pachka_id: act.actPackId,
+          akt_id: act.id,
+          aktInfo: {
+            ...act,
+          },
+          akt_date: act.createdAt,
         },
-        akt_date: act.createdAt,
+        $push: { actHistory: ariza.aktInfo },
       },
-      $push: { actHistory: ariza.aktInfo },
+      {
+        new: true,
+      }
+    );
+    res.json({
+      ok: true,
+      ariza: updatedAriza,
     });
   } catch (err) {
     console.error(err);
