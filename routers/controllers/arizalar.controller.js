@@ -6,7 +6,7 @@ const akt_pachka_id = {
   odam_soni: "4445915",
   dvaynik: "4445913",
   pul_kuchirish: "4445914",
-  death: "4445909",
+  death: "4446883",
   gps: "4446034",
   // boshqa: "4444109",
 };
@@ -233,23 +233,15 @@ module.exports.changeArizaAct = async (req, res) => {
         startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
         fileId,
         kSaldo,
-        residentId: ariza.id,
+        residentId: ariza.aktInfo.residentId,
       };
       if (inhabitantCount) body.inhabitantCount = inhabitantCount;
-      act = (
-        await tozaMakonApi.post("/billing-service/acts", {
-          actType: Number(allAmount) > 0 ? "CREDIT" : "DEBIT",
-          amount: allAmount,
-          amountWithQQS,
-          amountWithoutQQS,
-          description,
-          id: ariza.akt_id,
-          inhabitantCount,
-          residentId: ariza.aktInfo.residentId,
-        })
-      ).data;
+      act = (await tozaMakonApi.post("/billing-service/acts", body)).data;
     }
-    if (!act) throw new Error("act qilinmadi");
+    if (!act)
+      return res
+        .status(500)
+        .json({ ok: false, message: "Internal server error" });
     await ariza.updateOne({
       $set: {
         status: "qayta_akt_kiritilgan",
