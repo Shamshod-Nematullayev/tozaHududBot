@@ -70,10 +70,8 @@
           <th>Фоизда</th>
           <th style="width: 120px">Фарқи</th>
         </tr>
-        <% data.forEach( (mfy, i) => { %> <% let isBelowAverage =
-        mfy.procent < Math.round((jamiKiritilgan / jamiReja +
-        Number.EPSILON) * 1000) / 10; %>
-        <tr style="color: <%= isBelowAverage ? 'red' : 'black' %>;">
+        <% data.forEach( (mfy, i) => { %>
+        <tr>
           <td><%= i+1 %></td>
           <td align="left" class="left"><%= mfy.name %></td>
           <td>
@@ -85,7 +83,7 @@
             <%= Math.floor(mfy.counterOfConfirm).toLocaleString().replace(/,/g,
             " ") %>
           </td>
-          <td align="center"><%= mfy.bajarilishi_foizda %></td>
+          <td align="center" style="color: <%= mfy.procent <= 50 ? 'red' : mfy.procent <= 80 ? 'orange' : 'black' %>;"><%= mfy.bajarilishi_foizda %></td>
           <td>
             <%= Math.floor(mfy.farqi).toLocaleString().replace(/,/g, " ") %>
           </td>

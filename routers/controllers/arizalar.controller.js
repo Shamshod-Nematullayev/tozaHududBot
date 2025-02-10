@@ -1,6 +1,15 @@
 const { tozaMakonApi } = require("../../api/tozaMakon");
 const { Ariza } = require("../../models/Ariza");
 const { Abonent } = require("../../requires");
+const akt_pachka_id = {
+  viza: "4445910",
+  odam_soni: "4445915",
+  dvaynik: "4445913",
+  pul_kuchirish: "4445914",
+  death: "4445909",
+  gps: "4446034",
+  // boshqa: "4444109",
+};
 
 module.exports.getArizalar = async (req, res) => {
   try {
@@ -145,13 +154,38 @@ module.exports.updateArizaFromBillingById = async (req, res) => {
 module.exports.changeArizaAct = async (req, res) => {
   try {
     const { ariza_id } = req.params;
-    const { allAmount, inhabitantCount } = req.body;
+    const {
+      allAmount,
+      inhabitantCount,
+      amountWithQQS,
+      amountWithoutQQS,
+      description,
+    } = req.body;
+    if (!allAmount || !amountWithQQS || !amountWithoutQQS || !description) {
+      return res.status(400).json({
+        ok: false,
+        message: "All fields are required",
+      });
+    }
+    const file = req.file;
     const ariza = await Ariza.findById(ariza_id);
     if (!ariza)
       return res.status(404).json({
         ok: false,
         message: "Ariza topilmadi",
       });
+    let fileId = ariza.aktInfo.fileId;
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file.buffer, file.originalname);
+      const fileData = (
+        await tozaMakonApi.post("/file-service/buckets/upload", formData, {
+          params: { folderType: "ACT" },
+        })
+      ).data;
+      fileId = ariza.document_number + "*" + fileData.id;
+    }
+    let act;
     if (ariza.actStatus === "WARNED" || ariza.actStatus === "NEW") {
       const kSaldo = (
         await tozaMakonApi.get("billing-service/acts/calculate-k-saldo", {
@@ -161,11 +195,73 @@ module.exports.changeArizaAct = async (req, res) => {
             actPackId: ariza.aktInfo.actPackId,
             actType: Number(allAmount) > 0 ? "CREDIT" : "DEBIT",
             inhabitantCount,
+            fileId,
           },
         })
       ).data;
-      const act = await tozaMakonApi.put("/billing-service/acts", {});
+      act = await tozaMakonApi.put("/billing-service/acts", {
+        actType: Number(allAmount) > 0 ? "CREDIT" : "DEBIT",
+        amount: allAmount,
+        amountWithQQS,
+        amountWithoutQQS,
+        description,
+        id: ariza.akt_id,
+        inhabitantCount,
+        kSaldo,
+        residentId: ariza.aktInfo.residentId,
+      });
+    } else {
+      const kSaldo = (
+        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+          params: {
+            amount: allAmount,
+            residentId: ariza.aktInfo.residentId,
+            actPackId: akt_pachka_id[ariza.document_type],
+            actType: Number(allAmount) < 0 ? "DEBIT" : "CREDIT",
+          },
+        })
+      ).data;
+      const date = new Date();
+      const body = {
+        actPackId: akt_pachka_id[ariza.document_type],
+        actType: Number(allAmount) < 0 ? "DEBIT" : "CREDIT",
+        amount: allAmount,
+        amountWithQQS: amountWithQQS,
+        amountWithoutQQS: amountWithoutQQS,
+        description,
+        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        fileId,
+        kSaldo,
+        residentId: ariza.id,
+      };
+      if (inhabitantCount) body.inhabitantCount = inhabitantCount;
+      act = (
+        await tozaMakonApi.post("/billing-service/acts", {
+          actType: Number(allAmount) > 0 ? "CREDIT" : "DEBIT",
+          amount: allAmount,
+          amountWithQQS,
+          amountWithoutQQS,
+          description,
+          id: ariza.akt_id,
+          inhabitantCount,
+          residentId: ariza.aktInfo.residentId,
+        })
+      ).data;
     }
+    if (!act) throw new Error("act qilinmadi");
+    await ariza.updateOne({
+      $set: {
+        status: "qayta_akt_kiritilgan",
+        akt_pachka_id: act.actPackId,
+        akt_id: act.id,
+        aktInfo: {
+          ...act,
+        },
+        akt_date: act.createdAt,
+      },
+      $push: { actHistory: ariza.aktInfo },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ ok: false, message: "Internal server error" });

@@ -51,6 +51,7 @@ const schema = new mongoose.Schema({
       "tasdiqlangan",
       "bekor qilindi",
       "akt_kiritilgan",
+      "qayta_akt_kiritilgan",
     ],
     default: "yangi",
   },

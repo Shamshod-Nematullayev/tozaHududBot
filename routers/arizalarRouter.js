@@ -7,6 +7,7 @@ const {
   updateArizaFromBillingById,
   changeArizaAct,
 } = require("./controllers/arizalar.controller");
+const { uploadAsBlob } = require("../middlewares/multer");
 
 const router = require("express").Router();
 
@@ -157,5 +158,9 @@ router.patch("/:ariza_id", async (req, res) => {
 
 router.put("/updateFromBilling/:ariza_id", updateArizaFromBillingById);
 
-router.put("/change-akt/:ariza_id", changeArizaAct);
+router.put(
+  "/change-akt/:ariza_id",
+  uploadAsBlob.single("file"),
+  changeArizaAct
+);
 module.exports = router;
