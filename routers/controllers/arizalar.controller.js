@@ -132,7 +132,7 @@ module.exports.updateArizaFromBillingById = async (req, res) => {
       aktInfo: act,
     };
     if (act.actStatus === "CONFIRMED") updates.status = "tasdiqlangan";
-    await ariza.updateOne(
+    const updatedAriza = await ariza.updateOne(
       {
         $set: updates,
       },
@@ -141,7 +141,7 @@ module.exports.updateArizaFromBillingById = async (req, res) => {
     console.log(act);
     res.json({
       ok: true,
-      ariza,
+      ariza: updatedAriza,
     });
   } catch (error) {
     console.error(error);
