@@ -393,9 +393,10 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
       const isBelowMaxSaldo = maxSaldo ? abonentSaldo < Number(maxSaldo) : true;
 
       return (
-        isNotExcluded && isAboveMinSaldo && isBelowMaxSaldo
-        // &&
-        // !abonentMongo.shaxsi_tasdiqlandi?.confirm
+        isNotExcluded &&
+        isAboveMinSaldo &&
+        isBelowMaxSaldo &&
+        !abonentMongo.shaxsi_tasdiqlandi?.confirm
       );
     });
     filteredData = filteredData.map((abonent) => {

@@ -92,9 +92,12 @@ module.exports.signDocumentTargets = async (req, res) => {
       return res.status(400).json({ ok: false, message: "File required" });
     }
     // upload file to telegram
-    const ctx = await bot.telegram.sendDocument(process.env.CHANNEL, {
-      source: req.file.buffer,
-    });
+    const ctx = await bot.telegram.sendDocument(
+      process.env.TEST_BASE_CHANNEL_ID,
+      {
+        source: req.file.buffer,
+      }
+    );
     // updateDocument
     const document = await Bildirishnoma.findByIdAndUpdate(document_id, {
       $set: { file_id: ctx.document.file_id },

@@ -52,6 +52,7 @@ tozaMakonApi.interceptors.response.use(
       error.config.headers["Authorization"] = `Bearer ${data.access_token}`;
       return tozaMakonApi.request(error.config);
     }
+    return error.response;
   }
 );
 

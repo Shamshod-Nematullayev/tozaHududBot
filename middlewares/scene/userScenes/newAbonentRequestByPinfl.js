@@ -99,15 +99,9 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         return;
       }
       if (houses.data.cadastr_list.length < 1) {
-        await ctx.replyWithHTML(
+        return await ctx.replyWithHTML(
           "Ushbu fuqaroga tegishli xonadon (kadastr) yo'q!\n <b>Diqqat xonadon egasi bo'lmagan shaxsga abonent ochish tavsiya etilmaydi</b>"
         );
-        ctx.reply(
-          "Mahallani tanlang",
-          Markup.inlineKeyboard(mahallalarButtons)
-        );
-        ctx.wizard.selectStep(2);
-        return;
       }
       if (houses.data.cadastr_list.length == 1) {
         ctx.reply(
@@ -297,9 +291,10 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         residentType: "INDIVIDUAL",
         streetId: ctx.wizard.state.street_id,
       });
-      console.log(newAbonent.data);
       if (!newAbonent || newAbonent.status !== 201) {
-        ctx.reply("Abonent qo'shishda xatolik yuz berdi");
+        ctx.reply(
+          "Abonent qo'shishda xatolik yuz berdi \n" + newAbonent.data.message
+        );
         throw new Error("Abonent qo'shishda xatolik yuz berdi");
       }
       await tozaMakonApi.patch("/user-service/residents/identified", {

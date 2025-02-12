@@ -16,7 +16,7 @@ module.exports.NOTIFICATIONS_CHANNEL_ID = -1002429873864;
 module.exports.TEST_BASE_CHANNEL_ID = -1001567163110;
 module.exports.akt_pachka_id = {
   viza: "4445910",
-  odam_soni: "4445915",
+  odam_soni: "4446811",
   dvaynik: "4445913",
   pul_kuchirish: "4445914",
   death: "4445909",

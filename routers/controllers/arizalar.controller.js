@@ -132,7 +132,8 @@ module.exports.updateArizaFromBillingById = async (req, res) => {
       aktInfo: act,
     };
     if (act.actStatus === "CONFIRMED") updates.status = "tasdiqlangan";
-    const updatedAriza = await ariza.updateOne(
+    const updatedAriza = await Ariza.findByIdAndUpdate(
+      ariza._id,
       {
         $set: updates,
       },
@@ -242,7 +243,8 @@ module.exports.changeArizaAct = async (req, res) => {
       return res
         .status(500)
         .json({ ok: false, message: "Internal server error" });
-    const updatedAriza = await ariza.updateOne(
+    const updatedAriza = await Ariza.findByIdAndUpdate(
+      ariza._id,
       {
         $set: {
           status: "qayta_akt_kiritilgan",
