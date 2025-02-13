@@ -16,6 +16,7 @@ const {
   getAbonentDHJByAbonentId,
   getAbonentActs,
   createFullAct,
+  createDublicateAct,
 } = require("./controllers/billing.controller");
 const akt_pachka_id = {
   viza: "4445910",
@@ -43,140 +44,7 @@ router.post("/create-full-akt", uploadAsBlob.single("file"), createFullAct);
 router.post(
   "/create-dvaynik-akt-by-ariza",
   uploadAsBlob.single("file"),
-  async (req, res) => {
-    try {
-      const { ariza_id, akt_sum } = req.body;
-      const ariza = await Ariza.findById(ariza_id);
-      const abonent = await Abonent.findOne({ licshet: ariza.licshet });
-      const fake_account = await Abonent.findOne({
-        licshet: ariza.ikkilamchi_licshet,
-      });
-      const date = new Date();
-      // upload file to billing service
-      const formData = new FormData();
-      formData.append("file", req.file.buffer, req.file.originalname);
-      const fileUploadResponse = await tozaMakonApi.post(
-        "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (akt_sum > 0) {
-        // monay transfer to real account
-        const calculateKSaldo = (
-          await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
-            params: {
-              amount: Math.abs(akt_sum),
-              residentId: abonent.id,
-              actPackId: akt_pachka_id.pul_kuchirish,
-              actType: "CREDIT",
-            },
-          })
-        ).data;
-        (
-          await tozaMakonApi.post("/billing-service/acts", {
-            actPackId: akt_pachka_id.pul_kuchirish,
-            actType: "CREDIT",
-            amount: Math.abs(akt_sum),
-            amountWithQQS: 0,
-            amountWithoutQQS: Math.abs(akt_sum),
-            description: `${ariza.ikkilamchi_licshet} ikkilamchi hisob raqamidan pul ko'chirish`,
-            endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-            startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-            fileId:
-              fileUploadResponse.data.fileName +
-              "*" +
-              fileUploadResponse.data.fileId,
-            kSaldo: calculateKSaldo,
-            residentId: abonent.id,
-          })
-        ).data;
-        // monay transfer from fake account
-        const calculateKSaldo2 = (
-          await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
-            params: {
-              amount: Math.abs(akt_sum),
-              residentId: abonent.id,
-              actPackId: akt_pachka_id.pul_kuchirish,
-              actType: "DEBIT",
-            },
-          })
-        ).data;
-        (
-          await tozaMakonApi.post("/billing-service/acts", {
-            actPackId: akt_pachka_id.pul_kuchirish,
-            actType: "DEBIT",
-            amount: akt_sum,
-            amountWithQQS: 0,
-            amountWithoutQQS: akt_sum,
-            description: `${fake_account.licshet} haqiqiy hisob raqamiga pul ko'chirish`,
-            endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-            startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-            fileId:
-              fileUploadResponse.data.fileName +
-              "*" +
-              fileUploadResponse.data.fileId,
-            kSaldo: calculateKSaldo2,
-            residentId: fake_account.id,
-          })
-        ).data;
-      }
-
-      // ikkilamchi hisob raqamini o'chirish kodlari
-      const calculateAmount = (
-        await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
-          params: {
-            actPackId: akt_pachka_id.dvaynik,
-            residentId: fake_account.id,
-            inhabitantCount: 0,
-            kSaldo: 0,
-            // endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-            // startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          },
-        })
-      ).data;
-      const dvaynikAkt = (
-        await tozaMakonApi.post("/billing-service/acts", {
-          actPackId: akt_pachka_id.dvaynik,
-          actType: "CREDIT",
-          amount: Number(calculateAmount.amount) + Number(akt_sum),
-          amountWithQQS: 0,
-          amountWithoutQQS: Number(calculateAmount.amount) + Number(akt_sum),
-          description: `ikkilamchi hisob raqamini o'chirish`,
-          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          fileId:
-            fileUploadResponse.data.fileName +
-            "*" +
-            fileUploadResponse.data.fileId,
-          kSaldo: 0,
-          residentId: fake_account.id,
-          inhabitantCount: 0,
-        })
-      ).data;
-
-      await ariza.updateOne({
-        $set: {
-          status: "akt_kiritilgan",
-          akt_pachka_id: akt_pachka_id.dvaynik,
-          akt_id: dvaynikAkt.id,
-          aktInfo: dvaynikAkt,
-          akt_date: new Date(),
-        },
-      });
-      return res.json({
-        ok: true,
-        message: "muvaffaqqiyatli akt qilindi",
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ ok: false, message: err.message });
-    }
-  }
+  createDublicateAct
 );
 
 router.post(

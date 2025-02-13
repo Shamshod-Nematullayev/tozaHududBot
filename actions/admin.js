@@ -1,3 +1,4 @@
+const { tozaMakonApi } = require("../api/tozaMakon");
 const { NOTIFICATIONS_CHANNEL_ID } = require("../constants");
 const {
   nazoratchilarKunlikTushum,
@@ -353,19 +354,44 @@ composer.hears("q", async (ctx) => {
 });
 
 composer.hears(/karta_/g, async (ctx) => {
-  const html = await getAbonentCardHtml(ctx.message.text.split("_")[1]);
-  htmlPDF
-    .create(html, {
-      format: "A4",
-      orientation: "portrait",
-    })
-    .toFile("./uploads/abonent_card.pdf", async (err, res) => {
-      if (err) throw err;
-      await ctx.replyWithDocument({ source: "./uploads/abonent_card.pdf" });
-      fs.unlink("./uploads/abonent_card.pdf", (err) =>
-        err ? console.log(err) : ""
+  try {
+    const abonent = await Abonent.findOne({
+      licshet: ctx.message.text.split("_")[1],
+    });
+    if (!abonent) return ctx.reply("Абоненти топилмаган!");
+
+    const data = (
+      await tozaMakonApi(
+        `/user-service/residents/${abonent.id}/print-card?lang=UZ`
+      )
+    ).data;
+    const html = await new Promise((resolve, reject) => {
+      ejs.renderFile(
+        "./views/abonentKarta.ejs",
+        { ...data },
+        {},
+        (err, str) => {
+          if (err) return reject(err);
+          resolve(str);
+        }
       );
     });
+    htmlPDF
+      .create(html, {
+        format: "A4",
+        orientation: "portrait",
+      })
+      .toFile("./uploads/abonent_card.pdf", async (err, res) => {
+        if (err) throw err;
+        await ctx.replyWithDocument({ source: "./uploads/abonent_card.pdf" });
+        fs.unlink("./uploads/abonent_card.pdf", (err) =>
+          err ? console.log(err) : ""
+        );
+      });
+  } catch (error) {
+    ctx.reply("Xatolik yuzaga keldi");
+    console.error(error);
+  }
 });
 
 composer.hears("OGOHLANTIRISH XATLARI IMPORT", async (ctx) => {
