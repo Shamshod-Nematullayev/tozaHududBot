@@ -102,7 +102,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
           },
         },
         $push: {
-          shaxs_tasdiqlash_history: {
+          shaxsi_tasdiqlandi_history: {
             ...abonent.shaxsi_tasdiqlandi,
             fullName: abonent.fio,
             pinfl: abonent.pinfl,
