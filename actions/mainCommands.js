@@ -49,7 +49,7 @@ composer.hears(
 );
 composer.action(/newAbonentsList_/, async (ctx) => {
   try {
-    ctx.deleteMessage();
+    await ctx.deleteMessage();
     const abonents = await NewAbonent.find({
       mahalla_id: ctx.callbackQuery.data.split("_")[1],
     });
@@ -90,7 +90,7 @@ composer.hears(["✒️Судга хат✒️", "✒️Sudga xat✒️"], (ctx)
 
 composer.action("getTargets", async (ctx) => {
   try {
-    ctx.deleteMessage();
+    await ctx.deleteMessage();
     const inspector = await Nazoratchi.findOne({
       telegram_id: ctx.from.id,
     });
@@ -115,7 +115,7 @@ composer.action("getTargets", async (ctx) => {
 
 composer.action(/getTargets_/, async (ctx) => {
   try {
-    ctx.deleteMessage();
+    await ctx.deleteMessage();
     const mahalla_id = ctx.callbackQuery.data.split("_")[1];
     const targets = await Target.find({ mahalla_id });
     if (!targets.length) return ctx.reply("Ro'yxat bo'sh");
@@ -144,10 +144,10 @@ const actions = [
 ];
 
 actions.forEach((action) => {
-  composer.action(action, (ctx) => {
+  composer.action(action, async (ctx) => {
     try {
       ctx.scene.enter(action);
-      ctx.deleteMessage();
+      await ctx.deleteMessage();
     } catch (error) {
       console.error(error);
     }

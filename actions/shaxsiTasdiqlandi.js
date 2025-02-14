@@ -21,7 +21,11 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
     if (JSON.parse(tasdiqlandi)) {
       const abonent = await Abonent.findOne({ licshet: req.licshet });
       const [yil, oy, kun] = req.data.birth_date.split("-");
-      if (abonent.shaxsi_tasdiqlandi && abonent.shaxsi_tasdiqlandi.confirm) {
+      if (
+        abonent.shaxsi_tasdiqlandi &&
+        abonent.shaxsi_tasdiqlandi.confirm &&
+        !req.reUpdating
+      ) {
         return ctx.answerCbQuery("Bu abonent ma'lumoti kiritilib bo'lingan");
       }
       //   billingga yangilov so'rovini yuborish
@@ -97,6 +101,13 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
             updated_at: new Date(),
           },
         },
+        $push: {
+          shaxs_tasdiqlash_history: {
+            ...abonent.shaxsi_tasdiqlandi,
+            fullName: abonent.fio,
+            pinfl: abonent.pinfl,
+          },
+        },
       });
       //   tizimga kiritgan nazoratchiga baho berish
       await inspector.updateOne({
@@ -137,7 +148,8 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       // nazoratchiga xabar yuborish
       await ctx.telegram.sendMessage(
         req.user.id,
-        `Siz yuborgan pasport ma'lumot bekor qilindi. <b>${req.licshet}</b> \nPasport: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}`
+        `Siz yuborgan pasport ma'lumot bekor qilindi. <b>${req.licshet}</b> \nPasport: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}`,
+        { parse_mode: "HTML" }
       );
       // telegram kanaldagi xabarni o'zgartirish
       await ctx.editMessageCaption(

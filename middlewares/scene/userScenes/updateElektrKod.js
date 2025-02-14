@@ -109,6 +109,10 @@ const updateElektrKod = new Scenes.WizardScene(
         return;
       }
       const etk_abonent = findedETKAbonents[0];
+      if (!etk_abonent) {
+        ctx.reply("Bunday elektr kodi topilmadi");
+        return;
+      }
       ctx.replyWithHTML(
         `Abonent: <code>${etk_abonent.CUSTOMER_NAME}</code> \nUshbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
         createInlineKeyboard([
