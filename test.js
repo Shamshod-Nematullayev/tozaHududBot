@@ -10,6 +10,7 @@ const { Abonent } = require("./requires");
 
 const datas = require("./main.json");
 const { tozaMakonApi } = require("./api/tozaMakon");
+const { SudAkt } = require("./models/SudAkt");
 
 let init = 50000;
 // Abonent.find().then((abonents) => {
@@ -157,3 +158,12 @@ let init = 50000;
 //   loop();
 // }
 // // integrtsiya();
+const func = async () => {
+  const sudAktlari = await SudAkt.find({
+    sud_case_number: { $exists: true },
+    case_current_status: { $ne: "DECLINED" },
+  }).lean();
+  const akt = sudAktlari[0];
+  console.log(akt.created_at);
+};
+func();

@@ -9,6 +9,7 @@ const schema = new mongoose.Schema(
     mfy_name: String,
     sud_process_id_billing: String,
     sud_process_status: String,
+    case_current_status: String,
     fio: String,
     case_id: String,
     sud_case_id: String,
