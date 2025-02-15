@@ -18,8 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://192.168.1.138:8000",
-    // origin: "http://localhost:8000",
+    // origin: "http://192.168.1.138:8000",
+    origin: "http://localhost:8000",
     credentials: true,
   })
 );

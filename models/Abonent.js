@@ -50,6 +50,10 @@ const schema = new Schema(
         confirm: false,
       },
     },
+    shaxsi_tasdiqlandi_history: {
+      type: Array,
+      default: [],
+    },
     ekt_kod_tasdiqlandi: {
       type: Object,
       default: {

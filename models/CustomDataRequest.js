@@ -12,6 +12,10 @@ const schema = new Schema(
       type: String,
       required: true,
     },
+    reUpdating: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
