@@ -150,7 +150,9 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
   } catch (error) {
     try {
       ctx.answerCbQuery("Xatolik kuzatildi");
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
     console.error(error);
   }
 });

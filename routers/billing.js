@@ -264,6 +264,7 @@ router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
         isNotExcluded &&
         isAboveMinSaldo &&
         isBelowMaxSaldo &&
+        abonentMongo &&
         !abonentMongo.shaxsi_tasdiqlandi?.confirm
       );
     });

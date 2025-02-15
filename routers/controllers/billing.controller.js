@@ -7,6 +7,8 @@ const { Ariza } = require("../../models/Ariza");
 const { akt_pachka_id } = require("../../constants");
 const { bot } = require("../../requires");
 const FormData = require("form-data");
+const { default: axios } = require("axios");
+const { PDFDocument } = require("pdf-lib");
 
 module.exports.downloadFileFromBilling = async (req, res) => {
   try {
@@ -219,8 +221,6 @@ module.exports.createFullAct = async (req, res) => {
         residentId: abonent.id,
         ...inhabitantCounts,
       });
-      console.log(res.status, res.data, "LOGG");
-      return;
 
       if (aktResponse.status !== 201) {
         console.error(
