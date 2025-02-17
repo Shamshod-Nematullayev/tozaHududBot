@@ -47,6 +47,7 @@ router.get("/", async (req, res) => {
     sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
     const data = await MultiplyRequest.find({
       ...filters,
+      document_id: { $exists: false },
       confirm: false,
     }) // Filtrlash
       .sort(sortOptions)
@@ -55,6 +56,7 @@ router.get("/", async (req, res) => {
       .lean(); // Faqatgina "plain" obyekt qaytarish uchun (performance uchun yaxshi)
     const totalCount = await MultiplyRequest.countDocuments({
       ...filters,
+      document_id: { $exists: false },
       confirm: false,
     }); // Toplam sonliqni o'qish
 

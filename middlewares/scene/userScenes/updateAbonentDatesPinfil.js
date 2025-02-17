@@ -13,6 +13,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
   "update_abonent_date_by_pinfil",
   async (ctx) => {
     try {
+      ctx.wizard.state.reUpdating = false;
       const inspektor = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
       if (!inspektor) {
         ctx.reply(

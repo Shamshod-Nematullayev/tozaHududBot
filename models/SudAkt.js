@@ -30,7 +30,14 @@ const schema = new mongoose.Schema(
     },
     ariza_file_name: String,
     ariza_file_id: String,
-    tushum: Number,
+    tushum: {
+      type: Number,
+      default: 0,
+    },
+    akt: {
+      type: Number,
+      default: 0,
+    },
     isDelete: {
       type: Boolean,
       default: false,

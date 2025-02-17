@@ -159,11 +159,40 @@ let init = 50000;
 // }
 // // integrtsiya();
 const func = async () => {
-  const sudAktlari = await SudAkt.find({
-    sud_case_number: { $exists: true },
-    case_current_status: { $ne: "DECLINED" },
-  }).lean();
-  const akt = sudAktlari[0];
-  console.log(akt.created_at);
+  const sudAktlari = await SudAkt.find({ akt: { $exists: 0 } }).lean();
+  console.log(sudAktlari.length);
+  for (let akt of sudAktlari) {
+    try {
+      const month = akt.createdAt.getMonth() + 1;
+      const year = akt.createdAt.getFullYear();
+      const abonent = await Abonent.findOne({ licshet: akt.licshet });
+      const rows = (
+        await tozaMakonApi.get("/billing-service/resident-balances/dhsh", {
+          params: {
+            residentId: abonent.id,
+            page: 0,
+            size: 30,
+          },
+        })
+      ).data.content;
+      const rows2 = rows.filter(
+        (row) => row.god > year || (row.god === year && row.mes > month)
+      );
+      let allPayments = 0;
+      let allActs = 0;
+      rows2.forEach((row) => {
+        allPayments += row.allPaymentsSum;
+        allActs += row.actAmount;
+      });
+      await SudAkt.findByIdAndUpdate(akt._id, {
+        $set: { tushum: allPayments, akt: allActs },
+      });
+      console.log(allActs, akt.licshet);
+    } catch (error) {
+      console.error(akt, "xato");
+      console.error(error);
+    }
+  }
+  console.log("Jarayon yakullandi");
 };
-func();
+// func();
