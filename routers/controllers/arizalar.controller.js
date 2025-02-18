@@ -164,8 +164,9 @@ module.exports.changeArizaAct = async (req, res) => {
         message: "All fields are required",
       });
     }
-    const file = req.file;
+    let file = req.file;
     const ariza = await Ariza.findById(ariza_id);
+    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
     if (!ariza)
       return res.status(404).json({
         ok: false,
@@ -213,6 +214,7 @@ module.exports.changeArizaAct = async (req, res) => {
       await merger.add(pdfBuffer);
       const bufferAktFile = await merger.saveAsBuffer();
       req.file.buffer = bufferAktFile;
+      file = req.file;
     }
     let fileId = ariza.aktInfo.fileId;
     if (file) {
@@ -239,17 +241,19 @@ module.exports.changeArizaAct = async (req, res) => {
           },
         })
       ).data;
-      act = await tozaMakonApi.put("/billing-service/acts", {
-        actType: Number(allAmount) > 0 ? "CREDIT" : "DEBIT",
-        amount: allAmount,
-        amountWithQQS,
-        amountWithoutQQS,
-        description,
-        id: ariza.akt_id,
-        inhabitantCount,
-        kSaldo,
-        residentId: ariza.aktInfo.residentId,
-      });
+      act = (
+        await tozaMakonApi.put("/billing-service/acts/" + ariza.akt_id, {
+          actType: Number(allAmount) > 0 ? "CREDIT" : "DEBIT",
+          amount: allAmount,
+          amountWithQQS,
+          amountWithoutQQS,
+          description,
+          id: ariza.akt_id,
+          inhabitantCount,
+          kSaldo,
+          residentId: abonent.id,
+        })
+      ).data;
     } else {
       const kSaldo = (
         await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
