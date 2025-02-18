@@ -1,16 +1,11 @@
 const { uploadAsBlob } = require("../middlewares/multer");
 const { Mahalla } = require("../models/Mahalla");
-const { Ariza } = require("../models/Ariza");
 const { Counter } = require("../models/Counter");
-const { IncomingDocument } = require("../models/IncomingDocument");
 const { bot } = require("../core/bot");
 const { Abonent } = require("../requires");
 const { tozaMakonApi } = require("../api/tozaMakon");
 const FormData = require("form-data");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
-const { PDFDocument } = require("pdf-lib");
-const PDFMerger = require("pdf-merger-js");
-const { default: axios } = require("axios");
 const {
   downloadFileFromBilling,
   getAbonentDHJByAbonentId,
@@ -18,15 +13,7 @@ const {
   createFullAct,
   createDublicateAct,
 } = require("./controllers/billing.controller");
-const akt_pachka_id = {
-  viza: "4445910",
-  odam_soni: "4445915",
-  dvaynik: "4445913",
-  pul_kuchirish: "4445914",
-  death: "4445909",
-  gps: "4446034",
-  // boshqa: "4444109",
-};
+const { akt_pachka_id } = require("../constants");
 
 const router = require("express").Router();
 router.get("/next-incoming-document-number", async (req, res) => {

@@ -21,6 +21,13 @@ const multiplyLivingsScene = new Scenes.WizardScene(
       if (!abonent) {
         return ctx.reply(messages.abonentNotFound);
       }
+      const request = await MultiplyRequest.findOne({ KOD: ctx.message.text });
+      if (request) {
+        return ctx.reply(
+          `Ushbu abonent yashovchi sonini ko'paytirish uchun allaqachon so'rov yuborilgan   `
+        );
+      }
+      // fuqaro arizasi Davr: 10.2021 - 11.2024, Summa: 128108 Davr: 06.2021 - 01.2024, Summa: 92858 Davr: 04.2024 - 07.2024, Summa: 18496 Umumiy yig'indisi: 239462
       ctx.wizard.state.abonent = {
         id: abonent.id,
         fio: abonent.fio,

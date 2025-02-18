@@ -141,7 +141,6 @@ module.exports.createFullAct = async (req, res) => {
       const merger = new PDFMerger();
       await merger.add(req.file.buffer);
       pdfBuffer = Buffer.from(pdfBuffer);
-      console.log(Buffer.isBuffer(pdfBuffer));
       await merger.add(pdfBuffer);
       const bufferAktFile = await merger.saveAsBuffer();
       req.file.buffer = bufferAktFile;

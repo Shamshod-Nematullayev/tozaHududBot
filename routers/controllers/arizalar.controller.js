@@ -1,15 +1,11 @@
+const { default: axios } = require("axios");
 const { tozaMakonApi } = require("../../api/tozaMakon");
+const { akt_pachka_id } = require("../../constants");
 const { Ariza } = require("../../models/Ariza");
-const { Abonent } = require("../../requires");
-const akt_pachka_id = {
-  viza: "4445910",
-  odam_soni: "4445915",
-  dvaynik: "4445913",
-  pul_kuchirish: "4445914",
-  death: "4446883",
-  gps: "4446034",
-  // boshqa: "4444109",
-};
+const { Abonent, bot } = require("../../requires");
+const { PDFDocument } = require("pdf-lib");
+const PDFMerger = require("pdf-merger-js");
+const FormData = require("form-data");
 
 module.exports.getArizalar = async (req, res) => {
   try {
@@ -118,11 +114,11 @@ module.exports.updateArizaFromBillingById = async (req, res) => {
         ok: false,
         message: "Ariza topilmadi",
       });
-
+    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
     const acts = (
       await tozaMakonApi.get("/billing-service/acts", {
         params: {
-          residentId: ariza.aktInfo.residentId,
+          residentId: abonent.id,
         },
       })
     ).data.content;
@@ -139,7 +135,6 @@ module.exports.updateArizaFromBillingById = async (req, res) => {
       },
       { new: true }
     );
-    console.log(act);
     res.json({
       ok: true,
       ariza: updatedAriza,
@@ -161,6 +156,7 @@ module.exports.changeArizaAct = async (req, res) => {
       amountWithQQS,
       amountWithoutQQS,
       description,
+      photos,
     } = req.body;
     if (!allAmount || !amountWithQQS || !amountWithoutQQS || !description) {
       return res.status(400).json({
@@ -175,6 +171,49 @@ module.exports.changeArizaAct = async (req, res) => {
         ok: false,
         message: "Ariza topilmadi",
       });
+
+    if (photos?.length > 0) {
+      // endi pdf va rasmlarni birlashtirish kodi kerak
+      let imgs = photos.split(",");
+      const photosBuffer = [];
+      for (let file_id of imgs) {
+        const file = await bot.telegram.getFile(file_id);
+        const photoBuffer = await bot.telegram.getFileLink(file.file_id);
+        const response = await axios.get(photoBuffer, {
+          responseType: "arraybuffer",
+        });
+        photosBuffer.push(response.data);
+      }
+      const pdfDoc = await PDFDocument.create();
+      for (let photoBuffer of photosBuffer) {
+        const image = await pdfDoc.embedPng(photoBuffer);
+        const page = pdfDoc.addPage([image.width, image.height]);
+        page.drawImage(image, {
+          x: 0,
+          y: 0,
+          width: image.width,
+          height: image.height,
+        });
+      }
+      let pdfBuffer = await pdfDoc.save();
+      const merger = new PDFMerger();
+      if (req.file?.buffer) {
+        await merger.add(req.file.buffer);
+      } else {
+        const response = await tozaMakonApi.get(
+          "/file-service/buckets/download",
+          {
+            params: { file: ariza.aktInfo.fileId },
+            responseType: "arraybuffer",
+          }
+        );
+        await merger.add(response.data);
+      }
+      pdfBuffer = Buffer.from(pdfBuffer);
+      await merger.add(pdfBuffer);
+      const bufferAktFile = await merger.saveAsBuffer();
+      req.file.buffer = bufferAktFile;
+    }
     let fileId = ariza.aktInfo.fileId;
     if (file) {
       const formData = new FormData();
