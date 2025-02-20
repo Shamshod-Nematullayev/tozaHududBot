@@ -158,134 +158,63 @@ module.exports.changeArizaAct = async (req, res) => {
       description,
       photos,
     } = req.body;
+
     if (!allAmount || !amountWithQQS || !amountWithoutQQS || !description) {
-      return res.status(400).json({
-        ok: false,
-        message: "All fields are required",
-      });
+      return res
+        .status(400)
+        .json({ ok: false, message: "All fields are required" });
     }
+
     let file = req.file;
     const ariza = await Ariza.findById(ariza_id);
-    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
-    if (!ariza)
-      return res.status(404).json({
-        ok: false,
-        message: "Ariza topilmadi",
-      });
+    if (!ariza) {
+      return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
+    }
 
+    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
+    if (!abonent) {
+      return res.status(404).json({ ok: false, message: "Abonent topilmadi" });
+    }
+
+    // PDF va rasmlarni birlashtirish
     if (photos?.length > 0) {
-      // endi pdf va rasmlarni birlashtirish kodi kerak
-      let imgs = photos.split(",");
-      const photosBuffer = [];
-      for (let file_id of imgs) {
-        const file = await bot.telegram.getFile(file_id);
-        const photoBuffer = await bot.telegram.getFileLink(file.file_id);
-        const response = await axios.get(photoBuffer, {
-          responseType: "arraybuffer",
-        });
-        photosBuffer.push(response.data);
-      }
-      const pdfDoc = await PDFDocument.create();
-      for (let photoBuffer of photosBuffer) {
-        const image = await pdfDoc.embedPng(photoBuffer);
-        const page = pdfDoc.addPage([image.width, image.height]);
-        page.drawImage(image, {
-          x: 0,
-          y: 0,
-          width: image.width,
-          height: image.height,
-        });
-      }
-      let pdfBuffer = await pdfDoc.save();
-      const merger = new PDFMerger();
-      if (req.file?.buffer) {
-        await merger.add(req.file.buffer);
-      } else {
-        const response = await tozaMakonApi.get(
-          "/file-service/buckets/download",
-          {
-            params: { file: ariza.aktInfo.fileId },
-            responseType: "arraybuffer",
-          }
-        );
-        await merger.add(response.data);
-      }
-      pdfBuffer = Buffer.from(pdfBuffer);
-      await merger.add(pdfBuffer);
-      const bufferAktFile = await merger.saveAsBuffer();
-      req.file.buffer = bufferAktFile;
-      file = req.file;
+      file = await mergePhotosWithPdf(
+        photos,
+        req.file,
+        ariza.aktInfo.fileId.split("*")[1]
+      );
     }
-    let fileId = ariza.aktInfo.fileId;
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file.buffer, file.originalname);
-      const fileData = (
-        await tozaMakonApi.post("/file-service/buckets/upload", formData, {
-          params: { folderType: "ACT" },
-        })
-      ).data;
-      fileId = ariza.document_number + "*" + fileData.id;
-    }
-    let act;
-    if (ariza.actStatus === "WARNED" || ariza.actStatus === "NEW") {
-      const kSaldo = (
-        await tozaMakonApi.get("billing-service/acts/calculate-k-saldo", {
-          params: {
-            amount: allAmount,
-            residentId: ariza.aktInfo.residentId,
-            actPackId: ariza.aktInfo.actPackId,
-            actType: Number(allAmount) > 0 ? "CREDIT" : "DEBIT",
-            inhabitantCount,
-            fileId,
-          },
-        })
-      ).data;
-      act = (
-        await tozaMakonApi.put("/billing-service/acts/" + ariza.akt_id, {
-          actType: Number(allAmount) > 0 ? "CREDIT" : "DEBIT",
-          amount: allAmount,
-          amountWithQQS,
-          amountWithoutQQS,
-          description,
-          id: ariza.akt_id,
-          inhabitantCount,
-          kSaldo,
-          residentId: abonent.id,
-        })
-      ).data;
-    } else {
-      const kSaldo = (
-        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
-          params: {
-            amount: allAmount,
-            residentId: ariza.aktInfo.residentId,
-            actPackId: akt_pachka_id[ariza.document_type],
-            actType: Number(allAmount) < 0 ? "DEBIT" : "CREDIT",
-          },
-        })
-      ).data;
-      const date = new Date();
-      const body = {
-        actPackId: akt_pachka_id[ariza.document_type],
-        actType: Number(allAmount) < 0 ? "DEBIT" : "CREDIT",
-        amount: allAmount,
-        amountWithQQS: amountWithQQS,
-        amountWithoutQQS: amountWithoutQQS,
-        description,
-        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        fileId,
-        kSaldo,
-        residentId: ariza.aktInfo.residentId,
-      };
-      if (inhabitantCount) body.inhabitantCount = inhabitantCount;
-      act = (await tozaMakonApi.post("/billing-service/acts", body)).data;
-    }
-    if (!act)
+
+    // Fayl yuklash
+    let fileId = file
+      ? await uploadFile(file, ariza.document_number)
+      : ariza.aktInfo.fileId;
+
+    // K-Saldo hisoblash
+    const actType = Number(allAmount) > 0 ? "CREDIT" : "DEBIT";
+    const kSaldo = await calculateKSaldo(allAmount, ariza, abonent.id, actType);
+
+    // Aktni yangilash yoki yaratish
+    const act = await updateOrCreateAct(
+      ariza,
+      allAmount,
+      amountWithQQS,
+      amountWithoutQQS,
+      description,
+      inhabitantCount,
+      fileId,
+      kSaldo,
+      actType,
+      abonent.id
+    );
+
+    if (!act) {
       return res
         .status(500)
         .json({ ok: false, message: "Internal server error" });
+    }
+
+    // Arizani yangilash
     const updatedAriza = await Ariza.findByIdAndUpdate(
       ariza._id,
       {
@@ -294,23 +223,151 @@ module.exports.changeArizaAct = async (req, res) => {
           actStatus: "NEW",
           akt_pachka_id: act.actPackId,
           akt_id: act.id,
-          aktInfo: {
-            ...act,
-          },
+          aktInfo: act,
           akt_date: act.createdAt,
         },
         $push: { actHistory: ariza.aktInfo },
       },
-      {
-        new: true,
-      }
+      { new: true }
     );
-    res.json({
-      ok: true,
-      ariza: updatedAriza,
-    });
+
+    res.json({ ok: true, ariza: updatedAriza });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ ok: false, message: "Internal server error" });
+  }
+};
+
+// PDF va rasm birlashtirish
+async function mergePhotosWithPdf(photos, uploadedFile, existingFileId) {
+  let imgs = photos.split(",");
+  const photosBuffer = await Promise.all(
+    imgs.map(async (file_id) => {
+      const file = await bot.telegram.getFile(file_id);
+      const photoBuffer = await bot.telegram.getFileLink(file.file_id);
+      const response = await axios.get(photoBuffer, {
+        responseType: "arraybuffer",
+      });
+      return response.data;
+    })
+  );
+
+  const pdfDoc = await PDFDocument.create();
+  for (let photoBuffer of photosBuffer) {
+    const image = await pdfDoc.embedPng(photoBuffer);
+    const page = pdfDoc.addPage([image.width, image.height]);
+    page.drawImage(image, {
+      x: 0,
+      y: 0,
+      width: image.width,
+      height: image.height,
+    });
+  }
+
+  let pdfBuffer = await pdfDoc.save();
+  const merger = new PDFMerger();
+  if (uploadedFile?.buffer) {
+    await merger.add(uploadedFile.buffer);
+  } else {
+    const response = await tozaMakonApi.get("/file-service/buckets/download", {
+      params: { file: existingFileId },
+      responseType: "arraybuffer",
+    });
+    await merger.add(response.data);
+  }
+
+  await merger.add(Buffer.from(pdfBuffer));
+  return { buffer: await merger.saveAsBuffer(), originalname: "merged.pdf" };
+}
+
+// Fayl yuklash
+async function uploadFile(file, documentNumber) {
+  const formData = new FormData();
+  formData.append("file", file.buffer, file.originalname);
+  const fileData = (
+    await tozaMakonApi.post("/file-service/buckets/upload", formData, {
+      params: { folderType: "ACT" },
+    })
+  ).data;
+  return documentNumber + ".PDF*" + fileData.fileId;
+}
+
+// K-Saldo hisoblash
+async function calculateKSaldo(amount, ariza, residentId, actType) {
+  return (
+    await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+      params: {
+        amount,
+        residentId,
+        actPackId: ariza.aktInfo.actPackId,
+        actType,
+      },
+    })
+  ).data;
+}
+
+// Aktni yangilash yoki yaratish
+async function updateOrCreateAct(
+  ariza,
+  allAmount,
+  amountWithQQS,
+  amountWithoutQQS,
+  description,
+  inhabitantCount,
+  fileId,
+  kSaldo,
+  actType,
+  residentId
+) {
+  const body = {
+    actType,
+    amount: allAmount,
+    amountWithQQS,
+    amountWithoutQQS,
+    description,
+    fileId,
+    kSaldo,
+    residentId,
+  };
+
+  if (inhabitantCount) body.inhabitantCount = inhabitantCount;
+
+  if (ariza.actStatus === "WARNED" || ariza.actStatus === "NEW") {
+    return (
+      await tozaMakonApi.put(`/billing-service/acts/${ariza.akt_id}`, {
+        id: ariza.akt_id,
+        ...body,
+      })
+    ).data;
+  } else {
+    return (
+      await tozaMakonApi.post("/billing-service/acts", {
+        ...body,
+        actPackId: akt_pachka_id[ariza.document_type],
+      })
+    ).data;
+  }
+}
+
+module.exports.addImageToAriza = async (req, res) => {
+  try {
+    const { ariza_id } = req.params;
+    const { file_id } = req.body;
+    const ariza = await Ariza.findById(ariza_id);
+    if (!file_id) {
+      return res.status(400).json({ ok: false, message: "Fayl ID topilmadi" });
+    }
+    if (!ariza) {
+      return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
+    }
+    const updatedAriza = await Ariza.findByIdAndUpdate(
+      ariza_id,
+      { $push: { tempPhotos: file_id } },
+      { new: true }
+    );
+    res.json({ ok: true, message: "Biriktirildi", ariza: updatedAriza });
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ ok: false, message: "Internal server error" });
   }
 };

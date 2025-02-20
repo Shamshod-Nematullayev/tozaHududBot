@@ -82,6 +82,10 @@ const schema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  tempPhotos: {
+    type: Array,
+    default: [],
+  },
   recalculationPeriods: Array,
   muzlatiladi: Boolean,
   actHistory: {

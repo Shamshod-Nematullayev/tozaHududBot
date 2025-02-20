@@ -6,6 +6,7 @@ const {
   getArizalar,
   updateArizaFromBillingById,
   changeArizaAct,
+  addImageToAriza,
 } = require("./controllers/arizalar.controller");
 const { uploadAsBlob } = require("../middlewares/multer");
 
@@ -163,4 +164,7 @@ router.put(
   uploadAsBlob.single("file"),
   changeArizaAct
 );
+
+router.put("/add-image/:ariza_id", addImageToAriza);
+
 module.exports = router;
