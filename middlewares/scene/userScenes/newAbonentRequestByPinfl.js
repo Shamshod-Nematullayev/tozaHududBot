@@ -131,11 +131,11 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         throw "bad request";
       }
       ctx.wizard.state.cadastr = data[1];
-      ctx.reply(
+      await ctx.reply(
         "Mahallani tanlang",
         Markup.inlineKeyboard(ctx.wizard.state.mahallalarButtons)
       );
-      ctx.deleteMessage();
+      await ctx.deleteMessage();
       ctx.wizard.next();
     } catch (error) {
       ctx.reply("Noto'g'ri so'rov", ctx.scene.leave());
@@ -295,7 +295,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         ctx.reply(
           "Abonent qo'shishda xatolik yuz berdi \n" + newAbonent.data.message
         );
-        throw new Error("Abonent qo'shishda xatolik yuz berdi");
+        console.error(newAbonent.data);
       }
       await tozaMakonApi.patch("/user-service/residents/identified", {
         identified: true,
@@ -343,7 +343,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       );
       ctx.scene.leave();
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 );

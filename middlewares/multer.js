@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
 const memoryStorage = multer.memoryStorage();
 const uploadAsBlob = multer({
   storage: memoryStorage,
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 25 * 1024 * 1024 },
 });
 
 const isLimitFileSize = (err, req, res, next) => {

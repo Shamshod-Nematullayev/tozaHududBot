@@ -41,6 +41,7 @@ app.use(
   isAuth,
   require("./routers/yashovchiSoniXatlov")
 );
+
 app.use((req, res, next) => {
   res.status(404).json({
     ok: false,

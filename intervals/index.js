@@ -119,7 +119,8 @@ timer(
   sendEtkMfyReport
 );
 
-timer("15:31", addUpdateArizaAktTask);
+timer("15:00", addUpdateArizaAktTask);
+// addUpdateArizaAktTask();
 // require("./yuqoriQarzdorliklar");
 // require("./cleanCitySessionSaver");
 // require("./updateArizalarStatus");

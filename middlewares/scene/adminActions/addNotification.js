@@ -99,13 +99,13 @@ const addNotification = new Scenes.WizardScene(
 
     const documents = await Bildirishnoma.find({ type: "sudga_chiqoring" });
     let doc_num = documents[documents.length - 1].doc_num + 1;
-    const newDocument = new Bildirishnoma({
+    const newDocument = await Bildirishnoma.create({
       user: ctx.from,
       type: "sudga_chiqoring",
       ...ctx.wizard.state,
       doc_num,
+      mahallaId: ctx.wizard.state.mahallalar[0].id,
     });
-    await newDocument.save();
     await ctx.replyWithHTML(`✅\n№ <code>${doc_num}</code>`);
     await ctx.reply(
       "Muvaffaqqiyatli biriktirildi. Yana biriktiramizmi?",

@@ -12,64 +12,93 @@ router.get("/:file_id", async (req, res, next) => {
   try {
     const fileId = req.params.file_id;
 
-    // Get the file link
+    // Faylning URL manzilini olamiz
     const fileLink = await bot.telegram.getFileLink(fileId);
 
+    // Faylni yuklab olib, bufferga saqlash
     https
       .get(fileLink.href, (response) => {
-        const fileName = Date.now() + "file.png";
-        const fileStream = fs.createWriteStream(fileName);
+        if (response.statusCode !== 200) {
+          return next(
+            new Error(
+              `Failed to download file, status code: ${response.statusCode}`
+            )
+          );
+        }
 
-        response.pipe(fileStream);
+        let data = [];
 
-        fileStream.on("finish", () => {
-          fileStream.close();
-
-          // Send the file to the client
-          res.download(fileName, (err) => {
-            if (err) {
-              console.error("Error downloading the file:", err);
-              next(err);
-            } else {
-              // Remove the file after sending it
-              fs.unlink(fileName, (unlinkErr) => {
-                if (unlinkErr) {
-                  console.error("Error deleting the file:", unlinkErr);
-                }
-              });
-            }
-          });
+        // Fayl ma'lumotlarini qismlarga bo'lib olish
+        response.on("data", (chunk) => {
+          data.push(chunk);
         });
 
-        fileStream.on("error", (err) => {
-          console.error("Error writing to file stream:", err);
+        // Ma'lumot to'liq yuklanganda
+        response.on("end", () => {
+          const fileBuffer = Buffer.concat(data);
+
+          // Faylni mijozga yuborish
+          res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="file.png"`
+          );
+          res.setHeader("Content-Type", response.headers["content-type"]);
+          res.send(fileBuffer);
+        });
+
+        response.on("error", (err) => {
+          console.error("Error receiving file data:", err);
           next(err);
         });
       })
       .on("error", (err) => {
-        console.error("Error with https get request:", err);
+        console.error("Error with HTTPS request:", err);
         next(err);
       });
   } catch (err) {
-    console.error("Error in the try block:", err);
+    console.error("Error in try block:", err);
     next(err);
   }
 });
 
 router.post(
   "/create-document",
-  uploadAsBlob.single("file"),
-  async (req, res) => {
+  (req, res, next) => {
+    req.on("aborted", () => {
+      console.warn("Mijoz ulanishni uzib qo‘ydi!");
+    });
+
+    uploadAsBlob.single("file")(req, res, function (err) {
+      if (err) {
+        console.error("Multer error:", err);
+        return res.status(400).json({ ok: false, message: err.message });
+      }
+      next();
+    });
+  },
+  async (req, res, next) => {
+    if (!req.file) {
+      return res.status(400).json({ ok: false, message: "Fayl yuklanmadi!" });
+    }
+
     try {
       const document = await bot.telegram.sendDocument(TEST_BASE_CHANNEL_ID, {
         source: req.file.buffer,
+        filename: req.file.originalname,
       });
+
       res.json({ ok: true, document_id: document.document.file_id });
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ ok: false, message: "Internal server error 500" });
+      console.error("Telegramga hujjat jo‘natishda xatolik:", err);
+      next(err);
     }
   }
 );
+
+// Xatolarni ushlovchi middleware
+router.use((err, req, res, next) => {
+  console.error("Xato:", err);
+  res.status(500).json({ ok: false, message: "Ichki server xatosi (500)" });
+});
 
 module.exports = router;

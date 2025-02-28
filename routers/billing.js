@@ -12,6 +12,7 @@ const {
   getAbonentActs,
   createFullAct,
   createDublicateAct,
+  getAbonentsByMfyId,
 } = require("./controllers/billing.controller");
 const { akt_pachka_id } = require("../constants");
 
@@ -208,76 +209,7 @@ router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
   }
 });
 
-const uchirilishiKerakBulganAbonentlar = [];
-router.get("/get-abonents-by-mfy-id/:mfy_id", async (req, res) => {
-  try {
-    const abonents = await Abonent.find({
-      mahallas_id: req.params.mfy_id,
-    });
-    const { minSaldo, maxSaldo } = req.query;
-    let page = 0;
-    let totalPages = 1;
-    const rows = [];
-    const { data } = await tozaMakonApi.get(
-      `/user-service/residents?districtId=47&sort=id,DESC&page=${page}&size=300&companyId=1144&mahallaId=${req.params.mfy_id}`
-    );
-    rows.push(...data.content);
-    totalPages = data.totalPages;
-    if (totalPages > 1) {
-      for (let i = 1; i < totalPages; i++) {
-        const { data } = await tozaMakonApi.get(
-          `/user-service/residents?districtId=47&sort=id,DESC&page=${i}&size=300&companyId=1144&mahallaId=${req.params.mfy_id}`
-        );
-        rows.push(...data.content);
-      }
-    }
-    let filteredData = rows.filter((abonent) => {
-      const abonentSaldo = Number(abonent.ksaldo);
-
-      const abonentMongo = abonents.find(
-        (a) => a.licshet == abonent.accountNumber
-      );
-
-      // Abonentlar ro'yxatidan chiqarilgan bo'lmaganini tekshirish
-      const isNotExcluded = !uchirilishiKerakBulganAbonentlar.includes(
-        Number(abonent.licshet)
-      );
-
-      // Filtrlash uchun shartlarni qo'llash
-      const isAboveMinSaldo = minSaldo ? abonentSaldo > Number(minSaldo) : true;
-      const isBelowMaxSaldo = maxSaldo ? abonentSaldo < Number(maxSaldo) : true;
-
-      return (
-        isNotExcluded &&
-        isAboveMinSaldo &&
-        isBelowMaxSaldo &&
-        abonentMongo &&
-        !abonentMongo.shaxsi_tasdiqlandi?.confirm
-      );
-    });
-    filteredData = filteredData.map((abonent) => {
-      let isElektrKodConfirm = false;
-
-      const abonentMongo = abonents.find(
-        (a) => a.licshet == abonent.accountNumber
-      );
-      if (abonentMongo)
-        isElektrKodConfirm = abonentMongo.ekt_kod_tasdiqlandi?.confirm;
-      return {
-        ...abonent,
-        isElektrKodConfirm,
-        fullName: kirillga(
-          abonentMongo?.fio ? abonentMongo.fio : abonent.fullName
-        ),
-      };
-    });
-    filteredData.sort((a, b) => a.fullName.localeCompare(b.fullName));
-    res.json({ ok: true, data: filteredData });
-  } catch (error) {
-    res.json({ ok: false, message: "Internal server error 500" });
-    console.error(error);
-  }
-});
+router.get("/get-abonents-by-mfy-id/:mfy_id", getAbonentsByMfyId);
 
 router.get("/get-all-active-mfy", async (req, res) => {
   try {
@@ -342,7 +274,7 @@ router.post(
   uploadAsBlob.any(),
   async (req, res) => {
     try {
-      const { minSaldo, maxSaldo, mahalla_id, mahalla_name } = req.query;
+      const { minSaldo, maxSaldo, onlyNotIdentited, mahalla_name } = req.query;
       const files = req.files;
 
       if (!files || files.length === 0) {
@@ -361,11 +293,16 @@ router.post(
         process.env.NAZORATCHILAR_GURUPPASI,
         mediaGroup
       );
+      let caption = `${mahalla_name} ${
+        minSaldo ? minSaldo + " dan yuqori" : ""
+      } ${
+        maxSaldo ? maxSaldo + " dan past" : ""
+      } qarzdorligi mavjud abonentlar ro'yxati biriktirilgan aholi nazoratchisi uchun`;
+      if (onlyNotIdentited)
+        caption = `${mahalla_name} mahallasi shaxsi tasdiqlanmagan abonentlar ro'yxati, aholi nazoratchisi uchun`;
       await bot.telegram.sendMessage(
         process.env.NAZORATCHILAR_GURUPPASI,
-        `${mahalla_name} ${minSaldo ? minSaldo + " dan yuqori" : ""} ${
-          maxSaldo ? maxSaldo + " dan past" : ""
-        } qarzdorligi mavjud abonentlar ro'yxati biriktirilgan aholi nazoratchisi uchun`
+        caption
       );
 
       res.status(200).send("Rasmlar muvaffaqiyatli yuborildi!");
