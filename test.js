@@ -6,7 +6,7 @@
 // const { Nazoratchi, keyboards } = require("./requires");
 // const { lotinga } = require("./middlewares/smallFunctions/lotinKiril");
 
-const { Abonent } = require("./requires");
+const { Abonent, bot } = require("./requires");
 
 const datas = require("./main.json");
 const { tozaMakonApi } = require("./api/tozaMakon");
@@ -196,3 +196,5 @@ const func = async () => {
   console.log("Jarayon yakullandi");
 };
 // func();
+
+// bot.telegram.getChat()

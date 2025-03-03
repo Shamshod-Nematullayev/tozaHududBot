@@ -51,6 +51,8 @@ router.post("/login", async (req, res, next) => {
       ok: true,
       accessToken,
       refreshToken,
+      fullName: admin.fullName,
+      profilePhotoId: admin.profilePhotoId,
     });
   } catch (ex) {
     next(ex);

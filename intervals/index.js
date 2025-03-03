@@ -45,43 +45,43 @@ const timer = (times, callback) => {
   }, 60 * 1000); // Har daqiqada tekshiramiz
 };
 
-// timer(["09:00", "12:00", "17:00"], sendMFYIncomeReport);
-// timer(
-//   [
-//     "09:00",
-//     "10:00",
-//     "11:00",
-//     "12:00",
-//     "13:00",
-//     "14:00",
-//     "15:00",
-//     "16:00",
-//     "17:00",
-//     "18:00",
-//     "19:00",
-//     "20:00",
-//     "21:00",
-//   ],
-//   sendKunlikPinflReports
-// );
-// timer(
-//   [
-//     "09:00",
-//     "10:00",
-//     "11:00",
-//     "12:00",
-//     "13:00",
-//     "14:00",
-//     "15:00",
-//     "16:00",
-//     "17:00",
-//     "18:00",
-//     "19:00",
-//     "20:00",
-//     "21:00",
-//   ],
-//   sendPinflMfyReport
-// );
+timer(["09:00", "12:00", "17:00"], sendMFYIncomeReport);
+timer(
+  [
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00",
+  ],
+  sendKunlikPinflReports
+);
+timer(
+  [
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00",
+  ],
+  sendPinflMfyReport
+);
 timer(
   [
     "09:00",
@@ -119,7 +119,7 @@ timer(
   sendEtkMfyReport
 );
 
-timer("15:00", addUpdateArizaAktTask);
+// timer("15:00", addUpdateArizaAktTask);
 // addUpdateArizaAktTask();
 // require("./yuqoriQarzdorliklar");
 // require("./cleanCitySessionSaver");

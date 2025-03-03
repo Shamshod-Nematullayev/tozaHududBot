@@ -5,5 +5,7 @@ const schema = new mongoose.Schema({
   login: String,
   password: String,
   refreshToken: String,
+  fullName: String,
+  profilePhotoId: String,
 });
 module.exports.Admin = mongoose.model("admin", schema, "admin");

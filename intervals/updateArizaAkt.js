@@ -9,7 +9,7 @@ const updateArizalarAkt = new Queue(
 
 const addUpdateArizaAktTask = async () => {
   const now = new Date();
-  const date = new Date(now.getFullYear(), now.getMonth(), 1);
+  const date = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const arizalar = await Ariza.find({
     sana: { $gte: date },
   });
