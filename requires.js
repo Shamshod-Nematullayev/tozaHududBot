@@ -18,7 +18,7 @@ const { messages } = require("./lib/messages");
 
 // mongo models
 const { Admin } = require("./models/Admin");
-const { CleanCitySession } = require("./models/CleanCitySession");
+const { Company } = require("./models/Company");
 const { Counter } = require("./models/Counter");
 const { Guvohnoma } = require("./models/Guvohnoma");
 const { Abonent } = require("./models/Abonent");
@@ -45,7 +45,7 @@ module.exports = {
   messages,
   // mongo models
   Admin,
-  CleanCitySession,
+  Company,
   Counter,
   Guvohnoma,
   Abonent,

@@ -120,7 +120,7 @@ timer(
 );
 
 // timer("15:00", addUpdateArizaAktTask);
-// addUpdateArizaAktTask();
+addUpdateArizaAktTask();
 // require("./yuqoriQarzdorliklar");
 // require("./cleanCitySessionSaver");
 // require("./updateArizalarStatus");

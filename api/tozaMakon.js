@@ -1,5 +1,5 @@
 const { default: axios } = require("axios");
-const { CleanCitySession } = require("../requires");
+const { Company } = require("../requires");
 
 const tozaMakonApi = axios.create({
   baseURL: "https://api.tozamakon.eco",
@@ -12,7 +12,7 @@ const tozaMakonApi = axios.create({
 
 tozaMakonApi.interceptors.request.use(
   async (config) => {
-    const session = await CleanCitySession.findOne({ login: "dxsh24107" });
+    const session = await Company.findOne({ login: "dxsh24107" });
     if (session.cookie) {
       config.headers["Authorization"] = `Bearer ${session.cookie}`;
     }
@@ -26,7 +26,7 @@ tozaMakonApi.interceptors.request.use(
 tozaMakonApi.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const session = await CleanCitySession.findOne({ login: "dxsh24107" });
+    const session = await Company.findOne({ login: "dxsh24107" });
     console.error(
       {
         method: error.response.config.method,

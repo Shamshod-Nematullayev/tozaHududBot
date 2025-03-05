@@ -1,5 +1,5 @@
 const { default: axios } = require("axios");
-const { CleanCitySession } = require("../requires");
+const { Company } = require("../requires");
 
 const hybridPochtaApi = axios.create({
   baseURL: "https://hybrid.pochta.uz/api",
@@ -10,7 +10,7 @@ const hybridPochtaApi = axios.create({
 
 hybridPochtaApi.interceptors.request.use(
   async (config) => {
-    const session = await CleanCitySession.findOne({ login: "dxsh24107" });
+    const session = await Company.findOne({ login: "dxsh24107" });
     if (session.hybridToken) {
       config.headers["Authorization"] = `Bearer ${session.hybridToken}`;
     }
@@ -24,7 +24,7 @@ hybridPochtaApi.interceptors.request.use(
 hybridPochtaApi.interceptors.response.use(
   (response) => response,
   async (err) => {
-    const session = await CleanCitySession.findOne({ login: "dxsh24107" });
+    const session = await Company.findOne({ login: "dxsh24107" });
 
     if (err.response && err.response.status === 401) {
       const { data } = await axios.post(

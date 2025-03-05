@@ -1,4 +1,4 @@
-const { CleanCitySession } = require("../../requires");
+const { Company } = require("../../requires");
 
 const ekopayLogin = async (callback) => {
   try {
@@ -19,9 +19,9 @@ const ekopayLogin = async (callback) => {
       credentials: "omit",
     });
     let data = await res.json();
-    const session = await CleanCitySession.findOne({ type: "ekopay" });
+    const session = await Company.findOne({ type: "ekopay" });
     if (!session) {
-      return await CleanCitySession.create({
+      return await Company.create({
         type: "ekopay",
         cookie: data.user.session_id,
         authorization: data.user.token,

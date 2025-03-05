@@ -30,4 +30,4 @@ const schema = new Schema(
   }
 );
 
-module.exports.CleanCitySession = model("cleancitysession", schema);
+module.exports.Company = model("Company", schema);

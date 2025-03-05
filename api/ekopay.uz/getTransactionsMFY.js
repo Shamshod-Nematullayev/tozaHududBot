@@ -1,9 +1,9 @@
-const { CleanCitySession } = require("../../requires");
+const { Company } = require("../../requires");
 const { ekopayLogin } = require("./login");
 
 const getTransactionMFY = async () => {
   try {
-    const session = await CleanCitySession.findOne({ type: "ekopay" });
+    const session = await Company.findOne({ type: "ekopay" });
     const now = new Date();
     const fromDate = `01.${now.getMonth() + 1}.${now.getFullYear()}`;
     const toDate = `${now.getDate()}.${

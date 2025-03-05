@@ -3,7 +3,7 @@ const { keyboards } = require("../../../requires");
 const isCancel = require("../../smallFunctions/isCancel");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { Abonent } = require("../../../models/Abonent");
-const { CleanCitySession } = require("../../../models/CleanCitySession");
+const { Company } = require("../../../models/Company");
 const { changeAbonentDates } = require("../../../requires");
 const cc = "https://cleancity.uz/";
 
@@ -47,7 +47,7 @@ const changeAbonentStreet = new Scenes.WizardScene(
           keyboards.lotin.cancelBtn.resize()
         );
       }
-      const session = await CleanCitySession.findOne({ type: "dxsh" });
+      const session = await Company.findOne({ type: "dxsh" });
       let streets = await fetch(cc + "ds?DAO=StreetsDAO&ACTION=GETLISTALL", {
         method: "POST",
         headers: {

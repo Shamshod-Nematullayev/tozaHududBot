@@ -1,8 +1,8 @@
-const { CleanCitySession } = require("../../models/CleanCitySession");
+const { Company } = require("../../models/Company");
 const { ekopayLogin } = require("./login");
 
 async function getTransactionsReportInspector() {
-  const session = await CleanCitySession.findOne({ type: "ekopay" });
+  const session = await Company.findOne({ type: "ekopay" });
   const date = new Date();
   const dateStr = `${date.getDate()}.${
     date.getMonth() + 1
