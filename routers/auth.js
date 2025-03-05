@@ -1,6 +1,8 @@
 const { Admin } = require("../models/Admin");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { bot } = require("../requires");
+const { default: axios } = require("axios");
 
 const router = require("express").Router();
 
@@ -46,13 +48,19 @@ router.post("/login", async (req, res, next) => {
         refreshToken: refreshToken,
       },
     });
-
+    const ctx = await bot.telegram.getChat(admin.user_id);
+    const file = await bot.telegram.getFile(ctx.photo.big_file_id);
+    const photo = await axios.get(
+      `https://api.telegram.org/file/bot${process.env.TOKEN}/${file.file_path}`,
+      { responseType: "arraybuffer" }
+    );
     res.status(200).json({
       ok: true,
       accessToken,
       refreshToken,
+      telegram_id: admin.user_id,
       fullName: admin.fullName,
-      profilePhotoId: admin.profilePhotoId,
+      photo: photo.data,
     });
   } catch (ex) {
     next(ex);

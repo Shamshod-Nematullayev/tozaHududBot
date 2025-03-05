@@ -5,6 +5,7 @@ const path = require("path");
 const { uploadAsBlob } = require("../middlewares/multer");
 const { TEST_BASE_CHANNEL_ID } = require("../constants");
 const { default: axios } = require("axios");
+const { getProfilePhoto } = require("./controllers/users.controller");
 
 const router = require("express").Router();
 

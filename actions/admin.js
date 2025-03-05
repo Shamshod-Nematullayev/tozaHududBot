@@ -353,47 +353,6 @@ composer.hears("q", async (ctx) => {
   fs.unlink(fileName + ".xlsx", (err) => {});
 });
 
-composer.hears(/karta_/g, async (ctx) => {
-  try {
-    const abonent = await Abonent.findOne({
-      licshet: ctx.message.text.split("_")[1],
-    });
-    if (!abonent) return ctx.reply("Абоненти топилмаган!");
-
-    const data = (
-      await tozaMakonApi(
-        `/user-service/residents/${abonent.id}/print-card?lang=UZ`
-      )
-    ).data;
-    const html = await new Promise((resolve, reject) => {
-      ejs.renderFile(
-        "./views/abonentKarta.ejs",
-        { ...data },
-        {},
-        (err, str) => {
-          if (err) return reject(err);
-          resolve(str);
-        }
-      );
-    });
-    htmlPDF
-      .create(html, {
-        format: "A4",
-        orientation: "portrait",
-      })
-      .toFile("./uploads/abonent_card.pdf", async (err, res) => {
-        if (err) throw err;
-        await ctx.replyWithDocument({ source: "./uploads/abonent_card.pdf" });
-        fs.unlink("./uploads/abonent_card.pdf", (err) =>
-          err ? console.log(err) : ""
-        );
-      });
-  } catch (error) {
-    ctx.reply("Xatolik yuzaga keldi");
-    console.error(error);
-  }
-});
-
 composer.hears("OGOHLANTIRISH XATLARI IMPORT", async (ctx) => {
   if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 

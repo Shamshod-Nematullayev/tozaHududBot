@@ -61,6 +61,7 @@ const {
 } = require("./scene/adminActions/sendWarningLettersByHybrid");
 const { createTargetScene } = require("./scene/userScenes/createTarget");
 const changePasswordScene = require("./scene/adminActions/changePassword");
+const getAbonentCard = require("./scene/userScenes/getAbonentCard");
 
 const stage = new Scenes.Stage([
   newAdminScene,
@@ -92,6 +93,7 @@ const stage = new Scenes.Stage([
   changeAbonentStreet,
   createTargetScene,
   changePasswordScene,
+  getAbonentCard,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

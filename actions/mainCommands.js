@@ -18,6 +18,9 @@ composer.hears(["👤Yangi abonent ochish", "👤Янги абонент"], (ctx
 composer.hears(["🔎Izlash", "🔎Излаш"], (ctx) => {
   ctx.scene.enter("SEARCH_BY_NAME");
 });
+composer.hears(["📅Abonent karta", "📅Абонент карта"], (ctx) => {
+  ctx.scene.enter("getAbonentCard");
+});
 composer.hears(["🔌ЭЛЕКТР КОДИ🔌", "🔌ELEKTR KODI🔌"], async (ctx) => {
   ctx.scene.enter("updateElektrKod");
 });
