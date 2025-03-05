@@ -1,9 +1,4 @@
 const { Scenes } = require("telegraf");
-const {
-  createMail,
-  getOneMailById,
-  getPdf,
-} = require("../../../api/hybrid.pochta.uz");
 const { INPUT_ABONENTS_LICSHET } = require("../../../constants");
 const { createInlineKeyboard } = require("../../../lib/keyboards");
 const { HybridMail } = require("../../../models/HybridMail");
@@ -22,12 +17,6 @@ const { hybridPochtaApi } = require("../../../api/hybridPochta");
 const FormData = require("form-data");
 
 // required small functions
-function bugungiSana() {
-  const date = new Date();
-  return `${date.getDate()}.${
-    date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1
-  }.${date.getFullYear()}`;
-}
 
 async function createWarningLetterPDF(abonentData) {
   const now = new Date();
