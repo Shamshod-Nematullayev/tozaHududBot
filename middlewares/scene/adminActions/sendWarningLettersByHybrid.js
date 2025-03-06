@@ -15,6 +15,7 @@ const PDFMerger = require("pdf-merger-js");
 const { tozaMakonApi } = require("../../../api/tozaMakon");
 const { hybridPochtaApi } = require("../../../api/hybridPochta");
 const FormData = require("form-data");
+const { ekopayApi } = require("../../../api/ekopayApi");
 
 // required small functions
 

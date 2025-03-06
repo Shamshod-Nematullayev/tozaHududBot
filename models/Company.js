@@ -3,13 +3,16 @@ const { Schema, model } = require("mongoose");
 const schema = new Schema(
   {
     user_id: Number,
-    cookie: String,
     login: String,
     password: String,
     authorization: String,
     hybridToken: String,
     hybridLogin: String,
     hybridPassword: String,
+    ekopayLogin: String,
+    ekopayPassword: String,
+    ekopaySessionId: String,
+    ekopayToken: String,
     type: {
       type: String,
       enum: ["dxsh", "ekopay"],

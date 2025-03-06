@@ -1,5 +1,6 @@
 const { fetchEcoTranzaksiyalar } = require("../requires");
 const { sendKunlikPinflReports } = require("./kunlikPinflReports");
+const { lastPayReportInspectors } = require("./lastPayReportInspectors");
 const { sendEtkMfyReport } = require("./sendEtkMfyReport");
 const { sendMFYIncomeReport } = require("./sendMFYIncomeReport");
 const { sendPinflMfyReport } = require("./sendPinflMfyReport");
@@ -118,9 +119,9 @@ timer(
   ],
   sendEtkMfyReport
 );
-
+lastPayReportInspectors();
 // timer("15:00", addUpdateArizaAktTask);
-addUpdateArizaAktTask();
+// addUpdateArizaAktTask();
 // require("./yuqoriQarzdorliklar");
 // require("./cleanCitySessionSaver");
 // require("./updateArizalarStatus");

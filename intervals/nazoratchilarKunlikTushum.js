@@ -1,13 +1,22 @@
-const {
-  getTransactionsReportInspector,
-} = require("../api/ekopay.uz/getTransactionsReportInspector");
 const { Nazoratchi, bot } = require("../requires");
 const ejs = require("ejs");
 const generateImage = require("../helpers/puppeteer-wrapper");
+const { ekopayApi } = require("../api/ekopayApi");
 
 async function nazoratchilarKunlikTushum() {
   try {
-    const data = await getTransactionsReportInspector();
+    const date = new Date();
+    const dateStr = `${date.getDate()}.${
+      date.getMonth() + 1
+    }.${date.getFullYear()}`;
+    const { data } = await ekopayApi.get(
+      `/ecopay/transaction-report;descending=false;page=1;perPage=100?parent_id=32&date_from=${dateStr}&date_to=${dateStr}&companies_id=1144&sys_companies_id=503`,
+      {
+        headers: {
+          login: "dxsh24107",
+        },
+      }
+    );
     const inspectors = await Nazoratchi.find({ activ: true });
     const now = new Date();
     const dateString = `${now.getFullYear()}.${
@@ -17,7 +26,7 @@ async function nazoratchilarKunlikTushum() {
     let [jamiTushumSoni, jamiTushumSummasi] = [0, 0];
 
     inspectors.forEach((inspector) => {
-      const tushum = data.find((elem) => elem.id === inspector.id);
+      const tushum = data.rows.find((elem) => elem.id === inspector.id);
       if (!tushum)
         return rows.push({
           id: inspector.id,

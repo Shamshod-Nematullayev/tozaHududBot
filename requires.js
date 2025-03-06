@@ -7,7 +7,6 @@ const htmlPDF = require("html-pdf");
 const ejs = require("ejs");
 
 // required functions
-const { fetchEcoTranzaksiyalar } = require("./middlewares/fetchEcopay");
 const { find_address_by_pinfil_from_mvd } = require("./api/mvd-pinfil");
 
 // telegraf resources
@@ -36,7 +35,6 @@ module.exports = {
   htmlPDF,
   ejs,
   // required functions
-  fetchEcoTranzaksiyalar,
   find_address_by_pinfil_from_mvd,
   // telegraf resourses
   Composer,

@@ -12,33 +12,81 @@ const ekopayApi = axios.create({
 
 ekopayApi.interceptors.request.use(
   async (config) => {
-    const session = await Company.findOne({ login: "dxsh24107" });
-    if (session.ekopayToken) {
+    if (!config.headers.login) {
+      throw new Error("Login not found");
+    }
+    const session = await Company.findOne({
+      login: config.headers.login,
+    });
+
+    if (session?.ekopayToken) {
       config.headers["Authorization"] = `Bearer ${session.ekopayToken}`;
     }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 ekopayApi.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const session = await Company.findOne({ login: "dxsh24107" });
-    if (error.response.status === 401) {
-      const { data } = await axios.post("https://ekopay.uz/api/auth/login", {
-        username: session.login,
-        password: session.password,
-      });
-      await session.updateOne({
-        $set: {
-          ekopayToken: data.access_token,
-        },
-      });
-      return ekopayApi.request(error.response.config);
+    try {
+      const login = error.config?.headers?.login;
+      if (!login) {
+        return Promise.reject("Login not found in request");
+      }
+
+      const company = await Company.findOne({ login });
+      if (!company) {
+        return Promise.reject("Company not found");
+      }
+
+      if (error.response?.status === 401) {
+        const { data } = await axios.post(
+          "https://ekopay.uz/api/admin/auth/login",
+          {
+            username: company.ekopayLogin,
+            password: company.ekopayPassword,
+            remember: false,
+            lang: "uz",
+          },
+          {
+            headers: {
+              accept: "application/json, text/plain, */*",
+              "content-type": "application/x-www-form-urlencoded",
+            },
+          }
+        );
+
+        await Company.findByIdAndUpdate(company._id, {
+          $set: {
+            ekopayToken: data.user.token,
+            ekopaySessionId: data.user.session_id,
+          },
+        });
+
+        // Xatolik yuz bergan so‘rovni yana bir bor bajarish
+        error.config.headers["Authorization"] = `Bearer ${data.user.token}`;
+        return ekopayApi.request(error.config);
+      }
+
+      return Promise.reject(error.response);
+    } catch (err) {
+      return Promise.reject(err);
     }
-    return Promise.reject(error.response);
   }
 );
+
+(async () => {
+  try {
+    const { data } = await ekopayApi.get("/admin/app/ping", {
+      headers: { login: "dxsh24107" },
+    });
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+})();
+
+module.exports = { ekopayApi };
