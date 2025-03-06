@@ -10,6 +10,7 @@ const isCancel = require("../../smallFunctions/isCancel");
 const fs = require("fs");
 const https = require("https");
 const excelToJson = require("convert-excel-to-json");
+const { Nazoratchi } = require("../../../requires");
 
 const personConfirm = new Scenes.WizardScene(
   "shaxsi_tashdiqlandi_bildirish_xati",
@@ -28,7 +29,7 @@ const personConfirm = new Scenes.WizardScene(
     ctx.wizard.state.file_name = ctx.message.document.file_name;
 
     // Inspektorni tanlash tugmasi
-    const inspectors = require("../../../lib/nazoratchilar.json");
+    const inspectors = await Nazoratchi.find();
     const buttonsArray = [];
     inspectors.forEach((ins) => {
       buttonsArray.push([Markup.button.callback(ins.name, ins.id)]);
@@ -39,15 +40,14 @@ const personConfirm = new Scenes.WizardScene(
     );
     ctx.wizard.next();
   },
-  (ctx) => {
+  async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
-      const inspectors = require("../../../lib/nazoratchilar.json");
-      ctx.wizard.state.inspector = inspectors.filter(
-        (ins) => ctx.update.callback_query.data == ins.id
-      )[0];
+      ctx.wizard.state.inspector = await Nazoratchi.findOne({
+        id: ctx.update.callback_query.data,
+      });
       ctx.wizard.state.mahallalar = [];
-      ctx.editMessageText(
+      await ctx.editMessageText(
         messages.enterMahalla,
         keyboards[ctx.session.til].mahallalar
       );

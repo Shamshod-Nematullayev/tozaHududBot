@@ -3,45 +3,50 @@ const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
 const { Bildirishnoma } = require("../../../models/SudBildirishnoma");
 const isCancel = require("../../smallFunctions/isCancel");
+const { Nazoratchi } = require("../../../requires");
 
 const addNotification = new Scenes.WizardScene(
   "add_notification",
   async (ctx) => {
-    // Bekor qilish tugmasini tekshirish
-    if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
-    // Yuborilgan xabar faylmi tekshirish
-    if (!ctx.message.document) {
-      return ctx.reply(
-        messages.notFile,
-        keyboards[ctx.session.til].cancelBtn.resize()
+    try {
+      // Bekor qilish tugmasini tekshirish
+      if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
+      // Yuborilgan xabar faylmi tekshirish
+      if (!ctx.message.document) {
+        return ctx.reply(
+          messages.notFile,
+          keyboards[ctx.session.til].cancelBtn.resize()
+        );
+      }
+
+      ctx.wizard.state.file_id = ctx.message.document.file_id;
+      ctx.wizard.state.file_name = ctx.message.document.file_name;
+
+      // Inspektorni tanlash tugmasi
+      let inspectors = await Nazoratchi.find();
+      inspectors = inspectors.sort((a, b) => a.name.localeCompare(b.name));
+      const buttonsArray = [];
+      inspectors.forEach((ins) => {
+        buttonsArray.push([Markup.button.callback(ins.name, ins.id)]);
+      });
+      await ctx.reply(
+        messages.chooseInspektor,
+        Markup.inlineKeyboard(buttonsArray).oneTime()
       );
+      ctx.wizard.next();
+    } catch (error) {
+      console.error(error);
+      ctx.reply("Xatolik kuzatildi").catch();
     }
-
-    ctx.wizard.state.file_id = ctx.message.document.file_id;
-    ctx.wizard.state.file_name = ctx.message.document.file_name;
-
-    // Inspektorni tanlash tugmasi
-    let inspectors = require("../../../lib/nazoratchilar.json");
-    inspectors = inspectors.sort((a, b) => a.name.localeCompare(b.name));
-    const buttonsArray = [];
-    inspectors.forEach((ins) => {
-      buttonsArray.push([Markup.button.callback(ins.name, ins.id)]);
-    });
-    ctx.reply(
-      messages.chooseInspektor,
-      Markup.inlineKeyboard(buttonsArray).oneTime()
-    );
-    ctx.wizard.next();
   },
-  (ctx) => {
+  async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
-      const inspectors = require("../../../lib/nazoratchilar.json");
-      ctx.wizard.state.inspector = inspectors.filter(
-        (ins) => ctx.update.callback_query.data == ins.id
-      )[0];
+      ctx.wizard.state.inspector = await Nazoratchi.findOne({
+        id: ctx.update.callback_query.data,
+      });
       ctx.wizard.state.mahallalar = [];
-      ctx.editMessageText(
+      await ctx.editMessageText(
         messages.enterMahalla,
         keyboards[ctx.session.til].mahallalar
       );

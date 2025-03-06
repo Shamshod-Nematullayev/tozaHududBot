@@ -1,6 +1,6 @@
 const nodeHtmlToImage = require("node-html-to-image");
 const { ekopayApi } = require("../api/ekopayApi");
-const { bot } = require("../requires");
+const { bot, Nazoratchi } = require("../requires");
 
 function soatga(sec_num) {
   var hours = Math.floor(sec_num / 3600);
@@ -18,7 +18,7 @@ function soatga(sec_num) {
 
 async function lastPayReportInspectors() {
   try {
-    const nazoratchilar = require("../lib/nazoratchilar.json");
+    const nazoratchilar = await Nazoratchi.find({ activ: true });
     const date = new Date();
     const dateStr = `${date.getDate()}.${
       date.getMonth() + 1
@@ -42,57 +42,55 @@ async function lastPayReportInspectors() {
     }.${date.getDate()}`;
     data.tranzaksiyalar = [];
     nazoratchilar.forEach((ins) => {
-      if (ins.activ) {
-        let found = false;
-        let index;
-        let lastDate = 0;
-        for (let i = 0; i < tranzaksiyalar.length; i++) {
-          if (
-            ins.id == tranzaksiyalar[i].inspector_id &&
-            tranzaksiyalar[i].transaction_time > lastDate
-          ) {
-            lastDate = tranzaksiyalar[i].transaction_time;
-            found = true;
-            index = i;
-          }
+      let found = false;
+      let index;
+      let lastDate = 0;
+      for (let i = 0; i < tranzaksiyalar.length; i++) {
+        if (
+          ins.id == tranzaksiyalar[i].inspector_id &&
+          tranzaksiyalar[i].transaction_time > lastDate
+        ) {
+          lastDate = tranzaksiyalar[i].transaction_time;
+          found = true;
+          index = i;
         }
-        if (!found) {
-          data.tranzaksiyalar.push({
-            id: ins.id,
-            name: ins.name,
-            lastSeen: "Ishga chiqmagan",
-            forSort: 0,
-          });
-        } else {
-          data.tranzaksiyalar.push({
-            id: ins.id,
-            name: ins.name,
-            lastSeen: `${
-              new Date(tranzaksiyalar[index].transaction_time).getHours() < 10
-                ? "0" +
-                  new Date(tranzaksiyalar[index].transaction_time).getHours()
-                : new Date(tranzaksiyalar[index].transaction_time).getHours()
-            }:${
-              new Date(tranzaksiyalar[index].transaction_time).getMinutes() < 10
-                ? "0" +
-                  new Date(tranzaksiyalar[index].transaction_time).getMinutes()
-                : new Date(tranzaksiyalar[index].transaction_time).getMinutes()
-            }`,
-            forHuman: soatga(
-              String(
-                Math.floor(
-                  (Date.now() - tranzaksiyalar[index].transaction_time) / 1000
-                )
-              )
-            ),
-            farqi: String(
+      }
+      if (!found) {
+        data.tranzaksiyalar.push({
+          id: ins.id,
+          name: ins.name,
+          lastSeen: "Ishga chiqmagan",
+          forSort: 0,
+        });
+      } else {
+        data.tranzaksiyalar.push({
+          id: ins.id,
+          name: ins.name,
+          lastSeen: `${
+            new Date(tranzaksiyalar[index].transaction_time).getHours() < 10
+              ? "0" +
+                new Date(tranzaksiyalar[index].transaction_time).getHours()
+              : new Date(tranzaksiyalar[index].transaction_time).getHours()
+          }:${
+            new Date(tranzaksiyalar[index].transaction_time).getMinutes() < 10
+              ? "0" +
+                new Date(tranzaksiyalar[index].transaction_time).getMinutes()
+              : new Date(tranzaksiyalar[index].transaction_time).getMinutes()
+          }`,
+          forHuman: soatga(
+            String(
               Math.floor(
                 (Date.now() - tranzaksiyalar[index].transaction_time) / 1000
               )
-            ).toHHMMSS(),
-            forSort: tranzaksiyalar[index].transaction_time,
-          });
-        }
+            )
+          ),
+          farqi: String(
+            Math.floor(
+              (Date.now() - tranzaksiyalar[index].transaction_time) / 1000
+            )
+          ).toHHMMSS(),
+          forSort: tranzaksiyalar[index].transaction_time,
+        });
       }
     });
     data.tranzaksiyalar.sort(
