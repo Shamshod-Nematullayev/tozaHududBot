@@ -8,7 +8,6 @@
 
 const { Abonent, bot } = require("./requires");
 
-const datas = require("./main.json");
 const { tozaMakonApi } = require("./api/tozaMakon");
 const { SudAkt } = require("./models/SudAkt");
 

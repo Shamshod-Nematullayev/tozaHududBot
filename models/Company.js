@@ -1,5 +1,27 @@
 const { Schema, model } = require("mongoose");
 
+const aktPackSchema = new Schema({
+  id: {
+    type: String,
+    required: true,
+  },
+  month: {
+    type: Number,
+    required: true,
+  },
+  year: {
+    type: Number,
+    required: true,
+  },
+});
+const aktPackTypesSchema = new Schema({
+  viza: aktPackSchema,
+  odam_soni: aktPackSchema,
+  dvaynik: aktPackSchema,
+  pul_kuchirish: aktPackSchema,
+  death: aktPackSchema,
+  gps: aktPackSchema,
+});
 const schema = new Schema(
   {
     user_id: Number,
@@ -26,6 +48,7 @@ const schema = new Schema(
         searchAbonent: "",
       },
     },
+    akt_pachka_ids: aktPackTypesSchema,
     active: Boolean,
   },
   {
