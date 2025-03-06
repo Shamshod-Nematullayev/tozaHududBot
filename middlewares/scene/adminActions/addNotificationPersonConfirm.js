@@ -11,6 +11,7 @@ const fs = require("fs");
 const https = require("https");
 const excelToJson = require("convert-excel-to-json");
 const { Nazoratchi } = require("../../../requires");
+const { default: axios } = require("axios");
 
 const personConfirm = new Scenes.WizardScene(
   "shaxsi_tashdiqlandi_bildirish_xati",
@@ -44,7 +45,7 @@ const personConfirm = new Scenes.WizardScene(
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       ctx.wizard.state.inspector = await Nazoratchi.findOne({
-        id: ctx.update.callback_query.data,
+        id: ctx.update.callback_query?.data,
       });
       ctx.wizard.state.mahallalar = [];
       await ctx.editMessageText(
@@ -63,7 +64,7 @@ const personConfirm = new Scenes.WizardScene(
       const mahallalar = require("../../../lib/mahallalar.json");
 
       mahallalar.forEach((mfy) => {
-        if (ctx.update.callback_query.data.split("_")[1] == mfy.id)
+        if (ctx.update.callback_query?.data.split("_")[1] == mfy.id)
           ctx.wizard.state.mahalla = mfy.id;
       });
       ctx.deleteMessage();
@@ -107,48 +108,45 @@ const personConfirm = new Scenes.WizardScene(
         ctx.message.document.mime_type == "application/vnd.ms-excel")
     ) {
       const xlsx = await ctx.telegram.getFileLink(ctx.message.document.file_id);
-      const excelFile = fs.createWriteStream("./shaxs_tasdiqlandi.xls");
       ctx.reply(messages.pleaseWait);
-      https.get(xlsx.href, (res) => {
-        res.pipe(excelFile);
-        excelFile.on("finish", async (cb) => {
-          excelFile.close(cb);
-          const xls = excelToJson({
-            sourceFile: "./shaxs_tasdiqlandi.xls",
-          });
-          const abonents = [];
-          for (let i = 0; i < xls[Object.keys(xls)[0]].length; i++) {
-            const elem = xls[Object.keys(xls)[0]][i];
-
-            if (i > 1 && elem.B) {
-              abonents.push({
-                KOD: elem.B,
-                PASSPORT: elem.C,
-              });
-            }
-          }
-          const counter = await Counter.findOne({
-            name: "shaxsi_tashdiqlandi_bildirish_xati",
-          });
-          await Bildirishnoma.create({
-            abonents,
-            date: ctx.wizard.state.date,
-            file_id: ctx.wizard.state.file_id,
-            file_name: ctx.wizard.state.file_id,
-            inspector: ctx.wizard.state.inspector,
-            mahallalar: [ctx.wizard.state.mahalla],
-            type: "shaxsi_tasdiqlandi",
-            user: ctx.from,
-            doc_num: counter.value + 1,
-          });
-          await counter.updateOne({ $set: { value: counter.value + 1 } });
-          await ctx.reply(
-            `<code>${counter.value + 1}</code> raqami bilan saqlandi`,
-            { parse_mode: "HTML" }
-          );
-          return ctx.scene.leave();
-        });
+      const response = await axios.get(xlsx.href, {
+        responseType: "arraybuffer",
       });
+
+      const xls = excelToJson({
+        sourceFile: response.data,
+      });
+      const abonents = [];
+      for (let i = 0; i < xls[Object.keys(xls)[0]].length; i++) {
+        const elem = xls[Object.keys(xls)[0]][i];
+
+        if (i > 1 && elem.B) {
+          abonents.push({
+            KOD: elem.B,
+            PASSPORT: elem.C,
+          });
+        }
+      }
+      const counter = await Counter.findOne({
+        name: "shaxsi_tashdiqlandi_bildirish_xati",
+      });
+      await Bildirishnoma.create({
+        abonents,
+        date: ctx.wizard.state.date,
+        file_id: ctx.wizard.state.file_id,
+        file_name: ctx.wizard.state.file_id,
+        inspector: ctx.wizard.state.inspector,
+        mahallalar: [ctx.wizard.state.mahalla],
+        type: "shaxsi_tasdiqlandi",
+        user: ctx.from,
+        doc_num: counter.value + 1,
+      });
+      await counter.updateOne({ $set: { value: counter.value + 1 } });
+      await ctx.reply(
+        `<code>${counter.value + 1}</code> raqami bilan saqlandi`,
+        { parse_mode: "HTML" }
+      );
+      return ctx.scene.leave();
     } else {
       ctx.reply(
         messages.notExcelFile,
