@@ -15,6 +15,10 @@ const caotoNames = [
     title: "Xatirchi TETK",
     caoto: 12251,
   },
+  {
+    title: "Kattaqo'rg'on TETK",
+    caoto: 18215,
+  },
 ];
 
 const updateElektrKod = new Scenes.WizardScene(
