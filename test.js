@@ -6,9 +6,8 @@
 // const { Nazoratchi, keyboards } = require("./requires");
 // const { lotinga } = require("./middlewares/smallFunctions/lotinKiril");
 
-const { Abonent, bot } = require("./requires");
+const { Abonent } = require("./requires");
 
-const datas = require("./main.json");
 const { tozaMakonApi } = require("./api/tozaMakon");
 const { SudAkt } = require("./models/SudAkt");
 

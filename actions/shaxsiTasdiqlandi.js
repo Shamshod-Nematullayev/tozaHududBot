@@ -37,13 +37,13 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         },
       });
       if (pasportData.data.code) {
-        return ctx.answerCbQuery(pasportData.data.message);
+        return await ctx.answerCbQuery(pasportData.data.message);
       }
       const abonentDatasResponse = await tozaMakonApi.get(
         `/user-service/residents/${abonent.id}?include=translates`
       );
       if (!abonentDatasResponse || abonentDatasResponse.status !== 200) {
-        return ctx.answerCbQuery(
+        return await ctx.answerCbQuery(
           "Abonent dastlabki ma'lumotlarini oliishda xatolik"
         );
       }
@@ -74,7 +74,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         }
       );
       if (!updateResponse || updateResponse.status !== 200) {
-        return ctx.answerCbQuery("Ma'lumotlarni yangilashda xatolik");
+        return await ctx.answerCbQuery("Ma'lumotlarni yangilashda xatolik");
       }
       await tozaMakonApi.patch("/user-service/residents/identified", {
         identified: true,
@@ -161,7 +161,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
     }
   } catch (error) {
     try {
-      ctx.answerCbQuery("Xatolik kuzatildi");
+      await ctx.answerCbQuery("Xatolik kuzatildi");
     } catch (error) {
       console.error(error);
     }

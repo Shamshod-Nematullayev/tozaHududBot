@@ -78,15 +78,4 @@ ekopayApi.interceptors.response.use(
   }
 );
 
-(async () => {
-  try {
-    const { data } = await ekopayApi.get("/admin/app/ping", {
-      headers: { login: "dxsh24107" },
-    });
-    console.log(data);
-  } catch (error) {
-    console.error(error);
-  }
-})();
-
 module.exports = { ekopayApi };

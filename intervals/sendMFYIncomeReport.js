@@ -13,7 +13,6 @@ const formatDate = (date) => {
 
 async function sendMFYIncomeReport(ctx = false, companyId = 1144) {
   try {
-    console.log("FIRE");
     const now = new Date();
     const incomesFromEkopay = (
       await tozaMakonApi.get(

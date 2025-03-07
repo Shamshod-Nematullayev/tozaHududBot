@@ -27,6 +27,18 @@ const schema = new Schema(
       },
     },
     active: Boolean,
+    akt_pachka_id: {
+      type: Object,
+      default: {
+        death: "", //o'lim haqidagi guvohnomalar
+        viza: "", // horijga chiqish vizasi bo'yicha
+        odam_soni: "",
+        pul_kuchirish: "",
+        dvaynik: "", // ikkilamchi kodlarni o'chirish bo'yicha
+        gps: "", // moshin bormagan davrni akt qilish bo'yicha
+        boshqa: "",
+      },
+    },
   },
   {
     timestamps: true,
