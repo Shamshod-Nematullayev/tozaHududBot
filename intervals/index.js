@@ -1,7 +1,7 @@
-const { fetchEcoTranzaksiyalar } = require("../requires");
-const { createAktPack } = require("./createAktPachka");
+const { createAktPack } = require("./createAktPack");
 const { sendKunlikPinflReports } = require("./kunlikPinflReports");
 const { lastPayReportInspectors } = require("./lastPayReportInspectors");
+const { nazoratchilarKunlikTushum } = require("./nazoratchilarKunlikTushum");
 const { sendEtkMfyReport } = require("./sendEtkMfyReport");
 const { sendMFYIncomeReport } = require("./sendMFYIncomeReport");
 const { sendPinflMfyReport } = require("./sendPinflMfyReport");
@@ -101,7 +101,7 @@ alarm(
     "20:00",
     "21:00",
   ],
-  fetchEcoTranzaksiyalar
+  lastPayReportInspectors
 );
 alarm(
   [
@@ -121,11 +121,21 @@ alarm(
   ],
   sendEtkMfyReport
 );
-// alarm("15:00", addUpdateArizaAktTask);
-// addUpdateArizaAktTask();
-// require("./yuqoriQarzdorliklar");
-// require("./cleanCitySessionSaver");
-// require("./updateArizalarStatus");
-// require("./kunlikEtkReports");
-// require("./nazoratchilarKunlikTushum");
-// require("./checkMailExpires");
+alarm(
+  [
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00",
+  ],
+  nazoratchilarKunlikTushum
+);
