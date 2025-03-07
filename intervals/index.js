@@ -1,4 +1,5 @@
 const { fetchEcoTranzaksiyalar } = require("../requires");
+const { createAktPack } = require("./createAktPachka");
 const { sendKunlikPinflReports } = require("./kunlikPinflReports");
 const { lastPayReportInspectors } = require("./lastPayReportInspectors");
 const { sendEtkMfyReport } = require("./sendEtkMfyReport");
@@ -6,7 +7,7 @@ const { sendMFYIncomeReport } = require("./sendMFYIncomeReport");
 const { sendPinflMfyReport } = require("./sendPinflMfyReport");
 const { addUpdateArizaAktTask } = require("./updateArizaAkt");
 
-const timer = (times, callback) => {
+const alarm = (times, callback) => {
   if (!Array.isArray(times)) {
     times = [times]; // Agar bitta vaqt yuborilgan bo'lsa, uni arrayga o'raymiz
   }
@@ -27,10 +28,10 @@ const timer = (times, callback) => {
       const [timePart, datePart] = time.split(" ");
 
       if (datePart) {
-        // Sana bor (masalan, "01.02" yoki "01.02.2025")
+        // Sana bor (masalan, "01.02")
         if (
-          (datePart.length === 5 && datePart === currentDate) || // Oyda bir marta
-          (datePart.length === 10 && datePart === currentYear) // Yilda bir marta
+          datePart.length === 5 &&
+          datePart === currentDate // Oyda bir marta
         ) {
           if (timePart === currentTime) {
             callback();
@@ -45,9 +46,10 @@ const timer = (times, callback) => {
     });
   }, 60 * 1000); // Har daqiqada tekshiramiz
 };
+createAktPack();
 
-timer(["09:00", "12:00", "17:00"], sendMFYIncomeReport);
-timer(
+alarm(["09:00", "12:00", "17:00"], sendMFYIncomeReport);
+alarm(
   [
     "09:00",
     "10:00",
@@ -65,7 +67,7 @@ timer(
   ],
   sendKunlikPinflReports
 );
-timer(
+alarm(
   [
     "09:00",
     "10:00",
@@ -83,7 +85,7 @@ timer(
   ],
   sendPinflMfyReport
 );
-timer(
+alarm(
   [
     "09:00",
     "10:00",
@@ -101,7 +103,7 @@ timer(
   ],
   fetchEcoTranzaksiyalar
 );
-timer(
+alarm(
   [
     "09:00",
     "10:00",
@@ -119,8 +121,7 @@ timer(
   ],
   sendEtkMfyReport
 );
-lastPayReportInspectors();
-// timer("15:00", addUpdateArizaAktTask);
+// alarm("15:00", addUpdateArizaAktTask);
 // addUpdateArizaAktTask();
 // require("./yuqoriQarzdorliklar");
 // require("./cleanCitySessionSaver");

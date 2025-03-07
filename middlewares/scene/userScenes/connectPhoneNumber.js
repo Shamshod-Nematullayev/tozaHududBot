@@ -3,6 +3,7 @@ const { keyboards } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
 const { PhoneConnect } = require("../../../models/PhoneConnect");
 const isCancel = require("../../smallFunctions/isCancel");
+const { Abonent } = require("../../../models/Abonent");
 
 const connectPhoneNumber = new Scenes.WizardScene(
   "connect_phone_number",
@@ -19,11 +20,8 @@ const connectPhoneNumber = new Scenes.WizardScene(
           messages.enterFullNamber,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
-      const abonents = require("../../../lib/abonents.json");
+      const abonent = await Abonent.findOne({ licshet: "ctx.message.text" });
 
-      const abonent = abonents[Object.keys(abonents)[0]].filter((a) => {
-        return a.litsavoy == ctx.message.text;
-      })[0];
       if (abonent) {
         const request = await PhoneConnect.findOne({ KOD: ctx.message.text });
         if (request) {
@@ -35,7 +33,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
         ctx.wizard.state.abonent = abonent;
         ctx.wizard.state.KOD = ctx.message.text;
         ctx.replyWithHTML(
-          `<b>${abonent.FISH}</b> ${abonent.MFY} MFY\n` +
+          `<b>${abonent.fio}</b> ${abonent.mahalla_name} MFY\n` +
             `Telefon raqamini kiriting misol: 992852536`,
           keyboards[ctx.session.til].cancelBtn.resize()
         );
