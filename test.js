@@ -196,4 +196,18 @@ const func = async () => {
 };
 // func();
 
+// (async () => {
+//   const rows = require("./main.json");
+//   for (let row of rows) {
+//     const { status } = await tozaMakonApi.patch(
+//       "/user-service/residents/identified",
+//       {
+//         identified: true,
+//         residentIds: [row.ID],
+//       }
+//     );
+//     console.log(row, status);
+//   }
+// })();
+
 // bot.telegram.getChat()

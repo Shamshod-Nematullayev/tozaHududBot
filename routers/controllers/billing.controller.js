@@ -4,8 +4,7 @@ const { Abonent } = require("../../models/Abonent");
 const { Counter } = require("../../models/Counter");
 const { IncomingDocument } = require("../../models/IncomingDocument");
 const { Ariza } = require("../../models/Ariza");
-const { akt_pachka_id } = require("../../constants");
-const { bot } = require("../../requires");
+const { bot, Company } = require("../../requires");
 const FormData = require("form-data");
 const { default: axios } = require("axios");
 const { PDFDocument } = require("pdf-lib");
@@ -183,15 +182,15 @@ module.exports.createFullAct = async (req, res) => {
         },
       }
     );
+    const packIds = (await Company.findOne({ id: req.user.companyId }))
+      .akt_pachka_ids;
     if (!isNaN(akt_sum)) {
       const calculateKSaldo = (
         await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
           params: {
             amount: Math.abs(akt_sum),
             residentId: abonent.id,
-            actPackId: document_type
-              ? akt_pachka_id[document_type]
-              : akt_pachka_id.boshqa,
+            actPackId: packIds[document_type].id,
             actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
           },
         })
@@ -203,9 +202,7 @@ module.exports.createFullAct = async (req, res) => {
           : {};
       const date = new Date();
       const aktResponse = await tozaMakonApi.post("/billing-service/acts", {
-        actPackId: document_type
-          ? akt_pachka_id[document_type]
-          : akt_pachka_id.boshqa,
+        actPackId: packIds[document_type].id,
         actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
         amount: Number(akt_sum),
         amountWithQQS: Number(akt_sum) - (Number(amountWithoutQQS) || 0),
@@ -256,7 +253,7 @@ module.exports.createFullAct = async (req, res) => {
   }
 };
 
-module.exports.createDublicateAct = async (req, res) => {
+module.exports.createDublicateActByAriza = async (req, res) => {
   try {
     const { ariza_id, akt_sum } = req.body;
     const ariza = await Ariza.findById(ariza_id);
@@ -278,6 +275,8 @@ module.exports.createDublicateAct = async (req, res) => {
       }
     );
 
+    const packIds = (await Company.findOne({ id: req.user.companyId }))
+      .akt_pachka_ids;
     if (akt_sum > 0) {
       // monay transfer to real account
       const calculateKSaldo = (
@@ -285,14 +284,14 @@ module.exports.createDublicateAct = async (req, res) => {
           params: {
             amount: Math.abs(akt_sum),
             residentId: abonent.id,
-            actPackId: akt_pachka_id.pul_kuchirish,
+            actPackId: packIds.pul_kuchirish.id,
             actType: "CREDIT",
           },
         })
       ).data;
       (
         await tozaMakonApi.post("/billing-service/acts", {
-          actPackId: akt_pachka_id.pul_kuchirish,
+          actPackId: packIds.pul_kuchirish.id,
           actType: "CREDIT",
           amount: Math.abs(akt_sum),
           amountWithQQS: 0,
@@ -314,14 +313,14 @@ module.exports.createDublicateAct = async (req, res) => {
           params: {
             amount: Math.abs(akt_sum),
             residentId: abonent.id,
-            actPackId: akt_pachka_id.pul_kuchirish,
+            actPackId: packIds.pul_kuchirish.id,
             actType: "DEBIT",
           },
         })
       ).data;
       (
         await tozaMakonApi.post("/billing-service/acts", {
-          actPackId: akt_pachka_id.pul_kuchirish,
+          actPackId: packIds.pul_kuchirish.id,
           actType: "DEBIT",
           amount: akt_sum,
           amountWithQQS: 0,
@@ -343,7 +342,7 @@ module.exports.createDublicateAct = async (req, res) => {
     const calculateAmount = (
       await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
         params: {
-          actPackId: akt_pachka_id.dvaynik,
+          actPackId: packIds.dvaynik.id,
           residentId: fake_account.id,
           inhabitantCount: 0,
           kSaldo: 0,
@@ -354,7 +353,7 @@ module.exports.createDublicateAct = async (req, res) => {
     ).data;
     const dvaynikAkt = (
       await tozaMakonApi.post("/billing-service/acts", {
-        actPackId: akt_pachka_id.dvaynik,
+        actPackId: packIds.dvaynik.id,
         actType: "CREDIT",
         amount: Number(calculateAmount.amount) + Number(akt_sum),
         amountWithQQS: 0,
@@ -382,7 +381,7 @@ module.exports.createDublicateAct = async (req, res) => {
     await ariza.updateOne({
       $set: {
         status: "akt_kiritilgan",
-        akt_pachka_id: akt_pachka_id.dvaynik,
+        akt_pachka_id: packIds.dvaynik.id,
         akt_id: dvaynikAkt.id,
         aktInfo: dvaynikAkt,
         akt_date: new Date(),
@@ -460,5 +459,125 @@ module.exports.getAbonentsByMfyId = async (req, res) => {
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
     console.error(error);
+  }
+};
+
+module.exports.createDublicateAct = async (req, res) => {
+  try {
+    const { realAccountNumber, fakeAccountNumber, fakeAccountIncomeAmount } =
+      req.body;
+    const date = new Date();
+    const abonentReal = await Abonent.findOne({ licshet: realAccountNumber });
+    const abonentFake = await Abonent.findOne({ licshet: fakeAccountNumber });
+    const formData = new FormData();
+    formData.append("file", req.file.buffer, req.file.originalname);
+    const fileUploadResponse = await tozaMakonApi.post(
+      "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    if (fakeAccountIncomeAmount > 0) {
+      const calculateKSaldo = (
+        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+          params: {
+            amount: Math.abs(fakeAccountIncomeAmount),
+            residentId: abonentReal.id,
+            actPackId: akt_pachka_id.pul_kuchirish,
+            actType: "CREDIT",
+          },
+        })
+      ).data;
+      (
+        await tozaMakonApi.post("/billing-service/acts", {
+          actPackId: akt_pachka_id.pul_kuchirish,
+          actType: "CREDIT",
+          amount: Math.abs(fakeAccountIncomeAmount),
+          amountWithQQS: Math.abs(fakeAccountIncomeAmount),
+          amountWithoutQQS: 0,
+          description: `${fakeAccountNumber} ikkilamchi hisob raqamidan pul ko'chirish`,
+          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          fileId:
+            fileUploadResponse.data.fileName +
+            "*" +
+            fileUploadResponse.data.fileId,
+          kSaldo: calculateKSaldo,
+          residentId: abonentReal.id,
+        })
+      ).data;
+      // monay transfer from fake account
+      const calculateKSaldo2 = (
+        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+          params: {
+            amount: fakeAccountIncomeAmount,
+            residentId: abonentFake.id,
+            actPackId: akt_pachka_id.pul_kuchirish,
+            actType: "DEBIT",
+          },
+        })
+      ).data;
+      (
+        await tozaMakonApi.post("/billing-service/acts", {
+          actPackId: akt_pachka_id.pul_kuchirish,
+          actType: "DEBIT",
+          amount: fakeAccountIncomeAmount,
+          amountWithQQS: fakeAccountIncomeAmount,
+          amountWithoutQQS: 0,
+          description: `${abonentReal.licshet} haqiqiy hisob raqamiga pul ko'chirish`,
+          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          fileId:
+            fileUploadResponse.data.fileName +
+            "*" +
+            fileUploadResponse.data.fileId,
+          kSaldo: calculateKSaldo2,
+          residentId: abonentFake.id,
+        })
+      ).data;
+    }
+    // ikkilamchi hisob raqamini o'chirish kodlari
+    const calculateAmount = (
+      await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
+        params: {
+          actPackId: akt_pachka_id.dvaynik,
+          residentId: abonentFake.id,
+          inhabitantCount: 0,
+          kSaldo: 0,
+        },
+      })
+    ).data;
+    const dvaynikAkt = (
+      await tozaMakonApi.post("/billing-service/acts", {
+        actPackId: akt_pachka_id.dvaynik,
+        actType: "CREDIT",
+        amount:
+          Number(calculateAmount.amount) + Number(fakeAccountIncomeAmount),
+        amountWithQQS:
+          Number(calculateAmount.amount) + Number(fakeAccountIncomeAmount),
+        amountWithoutQQS: 0,
+        description: `ikkilamchi hisob raqamini o'chirish`,
+        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        fileId:
+          fileUploadResponse.data.fileName +
+          "*" +
+          fileUploadResponse.data.fileId,
+        kSaldo: 0,
+        residentId: abonentFake.id,
+        inhabitantCount: 0,
+      })
+    ).data;
+
+    return res.json({
+      ok: true,
+      message: "muvaffaqqiyatli akt qilindi",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, message: "Internal server error 500" });
   }
 };

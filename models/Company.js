@@ -13,6 +13,8 @@ const aktPackSchema = new Schema({
     type: Number,
     required: true,
   },
+  type: String,
+  name: String,
 });
 const aktPackTypesSchema = new Schema({
   viza: aktPackSchema,
@@ -24,6 +26,10 @@ const aktPackTypesSchema = new Schema({
 });
 const schema = new Schema(
   {
+    id: {
+      type: Number,
+      required: true,
+    },
     user_id: Number,
     login: String,
     password: String,
@@ -50,18 +56,6 @@ const schema = new Schema(
     },
     akt_pachka_ids: aktPackTypesSchema,
     active: Boolean,
-    akt_pachka_id: {
-      type: Object,
-      default: {
-        death: "", //o'lim haqidagi guvohnomalar
-        viza: "", // horijga chiqish vizasi bo'yicha
-        odam_soni: "",
-        pul_kuchirish: "",
-        dvaynik: "", // ikkilamchi kodlarni o'chirish bo'yicha
-        gps: "", // moshin bormagan davrni akt qilish bo'yicha
-        boshqa: "",
-      },
-    },
   },
   {
     timestamps: true,

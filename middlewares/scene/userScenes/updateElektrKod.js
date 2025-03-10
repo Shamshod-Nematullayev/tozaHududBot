@@ -117,7 +117,7 @@ const updateElektrKod = new Scenes.WizardScene(
         ctx.reply("Bunday elektr kodi topilmadi");
         return;
       }
-      ctx.replyWithHTML(
+      await ctx.replyWithHTML(
         `Abonent: <code>${etk_abonent.CUSTOMER_NAME}</code> \nUshbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
         createInlineKeyboard([
           [
@@ -168,8 +168,8 @@ const updateElektrKod = new Scenes.WizardScene(
             energy_licshet: ctx.wizard.state.ETK,
           },
         });
-        ctx.editMessageText(ctx.callbackQuery.message.text);
-        ctx.replyWithHTML(
+        await ctx.editMessageText(ctx.callbackQuery.message.text);
+        await ctx.replyWithHTML(
           `ETK kod qabul qilindi`,
           keyboards.lotin.mainKeyboard.resize()
         );

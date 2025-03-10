@@ -1,8 +1,7 @@
 const { default: axios } = require("axios");
 const { tozaMakonApi } = require("../../api/tozaMakon");
-const { akt_pachka_id } = require("../../constants");
 const { Ariza } = require("../../models/Ariza");
-const { Abonent, bot } = require("../../requires");
+const { Abonent, bot, Company } = require("../../requires");
 const { PDFDocument } = require("pdf-lib");
 const PDFMerger = require("pdf-merger-js");
 const FormData = require("form-data");
@@ -340,10 +339,12 @@ async function updateOrCreateAct(
       })
     ).data;
   } else {
+    const packId = (await Company.findOne({ id: req.user.companyId }))
+      .akt_pachka_ids;
     return (
       await tozaMakonApi.post("/billing-service/acts", {
         ...body,
-        actPackId: akt_pachka_id[ariza.document_type],
+        actPackId: packId[ariza.document_type].id,
       })
     ).data;
   }

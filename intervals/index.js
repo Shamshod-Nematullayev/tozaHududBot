@@ -46,7 +46,7 @@ const alarm = (times, callback) => {
     });
   }, 60 * 1000); // Har daqiqada tekshiramiz
 };
-createAktPack();
+alarm(["09:01"], createAktPack);
 
 alarm(["09:00", "12:00", "17:00"], sendMFYIncomeReport);
 alarm(

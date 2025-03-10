@@ -7,5 +7,7 @@ const schema = new mongoose.Schema({
   refreshToken: String,
   fullName: String,
   profilePhotoId: String,
+  companyId: Number,
+  roles: Array,
 });
 module.exports.Admin = mongoose.model("admin", schema, "admin");

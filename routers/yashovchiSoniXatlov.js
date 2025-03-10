@@ -3,8 +3,8 @@ const { Mahalla } = require("../models/Mahalla");
 const { XatlovDocument } = require("../models/XatlovDocument");
 const { MultiplyRequest } = require("../models/MultiplyRequest");
 const { uploadAsBlob } = require("../middlewares/multer");
-const { akt_pachka_id } = require("../constants");
 const FormData = require("form-data");
+const { Company } = require("../requires");
 
 const router = require("express").Router();
 
@@ -171,8 +171,10 @@ router.put("/confirm/:_id", uploadAsBlob.single("file"), async (req, res) => {
     if (!request) {
       return res.status(404).json({ ok: false, message: "Not Found" });
     }
+    const packId = (await Company.findOne({ id: req.user.companyId }))
+      .akt_pachka_ids.odam_soni.id;
     const responseAkt = await tozaMakonApi.post("/billing-service/acts", {
-      actPackId: akt_pachka_id.odam_soni,
+      actPackId: packId,
       actType: "DEBIT",
       amount: 0,
       amountWithQQS: 0,
@@ -187,7 +189,7 @@ router.put("/confirm/:_id", uploadAsBlob.single("file"), async (req, res) => {
           params: {
             amount: 0,
             residentId: request.abonentId,
-            actPackId: akt_pachka_id.odam_soni,
+            actPackId: packId,
             actType: "DEBIT",
             inhabitantCount: request.YASHOVCHILAR,
           },

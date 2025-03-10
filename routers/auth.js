@@ -39,6 +39,7 @@ router.post("/login", async (req, res, next) => {
       {
         id: admin.id,
         login: admin.login,
+        companyId: admin.companyId,
       },
       process.env.REFRESH_JWT_KEY,
       { expiresIn: "12h" }
