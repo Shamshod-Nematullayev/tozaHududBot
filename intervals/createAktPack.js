@@ -17,7 +17,7 @@ const packTypes = {
   dvaynik: "CANCEL_CONTRACT",
   pul_kuchirish: "SIMPLE",
   death: "INVENTORY",
-  gps: "SERVICE_NOT_PROVIDED",
+  gps: "INVENTORY",
 };
 
 function formatDate(date) {
@@ -28,6 +28,7 @@ function formatDate(date) {
 }
 
 function checkPackExist(pack, company) {
+  console.log("GO");
   const date = new Date();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();

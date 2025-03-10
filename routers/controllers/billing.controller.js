@@ -21,7 +21,6 @@ module.exports.downloadFileFromBilling = async (req, res) => {
 
     const cleanFileId = file_id.split("*").pop(); // Oxirgi qismni olish
 
-    // Server 2 ga so‘rov yuborish
     const response = await tozaMakonApi.get("/file-service/buckets/download", {
       params: { file: cleanFileId },
       responseType: "arraybuffer",
@@ -101,10 +100,11 @@ module.exports.createFullAct = async (req, res) => {
       ariza_id,
       photos,
     } = req.body;
-    if (isNaN(next_inhabitant_count) && isNaN(akt_sum)) {
+    if ([next_inhabitant_count, akt_sum, amountWithoutQQS].some(isNaN)) {
       return res.status(400).json({
         ok: false,
-        message: "yashovchi soni yoki akt summasi bo'lishi kerak",
+        message:
+          "[next_inhabitant_count, akt_sum, amountWithoutQQS] fields are not valid",
       });
     }
     const abonent = await Abonent.findOne({ licshet });
@@ -113,7 +113,6 @@ module.exports.createFullAct = async (req, res) => {
         ok: false,
         message: "Abonent mavjud emas",
       });
-    let counter = await Counter.findOne({ name: "incoming_document_number" });
 
     if (photos?.length > 0) {
       // endi pdf va rasmlarni birlashtirish kodi kerak
@@ -153,6 +152,8 @@ module.exports.createFullAct = async (req, res) => {
         filename: req.file.originalname,
       }
     );
+
+    let counter = await Counter.findOne({ name: "incoming_document_number" });
     await IncomingDocument.create({
       abonent: licshet,
       doc_type: document_type,

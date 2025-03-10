@@ -210,4 +210,8 @@ const func = async () => {
 //   }
 // })();
 
-// bot.telegram.getChat()
+(async () => {
+  const rows = require("./main.json");
+  for (let row of rows) {
+  }
+})();

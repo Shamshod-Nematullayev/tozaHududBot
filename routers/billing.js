@@ -4,8 +4,6 @@ const { Counter } = require("../models/Counter");
 const { bot } = require("../core/bot");
 const { Abonent } = require("../requires");
 const { tozaMakonApi } = require("../api/tozaMakon");
-const FormData = require("form-data");
-const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const {
   downloadFileFromBilling,
   getAbonentDHJByAbonentId,
