@@ -30,6 +30,7 @@ const schema = new Schema(
       type: Number,
       required: true,
     },
+    tozamakonAccessToken: String,
     user_id: Number,
     login: String,
     password: String,

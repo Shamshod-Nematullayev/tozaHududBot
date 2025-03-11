@@ -211,37 +211,38 @@ const func = async () => {
 //   }
 // })();
 
-(async () => {
-  const rows = require("./main.json");
-  for (let row of rows) {
-    const ariza = await Ariza.findOne({ akt_id: row.id });
-    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
-    const company = await Company.findOne({ id: 1144 });
-    const amounts = (
-      await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
-        params: {
-          actPackId: company.akt_pachka_ids.gps.id,
-          residentId: abonent.id,
-          inhabitantCount: 0,
-          kSaldo: 0,
-          startPeriod: "03.2025",
-          endPeriod: "03.2025",
-        },
-      })
-    ).data;
-    await tozaMakonApi.post("/billing-service/acts", {
-      actPackId: company.akt_pachka_ids.gps.id,
-      actType: amounts.actType,
-      amount: amounts.amount,
-      amountWithQQS: amounts.amountWithQQS,
-      amountWithoutQQS: 0,
-      description: `kamchiliklarni bartaraf etish`,
-      startPeriod: "03.2025",
-      endPeriod: "03.2025",
-      fileId: ariza.aktInfo.fileId,
-      kSaldo: 0,
-      residentId: abonent.id,
-      inhabitantCounts: 0,
-    });
-  }
-})();
+// (async () => {
+//   const rows = require("./main.json");
+//   for (let row of rows) {
+//     const ariza = await Ariza.findOne({ akt_id: row.id });
+//     const abonent = await Abonent.findOne({ licshet: ariza.licshet });
+//     const company = await Company.findOne({ id: 1144 });
+//     const amounts = (
+//       await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
+//         params: {
+//           actPackId: company.akt_pachka_ids.gps.id,
+//           residentId: abonent.id,
+//           inhabitantCount: 0,
+//           kSaldo: 0,
+//           startPeriod: "03.2025",
+//           endPeriod: "03.2025",
+//         },
+//       })
+//     ).data;
+//     await tozaMakonApi.post("/billing-service/acts", {
+//       actPackId: company.akt_pachka_ids.gps.id,
+//       actType: amounts.actType,
+//       amount: amounts.amount,
+//       amountWithQQS: amounts.amountWithQQS,
+//       amountWithoutQQS: 0,
+//       description: `kamchiliklarni bartaraf etish`,
+//       startPeriod: "03.2025",
+//       endPeriod: "03.2025",
+//       fileId: ariza.aktInfo.fileId,
+//       kSaldo: 0,
+//       residentId: abonent.id,
+//       inhabitantCount: 0,
+//     });
+//     break;
+//   }
+// })();

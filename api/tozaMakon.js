@@ -13,8 +13,10 @@ const tozaMakonApi = axios.create({
 tozaMakonApi.interceptors.request.use(
   async (config) => {
     const session = await Company.findOne({ login: "dxsh24107" });
-    if (session.cookie) {
-      config.headers["Authorization"] = `Bearer ${session.cookie}`;
+    if (session.tozamakonAccessToken) {
+      config.headers[
+        "Authorization"
+      ] = `Bearer ${session.tozamakonAccessToken}`;
     }
     return config;
   },
@@ -33,7 +35,9 @@ tozaMakonApi.interceptors.response.use(
         url: error.response.config.url,
         data: error.response.data,
       },
-      error.config.data
+      error.config.data,
+      error.response.status,
+      error.response.statusText
     );
     if (error.response && error.response.status === 401) {
       const { data } = await axios.post(
@@ -43,9 +47,9 @@ tozaMakonApi.interceptors.response.use(
           password: session.password,
         }
       );
-      await session.updateOne({
+      await Company.findByIdAndUpdate(session._id, {
         $set: {
-          cookie: data.access_token,
+          tozamakonAccessToken: data.access_token,
         },
       });
 
