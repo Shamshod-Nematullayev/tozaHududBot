@@ -3,13 +3,19 @@ const { kirillga } = require("./smallFunctions/lotinKiril");
 function modifyReply(ctx) {
   const originalReply = ctx.reply.bind(ctx);
   // kirill tilini tanlaganlar uchun kirillda xabar yuborish
-  ctx.reply = async function () {
-    let kirilcha = "";
-    if (ctx.session.til === "kiril") {
-      kirilcha = kirillga(arguments[0]);
-      return originalReply(kirilcha, arguments[1]);
+  ctx.reply = async function (message, ...extra) {
+    try {
+      if (ctx.session?.til === "kiril") {
+        // HTML teglarini himoya qilish va faqatgina matnni tarjima qilish
+        message = message.replace(/(<[^>]+>)|([^<>]+)/g, (match, tag, text) => {
+          return tag ? tag : kirillga(text);
+        });
+      }
+      return originalReply(message, ...extra);
+    } catch (error) {
+      console.log("lotin kiril chiqish functionda xatolik");
+      console.error(error);
     }
-    return originalReply(...arguments);
   };
 }
 bot.use((ctx, next) => {
