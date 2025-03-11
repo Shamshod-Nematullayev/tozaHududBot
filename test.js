@@ -220,7 +220,7 @@ const func = async () => {
 //     const amounts = (
 //       await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
 //         params: {
-//           actPackId: company.akt_pachka_ids.gps.id,
+//           actPackId: company.akt_pachka_ids.dvaynik.id,
 //           residentId: abonent.id,
 //           inhabitantCount: 0,
 //           kSaldo: 0,
@@ -243,6 +243,5 @@ const func = async () => {
 //       residentId: abonent.id,
 //       inhabitantCount: 0,
 //     });
-//     break;
 //   }
 // })();

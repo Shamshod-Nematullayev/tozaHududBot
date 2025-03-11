@@ -204,7 +204,8 @@ module.exports.changeArizaAct = async (req, res) => {
       fileId,
       kSaldo,
       actType,
-      abonent.id
+      abonent.id,
+      req
     );
 
     if (!act) {
@@ -316,7 +317,8 @@ async function updateOrCreateAct(
   fileId,
   kSaldo,
   actType,
-  residentId
+  residentId,
+  req
 ) {
   const body = {
     actType,
