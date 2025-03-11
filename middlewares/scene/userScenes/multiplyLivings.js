@@ -14,7 +14,7 @@ const multiplyLivingsScene = new Scenes.WizardScene(
       if (ctx.message.text.length != 12)
         return ctx.reply(
           messages.enterFullNamber,
-          keyboards[ctx.session.til].cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       // main logic
       const abonent = await Abonent.findOne({ licshet: ctx.message.text });
@@ -38,7 +38,7 @@ const multiplyLivingsScene = new Scenes.WizardScene(
       ctx.replyWithHTML(
         `<b>${abonent.fio}</b> ${abonent.mahalla_name} MFY\n` +
           messages.enterYashovchiSoni,
-        keyboards[ctx.session.til].cancelBtn.resize()
+        keyboards.cancelBtn.resize()
       );
       ctx.wizard.next();
     } catch (error) {
@@ -76,10 +76,7 @@ const multiplyLivingsScene = new Scenes.WizardScene(
   }
 );
 multiplyLivingsScene.enter((ctx) => {
-  ctx.reply(
-    messages.enterAbonentKod,
-    keyboards[ctx.session.til].cancelBtn.resize()
-  );
+  ctx.reply(messages.enterAbonentKod, keyboards.cancelBtn.resize());
 });
 multiplyLivingsScene.on("text", (ctx, next) => {
   if (isCancel(ctx.message?.text)) {
@@ -92,10 +89,7 @@ multiplyLivingsScene.on("text", (ctx, next) => {
   next();
 });
 multiplyLivingsScene.leave((ctx) => {
-  ctx.reply(
-    messages.startGreeting,
-    keyboards[ctx.session.til].mainKeyboard.resize()
-  );
+  ctx.reply(messages.startGreeting, keyboards.mainKeyboard.resize());
 });
 
 module.exports = { multiplyLivingsScene };

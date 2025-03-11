@@ -16,7 +16,7 @@ const searchAbonentbyName = new Scenes.WizardScene(
       ctx.reply(messages.enterFISH);
       ctx.wizard.next();
     } catch (error) {
-      ctx.reply("Xatolik", keyboards.lotin.cancelBtn.resize());
+      ctx.reply("Xatolik", keyboards.cancelBtn.resize());
       console.error(error);
     }
   },
@@ -37,10 +37,7 @@ const searchAbonentbyName = new Scenes.WizardScene(
         );
       });
       if (abonent.length < 1)
-        return ctx.reply(
-          messages.notFoundData,
-          keyboards[ctx.session.til].cancelBtn.resize()
-        );
+        return ctx.reply(messages.notFoundData, keyboards.cancelBtn.resize());
       if (abonent.length > 50) {
         return ctx.reply(
           "Qidiruv natijalari juda ko'p, iltimos ko'proq belgi kiriting"
@@ -52,10 +49,7 @@ const searchAbonentbyName = new Scenes.WizardScene(
           doc.fio
         }</b> ${doc.streets_name}\n`;
       });
-      ctx.replyWithHTML(
-        messageText,
-        keyboards[ctx.session.til].cancelBtn.resize()
-      );
+      ctx.replyWithHTML(messageText, keyboards.cancelBtn.resize());
     } catch (error) {
       console.log(error);
       ctx.scene.leave();
@@ -63,16 +57,10 @@ const searchAbonentbyName = new Scenes.WizardScene(
   }
 );
 searchAbonentbyName.enter((ctx) => {
-  ctx.reply(
-    messages.enterMahalla,
-    keyboards[ctx.session.til].mahallalar.oneTime()
-  );
+  ctx.reply(messages.enterMahalla, keyboards.mahallalar.oneTime());
 });
 searchAbonentbyName.leave((ctx) => {
-  ctx.reply(
-    messages.startGreeting,
-    keyboards[ctx.session.til].mainKeyboard.resize()
-  );
+  ctx.reply(messages.startGreeting, keyboards.mainKeyboard.resize());
 });
 
 module.exports = { searchAbonentbyName };

@@ -330,19 +330,19 @@ sendWarningLettersByHybrid.enter((ctx) => {
   ctx.replyWithDocument(INPUT_ABONENTS_LICSHET, {
     caption:
       "Excel faylni kiriting. Xat yuborilishi kerak bo'lgan abonentlar shaxsiy hisob raqamlarini A ustuniga joylashtiring.",
-    reply_markup: keyboards.lotin.cancelBtn.reply_markup,
+    reply_markup: keyboards.cancelBtn.reply_markup,
   });
 });
 sendWarningLettersByHybrid.on("text", (ctx, next) => {
   if (isCancel(ctx.message.text)) {
-    ctx.reply("Bekor qilindi", keyboards.lotin.adminKeyboard.resize());
+    ctx.reply("Bekor qilindi", keyboards.adminKeyboard.resize());
     return ctx.scene.leave();
   }
   next();
 });
 
 sendWarningLettersByHybrid.leave((ctx) => {
-  ctx.reply("Asosiy menyu", keyboards.lotin.adminKeyboard.resize());
+  ctx.reply("Asosiy menyu", keyboards.adminKeyboard.resize());
 });
 
 module.exports = { sendWarningLettersByHybrid };

@@ -17,7 +17,7 @@ const userToInspektor = new Scenes.WizardScene(
       if (!user) {
         return ctx.reply(
           "Bunday id raqamiga ega foydalanuvchi topilmadi",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       }
       if (user.nazoratchiQilingan) {
@@ -48,10 +48,7 @@ const userToInspektor = new Scenes.WizardScene(
   async (ctx) => {
     try {
       if (ctx.message?.text) {
-        await ctx.reply(
-          "Bekor qilindi",
-          keyboards.lotin.adminKeyboard.resize()
-        );
+        await ctx.reply("Bekor qilindi", keyboards.adminKeyboard.resize());
         return ctx.scene.leave();
       }
       ctx.deleteMessage();
@@ -78,7 +75,7 @@ const userToInspektor = new Scenes.WizardScene(
   (ctx) => {
     try {
       if (ctx.message?.text) {
-        ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
+        ctx.reply("OK", keyboards.adminKeyboard.resize());
         ctx.scene.leave();
       }
       if (ctx.callbackQuery?.data) ctx.deleteMessage();
@@ -89,7 +86,7 @@ const userToInspektor = new Scenes.WizardScene(
           break;
         case "yoq":
           ctx.deleteMessage();
-          ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
+          ctx.reply("OK", keyboards.adminKeyboard.resize());
           ctx.scene.leave();
           break;
       }

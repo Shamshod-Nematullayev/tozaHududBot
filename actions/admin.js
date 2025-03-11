@@ -4,6 +4,7 @@ const {
   nazoratchilarKunlikTushum,
 } = require("../intervals/nazoratchilarKunlikTushum");
 const { sendMFYIncomeReport } = require("../intervals/sendMFYIncomeReport");
+const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { Notification } = require("../models/Notification");
 const {
   // node modules
@@ -91,10 +92,10 @@ composer.command("change_password", async (ctx) => {
   ctx.scene.enter("changePasswordScene");
 });
 
-composer.hears(["👨‍💻 Ish maydoni", "👨‍💻 Иш майдони"], async (ctx) => {
+composer.hears(["👨‍💻 Ish maydoni", kirillga("👨‍💻 Ish maydoni")], async (ctx) => {
   if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 
-  ctx.reply(messages.chooseMenu, keyboards[ctx.session.til].adminWorkSpace);
+  ctx.reply(messages.chooseMenu, keyboards.adminWorkSpace);
 });
 
 composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {

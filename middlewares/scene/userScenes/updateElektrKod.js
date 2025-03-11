@@ -29,13 +29,13 @@ const updateElektrKod = new Scenes.WizardScene(
       if (!ctx.message)
         return ctx.reply(
           "Kutilgan amal bajarilmadi",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
 
       if (isNaN(ctx.message.text) || ctx.message.text.length !== 12) {
         return ctx.reply(
           "Litsavoy kod to'g'ri kiritilmadi",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       }
       const inspektor = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
@@ -54,7 +54,7 @@ const updateElektrKod = new Scenes.WizardScene(
       if (!abonent) {
         ctx.reply(
           "Siz kiritgan litsavoy kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
         return;
       }
@@ -65,12 +65,12 @@ const updateElektrKod = new Scenes.WizardScene(
       if (abonent.ekt_kod_tasdiqlandi?.confirm) {
         return ctx.reply(
           "Bu abonent ma'lumoti kiritilib bo'lingan",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       }
       await ctx.reply(
         `FIO: ${abonent.fio}\nElektr kodini bazaga kiriting:`,
-        keyboards.lotin.cancelBtn.resize()
+        keyboards.cancelBtn.resize()
       );
       ctx.wizard.next();
     } catch (error) {
@@ -85,7 +85,7 @@ const updateElektrKod = new Scenes.WizardScene(
       if (isNaN(ctx.message.text)) {
         ctx.reply(
           "Error: ETK kod to'g'ri kiritilmadi",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
         return;
       }
@@ -96,7 +96,7 @@ const updateElektrKod = new Scenes.WizardScene(
       if (!findedETKAbonents.length < 0) {
         ctx.reply(
           "Siz kiritgan ETK kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
         return;
       }
@@ -171,12 +171,12 @@ const updateElektrKod = new Scenes.WizardScene(
         await ctx.editMessageText(ctx.callbackQuery.message.text);
         await ctx.replyWithHTML(
           `ETK kod qabul qilindi`,
-          keyboards.lotin.mainKeyboard.resize()
+          keyboards.mainKeyboard.resize()
         );
         return ctx.scene.leave();
       case "no":
         ctx.deleteMessage();
-        ctx.reply("Bekor qilindi.", keyboards.lotin.mainKeyboard.resize());
+        ctx.reply("Bekor qilindi.", keyboards.mainKeyboard.resize());
         ctx.scene.leave();
         break;
     }
@@ -214,7 +214,7 @@ updateElektrKod.enter(async (ctx) => {
 });
 updateElektrKod.on("text", (ctx, next) => {
   if (isCancel(ctx.message.text)) {
-    ctx.reply("Bekor qilindi", keyboards.lotin.mainKeyboard.resize());
+    ctx.reply("Bekor qilindi", keyboards.mainKeyboard.resize());
     return ctx.scene.leave();
   } else next();
 });

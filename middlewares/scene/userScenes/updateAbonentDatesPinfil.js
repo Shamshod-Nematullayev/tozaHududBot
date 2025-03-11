@@ -26,7 +26,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       if (!ctx.message)
         return ctx.reply(
           "kutilgan ma'lumot kiritilmadi",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       if (ctx.message && isCancel(ctx.message.text)) {
         ctx.reply("Bekor qilindi");
@@ -35,18 +35,18 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       if (isNaN(ctx.message.text))
         return ctx.reply(
           messages.enterOnlyNumber,
-          keyboards[ctx.session.til].cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       if (ctx.message.text.length != 12)
         return ctx.reply(
           messages.enterFullNamber,
-          keyboards[ctx.session.til].cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       const abonent = await Abonent.findOne({ licshet: ctx.message.text });
       if (!abonent) {
         return ctx.reply(
           "Siz kiritgan litsavoy kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       }
       ctx.wizard.state.abonent = abonent;
@@ -84,22 +84,19 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           "https://scontent.fbhk1-4.fna.fbcdn.net/v/t39.30808-6/245114763_1689005674643325_574715679907072430_n.jpg?cstp=mx960x540&ctp=s960x540&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=UuAJ9wX9hRUQ7kNvgFH6cIS&_nc_ht=scontent.fbhk1-4.fna&oh=00_AYBErDlZHdtXHYwOa1n9AicX7rhWP63Hkf8COiCnTKAlUw&oe=669E7F35",
           {
             caption: messages.enterReallyPinfl,
-            reply_markup: keyboards.lotin.cancelBtn.resize().reply_markup,
+            reply_markup: keyboards.cancelBtn.resize().reply_markup,
           }
         );
       }
       // shaxsiy ma'lumotlarni olish
       const customDates = await find_one_by_pinfil_from_mvd(ctx.message.text);
       if (!customDates.success) {
-        return ctx.reply(
-          customDates.message,
-          keyboards.lotin.cancelBtn.resize()
-        );
+        return ctx.reply(customDates.message, keyboards.cancelBtn.resize());
       }
       if (customDates.first_name == "" || customDates.success === false) {
         return ctx.reply(
           "Ushbu fuqoroga tegishli ma'lumotlar topilmadi. PINFL to'g'ri kiritilganmikan tekshirib qaytadan kiriting",
-          keyboards.lotin.cancelBtn.resize().reply_markup
+          keyboards.cancelBtn.resize().reply_markup
         ); // agarda ma'lumotlar topilmasa
       }
       ctx.wizard.state.pinfl = ctx.message.text;
@@ -208,7 +205,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
   async (ctx) => {
     try {
       if (ctx.message?.text) {
-        ctx.reply("OK", keyboards.lotin.mainKeyboard.resize());
+        ctx.reply("OK", keyboards.mainKeyboard.resize());
         ctx.scene.leave();
       }
       if (ctx.callbackQuery?.data) await ctx.deleteMessage();
@@ -218,7 +215,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           ctx.wizard.selectStep(0);
           break;
         case "yoq":
-          ctx.reply("OK", keyboards.lotin.mainKeyboard.resize());
+          ctx.reply("OK", keyboards.mainKeyboard.resize());
           ctx.scene.leave();
           break;
       }
@@ -230,7 +227,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
   async (ctx) => {
     try {
       if (ctx.message?.text) {
-        ctx.reply("OK", keyboards.lotin.mainKeyboard.resize());
+        ctx.reply("OK", keyboards.mainKeyboard.resize());
         ctx.scene.leave();
       }
       if (ctx.callbackQuery?.data) await ctx.deleteMessage();
@@ -241,7 +238,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         );
         ctx.wizard.selectStep(1);
       } else {
-        ctx.reply("OK", keyboards.lotin.mainKeyboard.resize());
+        ctx.reply("OK", keyboards.mainKeyboard.resize());
         ctx.scene.leave();
       }
     } catch (error) {

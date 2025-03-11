@@ -81,10 +81,7 @@ const generateAlertLetter = new Scenes.WizardScene(
           });
         });
       } else {
-        ctx.reply(
-          messages.notExcelFile,
-          keyboards[ctx.session.til].cancelBtn.resize()
-        );
+        ctx.reply(messages.notExcelFile, keyboards.cancelBtn.resize());
       }
     } catch (error) {
       console.log(error);
@@ -97,7 +94,7 @@ const generateAlertLetter = new Scenes.WizardScene(
 generateAlertLetter.enter((ctx) => {
   ctx.replyWithDocument(INPUT_ALERT_LETTER_EXCEL, {
     caption: `Ogohlantirish xati namuna \n` + messages.enterExcelFile,
-    reply_markup: keyboards[ctx.session.til].cancelBtn.resize().reply_markup,
+    reply_markup: keyboards.cancelBtn.resize().reply_markup,
   });
 });
 

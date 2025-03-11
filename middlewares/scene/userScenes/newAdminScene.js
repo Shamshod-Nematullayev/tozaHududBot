@@ -1,6 +1,6 @@
 const { Scenes } = require("telegraf");
 const { Admin } = require("../../../models/Admin");
-const { messages } = require("../../../requires");
+const { messages, keyboards } = require("../../../requires");
 const bcrypt = require("bcrypt");
 
 const newAdminScene = new Scenes.WizardScene(
@@ -29,17 +29,11 @@ const newAdminScene = new Scenes.WizardScene(
 );
 
 newAdminScene.enter((ctx) => {
-  ctx.reply(
-    messages.enterYourLogin,
-    keyboards[ctx.session.til].cancelBtn.resize()
-  );
+  ctx.reply(messages.enterYourLogin, keyboards.cancelBtn.resize());
 });
 
 newAdminScene.leave((ctx) => {
-  ctx.reply(
-    messages.adminDone,
-    keyboards[ctx.session.til].mainKeyboard.resize()
-  );
+  ctx.reply(messages.adminDone, keyboards.mainKeyboard.resize());
 });
 
 module.exports = newAdminScene;

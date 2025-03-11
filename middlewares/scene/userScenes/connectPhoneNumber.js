@@ -13,12 +13,12 @@ const connectPhoneNumber = new Scenes.WizardScene(
       if (!ctx.message || isNaN(ctx.message?.text))
         return ctx.reply(
           messages.enterOnlyNumber,
-          keyboards[ctx.session.til].cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       if (ctx.message.text.length != 12)
         return ctx.reply(
           messages.enterFullNamber,
-          keyboards[ctx.session.til].cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       const abonent = await Abonent.findOne({ licshet: "ctx.message.text" });
 
@@ -35,7 +35,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
         ctx.replyWithHTML(
           `<b>${abonent.fio}</b> ${abonent.mahalla_name} MFY\n` +
             `Telefon raqamini kiriting misol: 992852536`,
-          keyboards[ctx.session.til].cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
         ctx.wizard.next();
       } else {
@@ -52,7 +52,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
       if (isNaN(ctx.message.text)) {
         return ctx.reply(
           messages.enterOnlyNumber,
-          keyboards[ctx.session.til].cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       }
 
@@ -64,7 +64,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
       if (request) {
         return ctx.reply(
           `Ushbu telefon raqam ${request.KOD} hisob raqamiga allaqachon ulab bo'lingan, iltomos boshqa telefon raqami kiriting!`,
-          keyboards[ctx.session.til].cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       }
       await PhoneConnect.create({
@@ -81,16 +81,10 @@ const connectPhoneNumber = new Scenes.WizardScene(
 );
 
 connectPhoneNumber.enter((ctx) => {
-  ctx.reply(
-    `Abonent listavoy kodini kiriting`,
-    keyboards[ctx.session.til].cancelBtn.resize()
-  );
+  ctx.reply(`Abonent listavoy kodini kiriting`, keyboards.cancelBtn.resize());
 });
 connectPhoneNumber.leave((ctx) => {
-  ctx.reply(
-    messages.startGreeting,
-    keyboards[ctx.session.til].mainKeyboard.resize()
-  );
+  ctx.reply(messages.startGreeting, keyboards.mainKeyboard.resize());
 });
 
 module.exports = { connectPhoneNumber };

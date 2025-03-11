@@ -45,7 +45,7 @@ const vaqtinchalikFunc = new Scenes.WizardScene(
               if (!customDates.success) {
                 return ctx.reply(
                   customDates.message,
-                  keyboards.lotin.cancelBtn.resize()
+                  keyboards.cancelBtn.resize()
                 );
               }
               if (
@@ -54,7 +54,7 @@ const vaqtinchalikFunc = new Scenes.WizardScene(
               ) {
                 return ctx.reply(
                   "Ushbu fuqoroga tegishli ma'lumotlar topilmadi. PINFL to'g'ri kiritilganmikan tekshirib qaytadan kiriting",
-                  keyboards.lotin.cancelBtn.resize().reply_markup
+                  keyboards.cancelBtn.resize().reply_markup
                 ); // agarda ma'lumotlar topilmasa
               }
 
@@ -81,10 +81,7 @@ const vaqtinchalikFunc = new Scenes.WizardScene(
           });
         });
       } else {
-        return ctx.reply(
-          "Siz excel fayl kiritmadingiz",
-          keyboards.lotin.cancelBtn
-        );
+        return ctx.reply("Siz excel fayl kiritmadingiz", keyboards.cancelBtn);
       }
     } catch (error) {
       console.error(error);

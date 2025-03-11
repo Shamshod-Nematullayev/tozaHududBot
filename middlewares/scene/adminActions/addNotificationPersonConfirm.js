@@ -20,10 +20,7 @@ const personConfirm = new Scenes.WizardScene(
     if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
     // Yuborilgan xabar faylmi tekshirish
     if (!ctx.message.document) {
-      return ctx.reply(
-        messages.notFile,
-        keyboards[ctx.session.til].cancelBtn.resize()
-      );
+      return ctx.reply(messages.notFile, keyboards.cancelBtn.resize());
     }
 
     ctx.wizard.state.file_id = ctx.message.document.file_id;
@@ -48,13 +45,10 @@ const personConfirm = new Scenes.WizardScene(
         id: ctx.update.callback_query?.data,
       });
       ctx.wizard.state.mahallalar = [];
-      await ctx.editMessageText(
-        messages.enterMahalla,
-        keyboards[ctx.session.til].mahallalar
-      );
+      await ctx.editMessageText(messages.enterMahalla, keyboards.mahallalar);
       ctx.wizard.next();
     } catch (error) {
-      ctx.reply("Xatolik", keyboards[ctx.session.til].cancelBtn.resize());
+      ctx.reply("Xatolik", keyboards.cancelBtn.resize());
     }
   },
   (ctx) => {
@@ -68,10 +62,7 @@ const personConfirm = new Scenes.WizardScene(
           ctx.wizard.state.mahalla = mfy.id;
       });
       ctx.deleteMessage();
-      ctx.reply(
-        messages.enterDate,
-        keyboards[ctx.session.til].cancelBtn.resize()
-      );
+      ctx.reply(messages.enterDate, keyboards.cancelBtn.resize());
       return ctx.wizard.next();
     } catch (error) {
       ctx.reply("Xatolik");
@@ -81,10 +72,7 @@ const personConfirm = new Scenes.WizardScene(
   (ctx) => {
     if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
     if (ctx.message && ctx.message.text.split(".").length != 3) {
-      return ctx.reply(
-        messages.enterDate,
-        keyboards[ctx.session.til].cancelBtn.resize()
-      );
+      return ctx.reply(messages.enterDate, keyboards.cancelBtn.resize());
     }
     const date = ctx.message.text.split(".");
     ctx.wizard.state.date = {
@@ -94,7 +82,7 @@ const personConfirm = new Scenes.WizardScene(
     };
     ctx.replyWithDocument(shaxsiTasdiqlandiBildirishXatiImportExcel, {
       caption: `Abonentlar ma'lumotini na'munadagidek excel shaklida kiriting`,
-      reply_markup: keyboards[ctx.session.til].cancelBtn.resize(),
+      reply_markup: keyboards.cancelBtn.resize(),
     });
     ctx.wizard.next();
   },
@@ -148,10 +136,7 @@ const personConfirm = new Scenes.WizardScene(
       );
       return ctx.scene.leave();
     } else {
-      ctx.reply(
-        messages.notExcelFile,
-        keyboards[ctx.session.til].cancelBtn.resize()
-      );
+      ctx.reply(messages.notExcelFile, keyboards.cancelBtn.resize());
     }
   }
 );
@@ -162,15 +147,12 @@ personConfirm.enter(async (ctx) => {
   });
   ctx.replyWithHTML(
     messages.enterNotificationFile + `\n<code>${counter.value + 1}</code>`,
-    keyboards[ctx.session.til].cancelBtn.resize()
+    keyboards.cancelBtn.resize()
   );
 });
 
 personConfirm.leave((ctx) => {
-  ctx.reply(
-    messages.heyAdmin,
-    keyboards[ctx.session.til].adminKeyboard.resize()
-  );
+  ctx.reply(messages.heyAdmin, keyboards.adminKeyboard.resize());
 });
 
 module.exports = { personConfirm };

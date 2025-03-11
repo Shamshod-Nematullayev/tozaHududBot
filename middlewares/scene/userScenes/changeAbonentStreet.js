@@ -14,13 +14,13 @@ const changeAbonentStreet = new Scenes.WizardScene(
       if (!ctx.message)
         return ctx.reply(
           "Kutilgan amal bajarilmadi",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
 
       if (isNaN(ctx.message.text) || ctx.message.text.length !== 12) {
         return ctx.reply(
           "Litsavoy kod to'g'ri kiritilmadi",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       }
       const inspektor = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
@@ -37,14 +37,14 @@ const changeAbonentStreet = new Scenes.WizardScene(
       if (!abonent) {
         ctx.reply(
           "Siz kiritgan litsavoy kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
         return;
       }
       if (abonent.street_tasdiqlandi?.confirm) {
         return ctx.reply(
           "Bu abonent ma'lumoti kiritilib bo'lingan",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       }
       const session = await Company.findOne({ type: "dxsh" });
@@ -73,7 +73,7 @@ const changeAbonentStreet = new Scenes.WizardScene(
       );
       ctx.wizard.next();
     } catch (error) {
-      ctx.reply("Xatolik kuzatildi", keyboards.lotin.cancelBtn.resize());
+      ctx.reply("Xatolik kuzatildi", keyboards.cancelBtn.resize());
       console.error(error);
     }
   },
@@ -86,7 +86,7 @@ const changeAbonentStreet = new Scenes.WizardScene(
       if (!street) {
         ctx.reply(
           "Xatolik kuzatildi " + error.message,
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
         return ctx.scene.leave();
       }
@@ -117,13 +117,13 @@ const changeAbonentStreet = new Scenes.WizardScene(
       await ctx.deleteMessage();
       ctx.reply(
         "Ko'cha/qishloq muvaffaqqiyatli kiritildi",
-        keyboards.lotin.mainKeyboard.resize()
+        keyboards.mainKeyboard.resize()
       );
       ctx.scene.leave();
     } catch (error) {
       ctx.reply(
         "Xatolik kuzatildi " + error.message,
-        keyboards.lotin.cancelBtn.resize()
+        keyboards.cancelBtn.resize()
       );
       console.error(error);
     }
@@ -132,17 +132,14 @@ const changeAbonentStreet = new Scenes.WizardScene(
 
 changeAbonentStreet.on("text", (ctx, next) => {
   if (isCancel(ctx.message.text)) {
-    ctx.reply("Bekor qilindi", keyboards.lotin.mainKeyboard);
+    ctx.reply("Bekor qilindi", keyboards.mainKeyboard);
     return ctx.scene.leave();
   }
   next();
 });
 
 changeAbonentStreet.enter((ctx) => {
-  ctx.reply(
-    "Abonent litsavoy hisob raqamini kiriting",
-    keyboards.lotin.cancelBtn
-  );
+  ctx.reply("Abonent litsavoy hisob raqamini kiriting", keyboards.cancelBtn);
 });
 
 module.exports = { changeAbonentStreet };

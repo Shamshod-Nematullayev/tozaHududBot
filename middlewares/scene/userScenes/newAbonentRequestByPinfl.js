@@ -62,7 +62,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       if (!mahallalarButtons) {
         return ctx.reply(
           "Sizga biriktirilgan mahallalar yo'q!",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       }
       ctx.wizard.state.mahallalarButtons = mahallalarButtons;
@@ -183,10 +183,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       );
       ctx.wizard.next();
     } catch (error) {
-      ctx.reply(
-        "Kutilgan amal bajarilmadi",
-        keyboards.lotin.cancelBtn.resize()
-      );
+      ctx.reply("Kutilgan amal bajarilmadi", keyboards.cancelBtn.resize());
       console.log(error);
     }
   },
@@ -210,10 +207,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       );
       ctx.wizard.next();
     } catch (error) {
-      ctx.reply(
-        "Kutilgan amal bajarilmadi",
-        keyboards.lotin.cancelBtn.resize()
-      );
+      ctx.reply("Kutilgan amal bajarilmadi", keyboards.cancelBtn.resize());
       console.log(error);
     }
   },
@@ -232,7 +226,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       if (isNaN(ctx.message.text))
         return ctx.reply(
           "Yashovchi sonini raqamda kiritish kerak",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       if (parseInt(ctx.message.text) > 15)
         return ctx.reply(
@@ -356,7 +350,7 @@ new_abonent_request_by_pinfl_scene.on("text", (ctx, next) => {
   next();
 });
 new_abonent_request_by_pinfl_scene.leave((ctx) =>
-  ctx.reply("Yakunlandi", keyboards.lotin.mainKeyboard.resize())
+  ctx.reply("Yakunlandi", keyboards.mainKeyboard.resize())
 );
 new_abonent_request_by_pinfl_scene.enter(enterFunc);
 

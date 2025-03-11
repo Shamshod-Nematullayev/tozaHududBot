@@ -13,10 +13,7 @@ const addNotification = new Scenes.WizardScene(
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       // Yuborilgan xabar faylmi tekshirish
       if (!ctx.message.document) {
-        return ctx.reply(
-          messages.notFile,
-          keyboards[ctx.session.til].cancelBtn.resize()
-        );
+        return ctx.reply(messages.notFile, keyboards.cancelBtn.resize());
       }
 
       ctx.wizard.state.file_id = ctx.message.document.file_id;
@@ -46,13 +43,10 @@ const addNotification = new Scenes.WizardScene(
         id: ctx.update.callback_query.data,
       });
       ctx.wizard.state.mahallalar = [];
-      await ctx.editMessageText(
-        messages.enterMahalla,
-        keyboards[ctx.session.til].mahallalar
-      );
+      await ctx.editMessageText(messages.enterMahalla, keyboards.mahallalar);
       ctx.wizard.next();
     } catch (error) {
-      ctx.reply("Xatolik", keyboards[ctx.session.til].cancelBtn.resize());
+      ctx.reply("Xatolik", keyboards.cancelBtn.resize());
     }
   },
   async (ctx) => {
@@ -66,10 +60,7 @@ const addNotification = new Scenes.WizardScene(
         )[0]
       );
       await ctx.deleteMessage();
-      await ctx.reply(
-        messages.enterDate,
-        keyboards[ctx.session.til].cancelBtn.resize()
-      );
+      await ctx.reply(messages.enterDate, keyboards.cancelBtn.resize());
       return ctx.wizard.next();
     } catch (error) {
       ctx.reply("Xatolik");
@@ -79,10 +70,7 @@ const addNotification = new Scenes.WizardScene(
   (ctx) => {
     if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
     if (ctx.message && ctx.message.text.split(".").length != 3) {
-      return ctx.reply(
-        messages.enterDate,
-        keyboards[ctx.session.til].cancelBtn.resize()
-      );
+      return ctx.reply(messages.enterDate, keyboards.cancelBtn.resize());
     }
     const date = ctx.message.text.split(".");
     ctx.wizard.state.date = {
@@ -90,10 +78,7 @@ const addNotification = new Scenes.WizardScene(
       month: date[1],
       year: date[2],
     };
-    ctx.reply(
-      messages.enterAbonents,
-      keyboards[ctx.session.til].cancelBtn.resize()
-    );
+    ctx.reply(messages.enterAbonents, keyboards.cancelBtn.resize());
     ctx.wizard.next();
   },
   async (ctx) => {
@@ -121,7 +106,7 @@ const addNotification = new Scenes.WizardScene(
   async (ctx) => {
     try {
       if (ctx.message?.text) {
-        ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
+        ctx.reply("OK", keyboards.adminKeyboard.resize());
         return ctx.scene.leave();
       }
       switch (ctx.callbackQuery?.data) {
@@ -132,13 +117,13 @@ const addNotification = new Scenes.WizardScene(
           let doc_num = documents[documents.length - 1].doc_num + 1;
           await ctx.replyWithHTML(
             messages.enterNotificationFile + `\n<code>${doc_num}</code>`,
-            keyboards[ctx.session.til].cancelBtn.resize()
+            keyboards.cancelBtn.resize()
           );
           ctx.wizard.selectStep(0);
           break;
         case "yoq":
           ctx.deleteMessage();
-          ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
+          ctx.reply("OK", keyboards.adminKeyboard.resize());
           ctx.scene.leave();
           break;
       }
@@ -154,15 +139,12 @@ addNotification.enter(async (ctx) => {
   let doc_num = documents[documents.length - 1].doc_num + 1;
   ctx.replyWithHTML(
     messages.enterNotificationFile + `\n<code>${doc_num}</code>`,
-    keyboards[ctx.session.til].cancelBtn.resize()
+    keyboards.cancelBtn.resize()
   );
 });
 
 addNotification.leave((ctx) => {
-  ctx.reply(
-    messages.heyAdmin,
-    keyboards[ctx.session.til].adminKeyboard.resize()
-  );
+  ctx.reply(messages.heyAdmin, keyboards.adminKeyboard.resize());
 });
 
 module.exports = { addNotification };

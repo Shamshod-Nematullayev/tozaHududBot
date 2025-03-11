@@ -21,7 +21,7 @@ const generateProkuraturaSudAriza = new Scenes.WizardScene(
     ctx.wizard.state.oy = oy;
     ctx.replyWithDocument(INPUT_ALERT_LETTER_EXCEL, {
       caption: `Prokuratura tomonidan sudga yoziladigan arizalarini ma'lumotlarini na'munadagi jadvalga qo'yib menga yuboring!`,
-      reply_markup: keyboards.lotin.cancelBtn,
+      reply_markup: keyboards.cancelBtn,
     });
     ctx.wizard.next();
   },
@@ -90,10 +90,7 @@ const generateProkuraturaSudAriza = new Scenes.WizardScene(
           });
         });
       } else {
-        ctx.reply(
-          messages.notExcelFile,
-          keyboards[ctx.session.til].cancelBtn.resize()
-        );
+        ctx.reply(messages.notExcelFile, keyboards.cancelBtn.resize());
       }
     } catch (err) {
       ctx.reply("Xukmdorim !!  Arizalarni generate qilishda muammo");

@@ -12,7 +12,7 @@ const connect_mfy_tg_group_scene = new Scenes.WizardScene(
         process.env.ADD_TG_GROUP_TOKEN = "";
         await ctx.reply(
           `Guruhni ulash bekor qilindi`,
-          keyboards.lotin.adminKeyboard.resize()
+          keyboards.adminKeyboard.resize()
         );
         return ctx.scene.leave();
       }
@@ -28,7 +28,7 @@ const connect_mfy_tg_group_scene = new Scenes.WizardScene(
         );
         ctx.reply(
           "Token kutilmoqda...",
-          keyboards.lotin.cancelBtn.oneTime().resize()
+          keyboards.cancelBtn.oneTime().resize()
         );
       } else {
         throw new Error(

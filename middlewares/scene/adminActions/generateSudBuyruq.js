@@ -86,10 +86,7 @@ const generateSBuyruq = new Scenes.WizardScene(
           });
         });
       } else {
-        ctx.reply(
-          messages.notExcelFile,
-          keyboards[ctx.session.til].cancelBtn.resize()
-        );
+        ctx.reply(messages.notExcelFile, keyboards.cancelBtn.resize());
       }
     } catch (err) {
       ctx.reply(
@@ -103,7 +100,7 @@ const generateSBuyruq = new Scenes.WizardScene(
 generateSBuyruq.enter((ctx) => {
   // ctx.replyWithDocument(importSudBuyruqlariExample, {
   //   caption: `Sud buyruqlari generatsiya qilinadigan abonentlar ma'lumotini ushbu shablonga ko'ra menga yuboring!`,
-  //   reply_markup: keyboards.lotin.cancelBtn,
+  //   reply_markup: keyboards.cancelBtn,
   // });
   ctx.reply("Kirit");
 });

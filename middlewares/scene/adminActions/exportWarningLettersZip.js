@@ -79,10 +79,7 @@ const exportWarningLettersZip = new Scenes.WizardScene(
         });
       });
     } else {
-      return ctx.reply(
-        "Siz excel fayl kiritmadingiz",
-        keyboards.lotin.cancelBtn
-      );
+      return ctx.reply("Siz excel fayl kiritmadingiz", keyboards.cancelBtn);
     }
   }
 );

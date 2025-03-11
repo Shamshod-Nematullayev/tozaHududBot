@@ -42,7 +42,7 @@ const ommaviyShartnomaBiriktirish = new Scenes.WizardScene(
   (ctx) => {
     try {
       if (ctx.message?.text) {
-        ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
+        ctx.reply("OK", keyboards.adminKeyboard.resize());
         ctx.scene.leave();
       }
       if (ctx.callbackQuery?.data) ctx.deleteMessage();
@@ -53,7 +53,7 @@ const ommaviyShartnomaBiriktirish = new Scenes.WizardScene(
           break;
         case "yoq":
           ctx.deleteMessage();
-          ctx.reply("OK", keyboards.lotin.adminKeyboard.resize());
+          ctx.reply("OK", keyboards.adminKeyboard.resize());
           ctx.scene.leave();
           break;
       }

@@ -151,7 +151,7 @@ const uploadSudBuyruqlarBillingga = new Scenes.WizardScene(
       ctx.scene.leave();
       ctx.reply(
         "Sud buyruqlar billingga yuklandi",
-        keyboards.lotin.adminKeyboard.resize()
+        keyboards.adminKeyboard.resize()
       );
     } catch (err) {
       console.error({ err });
@@ -162,7 +162,7 @@ const uploadSudBuyruqlarBillingga = new Scenes.WizardScene(
 
 uploadSudBuyruqlarBillingga.on("text", (ctx, next) => {
   if (isCancel(ctx.message.text)) {
-    ctx.reply("Bekor qilindi", keyboards.lotin.adminKeyboard.resize());
+    ctx.reply("Bekor qilindi", keyboards.adminKeyboard.resize());
     ctx.scene.leave();
     return;
   } else {

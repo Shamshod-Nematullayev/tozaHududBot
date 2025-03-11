@@ -10,23 +10,30 @@ const {
   Nazoratchi,
 } = require("../requires");
 const { Target } = require("../models/TargetAbonent");
+const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 
 const composer = new Composer();
-composer.hears(["👤Yangi abonent ochish", "👤Янги абонент"], (ctx) => {
-  ctx.scene.enter("new_abonent_request");
-});
-composer.hears(["🔎Izlash", "🔎Излаш"], (ctx) => {
+composer.hears(
+  ["👤Yangi abonent ochish", kirillga("👤Yangi abonent ochish")],
+  (ctx) => {
+    ctx.scene.enter("new_abonent_request");
+  }
+);
+composer.hears(["🔎Izlash", kirillga("🔎Izlash")], (ctx) => {
   ctx.scene.enter("SEARCH_BY_NAME");
 });
-composer.hears(["📅Abonent karta", "📅Абонент карта"], (ctx) => {
+composer.hears(["📅Abonent karta", kirillga("📅Abonent karta")], (ctx) => {
   ctx.scene.enter("getAbonentCard");
 });
-composer.hears(["🔌ЭЛЕКТР КОДИ🔌", "🔌ELEKTR KODI🔌"], async (ctx) => {
-  ctx.scene.enter("updateElektrKod");
-});
+composer.hears(
+  ["🔌 ELEKTR KODI🔌", kirillga("🔌 ELEKTR KODI🔌")],
+  async (ctx) => {
+    ctx.scene.enter("updateElektrKod");
+  }
+);
 
 composer.hears(
-  ["👥Mening abonentlarim", "👥Менинг абонентларим"],
+  ["👥Mening abonentlarim", kirillga("👥Mening abonentlarim")],
   async (ctx) => {
     try {
       const nazoratchi = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
@@ -70,21 +77,21 @@ composer.action(/newAbonentsList_/, async (ctx) => {
   }
 });
 
-composer.hears(["📓Qo`llanma", "📓Қўлланма"], (ctx) => {
+composer.hears(["📓Qo`llanma", kirillga("📓Qo`llanma")], (ctx) => {
   ctx.reply("Hozircha video qo'llanma mavjud emas. 🧠 Ishlatish kifoya");
 });
-composer.hears(["✏️Ma'lumotlarini o'zgartirish", "✏️Тахрирлаш"], (ctx) => {
-  ctx.reply(
-    messages.chooseEditType,
-    keyboards[ctx.session.til].editTypes.oneTime()
-  );
+composer.hears(
+  ["✏️Ma'lumotlarini o'zgartirish", kirillga("✏️Ma'lumotlarini o'zgartirish")],
+  (ctx) => {
+    ctx.reply(messages.chooseEditType, keyboards.editTypes.oneTime());
+  }
+);
+
+composer.hears(["⚙Sozlamalar", kirillga("⚙Sozlamalar")], (ctx) => {
+  ctx.reply(messages.chooseMenu, keyboards.settings);
 });
 
-composer.hears(["⚙Sozlamalar", "⚙Созламалар"], (ctx) => {
-  ctx.reply(messages.chooseMenu, keyboards[ctx.session.til].settings);
-});
-
-composer.hears(["✒️Судга хат✒️", "✒️Sudga xat✒️"], (ctx) => {
+composer.hears(["✒️Судга хат✒️", kirillga("✒️Судга хат✒️")], (ctx) => {
   ctx.reply(
     `To'lov qilishdan bosh tortgan abonentlarni majburiy undiruvga qaratish bo'limi`,
     keyboards.targetMenuKeyboard

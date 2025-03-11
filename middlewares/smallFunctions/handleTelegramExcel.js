@@ -55,10 +55,7 @@ async function handleTelegramExcel(ctx) {
 
       return jsonData; // Return JSON data if needed
     } else {
-      ctx.reply(
-        "Invalid or unsupported document type.",
-        keyboards.lotin.cancelBtn
-      );
+      ctx.reply("Invalid or unsupported document type.", keyboards.cancelBtn);
     }
   } catch (error) {
     console.error("Error handling Excel file:", error);

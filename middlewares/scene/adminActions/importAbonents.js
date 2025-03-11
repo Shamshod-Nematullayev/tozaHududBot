@@ -9,7 +9,7 @@ const importAbonentsScene = new Scenes.WizardScene(
   async (ctx) => {
     if (ctx.message?.text == `👨‍💻 Ish maydoni`) return ctx.scene.leave();
     if (ctx.update.callback_query.data == "no") {
-      ctx.reply("Bekor qilindi", keyboards.lotin.adminKeyboard.resize());
+      ctx.reply("Bekor qilindi", keyboards.adminKeyboard.resize());
       return ctx.scene.leave();
     } else if (ctx.update.callback_query.data == "yes") {
       const date = new Date();

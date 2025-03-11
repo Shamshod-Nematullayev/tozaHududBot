@@ -26,22 +26,13 @@ composer.start(async (ctx) => {
       const admin = await Admin.findOne({ user_id: ctx.from.id });
       if (admin) {
         // Admin dashboard
-        ctx.reply(
-          messages.heyAdmin,
-          keyboards[ctx.session.til].adminKeyboard.resize()
-        );
+        ctx.reply(messages.heyAdmin, keyboards.adminKeyboard.resize());
       } else {
         const user = await User.findOne({ "user.id": ctx.chat.id });
         if (user.is_stm_xodimi) {
-          return ctx.reply(
-            "Asosiy menyu",
-            keyboards.lotin.stm_xodimi_main_keyboard
-          );
+          return ctx.reply("Asosiy menyu", keyboards.stm_xodimi_main_keyboard);
         }
-        ctx.reply(
-          messages.startGreeting,
-          keyboards[ctx.session.til].mainKeyboard.resize()
-        );
+        ctx.reply(messages.startGreeting, keyboards.mainKeyboard.resize());
       }
     }
   } catch (err) {

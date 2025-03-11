@@ -33,7 +33,7 @@ const confirmGuvohnomaScene = new Scenes.WizardScene(
       );
       ctx.reply(
         "guvohnoma raqamini kiriting",
-        keyboards.lotin.adminAnswerKeyboard.resize()
+        keyboards.adminAnswerKeyboard.resize()
       );
 
       ctx.wizard.state.guvohnoma = guvohnoma;
@@ -97,17 +97,11 @@ const confirmGuvohnomaScene = new Scenes.WizardScene(
 );
 
 confirmGuvohnomaScene.enter((ctx) => {
-  ctx.reply(
-    messages.enterGuvohnomaNumber,
-    keyboards[ctx.session.til].cancelBtn.resize()
-  );
+  ctx.reply(messages.enterGuvohnomaNumber, keyboards.cancelBtn.resize());
 });
 
 confirmGuvohnomaScene.leave((ctx) => {
-  ctx.reply(
-    messages.heyAdmin,
-    keyboards[ctx.session.til].adminKeyboard.resize()
-  );
+  ctx.reply(messages.heyAdmin, keyboards.adminKeyboard.resize());
 });
 
 module.exports = { confirmGuvohnomaScene };

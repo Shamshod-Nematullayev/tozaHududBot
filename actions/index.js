@@ -8,8 +8,5 @@ require("./admin");
 require("./language");
 require("./shaxsiTasdiqlandi");
 bot.on("text", (ctx) => {
-  ctx.reply(
-    messages.startGreeting,
-    keyboards[ctx.session.til].mainKeyboard.resize()
-  );
+  ctx.reply(messages.startGreeting, keyboards.mainKeyboard);
 });

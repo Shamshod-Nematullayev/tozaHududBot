@@ -18,13 +18,13 @@ const sudBuyruqlariYaratish = new Scenes.WizardScene(
       if (!ctx.message)
         return ctx.reply(
           "Kutilgan amal bajarilmadi",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
 
       if (!ctx.message.document)
         return ctx.reply(
           `Siz fayl kiritmadingiz!!`,
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       if (
         !(

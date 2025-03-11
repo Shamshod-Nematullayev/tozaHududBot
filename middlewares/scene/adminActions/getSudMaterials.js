@@ -182,7 +182,7 @@ async function arxivdanFaylOlish(
     }
   } catch (error) {
     console.error(error);
-    ctx.reply("xatolik kuzatildi", keyboards.lotin.cancelBtn.resize());
+    ctx.reply("xatolik kuzatildi", keyboards.cancelBtn.resize());
   }
 }
 
@@ -293,14 +293,11 @@ const getSudMaterial = new Scenes.WizardScene(
           });
         });
       } else {
-        return ctx.reply(
-          "Siz excel fayl kiritmadingiz",
-          keyboards.lotin.cancelBtn
-        );
+        return ctx.reply("Siz excel fayl kiritmadingiz", keyboards.cancelBtn);
       }
     } catch (error) {
       console.error(error);
-      ctx.reply("xatolik kuzatildi", keyboards.lotin.cancelBtn.resize());
+      ctx.reply("xatolik kuzatildi", keyboards.cancelBtn.resize());
     }
   },
   // async (ctx) => {

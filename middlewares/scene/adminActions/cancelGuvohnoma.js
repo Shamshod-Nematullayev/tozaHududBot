@@ -66,10 +66,7 @@ const cancelGuvohnoma = new Scenes.WizardScene(
 );
 
 cancelGuvohnoma.enter((ctx) => {
-  ctx.reply(
-    messages.ogohlantirishKiriting,
-    keyboards[ctx.session.til].cancelBtn.resize()
-  );
+  ctx.reply(messages.ogohlantirishKiriting, keyboards.cancelBtn.resize());
 });
 
 cancelGuvohnoma.leave((ctx) => {

@@ -16,7 +16,7 @@ const importPlanForInspectors = new Scenes.WizardScene(
       if (!ctx.message.document) {
         return ctx.reply(
           "Siz excel fayl yubormadingiz",
-          keyboards.lotin.cancelBtn.resize()
+          keyboards.cancelBtn.resize()
         );
       }
       const { href } = await ctx.telegram.getFileLink(
@@ -68,7 +68,7 @@ const importPlanForInspectors = new Scenes.WizardScene(
 importPlanForInspectors.enter((ctx) => {
   ctx.replyWithDocument(importPlanInspectorsFileId, {
     caption: `Ushbu shablonga kerakli qiymatlarni joylashtirib menga qayta yuboring`,
-    reply_markup: keyboards.lotin.cancelBtn.resize().reply_markup,
+    reply_markup: keyboards.cancelBtn.resize().reply_markup,
   });
 });
 
