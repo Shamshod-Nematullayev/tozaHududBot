@@ -296,31 +296,21 @@ function kirillga(originalMessage) {
 
   /*kirillga o'girish algoritmi :*/
   function encrypt(string) {
-    /*asosiy kirill ga o'girish algoritmi */
+    CyrillicTranslated = ""; // Natijani tozalaymiz
     for (var i = 0; i < string.length; i++) {
+      let found = false;
       for (var j = 0; j < alphaLatin.length; j++) {
-        if (string[i] == alphaLatin[j]) {
+        if (string[i] === alphaLatin[j]) {
           CyrillicTranslated += alphaRus[j];
-          break;
-        } else if (
-          /*simvollarni va shuningdek o'zi kirill alifbosidagi harflarni ham o'zgartirmaydi: */
-          (string.charCodeAt(i) >= 9 && string.charCodeAt(i) <= 11) ||
-          (string.charCodeAt(i) > 32 && string.charCodeAt(i) < 39) ||
-          (string.charCodeAt(i) > 39 && string.charCodeAt(i) <= 64) ||
-          (string.charCodeAt(i) >= 91 && string.charCodeAt(i) < 96) ||
-          (string.charCodeAt(i) >= 123 && string.charCodeAt(i) <= 1300)
-        ) {
-          CyrillicTranslated += string[i];
-          break;
-          // alert("son simvol topdi");
-        } else if (string.charCodeAt(i) === 32) {
-          /* probelni necha bo'lsa shuncha qo'shadi :)*/
-          CyrillicTranslated += " ";
+          found = true;
           break;
         }
       }
+      // Agar belgi topilmagan bo'lsa, uni o'zgarishsiz qo'shamiz
+      if (!found) {
+        CyrillicTranslated += string[i];
+      }
     }
-    // console.log(CyrillicTranslated)
   }
 
   encrypt(originalMessage); //keyin tarjima uchun yubor :)
