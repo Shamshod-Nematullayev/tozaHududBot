@@ -1,4 +1,4 @@
-Copyright (C) 2022-2025 Shamshod Ne'matullayev. All rights reserved.
+Copyright (C) 2023-2025 Shamshod Ne'matullayev. All rights reserved.
 
 Ushbu dasturiy ta’minotning barcha huquqlari muallif tomonidan himoyalangan.
 Ushbu kodni nusxalash, tarqatish yoki tijorat maqsadlarida ishlatish taqiqlanadi.
