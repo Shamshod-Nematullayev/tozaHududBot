@@ -6,6 +6,7 @@ const isCancel = require("../../smallFunctions/isCancel");
 const { EtkKodRequest } = require("../../../models/EtkKodRequest");
 const { tozaMakonApi } = require("../../../api/tozaMakon");
 const { EtkAbonent } = require("../../../models/EtkAbonent");
+const { default: axios } = require("axios");
 
 const caotoNames = [
   {
@@ -93,7 +94,36 @@ const updateElektrKod = new Scenes.WizardScene(
       const findedETKAbonents = await EtkAbonent.find({
         accountNumber: ctx.message.text,
       });
-      if (!findedETKAbonents.length < 0) {
+      if (!findedETKAbonents[0]) {
+        for (let caoto of caotoNames) {
+          const { data } = await axios.post(
+            "https://api-e3abced5.payme.uz/api/cheque.create",
+            {
+              method: "cheque.create",
+              params: {
+                amount: 50000,
+                merchant_id: "5a5dffd8687ee421a5c4b0e6",
+                account: {
+                  account: ctx.message.text,
+                  region: "18",
+                  subRegion: caoto.caoto,
+                },
+              },
+            }
+          );
+
+          if (!data.error) {
+            findedETKAbonents.push({
+              caotoNumber: caoto.caoto,
+              accountNumber: ctx.message.text,
+              customerName: data.result.cheque.account.find(
+                (row) => row.name == "fio"
+              ).value,
+            });
+          }
+        }
+      }
+      if (!findedETKAbonents[0]) {
         ctx.reply(
           "Siz kiritgan ETK kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
           keyboards.cancelBtn.resize()
