@@ -6,7 +6,6 @@ const { sendEtkMfyReport } = require("./sendEtkMfyReport");
 const { sendMFYIncomeReport } = require("./sendMFYIncomeReport");
 const { sendPinflMfyReport } = require("./sendPinflMfyReport");
 const { addUpdateArizaAktTask } = require("./updateArizaAkt");
-
 const alarm = (times, callback) => {
   if (!Array.isArray(times)) {
     times = [times]; // Agar bitta vaqt yuborilgan bo'lsa, uni arrayga o'raymiz
@@ -48,7 +47,7 @@ const alarm = (times, callback) => {
 };
 alarm(["09:01"], createAktPack);
 
-// alarm(["09:00", "12:00", "17:00"], sendMFYIncomeReport);
+alarm(["09:00", "12:00", "17:00"], sendMFYIncomeReport);
 // alarm(
 //   [
 //     "09:00",
@@ -67,24 +66,24 @@ alarm(["09:01"], createAktPack);
 //   ],
 //   sendKunlikPinflReports
 // );
-// alarm(
-//   [
-//     "09:00",
-//     "10:00",
-//     "11:00",
-//     "12:00",
-//     "13:00",
-//     "14:00",
-//     "15:00",
-//     "16:00",
-//     "17:00",
-//     "18:00",
-//     "19:00",
-//     "20:00",
-//     "21:00",
-//   ],
-//   sendPinflMfyReport
-// );
+alarm(
+  [
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00",
+  ],
+  sendPinflMfyReport
+);
 // alarm(
 //   [
 //     "09:00",
@@ -103,39 +102,39 @@ alarm(["09:01"], createAktPack);
 //   ],
 //   lastPayReportInspectors
 // );
-// alarm(
-//   [
-//     "09:00",
-//     "10:00",
-//     "11:00",
-//     "12:00",
-//     "13:00",
-//     "14:00",
-//     "15:00",
-//     "16:00",
-//     "17:00",
-//     "18:00",
-//     "19:00",
-//     "20:00",
-//     "21:00",
-//   ],
-//   sendEtkMfyReport
-// );
-// alarm(
-//   [
-//     "09:00",
-//     "10:00",
-//     "11:00",
-//     "12:00",
-//     "13:00",
-//     "14:00",
-//     "15:00",
-//     "16:00",
-//     "17:00",
-//     "18:00",
-//     "19:00",
-//     "20:00",
-//     "21:00",
-//   ],
-//   nazoratchilarKunlikTushum
-// );
+alarm(
+  [
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00",
+  ],
+  sendEtkMfyReport
+);
+alarm(
+  [
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00",
+  ],
+  nazoratchilarKunlikTushum
+);
