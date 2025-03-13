@@ -5,6 +5,7 @@ const { Nazoratchi } = require("../../../models/Nazoratchi");
 const isCancel = require("../../smallFunctions/isCancel");
 const { EtkKodRequest } = require("../../../models/EtkKodRequest");
 const { tozaMakonApi } = require("../../../api/tozaMakon");
+const { EtkAbonent } = require("../../../models/EtkAbonent");
 
 const caotoNames = [
   {
@@ -89,9 +90,8 @@ const updateElektrKod = new Scenes.WizardScene(
         );
         return;
       }
-      const etk_abonents = require("../../../lib/etk_baza.json");
-      const findedETKAbonents = etk_abonents.filter((a) => {
-        return a.CUSTOMER_CODE == ctx.message.text;
+      const findedETKAbonents = await EtkAbonent.find({
+        accountNumber: ctx.message.text,
       });
       if (!findedETKAbonents.length < 0) {
         ctx.reply(
@@ -103,8 +103,10 @@ const updateElektrKod = new Scenes.WizardScene(
       if (findedETKAbonents.length > 1) {
         const buttons = [];
         findedETKAbonents.forEach((abonent) => {
-          const caoto = caotoNames.find((c) => c.caoto == abonent.CAOTO);
-          buttons.push(Markup.button.callback(caoto.title, abonent.CAOTO));
+          const caoto = caotoNames.find((c) => c.caoto == abonent.caotoNumber);
+          buttons.push(
+            Markup.button.callback(caoto.title, abonent.caotoNumber)
+          );
         });
         ctx.reply("Hududni tanlang", Markup.inlineKeyboard(buttons));
         ctx.wizard.state.findedETKAbonents = findedETKAbonents;
@@ -118,7 +120,7 @@ const updateElektrKod = new Scenes.WizardScene(
         return;
       }
       await ctx.replyWithHTML(
-        `Abonent: <code>${etk_abonent.CUSTOMER_NAME}</code> \nUshbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
+        `Abonent: <code>${etk_abonent.customerName}</code> \nUshbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
         createInlineKeyboard([
           [
             ["Xa 👌", "yes"],
@@ -148,14 +150,13 @@ const updateElektrKod = new Scenes.WizardScene(
             licshet: abonent.licshet,
             abonent_id: abonent.id,
             etk_kod: ctx.wizard.state.ETK,
-            etk_saoto: etkAbonent.CAOTO,
-            phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE,
+            etk_saoto: etkAbonent.caotoNumber,
             inspector_id: ctx.wizard.state.inspector_id,
             update_at: new Date(),
           });
           await tozaMakonApi.patch("/user-service/residents/" + abonent.id, {
             electricityAccountNumber: ctx.wizard.state.ETK,
-            electricityCoato: etkAbonent.CAOTO,
+            electricityCoato: etkAbonent.caotoNumber,
             id: abonent.id,
           });
           await Abonent.findByIdAndUpdate(abonent._id, {
@@ -190,14 +191,14 @@ const updateElektrKod = new Scenes.WizardScene(
     try {
       const findedETKAbonents = ctx.wizard.state.findedETKAbonents;
       const etk_abonent = findedETKAbonents.find(
-        (a) => a.CAOTO == ctx.update.callback_query.data
+        (a) => a.caotoNumber == ctx.update.callback_query.data
       );
       if (!etk_abonent) {
         ctx.reply("Xatolik");
         return ctx.scene.leave();
       }
       ctx.replyWithHTML(
-        `Abonent: <code>${etk_abonent.CUSTOMER_NAME}</code> \nTelefon: <b>${etk_abonent.MOBILE_PHONE}</b>Ushbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
+        `Abonent: <code>${etk_abonent.customerName}</code> \nUshbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
         createInlineKeyboard([
           [
             ["Xa 👌", "yes"],
