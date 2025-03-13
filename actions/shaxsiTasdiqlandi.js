@@ -1,12 +1,9 @@
 const { tozaMakonApi } = require("../api/tozaMakon");
-const {
-  Composer,
-  bot,
-  CustomDataRequest,
-  Nazoratchi,
-  changeAbonentDates,
-  Abonent,
-} = require("../requires");
+const { Composer } = require("telegraf");
+const { bot } = require("../core/bot");
+const { CustomDataRequest } = require("../models/CustomDataRequest");
+const { Nazoratchi } = require("../models/Nazoratchi");
+const { Abonent } = require("../models/Abonent");
 
 const composer = new Composer();
 
@@ -33,7 +30,6 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         params: {
           passport: req.data.passport_serial + req.data.passport_number,
           pinfl: req.data.pinfl,
-          birthdate: req.data.birth_date,
         },
       });
       if (pasportData.data.code) {

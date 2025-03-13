@@ -100,11 +100,22 @@ module.exports.createFullAct = async (req, res) => {
       ariza_id,
       photos,
     } = req.body;
-    if ([next_inhabitant_count, akt_sum, amountWithoutQQS].some(isNaN)) {
+    if (
+      [next_inhabitant_count, akt_sum, amountWithoutQQS].some(isNaN) &&
+      document_type !== "viza"
+    ) {
       return res.status(400).json({
         ok: false,
         message:
           "[next_inhabitant_count, akt_sum, amountWithoutQQS] fields are not valid",
+      });
+    } else if (
+      document_type == "viza" &&
+      [akt_sum, amountWithoutQQS].some(isNaN)
+    ) {
+      return res.status(400).json({
+        ok: false,
+        message: "[akt_sum, amountWithoutQQS] fields are not valid",
       });
     }
     const abonent = await Abonent.findOne({ licshet });
@@ -183,6 +194,7 @@ module.exports.createFullAct = async (req, res) => {
         },
       }
     );
+    console.log(req.user)
     const packIds = (await Company.findOne({ id: req.user.companyId }))
       .akt_pachka_ids;
     if (!isNaN(akt_sum)) {

@@ -135,50 +135,55 @@ const updateElektrKod = new Scenes.WizardScene(
     }
   },
   async (ctx) => {
-    if (ctx.message?.text) {
-      ctx.reply("OK");
-      ctx.scene.leave();
-    }
-    switch (ctx.callbackQuery?.data) {
-      case "yes":
-        const abonent = ctx.wizard.state.abonent;
-        const etkAbonent = ctx.wizard.state.etk_abonent;
-        await EtkKodRequest.create({
-          licshet: abonent.licshet,
-          abonent_id: abonent.id,
-          etk_kod: ctx.wizard.state.ETK,
-          etk_saoto: etkAbonent.CAOTO,
-          phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE,
-          inspector_id: ctx.wizard.state.inspector_id,
-          update_at: new Date(),
-        });
-        await tozaMakonApi.patch("/user-service/residents/" + abonent.id, {
-          electricityAccountNumber: ctx.wizard.state.ETK,
-          electricityCoato: etkAbonent.CAOTO,
-          id: abonent.id,
-        });
-        await Abonent.findByIdAndUpdate(abonent._id, {
-          $set: {
-            ekt_kod_tasdiqlandi: {
-              confirm: true,
-              inspector_id: ctx.wizard.state.inspector_id,
-              inspector_name: ctx.wizard.state.inspector_name,
-              updated_at: new Date(),
-            },
-            energy_licshet: ctx.wizard.state.ETK,
-          },
-        });
-        await ctx.editMessageText(ctx.callbackQuery.message.text);
-        await ctx.replyWithHTML(
-          `ETK kod qabul qilindi`,
-          keyboards.mainKeyboard.resize()
-        );
-        return ctx.scene.leave();
-      case "no":
-        ctx.deleteMessage();
-        ctx.reply("Bekor qilindi.", keyboards.mainKeyboard.resize());
+    try {
+      if (ctx.message?.text) {
+        ctx.reply("OK");
         ctx.scene.leave();
-        break;
+      }
+      switch (ctx.callbackQuery?.data) {
+        case "yes":
+          const abonent = ctx.wizard.state.abonent;
+          const etkAbonent = ctx.wizard.state.etk_abonent;
+          await EtkKodRequest.create({
+            licshet: abonent.licshet,
+            abonent_id: abonent.id,
+            etk_kod: ctx.wizard.state.ETK,
+            etk_saoto: etkAbonent.CAOTO,
+            phone: ctx.wizard.state.etk_abonent.MOBILE_PHONE,
+            inspector_id: ctx.wizard.state.inspector_id,
+            update_at: new Date(),
+          });
+          await tozaMakonApi.patch("/user-service/residents/" + abonent.id, {
+            electricityAccountNumber: ctx.wizard.state.ETK,
+            electricityCoato: etkAbonent.CAOTO,
+            id: abonent.id,
+          });
+          await Abonent.findByIdAndUpdate(abonent._id, {
+            $set: {
+              ekt_kod_tasdiqlandi: {
+                confirm: true,
+                inspector_id: ctx.wizard.state.inspector_id,
+                inspector_name: ctx.wizard.state.inspector_name,
+                updated_at: new Date(),
+              },
+              energy_licshet: ctx.wizard.state.ETK,
+            },
+          });
+          await ctx.editMessageText(ctx.callbackQuery.message.text);
+          await ctx.replyWithHTML(
+            `ETK kod qabul qilindi`,
+            keyboards.mainKeyboard.resize()
+          );
+          return ctx.scene.leave();
+        case "no":
+          ctx.deleteMessage();
+          ctx.reply("Bekor qilindi.", keyboards.mainKeyboard.resize());
+          ctx.scene.leave();
+          break;
+      }
+    } catch (error) {
+      ctx.reply("Error: " + error.message);
+      console.error(error);
     }
   },
   (ctx) => {

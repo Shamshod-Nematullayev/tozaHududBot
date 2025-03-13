@@ -77,13 +77,4 @@ async function nazoratchilarKunlikTushum() {
   }
 }
 
-setInterval(() => {
-  const now = new Date();
-  if (now.getMinutes() === 0) {
-    if (now.getHours() > 7 && now.getHours() < 20) {
-      nazoratchilarKunlikTushum();
-    }
-  }
-}, 1000 * 60);
-
 module.exports = { nazoratchilarKunlikTushum };

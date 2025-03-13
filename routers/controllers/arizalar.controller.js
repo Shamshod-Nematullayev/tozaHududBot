@@ -208,10 +208,8 @@ module.exports.changeArizaAct = async (req, res) => {
       req
     );
 
-    if (!act) {
-      return res
-        .status(500)
-        .json({ ok: false, message: "Internal server error" });
+    if (act.code) {
+      return res.status(500).json({ ok: false, message: act.message });
     }
 
     // Arizani yangilash
@@ -343,9 +341,12 @@ async function updateOrCreateAct(
   } else {
     const packId = (await Company.findOne({ id: req.user.companyId }))
       .akt_pachka_ids;
+    const date = new Date();
     return (
       await tozaMakonApi.post("/billing-service/acts", {
         ...body,
+        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
         actPackId: packId[ariza.document_type].id,
       })
     ).data;
