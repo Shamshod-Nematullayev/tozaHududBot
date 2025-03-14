@@ -36,6 +36,7 @@ app.use("/api/inspectors", isAuth, require("./routers/inspectorsRouter"));
 app.use("/api/abonents", isAuth, require("./routers/abonentsRouter"));
 app.use("/api/billing", isAuth, require("./routers/billing"));
 app.use("/api/arizalar", isAuth, require("./routers/arizalarRouter"));
+app.use("/api/notification", isAuth, require("./routers/notificationRouter"));
 app.use(
   "/api/yashovchi-soni-xatlov",
   isAuth,
