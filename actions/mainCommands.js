@@ -91,7 +91,7 @@ composer.hears(["⚙Sozlamalar", kirillga("⚙Sozlamalar")], (ctx) => {
   ctx.reply(messages.chooseMenu, keyboards.settings);
 });
 
-composer.hears(["✒️Судга хат✒️", kirillga("✒️Судга хат✒️")], (ctx) => {
+composer.hears(["✒️Sudga xat✒️", kirillga("✒️Sudga xat✒️")], (ctx) => {
   ctx.reply(
     `To'lov qilishdan bosh tortgan abonentlarni majburiy undiruvga qaratish bo'limi`,
     keyboards.targetMenuKeyboard

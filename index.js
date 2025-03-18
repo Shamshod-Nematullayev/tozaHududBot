@@ -9,9 +9,9 @@ if (!process.env.SECRET_JWT_KEY || !process.env.REFRESH_JWT_KEY) {
 // process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 const { default: mongoose } = require("mongoose");
 const express = require("express");
-const app = express();
 const cors = require("cors");
 const isAuth = require("./middlewares/isAuth");
+const { app, server } = require("./config/socketConfig");
 
 // App middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -55,7 +55,7 @@ process.on("warning", (warning) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, async () => {
+server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
 
