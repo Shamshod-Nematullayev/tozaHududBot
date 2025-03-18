@@ -70,12 +70,7 @@ cancelGuvohnoma.enter((ctx) => {
 });
 
 cancelGuvohnoma.leave((ctx) => {
-  ctx.reply(
-    messages.heyAdmin,
-    keyboards[
-      ctx.session.til ? ctx.session.til : "lotin"
-    ].adminKeyboard.resize()
-  );
+  ctx.reply(messages.heyAdmin, keyboards.adminKeyboard.resize());
 });
 
 module.exports = cancelGuvohnoma;
