@@ -12,21 +12,21 @@ const io = new Server(server, {
   },
 });
 
-const usersMap = {};
+const usersMapSocket = {};
 io.on("connection", (socket) => {
   try {
     const decoded = jwt.verify(
       socket.handshake.query.accessToken || "",
       process.env.SECRET_JWT_KEY
     );
-    usersMap[decoded.id] = socket.id;
+    usersMapSocket[decoded.id] = socket.id;
 
     socket.on("disconnect", () => {
-      delete usersMap[decoded.id];
+      delete usersMapSocket[decoded.id];
     });
   } catch (error) {
     console.error(error.message);
   }
 });
 
-module.exports = { io, app, server };
+module.exports = { io, app, server, usersMapSocket };
