@@ -51,7 +51,7 @@ const userToInspektor = new Scenes.WizardScene(
         await ctx.reply("Bekor qilindi", keyboards.adminKeyboard.resize());
         return ctx.scene.leave();
       }
-      ctx.deleteMessage();
+      await ctx.deleteMessage();
 
       const a = await User.findOneAndUpdate(
         { "user.id": Number(ctx.wizard.state.telegram_id) },
@@ -72,7 +72,7 @@ const userToInspektor = new Scenes.WizardScene(
       throw error;
     }
   },
-  (ctx) => {
+  async (ctx) => {
     try {
       if (ctx.message?.text) {
         ctx.reply("OK", keyboards.adminKeyboard.resize());
@@ -85,7 +85,7 @@ const userToInspektor = new Scenes.WizardScene(
           ctx.wizard.selectStep(0);
           break;
         case "yoq":
-          ctx.deleteMessage();
+          await ctx.deleteMessage();
           ctx.reply("OK", keyboards.adminKeyboard.resize());
           ctx.scene.leave();
           break;

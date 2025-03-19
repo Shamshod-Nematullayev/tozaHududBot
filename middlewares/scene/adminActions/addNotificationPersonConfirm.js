@@ -51,7 +51,7 @@ const personConfirm = new Scenes.WizardScene(
       ctx.reply("Xatolik", keyboards.cancelBtn.resize());
     }
   },
-  (ctx) => {
+  async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
 
@@ -61,7 +61,7 @@ const personConfirm = new Scenes.WizardScene(
         if (ctx.update.callback_query?.data.split("_")[1] == mfy.id)
           ctx.wizard.state.mahalla = mfy.id;
       });
-      ctx.deleteMessage();
+      await ctx.deleteMessage();
       ctx.reply(messages.enterDate, keyboards.cancelBtn.resize());
       return ctx.wizard.next();
     } catch (error) {

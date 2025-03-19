@@ -147,7 +147,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         );
       switch (ctx.callbackQuery?.data) {
         case "yes":
-          ctx.deleteMessage();
+          await ctx.deleteMessage();
           const { ...data } = ctx.wizard.state.customDates;
           delete data.photo;
           const req = await CustomDataRequest.create({
@@ -192,7 +192,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           });
           break;
         case "no":
-          ctx.deleteMessage();
+          await ctx.deleteMessage();
           ctx.reply("Bekor qilindi. Demak PINFL raqami noto'g'ri ekan");
           ctx.scene.leave();
           break;

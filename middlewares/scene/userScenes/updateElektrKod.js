@@ -84,7 +84,7 @@ const updateElektrKod = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      if (isNaN(ctx.message.text)) {
+      if (isNaN(ctx.message?.text)) {
         ctx.reply(
           "Error: ETK kod to'g'ri kiritilmadi",
           keyboards.cancelBtn.resize()
@@ -207,7 +207,7 @@ const updateElektrKod = new Scenes.WizardScene(
           );
           return ctx.scene.leave();
         case "no":
-          ctx.deleteMessage();
+          await ctx.deleteMessage();
           ctx.reply("Bekor qilindi.", keyboards.mainKeyboard.resize());
           ctx.scene.leave();
           break;

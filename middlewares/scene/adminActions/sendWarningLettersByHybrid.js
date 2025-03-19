@@ -224,7 +224,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
         `<code>EHM${jonatilmagan.Id}</code> hali imzolanmagan`
       );
     }
-    ctx.deleteMessage();
+    await ctx.deleteMessage();
     await ctx.reply(
       "Hammasi jonatildi. Ruxsat bersangiz hisobga olishning yagona elektron tizimiga ham pochta kvitansiyalarini yuklab qo'yar edim",
       createInlineKeyboard([[["Billingga yuklash ⬆️", "uploadToBilling"]]])

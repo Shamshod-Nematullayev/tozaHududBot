@@ -122,7 +122,7 @@ const addNotification = new Scenes.WizardScene(
           ctx.wizard.selectStep(0);
           break;
         case "yoq":
-          ctx.deleteMessage();
+          await ctx.deleteMessage();
           ctx.reply("OK", keyboards.adminKeyboard.resize());
           ctx.scene.leave();
           break;

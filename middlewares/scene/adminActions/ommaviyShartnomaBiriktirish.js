@@ -23,7 +23,7 @@ const ommaviyShartnomaBiriktirish = new Scenes.WizardScene(
     ctx.wizard.next();
   },
   async (ctx) => {
-    ctx.deleteMessage();
+    await ctx.deleteMessage();
     const mahalla = await Mahalla.findOne({ id: ctx.callbackQuery.data });
     await mahalla.updateOne({
       $set: {
@@ -39,7 +39,7 @@ const ommaviyShartnomaBiriktirish = new Scenes.WizardScene(
     );
     ctx.wizard.next();
   },
-  (ctx) => {
+  async (ctx) => {
     try {
       if (ctx.message?.text) {
         ctx.reply("OK", keyboards.adminKeyboard.resize());
@@ -52,7 +52,7 @@ const ommaviyShartnomaBiriktirish = new Scenes.WizardScene(
           ctx.wizard.selectStep(0);
           break;
         case "yoq":
-          ctx.deleteMessage();
+          await ctx.deleteMessage();
           ctx.reply("OK", keyboards.adminKeyboard.resize());
           ctx.scene.leave();
           break;

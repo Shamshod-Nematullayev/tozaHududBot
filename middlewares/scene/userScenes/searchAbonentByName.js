@@ -7,12 +7,12 @@ const { kirillga, lotinga } = require("../../smallFunctions/lotinKiril");
 
 const searchAbonentbyName = new Scenes.WizardScene(
   "SEARCH_BY_NAME",
-  (ctx) => {
+  async (ctx) => {
     try {
       if (ctx.message && isCancel(ctx.message.text)) return ctx.scene.leave();
       const mfy_id = ctx.update.callback_query.data.split("_")[1];
       ctx.scene.state.MFY_ID = mfy_id;
-      ctx.deleteMessage();
+      await ctx.deleteMessage();
       ctx.reply(messages.enterFISH);
       ctx.wizard.next();
     } catch (error) {

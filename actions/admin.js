@@ -72,9 +72,9 @@ const ADMIN_ACTIONS = [
 function enterAdminAction(actionType) {
   if (!actionType) return;
 
-  composer.action(actionType, (ctx) => {
+  composer.action(actionType, async (ctx) => {
     if (isAdmin(ctx)) {
-      ctx.deleteMessage();
+      await ctx.deleteMessage();
       ctx.scene.enter(actionType);
     } else ctx.reply(messages.youAreNotAdmin);
   });

@@ -149,7 +149,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       if (key !== "mahalla") {
         throw "bad request";
       }
-      ctx.deleteMessage();
+      await ctx.deleteMessage();
       ctx.wizard.state.mahallaId = mahallaId;
       // tanlangan mahallaga doir qishloqlarni olish
       let streets = (
@@ -194,7 +194,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       if (key !== "street") {
         throw "bad request";
       }
-      ctx.deleteMessage();
+      await ctx.deleteMessage();
       ctx.wizard.state.street_id = streetId;
       // yashovchi soni kiritish keyboardini jo'natish
       ctx.reply(
