@@ -82,7 +82,6 @@ const stage = new Scenes.Stage([
   pochtaHarajatiniTekshirishScene,
   new_abonent_request_by_pinfl_scene,
   sudBuyruqlariYaratish,
-  vaqtinchalikFunc,
   sendWarningLettersByHybrid,
   updateElektrKod,
   changeAbonentStreet,
