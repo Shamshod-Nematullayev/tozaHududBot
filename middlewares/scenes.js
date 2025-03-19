@@ -15,7 +15,6 @@ const {
 } = require("./scene/adminActions/completeGuvohnoma");
 const importPlanForInspectors = require("./scene/adminActions/importPlanForInspectors");
 const { connectPhoneNumber } = require("./scene/userScenes/connectPhoneNumber");
-// const { importAbonentsScene } = require("./scene/adminActions/importAbonents");
 const { generateSBuyruq } = require("./scene/adminActions/generateSudBuyruq");
 const {
   connect_mfy_tg_group_scene,
@@ -46,9 +45,6 @@ const {
 const {
   sudBuyruqlariYaratish,
 } = require("./scene/adminActions/sud/sudBuyruqlariYaratish");
-const {
-  vaqtinchalikFunc,
-} = require("./scene/adminActions/vaqtinchalikFunksiya");
 // const {
 //   sendWarningLettersByHybrid,
 // } = require("./scene/adminActions/sendWarningLettersByHybrid");
@@ -74,7 +70,6 @@ const stage = new Scenes.Stage([
   confirmGuvohnomaScene,
   importPlanForInspectors,
   connectPhoneNumber,
-  // importAbonentsScene,
   generateSBuyruq,
   connect_mfy_tg_group_scene,
   generateSavdoSanoatAriza,

@@ -89,7 +89,7 @@ const createTargetScene = new WizardScene(
       const abonent = ctx.wizard.state.abonent;
       const inspector = ctx.wizard.state.inspector;
       if (ctx.wizard.state.request === "tasdiqlash") {
-        ctx.deleteMessage();
+        await ctx.deleteMessage();
         switch (ctx.update.callback_query.data) {
           case "no":
             ctx.reply("Bekor qilindi", keyboards.mainKeyboard);
@@ -112,7 +112,7 @@ const createTargetScene = new WizardScene(
         }
       }
       if (ctx.wizard.state.request === "yana kiritasizmi") {
-        // ctx.deleteMessage();
+        await ctx.deleteMessage();
         switch (ctx.update.callback_query.data) {
           case "no":
             ctx.reply("Asosiy menyu", keyboards.mainKeyboard);
