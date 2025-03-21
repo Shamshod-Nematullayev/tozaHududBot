@@ -5,11 +5,7 @@ const schema = new Schema({
     required: true,
     type: String,
   },
-  hybridMailId: {
-    required: true,
-    type: String,
-    unique: true,
-  },
+  hybridMailId: String,
   createdOn: Date,
   isCharged: { type: Boolean, default: false },
   isDeleted: { type: Boolean, default: false },

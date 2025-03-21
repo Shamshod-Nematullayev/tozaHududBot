@@ -1,4 +1,3 @@
-const { tozaMakonApi } = require("../api/tozaMakon");
 const { NOTIFICATIONS_CHANNEL_ID } = require("../constants");
 const {
   nazoratchilarKunlikTushum,
@@ -8,15 +7,8 @@ const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { Notification } = require("../models/Notification");
 const {
   // node modules
-  fs,
-  path,
-  xlsx,
-  htmlPDF,
-  ejs,
   // required functions
-  drawDebitViloyat,
   find_address_by_pinfil_from_mvd,
-  getAbonentCardHtml,
   // telegraf resourses
   Composer,
   bot,
@@ -26,18 +18,9 @@ const {
   Admin,
   Counter,
   Guvohnoma,
-  Abonent,
-  Bildirishnoma,
 } = require("./../requires");
 
 // small required functions =========================================================================
-function bugungiSana() {
-  const date = new Date();
-  return `${date.getDate()}.${
-    date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1
-  }.${date.getFullYear()}`;
-}
-
 async function isAdmin(ctx) {
   if (!ctx) return false;
 
@@ -58,7 +41,6 @@ const ADMIN_ACTIONS = [
   "confirm_game_over",
   "generate_alert_letter",
   "add_notification",
-  // "new_abonent",
   "shaxsi_tashdiqlandi_bildirish_xati",
   "user_to_inspektor",
   "get_sud_material",
@@ -92,11 +74,18 @@ composer.command("change_password", async (ctx) => {
   ctx.scene.enter("changePasswordScene");
 });
 
-composer.hears(["👨‍💻 Ish maydoni", kirillga("👨‍💻 Ish maydoni")], async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+composer.hears(
+  ["👨‍💻 Ish maydoni", kirillga("👨‍💻 Ish maydoni")],
+  (ctx, next) => {
+    ctx.reply("test");
+    next();
+  },
+  async (ctx) => {
+    if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 
-  ctx.reply(messages.chooseMenu, keyboards.adminWorkSpace);
-});
+    ctx.reply(messages.chooseMenu, keyboards.adminWorkSpace);
+  }
+);
 
 composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
   try {
@@ -154,69 +143,6 @@ composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
   }
 });
 
-// yashovchi soni ko'paytirish so'rovini tasdiqlash funksiyasi
-// composer.action(/done_\w+/g, async (ctx) => {
-//   try {
-//     if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-
-//     const doneCb = ctx.update.callback_query.data;
-//     const req = await MultiplyRequest.findById(doneCb.split("_")[1]);
-
-//     const response = await tozaMakonApi.patch(
-//       "/user-service/residents/inhabitant/" + req.abonent.id,
-//       {
-//         inhabitantCount: req.YASHOVCHILAR,
-//       }
-//     );
-//     if (response.status !== 200) {
-//       await ctx.telegram.sendMessage(
-//         req.from.id,
-//         `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n 🟥🟥 Bekor qilindi. \n Asos: ${cleancityResponse.msg}`,
-//         { parse_mode: "HTML" }
-//       );
-//       await req.updateOne({
-//         $set: {
-//           confirm: false,
-//         },
-//       });
-//       console.error(response.data);
-//       await ctx.answerCbQuery("Tizimga kiritda xatolik kuzatildi");
-//     } else {
-//       await ctx.answerCbQuery("Tizimga kiritildi");
-//       await ctx.telegram.sendMessage(
-//         req.from.id,
-//         `<code>${req.KOD}</code>\n ${req.YASHOVCHILAR} kishi \n ✅✅ Tasdiqlandi`,
-//         { parse_mode: "HTML" }
-//       );
-//       await ctx.editMessageText(
-//         `#yashovchisoni by <a href="https://t.me/${req.from.username}">${req.from.first_name}</a>\n<code>${req.KOD}</code>\n${req.YASHOVCHILAR} kishi \n✅✅✅ by <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
-//         { parse_mode: "HTML", disable_web_page_preview: true }
-//       );
-//       await ctx.telegram.forwardMessage(
-//         process.env.NAZORATCHILAR_GURUPPASI,
-//         process.env.CHANNEL,
-//         ctx.callbackQuery.message.message_id
-//       );
-//       await ctx.deleteMessage(ctx.callbackQuery.message.message_id);
-//     }
-//   } catch (error) {
-//     console.log(error);
-//   }
-// });
-
-composer.action(/notification_\w+/g, async (ctx) => {
-  const notificationCb = ctx.update.callback_query.data;
-  const notificationId = notificationCb.split("_")[1];
-  const notification = await Notification.findById(notificationId);
-  await notification.updateOne({ $set: { status: "read" } });
-  ctx.telegram.editMessageText(
-    NOTIFICATIONS_CHANNEL_ID,
-    notification.message_id,
-    1,
-    ctx.update.callback_query.message.text
-  );
-});
-
 // ======================== Special functions (not required just shortcuts) ========================//
 
 composer.hears("Sud buyruqlarini billingga yuklash", (ctx) => {});
@@ -237,12 +163,7 @@ composer.command("tushum", async (ctx) => {
   sendMFYIncomeReport();
 });
 
-composer.hears("debit", (ctx) => {
-  drawDebitViloyat("toMySelf");
-});
-
 composer.hears(/mvd_\w+/g, (ctx) => {
-  console.log("here");
   find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1]))
     .then((res) => {
       console.log(res);
@@ -264,150 +185,15 @@ composer.hears(/k_\w+/g, (ctx) => {
   );
 });
 
-const mahallaGroup = {
-  id: -1002104743021,
-  title: "Тоза Худуд МФЙ раислари Каттақўрғон гурухи",
-  type: "supergroup",
-};
-
-// this shortcut for export billing_abonents collection from mongodb
-composer.hears("export_abonents", async (ctx) => {
-  let abonents = await Abonent.find({}, { photo: 0 });
-  const content = [];
-  abonents = abonents.sort((a, b) => a.fio.localeCompare(b.fio));
-  abonents.forEach((abonent, i) => {
-    content.push({
-      tartib: i + 1,
-      licshet: abonent.licshet,
-      fio: abonent.fio,
-      fio2: `${abonent.last_name} ${abonent.first_name} ${abonent.middle_name}`,
-      street: abonent.mahalla_name,
-      kadastr_number: abonent.kadastr_number,
-      passport: abonent.passport_number,
-      pinfl: abonent.pinfl,
-      confirm: abonent.shaxsi_tasdiqlandi?.confirm,
-    });
-  });
-
-  const data = [
-    {
-      Sheet: "Abonents",
-      columns: [
-        { label: "№", value: "tartib" },
-        { label: "Лицевой", value: "licshet" },
-        { label: "ФИО--", value: "fio" },
-        { label: "ФИО--2", value: "fio2" },
-        { label: "Кўча", value: "street" },
-        { label: "Кадастр", value: "kadastr_number" },
-        { label: "ПАССПОРТ", value: "passport" },
-        { label: "ЖШШИР", value: "pinfl" },
-        { label: "Шахси тасдиқланди", value: "confirm" },
-      ],
-      content,
-    },
-  ];
-
-  const fileName = path.join(__dirname + "/../uploads/", "abonents");
-  let settings = {
-    fileName: fileName,
-    extraLength: 3,
-    writeMode: "writeFile",
-    writeOptions: {},
-  };
-  await xlsx(data, settings);
-  await ctx.replyWithDocument({ source: fileName + ".xlsx" });
-});
-
-composer.hears("q", async (ctx) => {
-  const xatlar = await Bildirishnoma.find({ type: "sudga_chiqoring" });
-  const fileName = path.join(__dirname + "/../uploads/", "bildirish_xati bor");
-  let settings = {
-    fileName: fileName,
-    writeMode: "writeFile",
-    writeOptions: {},
-  };
-  const ishdanKetganNazoratchilar = [27300, 200, 29203];
-  const content = [];
-  xatlar.forEach((xat) => {
-    let ishdanKetganYozgan = false;
-    ishdanKetganNazoratchilar.forEach((id) => {
-      if (xat.inspector.id == id) {
-        ishdanKetganYozgan = true;
-      }
-    });
-    if (!ishdanKetganYozgan) {
-      xat.abonents.forEach((kod) => {
-        content.push({ licshet: kod });
-      });
-    }
-  });
-  const data = [
-    {
-      Sheet: "Abonents",
-      columns: [{ label: "Лицевой", value: "licshet" }],
-      content,
-    },
-  ];
-
-  await xlsx(data, settings);
-  await ctx.replyWithDocument({ source: fileName + ".xlsx" });
-  fs.unlink(fileName + ".xlsx", (err) => {});
-});
-
-composer.hears("OGOHLANTIRISH XATLARI IMPORT", async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-
-  ctx.scene.enter("importAlertLetters");
-});
-composer.hears("ExportAbonentCards", async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-
-  ctx.scene.enter("exportAbonentCards");
-});
-composer.hears("ExportWarningLettersZip", async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
-
-  ctx.scene.enter("exportWarningLettersZip");
-});
-
 composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
   ctx.scene.enter("pochtaHarajatiniTekshirishScene")
 );
-async function createWarningLetterPDF(licshet) {
-  const abonentData = await getAbonentSaldoData(licshet);
-  if (!abonentData)
-    return { success: false, message: "Abonent data not found" };
-  const data = {
-    FISH: abonentData.fio,
-    MFY: abonentData.mahalla_name,
-    STREET: abonentData.streets_name,
-    KOD: abonentData.licshet,
-    SALDO: abonentData.saldo_k,
-    SANA: bugungiSana(),
-  };
-  const createHtmlString = new Promise((resolve, reject) => {
-    ejs.renderFile(
-      path.join(__dirname, "../", "views", "gibrid.ogohlantirish.ejs"),
-      { data },
-      {},
-      (err, str) => {
-        if (err) return reject(err);
-        resolve(str);
-      }
-    );
-  });
+composer.hears(
+  "Talabnomalarni import qilish",
 
-  const html = await createHtmlString;
-  const convertPDF = new Promise((resolve, reject) => {
-    htmlPDF
-      .create(html, { format: "A4", orientation: "portrait" })
-      .toBuffer((err, str) => {
-        if (err) return reject(err);
-        const base64PDF = str.toString("base64");
-        resolve({ success: true, data: base64PDF });
-      });
-  });
-  return await convertPDF;
-}
+  (ctx) => {
+    ctx.scene.enter("uploadWarningTozamakonScene");
+  }
+);
 
 bot.use(composer);

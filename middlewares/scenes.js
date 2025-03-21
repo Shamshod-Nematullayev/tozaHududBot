@@ -58,6 +58,9 @@ const {
 const { createTargetScene } = require("./scene/userScenes/createTarget");
 const changePasswordScene = require("./scene/adminActions/changePassword");
 const getAbonentCard = require("./scene/userScenes/getAbonentCard");
+const {
+  uploadWarningTozamakonScene,
+} = require("./scene/adminActions/uploadWarningTozamakon");
 
 const stage = new Scenes.Stage([
   newAdminScene,
@@ -88,6 +91,7 @@ const stage = new Scenes.Stage([
   createTargetScene,
   changePasswordScene,
   getAbonentCard,
+  uploadWarningTozamakonScene,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

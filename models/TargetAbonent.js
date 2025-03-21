@@ -22,6 +22,7 @@ const schema = new mongoose.Schema({
       "tasdiqlandi",
       "sudga_yuborildi",
       "sud_qarori_chiqarildi",
+      "bekor_qilindi",
     ],
     default: "yangi",
   },

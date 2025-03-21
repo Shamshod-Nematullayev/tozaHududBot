@@ -15,7 +15,6 @@ const PDFMerger = require("pdf-merger-js");
 const { tozaMakonApi } = require("../../../api/tozaMakon");
 const { hybridPochtaApi } = require("../../../api/hybridPochta");
 const FormData = require("form-data");
-const { ekopayApi } = require("../../../api/ekopayApi");
 
 // required small functions
 
@@ -251,7 +250,6 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
         loop();
         return;
       }
-      console.log({ row });
       const pdf = await hybridPochtaApi.get(`/PdfMail/` + row.hybridMailId, {
         responseType: "arraybuffer",
       });

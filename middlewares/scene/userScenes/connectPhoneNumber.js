@@ -20,7 +20,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
           messages.enterFullNamber,
           keyboards.cancelBtn.resize()
         );
-      const abonent = await Abonent.findOne({ licshet: "ctx.message.text" });
+      const abonent = await Abonent.findOne({ licshet: ctx.message.text });
 
       if (abonent) {
         const request = await PhoneConnect.findOne({ KOD: ctx.message.text });

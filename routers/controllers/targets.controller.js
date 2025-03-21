@@ -4,7 +4,7 @@ const { Target } = require("../../models/TargetAbonent");
 
 module.exports.getTargets = async (req, res) => {
   try {
-    const {
+    let {
       page = 1,
       limit = 30,
       accountNumber,
@@ -12,6 +12,7 @@ module.exports.getTargets = async (req, res) => {
       inspector_id,
       status,
     } = req.query;
+    if (!page) page = 1;
     const skip = (page - 1) * limit;
     const filters = {};
     if (accountNumber) filters.accountNumber = accountNumber;
@@ -109,9 +110,16 @@ module.exports.signDocumentTargets = async (req, res) => {
     });
     // updateTargets
     document.targets?.forEach(async (target) => {
-      await Target.findByIdAndUpdate(target, {
-        $set: { status: "tasdiqlandi" },
-      });
+      try {
+        const doc = await Target.findById(target);
+        const allowedStatus = ["yangi", "xujjat_yaratildi"];
+        if (allowedStatus.includes(doc.status))
+          await Target.findByIdAndUpdate(target, {
+            $set: { status: "tasdiqlandi" },
+          });
+      } catch (error) {
+        console.error(error);
+      }
     });
   } catch (error) {
     console.error(error.message);
@@ -165,6 +173,21 @@ module.exports.getDocumentTargets = async (req, res) => {
         totalPages: Math.ceil(totalCount / limit),
       },
     });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ ok: false, message: "Internal Server Error" });
+  }
+};
+
+module.exports.cancelTargetById = async (req, res) => {
+  try {
+    const target = await Target.findByIdAndUpdate(req.params.target_id, {
+      $set: { status: "bekor_qilindi" },
+    });
+    if (!target) {
+      return res.status(404).json({ ok: false, message: "Target not found" });
+    }
+    res.status(200).json({ ok: true, message: "Target canceled successfully" });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ ok: false, message: "Internal Server Error" });
