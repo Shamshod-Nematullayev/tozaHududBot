@@ -26,6 +26,7 @@ app.use(
 
 // use routers
 app.use("/api/auth", require("./routers/auth"));
+app.use("/api/statistics", isAuth, require("./routers/statisticsRouter"));
 app.use("/api/sudAkts", isAuth, require("./routers/sudRouter"));
 app.use("/api/targets", isAuth, require("./routers/targetsRouter"));
 app.use("/api/bildirgilar", isAuth, require("./routers/bildirgilarRouter"));

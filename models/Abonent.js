@@ -1,5 +1,24 @@
 const { Schema, model } = require("mongoose");
 
+const inspectorSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  _id: {
+    type: String,
+    required: true,
+  },
+});
+const isConfirmSchema = new Schema({
+  confirm: {
+    type: Boolean,
+    default: false,
+  },
+  inspector_id: Number,
+  inspector_name: String,
+  inspector: inspectorSchema,
+});
 const schema = new Schema(
   {
     id: {
@@ -44,28 +63,13 @@ const schema = new Schema(
     pinfl: Number,
     passport_number: String,
     prescribed_cnt: Number,
-    shaxsi_tasdiqlandi: {
-      type: Object,
-      default: {
-        confirm: false,
-      },
-    },
+    shaxsi_tasdiqlandi: isConfirmSchema,
     shaxsi_tasdiqlandi_history: {
       type: Array,
       default: [],
     },
-    ekt_kod_tasdiqlandi: {
-      type: Object,
-      default: {
-        confirm: false,
-      },
-    },
-    street_tasdiqlandi: {
-      type: Object,
-      default: {
-        confirm: false,
-      },
-    },
+    ekt_kod_tasdiqlandi: isConfirmSchema,
+    street_tasdiqlandi: isConfirmSchema,
     bumadi: Boolean,
   },
   {

@@ -12,14 +12,17 @@ const caotoNames = [
   {
     title: "Qoradaryo TETK",
     caoto: 18214,
+    region: 18,
   },
   {
     title: "Xatirchi TETK",
     caoto: 12251,
+    region: 12,
   },
   {
     title: "Kattaqo'rg'on TETK",
     caoto: 18215,
+    region: 18,
   },
 ];
 
@@ -65,10 +68,15 @@ const updateElektrKod = new Scenes.WizardScene(
         licshet: ctx.wizard.state.KOD,
       });
       if (abonent.ekt_kod_tasdiqlandi?.confirm) {
-        return ctx.reply(
-          "Bu abonent ma'lumoti kiritilib bo'lingan",
-          keyboards.cancelBtn.resize()
+        await ctx.reply(
+          `Bu abonent ma'lumoti ${
+            abonent.ekt_kod_tasdiqlandi.inspector_name ||
+            abonent.ekt_kod_tasdiqlandi.inspector?.name
+          } tomonidan kiritilib bo'lingan. Baribir kiritmoqchimisiz?`,
+          keyboards.yesOrNo
         );
+        ctx.wizard.selectStep(4);
+        return;
       }
       await ctx.reply(
         `FIO: ${abonent.fio}\nElektr kodini bazaga kiriting:`,
@@ -105,7 +113,7 @@ const updateElektrKod = new Scenes.WizardScene(
                 merchant_id: "5a5dffd8687ee421a5c4b0e6",
                 account: {
                   account: ctx.message.text,
-                  region: "18",
+                  region: caoto.region,
                   subRegion: caoto.caoto,
                 },
               },
@@ -238,6 +246,25 @@ const updateElektrKod = new Scenes.WizardScene(
       );
       ctx.wizard.state.etk_abonent = etk_abonent;
       ctx.wizard.selectStep(2);
+    } catch (error) {
+      console.error(error);
+      ctx.reply("Error: " + error.message);
+    }
+  },
+  async (ctx) => {
+    try {
+      if (ctx.callbackQuery.data === "yes") {
+        await ctx.deleteMessage();
+        await ctx.reply(
+          `FIO: ${ctx.wizard.state.abonent.fio}\nElektr kodini bazaga kiriting:`
+        );
+        ctx.wizard.selectStep(1);
+        return;
+      } else if (ctx.callbackQuery.data === "no") {
+        await ctx.deleteMessage();
+      }
+      await ctx.reply("Asosiy menyu", keyboards.mainKeyboard);
+      ctx.scene.leave();
     } catch (error) {
       console.error(error);
       ctx.reply("Error: " + error.message);
