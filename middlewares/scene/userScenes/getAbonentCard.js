@@ -17,7 +17,10 @@ const getAbonentCard = new WizardScene(
     try {
       const text = ctx.message.text;
       if (isNaN(text) || text.length < 12)
-        return ctx.reply("Abonent hisob raqami ", keyboards.cancelBtn);
+        return ctx.reply(
+          "Abonent hisob raqamini to'g'ri kiriting",
+          keyboards.cancelBtn
+        );
       const abonent = await Abonent.findOne({ licshet: text });
       if (!abonent) return ctx.reply("Abonent topilmadi");
       const data = (
@@ -47,10 +50,11 @@ const getAbonentCard = new WizardScene(
             source: buffer,
             filename: ctx.message.text + ".pdf",
           });
+          ctx.scene.leave();
         });
-      ctx.scene.leave();
     } catch (error) {
       console.error(error);
+      ctx.reply("Xatolik kuzatildi");
     }
   }
 );

@@ -59,3 +59,50 @@ module.exports.getSudAkts = async (req, res) => {
     res.status(500).json({ ok: false, message: "Internal Server Error" });
   }
 };
+
+module.exports.getCourtCaseBySudAktId = async (req, res) => {
+  try {
+    const sudAkt = await SudAkt.findById(req.params._id);
+    if (!sudAkt)
+      return res.status(404).json({
+        ok: false,
+        message: "Data not found",
+      });
+    let data = await fetch(
+      "https://cabinetapi.sud.uz/api/cabinet/case/civil/all-cases?size=30&page=0&withCreated=true&case_number=2-1402-2406/1059",
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7,ru;q=0.6",
+          "content-type": "application/json",
+          responsetype: "arraybuffer",
+          "sec-ch-ua":
+            '"Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-site",
+          "x-auth-token": "1435fdf8-eafa-4edd-b746-aa9a3495bfd7",
+        },
+        referrer: "https://cabinet.sud.uz/",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        body: null,
+        method: "GET",
+        mode: "cors",
+        credentials: "omit",
+      }
+    );
+    data = (await data.json()).content;
+    const courtCase = data.find(
+      (a) => a.case_number === sudAkt.sud_case_number
+    );
+    res.json({
+      ok: true,
+      data: courtCase,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, message: "Interval Server Error" });
+  }
+};

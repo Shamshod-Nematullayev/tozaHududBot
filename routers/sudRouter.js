@@ -8,9 +8,11 @@ const { hybridPochtaApi } = require("../api/hybridPochta");
 const PDFMerger = require("pdf-merger-js");
 const { tozaMakonApi } = require("../api/tozaMakon");
 const FormData = require("form-data");
-const { getSudAkts } = require("./controllers/sud.controller");
+const { getSudAkts, getSudAktById } = require("./controllers/sud.controller");
 
 router.get("/", getSudAkts);
+
+// router.get("/:_id", getSudAktById);
 
 router.get("/search-by-licshet", async (req, res) => {
   try {
