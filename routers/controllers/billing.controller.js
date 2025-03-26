@@ -194,7 +194,7 @@ module.exports.createFullAct = async (req, res) => {
         },
       }
     );
-    console.log(req.user)
+    console.log(req.user);
     const packIds = (await Company.findOne({ id: req.user.companyId }))
       .akt_pachka_ids;
     if (!isNaN(akt_sum)) {
@@ -449,7 +449,12 @@ module.exports.getAbonentsByMfyId = async (req, res) => {
       const isAboveMinSaldo = minSaldo ? abonentSaldo > Number(minSaldo) : true;
       const isBelowMaxSaldo = maxSaldo ? abonentSaldo < Number(maxSaldo) : true;
 
-      return isAboveMinSaldo && isBelowMaxSaldo && shaxsi_tasdiqlanmadi;
+      return (
+        isAboveMinSaldo &&
+        isBelowMaxSaldo &&
+        shaxsi_tasdiqlanmadi &&
+        abonent.accountNumber !== "77777"
+      );
     });
     filteredData = filteredData.map((abonent) => {
       let isElektrKodConfirm = false;

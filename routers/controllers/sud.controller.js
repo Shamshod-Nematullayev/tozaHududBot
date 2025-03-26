@@ -1,4 +1,5 @@
 const { SudAkt } = require("../../models/SudAkt");
+const { Counter } = require("../../requires");
 
 module.exports.getSudAkts = async (req, res) => {
   try {
@@ -104,5 +105,185 @@ module.exports.getCourtCaseBySudAktId = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ ok: false, message: "Interval Server Error" });
+  }
+};
+
+module.exports.getOneSudAkt = async (req, res) => {
+  try {
+    const filters = req.body;
+    const data = await SudAkt.findOne(filters);
+    if (!data) {
+      return res.status(404).json({
+        ok: false,
+        message: "not found",
+      });
+    }
+    res.json({
+      ok: true,
+      data,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+module.exports.searchByLicshetSudakt = async (req, res) => {
+  try {
+    const { licshet } = req.query;
+    if (!licshet) {
+      return res.json({ ok: false, message: "Licshet kiritilmadi" });
+    }
+    const results = await SudAkt.countDocuments({
+      licshet: new RegExp(licshet),
+      $or: [{ status: "yangi" }, { status: "ariza_yaratildi" }],
+    });
+    if (results > 30) {
+      return res.json({ ok: false, message: "Juda ko'p natijalar aniqlandi" });
+    }
+    const sudAkts = await SudAkt.find({
+      licshet: new RegExp(licshet),
+      $or: [{ status: "yangi" }, { status: "ariza_yaratildi" }],
+    });
+    res.json({ ok: true, rows: sudAkts });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+};
+
+module.exports.createSudAriza = async (req, res) => {
+  try {
+    const sudAkt = await SudAkt.findById(req.params._id);
+    if (!sudAkt) {
+      return res.json({ ok: false, message: "SudAkt topilmadi" });
+    }
+
+    const { ariza_date, ariza_type } = req.body;
+    if (!ariza_date || !ariza_type) {
+      return res.json({
+        ok: false,
+        message: "Ariza tartib raqami yoki turi kiritilmadi",
+      });
+    }
+    const counter = await Counter.findOne({
+      name: "sudga_ariza_tartib_raqami",
+    });
+    await sudAkt.updateOne({
+      $set: {
+        ariza_order_num: counter.value + 1,
+        ariza_date,
+        ariza_type,
+        status: "ariza_yaratildi",
+      },
+    });
+    await counter.updateOne({ $set: { value: counter.value + 1 } });
+    res.json({
+      ok: true,
+      sudAkt,
+      ariza_order_num: counter.value,
+      message: "Ariza tartib raqami qo'shildi",
+    });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+};
+
+module.exports.createManySudAriza = async (req, res) => {
+  try {
+    const { sudAktIds, ariza_date, ariza_type } = req.body;
+    if (!sudAktIds || sudAktIds.length === 0) {
+      return res.json({ ok: false, message: "SudAkt idlari kiritilmadi" });
+    }
+
+    if (!ariza_date || !ariza_type) {
+      return res.json({
+        ok: false,
+        message: "Ariza sanasi yoki turi kiritilmadi",
+      });
+    }
+    if (!SudAkt.schema.paths.ariza_type.options.enum.includes(ariza_type)) {
+      return res.json({
+        ok: false,
+        message: "Ariza turi mavjud emas",
+      });
+    }
+    const sudAkts = await SudAkt.find({ _id: { $in: sudAktIds } });
+    if (sudAkts.length !== sudAktIds.length) {
+      return res.json({ ok: false, message: "SudAkt topilmadi" });
+    }
+    const counter = await Counter.findOne({
+      name: "sudga_ariza_tartib_raqami",
+    });
+    const updatedSudAkts = [];
+    for (const sudAkt of sudAkts) {
+      if (sudAkt.status === "yangi") {
+        const newOrderNum = counter.value + updatedSudAkts.length + 1;
+        await sudAkt.updateOne({
+          $set: {
+            ariza_order_num: newOrderNum,
+            ariza_date: ariza_date,
+            ariza_type: ariza_type,
+            status: "ariza_yaratildi",
+          },
+        });
+        updatedSudAkts.push({
+          ...sudAkt.toObject(),
+          ariza_order_num: newOrderNum,
+          status: "ariza_yaratildi",
+        });
+        await counter.updateOne({ $set: { value: newOrderNum } });
+      } else {
+        updatedSudAkts.push(sudAkt.toObject());
+      }
+    }
+    return res.json({ ok: true, rows: updatedSudAkts });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+};
+
+module.exports.uploadSudArizaFile = async (req, res) => {
+  try {
+    const { file } = req;
+    const { sud_akt_id } = req.body;
+    if (!file) {
+      return res.json({ ok: false, message: "File not found" });
+    }
+    if (!file.mimetype.startsWith("application/pdf")) {
+      return res.json({
+        ok: false,
+        message: "Invalid file format. Please upload a PDF file",
+      });
+    }
+    if (!sud_akt_id) {
+      return res.json({ ok: false, message: "SudAkt id not found" });
+    }
+    const sud_akt = await SudAkt.findById(sud_akt_id);
+    const blobName = `ariza-file-${Date.now()}-${file.originalname}`;
+    const telegram_res = await bot.telegram.sendDocument(
+      process.env.TEST_BASE_CHANNEL_ID,
+      {
+        source: file.buffer,
+        filename: blobName,
+      }
+    );
+    await sud_akt.updateOne({
+      $set: {
+        ariza_file_id: telegram_res.document.file_id,
+        ariza_file_name: blobName,
+        status: "ariza_imzolandi",
+      },
+    });
+
+    res.json({ ok: true, message: "Muvaffaqqiyatli yuklandi" });
+  } catch (err) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(err);
   }
 };

@@ -60,7 +60,10 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
           homePhone: null,
           active: data.active,
           description: `${inspector.id} ${inspector.name} ma'lumotiga asosan shaxsi tasdiqlandi o'zgartirildi.`,
-          citizen: pasportData.data,
+          citizen: {
+            ...pasportData.data,
+            phone: data.citizen.phone,
+          },
           house: {
             ...data.house,
             cadastralNumber: data.house.cadastralNumber
