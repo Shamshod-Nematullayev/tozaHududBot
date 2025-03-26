@@ -415,7 +415,7 @@ module.exports.getAbonentsByMfyId = async (req, res) => {
     const abonents = await Abonent.find({
       mahallas_id: req.params.mfy_id,
     });
-    const { minSaldo, maxSaldo, onlyNotIdentited } = req.query;
+    const { minSaldo, maxSaldo, onlyNotIdentited, etkStatus } = req.query;
     let page = 0;
     let totalPages = 1;
     const rows = [];
@@ -444,6 +444,21 @@ module.exports.getAbonentsByMfyId = async (req, res) => {
           abonentMongo?.shaxsi_tasdiqlandi?.confirm
         );
       }
+      let etk = true;
+      if (abonentMongo) {
+        if (
+          etkStatus === "tasdiqlangan" &&
+          (!abonentMongo.ekt_kod_tasdiqlandi ||
+            !abonentMongo.ekt_kod_tasdiqlandi.confirm)
+        ) {
+          etk = false;
+        } else if (
+          etkStatus === "tasdiqlanmagan" &&
+          abonentMongo?.ekt_kod_tasdiqlandi?.confirm
+        ) {
+          etk = false;
+        }
+      }
 
       // Filtrlash uchun shartlarni qo'llash
       const isAboveMinSaldo = minSaldo ? abonentSaldo > Number(minSaldo) : true;
@@ -453,7 +468,8 @@ module.exports.getAbonentsByMfyId = async (req, res) => {
         isAboveMinSaldo &&
         isBelowMaxSaldo &&
         shaxsi_tasdiqlanmadi &&
-        abonent.accountNumber !== "77777"
+        abonent.accountNumber !== "77777" &&
+        etk
       );
     });
     filteredData = filteredData.map((abonent) => {

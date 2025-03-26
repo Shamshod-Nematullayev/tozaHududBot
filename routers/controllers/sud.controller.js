@@ -15,6 +15,7 @@ module.exports.getSudAkts = async (req, res) => {
       claim_amount_from,
       claim_amount_to,
       case_number,
+      pinfl,
     } = req.query;
     const skip = (page - 1) * limit;
     const sortOptions = {};
@@ -38,6 +39,7 @@ module.exports.getSudAkts = async (req, res) => {
         $lte: parseFloat(claim_amount_to),
       };
     if (case_number) filters.sud_case_number = case_number;
+    if (pinfl) filters.pinfl = pinfl;
 
     const data = await SudAkt.find(filters)
       .sort(sortOptions)
@@ -70,7 +72,8 @@ module.exports.getCourtCaseBySudAktId = async (req, res) => {
         message: "Data not found",
       });
     let data = await fetch(
-      "https://cabinetapi.sud.uz/api/cabinet/case/civil/all-cases?size=30&page=0&withCreated=true&case_number=2-1402-2406/1059",
+      "https://cabinetapi.sud.uz/api/cabinet/case/civil/all-cases?size=30&page=0&withCreated=true&case_number=" +
+        sudAkt.sud_case_number,
       {
         headers: {
           accept: "application/json, text/plain, */*",
@@ -98,6 +101,12 @@ module.exports.getCourtCaseBySudAktId = async (req, res) => {
     const courtCase = data.find(
       (a) => a.case_number === sudAkt.sud_case_number
     );
+    if (!courtCase) {
+      return res.status(404).json({
+        ok: false,
+        message: "Data not found",
+      });
+    }
     res.json({
       ok: true,
       data: courtCase,

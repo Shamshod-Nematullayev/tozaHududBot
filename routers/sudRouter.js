@@ -1,8 +1,7 @@
 const router = require("express").Router();
 const ejs = require("ejs");
-const { SudAkt } = require("../models/SudAkt");
 const { HybridMail } = require("../models/HybridMail");
-const { Counter, bot, htmlPDF } = require("../requires");
+const { htmlPDF } = require("../requires");
 const { uploadAsBlob, isLimitFileSize } = require("../middlewares/multer");
 const { hybridPochtaApi } = require("../api/hybridPochta");
 const PDFMerger = require("pdf-merger-js");
@@ -20,7 +19,7 @@ const {
 
 router.get("/", getSudAkts);
 
-router.get("/court-case-by-id", getCourtCaseBySudAktId);
+router.get("/court-case-by-id/:_id", getCourtCaseBySudAktId);
 
 router.get("/find-one", getOneSudAkt);
 
