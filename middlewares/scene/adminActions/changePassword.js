@@ -1,5 +1,5 @@
 const { Scenes } = require("telegraf");
-const { Admin } = require("../../../requires");
+const { Admin, keyboards } = require("../../../requires");
 const bcrypt = require("bcrypt");
 
 const changePasswordScene = new Scenes.WizardScene(
@@ -13,7 +13,7 @@ const changePasswordScene = new Scenes.WizardScene(
       }
       ctx.wizard.state.admin = admin;
       if (admin.password) {
-        ctx.reply("Joriy parolni kiriting");
+        ctx.reply("Joriy parolni kiriting", keyboards.cancelBtn);
         return ctx.wizard.next();
       }
       ctx.reply("Yangi parolni kiriting");
@@ -32,7 +32,7 @@ const changePasswordScene = new Scenes.WizardScene(
         admin.password
       );
       if (!validPassword) {
-        ctx.reply("Parol noto'g'ri kiritildi");
+        ctx.reply("Parol noto'g'ri kiritildi", keyboards.cancelBtn);
         return ctx.scene.leave();
       }
       ctx.reply("Yangi parolni kiriting");

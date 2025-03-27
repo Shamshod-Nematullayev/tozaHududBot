@@ -69,7 +69,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       ctx.wizard.next();
     } catch (error) {
       console.error(error);
-      ctx.reply("Xatolik kuzatildi, " + error.message);
+      ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
     }
   },
   async (ctx) => {
@@ -128,7 +128,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       });
       ctx.wizard.next();
     } catch (error) {
-      ctx.reply("Xatolik kuzatildi, " + error.message);
+      ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
       console.error(error);
     }
   },
@@ -198,7 +198,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           break;
       }
     } catch (error) {
-      ctx.reply("Xatolik kuzatildi, " + error.message);
+      ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
       console.error(error);
     }
   },
@@ -220,7 +220,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           break;
       }
     } catch (error) {
-      ctx.reply("Xatolik kuzatildi, " + error.message);
+      ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
       console.error(error);
     }
   },
@@ -242,7 +242,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         ctx.scene.leave();
       }
     } catch (error) {
-      ctx.reply("Xatolik kuzatildi, " + error.message);
+      ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
       console.error(error);
     }
   }

@@ -83,7 +83,12 @@
             <%= Math.floor(mfy.counterOfConfirm).toLocaleString().replace(/,/g,
             " ") %>
           </td>
-          <td align="center" style="color: <%= mfy.procent <= 50 ? 'red' : mfy.procent <= 80 ? 'orange' : 'black' %>;"><%= mfy.bajarilishi_foizda %></td>
+          <td
+            align="center"
+            style="color: <%= mfy.procent <= jamiKiritilgan / jamiReja * 100 ? 'red' : mfy.procent <= 70 ? 'orange' : 'black' %>;"
+          >
+            <%= mfy.bajarilishi_foizda %>
+          </td>
           <td>
             <%= Math.floor(mfy.farqi).toLocaleString().replace(/,/g, " ") %>
           </td>

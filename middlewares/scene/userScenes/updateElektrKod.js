@@ -267,7 +267,7 @@ const updateElektrKod = new Scenes.WizardScene(
       ctx.scene.leave();
     } catch (error) {
       console.error(error);
-      ctx.reply("Error: " + error.message);
+      ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
     }
   }
 );

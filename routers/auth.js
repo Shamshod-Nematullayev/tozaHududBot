@@ -51,11 +51,14 @@ router.post("/login", async (req, res, next) => {
       },
     });
     const ctx = await bot.telegram.getChat(admin.user_id);
-    const file = await bot.telegram.getFile(ctx.photo.big_file_id);
-    const photo = await axios.get(
-      `https://api.telegram.org/file/bot${process.env.TOKEN}/${file.file_path}`,
-      { responseType: "arraybuffer" }
-    );
+    let photo = { data: null };
+    if (ctx.photo) {
+      const file = await bot.telegram.getFile(ctx.photo.big_file_id);
+      photo = await axios.get(
+        `https://api.telegram.org/file/bot${process.env.TOKEN}/${file.file_path}`,
+        { responseType: "arraybuffer" }
+      );
+    }
     res.status(200).json({
       ok: true,
       accessToken,
