@@ -9,6 +9,7 @@ const {
   getOneDalolatnoma,
   confirmDalolatnoma,
   getRowsByIds,
+  getDalolatnomalar,
 } = require("./controllers/xatlovInhabitantCnt.controller");
 
 const router = require("express").Router();
@@ -21,6 +22,8 @@ router.get("/mahallas", getMahallasMultiplyRequests);
 router.patch("/update-from-tozamakon/:_id", updateFromTozamakon);
 
 router.put("/:_id", updateMultiplyRequest);
+
+router.get("/get-dalolatnomalar", getDalolatnomalar);
 
 router.get("/get-one-dalolatnoma", getOneDalolatnoma);
 

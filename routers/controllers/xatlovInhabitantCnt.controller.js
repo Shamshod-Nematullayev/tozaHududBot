@@ -172,6 +172,27 @@ module.exports.getOneDalolatnoma = async (req, res) => {
     res.status(500).json({ ok: false, message: "Internal server error" });
   }
 };
+module.exports.getDalolatnomalar = async (req, res) => {
+  try {
+    const { page = 0, pageSize = 15, ...filters } = req.query;
+    const skip = page * pageSize;
+    const dalolatnomalar = await XatlovDocument.find(filters)
+      .skip(skip)
+      .limit(pageSize);
+    const rowCount = await XatlovDocument.countDocuments(filters);
+    res.json({
+      ok: true,
+      rows: dalolatnomalar,
+      meta: {
+        page,
+        pageSize,
+        rowCount,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Internal server error" });
+  }
+};
 
 module.exports.confirmDalolatnoma = async (req, res) => {
   try {

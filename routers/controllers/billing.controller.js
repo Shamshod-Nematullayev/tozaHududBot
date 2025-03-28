@@ -9,6 +9,7 @@ const FormData = require("form-data");
 const { default: axios } = require("axios");
 const { PDFDocument } = require("pdf-lib");
 const { kirillga } = require("../../middlewares/smallFunctions/lotinKiril");
+const { Mahalla } = require("../../models/Mahalla");
 
 module.exports.downloadFileFromBilling = async (req, res) => {
   try {
@@ -490,6 +491,21 @@ module.exports.getAbonentsByMfyId = async (req, res) => {
     });
     filteredData.sort((a, b) => a.fullName.localeCompare(b.fullName));
     res.json({ ok: true, data: filteredData });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+};
+
+module.exports.getActiveMfy = async (req, res) => {
+  try {
+    const data = await Mahalla.find({ reja: { $gt: 0 } });
+    const mahallalar = data.map((mfy) => {
+      return { id: mfy.id, name: mfy.name, printed: mfy.abarotka_berildi };
+    });
+    mahallalar.sort((a, b) => a.name.localeCompare(b.name));
+    mahallalar.sort((a, b) => parseInt(a.printed) - parseInt(b.printed));
+    res.json({ ok: true, data: mahallalar });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
     console.error(error);

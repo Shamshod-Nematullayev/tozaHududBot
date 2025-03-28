@@ -12,6 +12,7 @@ const {
   createDublicateActByAriza,
   getAbonentsByMfyId,
   createDublicateAct,
+  getActiveMfy,
 } = require("./controllers/billing.controller");
 
 const router = require("express").Router();
@@ -91,20 +92,7 @@ router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
 
 router.get("/get-abonents-by-mfy-id/:mfy_id", getAbonentsByMfyId);
 
-router.get("/get-all-active-mfy", async (req, res) => {
-  try {
-    const data = await Mahalla.find({ reja: { $gt: 0 } });
-    const mahallalar = data.map((mfy) => {
-      return { id: mfy.id, name: mfy.name, printed: mfy.abarotka_berildi };
-    });
-    mahallalar.sort((a, b) => a.name.localeCompare(b.name));
-    mahallalar.sort((a, b) => parseInt(a.printed) - parseInt(b.printed));
-    res.json({ ok: true, data: mahallalar });
-  } catch (error) {
-    res.json({ ok: false, message: "Internal server error 500" });
-    console.error(error);
-  }
-});
+router.get("/get-all-active-mfy", getActiveMfy);
 
 router.put("/abarotka-berildi/:mfy_id", async (req, res) => {
   try {
