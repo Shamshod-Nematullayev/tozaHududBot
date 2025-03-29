@@ -8,18 +8,25 @@ const FormData = require("form-data");
 module.exports.cancelDalolatnoma = async (req, res) => {
   try {
     const dalolatnoma = await XatlovDocument.findById(req.params._id);
-    for (const requestId of dalolatnoma.request_ids) {
-      await MultiplyRequest.findByIdAndUpdate(requestId, {
-        $set: {
-          document_id: "",
-        },
-      });
+    if (!dalolatnoma) {
+      return res.status(404).json({ ok: false, message: "Not found" });
     }
-    await XatlovDocument.findByIdAndUpdate(req.params._id, {
-      $set: {
-        isCancel: true,
-      },
-    });
+
+    // for (const requestId of dalolatnoma.request_ids) {
+    //   await MultiplyRequest.findByIdAndUpdate(requestId, {
+    //     $set: {
+    //       document_id: "",
+    //     },
+    //   });
+    // }
+    // await XatlovDocument.findByIdAndUpdate(req.params._id, {
+    //   $set: {
+    //     isCancel: true,
+    //     cancelDescription: req.body.cancelDescription,
+    //     cancelDate: new Date(),
+    //   },
+    // });
+    res.json({ ok: true, message: "Dalolatnoma bekor qilindi" });
   } catch (error) {
     console.error(error);
     res.status(500).json({
