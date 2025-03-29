@@ -12,20 +12,20 @@ module.exports.cancelDalolatnoma = async (req, res) => {
       return res.status(404).json({ ok: false, message: "Not found" });
     }
 
-    // for (const requestId of dalolatnoma.request_ids) {
-    //   await MultiplyRequest.findByIdAndUpdate(requestId, {
-    //     $set: {
-    //       document_id: "",
-    //     },
-    //   });
-    // }
-    // await XatlovDocument.findByIdAndUpdate(req.params._id, {
-    //   $set: {
-    //     isCancel: true,
-    //     cancelDescription: req.body.cancelDescription,
-    //     cancelDate: new Date(),
-    //   },
-    // });
+    for (const requestId of dalolatnoma.request_ids) {
+      await MultiplyRequest.findByIdAndUpdate(requestId, {
+        $set: {
+          document_id: "",
+        },
+      });
+    }
+    await XatlovDocument.findByIdAndUpdate(req.params._id, {
+      $set: {
+        isCancel: true,
+        cancelDescription: req.body.cancelDescription,
+        cancelDate: new Date(),
+      },
+    });
     res.json({ ok: true, message: "Dalolatnoma bekor qilindi" });
   } catch (error) {
     console.error(error);
