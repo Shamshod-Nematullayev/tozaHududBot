@@ -31,6 +31,6 @@ router.put("/confirm/:_id", uploadAsBlob.single("file"), confirmDalolatnoma);
 
 router.get("/get-rows-by-ids", getRowsByIds);
 
-router.put("/cancel-document", cancelDalolatnoma);
+router.put("/cancel-document/:_id", cancelDalolatnoma);
 
 module.exports = router;

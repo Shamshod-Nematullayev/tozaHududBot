@@ -13,6 +13,8 @@ const schema = new mongoose.Schema({
   date: Date,
   documentNumber: Number,
   isCancel: Boolean,
+  cancelDescription: String,
+  cancelDate: Date,
 });
 
 const XatlovDocument = mongoose.model("xatlov_document", schema);
