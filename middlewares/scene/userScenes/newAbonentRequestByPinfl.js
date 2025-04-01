@@ -48,12 +48,12 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         pinfl: parseInt(ctx.message.text),
         "shaxsi_tasdiqlandi.confirm": true,
       });
-      // if (existAbonent) {
-      //   ctx.reply(
-      //     `Ushbu abonentga allaqachon ${existAbonent.licshet} hisob raqami ochilgan`
-      //   );
-      //   return;
-      // }
+      if (existAbonent) {
+        ctx.reply(
+          `Ushbu abonentga allaqachon ${existAbonent.licshet} hisob raqami ochilgan`
+        );
+        return;
+      }
 
       const mahallalarButtons = admin
         ? await keyboards.nazoratchigaBiriktirilganMahallalar()
@@ -81,7 +81,6 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       const houses = await tozaMakonApi.get(
         "/user-service/houses/pinfl/" + ctx.message.text
       );
-      console.log(houses.data);
       await ctx.reply(
         `${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}`
       );
@@ -98,10 +97,21 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         ctx.wizard.selectStep(2);
         return;
       }
-      if (houses.data.cadastr_list.length < 1) {
+      if (houses.data.cadastr_list.length < 1 && !admin) {
         return await ctx.replyWithHTML(
           "Ushbu fuqaroga tegishli xonadon (kadastr) yo'q!\n <b>Diqqat xonadon egasi bo'lmagan shaxsga abonent ochish tavsiya etilmaydi</b>"
         );
+      } else if (houses.data.cadastr_list.length < 1) {
+        await ctx.replyWithHTML(
+          "Ushbu fuqaroga tegishli xonadon (kadastr) yo'q!\n <b>Diqqat xonadon egasi bo'lmagan shaxsga abonent ochish tavsiya etilmaydi</b>"
+        );
+        ctx.reply(
+          "Mahallani tanlang",
+          Markup.inlineKeyboard(mahallalarButtons)
+        );
+        ctx.wizard.state.cadastr = "00:00:00:90:0000";
+        ctx.wizard.selectStep(2);
+        return;
       }
       if (houses.data.cadastr_list.length == 1) {
         ctx.reply(

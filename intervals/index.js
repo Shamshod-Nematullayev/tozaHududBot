@@ -6,7 +6,6 @@ const { sendEtkMfyReport } = require("./sendEtkMfyReport");
 const { sendMFYIncomeReport } = require("./sendMFYIncomeReport");
 const { sendPinflMfyReport } = require("./sendPinflMfyReport");
 const { addUpdateArizaAktTask } = require("./updateArizaAkt");
-sendEtkMfyReport();
 const alarm = (times, callback) => {
   if (!Array.isArray(times)) {
     times = [times]; // Agar bitta vaqt yuborilgan bo'lsa, uni arrayga o'raymiz
