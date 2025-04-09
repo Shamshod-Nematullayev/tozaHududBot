@@ -16,11 +16,13 @@ const getAbonentCard = new WizardScene(
   async (ctx) => {
     try {
       const text = ctx.message.text;
-      if (isNaN(text) || text.length < 12) ctx.scene.leave();
-      return ctx.reply(
-        "Abonent hisob raqamini to'g'ri kiriting",
-        keyboards.mainKeyboard
-      );
+      if (isNaN(text) || text.length < 12) {
+        ctx.scene.leave();
+        return ctx.reply(
+          "Abonent hisob raqamini to'g'ri kiriting",
+          keyboards.mainKeyboard
+        );
+      }
       const abonent = await Abonent.findOne({ licshet: text });
       if (!abonent) return ctx.reply("Abonent topilmadi");
       const data = (

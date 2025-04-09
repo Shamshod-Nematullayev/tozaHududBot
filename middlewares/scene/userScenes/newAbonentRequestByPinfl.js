@@ -335,6 +335,38 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           inspector: ctx.wizard.state.inspektor,
         },
       });
+      // kadastr raqamini o'chirish
+      if (ctx.wizard.state.cadastr == "00:00:00:90:0000") {
+        const abonentDatasResponse = await tozaMakonApi.get(
+          `/user-service/residents/${newAbonent}?include=translates`
+        );
+        if (!abonentDatasResponse || abonentDatasResponse.status !== 200) {
+          return await ctx.answerCbQuery(
+            "Abonent dastlabki ma'lumotlarini oliishda xatolik"
+          );
+        }
+        const data = abonentDatasResponse.data;
+        await tozaMakonApi.put("/user-service/residents/" + newAbonent, {
+          id: newAbonent,
+          accountNumber: generatedAccountNumber,
+          residentType: "INDIVIDUAL",
+          electricityAccountNumber: data.electricityAccountNumber,
+          electricityCoato: data.electricityCoato,
+          companyId: data.companyId,
+          streetId: data.streetId,
+          mahallaId: data.mahallaId,
+          contractNumber: data.contractNumber,
+          contractDate: data.contractDate,
+          homePhone: null,
+          active: data.active,
+          description: data.description,
+          citizen: data.citizen,
+          house: {
+            ...data.house,
+            cadastralNumber: "0",
+          },
+        });
+      }
       // so'rov yuborivchiga natijani yetkazish
       if (ctx.wizard.state.inspektor.id !== 17413)
         ctx.telegram.sendMessage(
