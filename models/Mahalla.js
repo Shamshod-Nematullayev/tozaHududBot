@@ -35,6 +35,10 @@ const schema = new mongoose.Schema({
     default: false,
   },
   publicOfferFileId: String,
+  companyId: {
+    type: Number,
+    required: true,
+  },
 });
 
 module.exports.Mahalla = mongoose.model("mahalla", schema);
