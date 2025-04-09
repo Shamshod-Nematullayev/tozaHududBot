@@ -16,6 +16,10 @@ const schema = new Schema(
       type: Boolean,
       default: false,
     },
+    companyId: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );

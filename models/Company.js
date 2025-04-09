@@ -57,6 +57,7 @@ const schema = new Schema(
     },
     akt_pachka_ids: aktPackTypesSchema,
     active: Boolean,
+    CHANNEL_ID_SHAXSI_TASDIQLANDI: String,
   },
   {
     timestamps: true,

@@ -1,8 +1,9 @@
-const { tozaMakonApi } = require("../api/tozaMakon");
+const { createTozaMakonApi } = require("../api/tozaMakon");
 const { Composer } = require("telegraf");
 const { bot } = require("../core/bot");
 const { CustomDataRequest } = require("../models/CustomDataRequest");
 const { Nazoratchi } = require("../models/Nazoratchi");
+const { Company } = require("../models/Company");
 const { Abonent } = require("../models/Abonent");
 
 const composer = new Composer();
@@ -26,6 +27,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         return ctx.answerCbQuery("Bu abonent ma'lumoti kiritilib bo'lingan");
       }
       //   billingga yangilov so'rovini yuborish
+      const tozaMakonApi = createTozaMakonApi(req.companyId);
       const pasportData = await tozaMakonApi.get("/user-service/citizens", {
         params: {
           passport: req.data.passport_serial + req.data.passport_number,
@@ -117,8 +119,9 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       //   requestni o'chirib yuborish
       await req.deleteOne();
       //   telegram kanaldagi postni yangilash
+      const company = await Company.findOne({ id: req.companyId });
       await ctx.telegram.editMessageCaption(
-        process.env.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+        company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
         ctx.update.callback_query.message.message_id,
         0,
         `KOD: ${req.licshet}\nFIO: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,

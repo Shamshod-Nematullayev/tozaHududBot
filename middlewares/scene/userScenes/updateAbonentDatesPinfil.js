@@ -1,5 +1,6 @@
 const { Scenes, Markup } = require("telegraf");
 const { Abonent } = require("../../../models/Abonent");
+const { Company } = require("../../../models/Company");
 const isCancel = require("../../smallFunctions/isCancel");
 const { messages } = require("../../../lib/messages");
 const { keyboards, createInlineKeyboard } = require("../../../lib/keyboards");
@@ -23,6 +24,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       }
       ctx.wizard.state.inspector_id = inspektor._id;
       ctx.wizard.state.inspector_name = inspektor.name;
+      ctx.wizard.state.companyId = inspektor.companyId;
       if (!ctx.message)
         return ctx.reply(
           "kutilgan ma'lumot kiritilmadi",
@@ -42,10 +44,13 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           messages.enterFullNamber,
           keyboards.cancelBtn.resize()
         );
-      const abonent = await Abonent.findOne({ licshet: ctx.message.text });
+      const abonent = await Abonent.findOne({
+        licshet: ctx.message.text,
+        companyId: inspektor.companyId,
+      });
       if (!abonent) {
         return ctx.reply(
-          "Siz kiritgan litsavoy kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
+          "Siz kiritgan hisob raqami bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
           keyboards.cancelBtn.resize()
         );
       }
@@ -159,6 +164,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
             inspector_id: ctx.wizard.state.inspector_id,
             licshet: ctx.wizard.state.abonent.licshet,
             reUpdating: ctx.wizard.state.reUpdating,
+            companyId: ctx.wizard.state.companyId,
           });
           let filename = ctx.wizard.state.filename;
           fs.writeFile(filename, customDates.photo, "base64", async (err) => {
@@ -169,8 +175,11 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
                 "‼️<b>DIQQAT</b>‼️\nUshbu abonent ikkinchi marta shaxsi tasdiqlanmoqda\n" +
                 text;
 
+            const company = await Company.findOne({
+              id: ctx.wizard.state.companyId,
+            });
             await ctx.telegram.sendPhoto(
-              process.env.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+              company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
               { source: filename },
               {
                 caption: text,

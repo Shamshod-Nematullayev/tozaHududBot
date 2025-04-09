@@ -21,6 +21,10 @@ const schema = new mongoose.Schema({
     default: [],
   },
   shaxs_tasdiqlash_ball: { type: Number, default: 0 },
+  companyId: {
+    type: Number,
+    required: true,
+  },
 });
 
 // id: ekopay tizimida nazoratchi nomiga yaratilgan id
@@ -29,5 +33,6 @@ const schema = new mongoose.Schema({
 // activ: hozirgi kunda ishlayaptimi yoki yo'q
 // biriktirilgan: Shu nazoratchiga biriktirilgan mahallalar
 // telegram_id: telegram akkauntini rasmiy nazoratchi sifatida bog'lash
+// companyId: kompaniya id raqami
 
 module.exports.Nazoratchi = mongoose.model("inpektor", schema);
