@@ -43,11 +43,8 @@ const schema = new Schema(
       max: 12,
       min: 12,
     },
-    saldo_n: Number,
-    saldo_k: Number,
     energy_licshet: Number,
     kadastr_number: String,
-    last_pay_date: String,
     mahalla_name: String,
     mahallas_id: {
       type: Number,
@@ -62,7 +59,6 @@ const schema = new Schema(
     phone: String,
     pinfl: Number,
     passport_number: String,
-    prescribed_cnt: Number,
     shaxsi_tasdiqlandi: isConfirmSchema,
     shaxsi_tasdiqlandi_history: {
       type: Array,
@@ -71,6 +67,10 @@ const schema = new Schema(
     ekt_kod_tasdiqlandi: isConfirmSchema,
     street_tasdiqlandi: isConfirmSchema,
     bumadi: Boolean,
+    companyId: {
+      type: Number,
+      required: true,
+    },
   },
   {
     timestamps: true,
