@@ -13,6 +13,11 @@ const { Target } = require("../models/TargetAbonent");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 
 const composer = new Composer();
+composer.command("user", (ctx) => {
+  ctx.reply(`Sizning id raqamingiz: <code> ${ctx.from.id}</code>`, {
+    parse_mode: "HTML",
+  });
+});
 composer.hears(
   ["👤Yangi abonent ochish", kirillga("👤Yangi abonent ochish")],
   (ctx) => {

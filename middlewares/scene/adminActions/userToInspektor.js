@@ -3,16 +3,14 @@ const { createInlineKeyboard, keyboards } = require("../../../lib/keyboards");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { User } = require("../../../models/User");
 const isCancel = require("../../smallFunctions/isCancel");
+const { Admin } = require("../../../requires");
 
 const userToInspektor = new Scenes.WizardScene(
   "user_to_inspektor",
   async (ctx) => {
     try {
-      if (isCancel(ctx.message?.text)) {
-        await ctx.reply("Bekor qilindi");
-        return ctx.scene.leave();
-      }
-
+      const admin = await Admin.findOne({ user_id: ctx.from.id });
+      ctx.wizard.state.admin = admin;
       const user = await User.findOne({ "user.id": Number(ctx.message.text) });
       if (!user) {
         return ctx.reply(
@@ -30,7 +28,9 @@ const userToInspektor = new Scenes.WizardScene(
         `<a href="https://t.me/${user.user.username}">${user.user.first_name}</a>`
       );
 
-      const inspectors = await Nazoratchi.find();
+      const inspectors = await Nazoratchi.find({
+        companyId: admin.companyId,
+      });
       const buttonsArray = [];
       inspectors.forEach((ins) => {
         buttonsArray.push([Markup.button.callback(ins.name, ins.id)]);
@@ -47,10 +47,6 @@ const userToInspektor = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      if (ctx.message?.text) {
-        await ctx.reply("Bekor qilindi", keyboards.adminKeyboard.resize());
-        return ctx.scene.leave();
-      }
       await ctx.deleteMessage();
 
       const a = await User.findOneAndUpdate(
@@ -74,10 +70,6 @@ const userToInspektor = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      if (ctx.message?.text) {
-        ctx.reply("OK", keyboards.adminKeyboard.resize());
-        ctx.scene.leave();
-      }
       if (ctx.callbackQuery?.data) ctx.deleteMessage();
       switch (ctx.callbackQuery?.data) {
         case "xa":
@@ -96,6 +88,16 @@ const userToInspektor = new Scenes.WizardScene(
     }
   }
 );
+
+userToInspektor.on("text", async (ctx, next) => {
+  if (ctx.message.text) {
+    if (isCancel(ctx.message?.text)) {
+      await ctx.reply("Bekor qilindi", keyboards.adminKeyboard.resize());
+      return ctx.scene.leave();
+    }
+  }
+  next();
+});
 
 userToInspektor.enter((ctx) => {
   ctx.reply("Foydalanuvchi telegram ID raqamini kiriting!");

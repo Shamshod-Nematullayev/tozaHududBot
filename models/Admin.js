@@ -1,7 +1,10 @@
 const { default: mongoose } = require("mongoose");
 
 const schema = new mongoose.Schema({
-  user_id: Number,
+  user_id: {
+    type: Number,
+    required: true,
+  },
   login: String,
   password: String,
   refreshToken: String,
