@@ -31,6 +31,9 @@ bot.use(async (ctx, next) => {
     });
   }
   if (ctx.chat.id < 0 && !ctx.update.callback_query) {
+    if (ctx.channelPost?.text == "chat_id") {
+      ctx.reply(ctx.chat.id);
+    }
   } else {
     next();
   }
