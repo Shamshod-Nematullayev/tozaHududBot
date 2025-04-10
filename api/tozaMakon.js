@@ -87,38 +87,37 @@ function createTozaMakonApi(companyId) {
     (response) => response,
     async (error) => {
       const session = await Company.findOne({ id: companyId });
-      if (!session) return Promise.reject(error);
+      if (!session || !error.response) return Promise.reject(error);
 
-      if (!error.response) return Promise.reject(error);
+      const status = error.response.status;
 
-      console.error(
-        {
-          method: error.response.config.method,
-          url: error.response.config.url,
-          data: error.response.data,
-        },
-        error.config.data,
-        error.response.status,
-        error.response.statusText
-      );
+      // Retry limiter
+      error.config._retryCount = (error.config._retryCount || 0) + 1;
+      if (error.config._retryCount > 1) {
+        return Promise.reject(error); // Stop retrying
+      }
 
-      if (error.response.status === 401) {
-        const { data } = await axios.post(
-          "https://api.tozamakon.eco/user-service/users/login",
-          {
-            username: session.login,
-            password: session.password,
-          }
-        );
+      if (status === 401) {
+        try {
+          const { data } = await axios.post(
+            "https://api.tozamakon.eco/user-service/users/login",
+            {
+              username: session.login,
+              password: session.password,
+            }
+          );
 
-        await Company.findByIdAndUpdate(session._id, {
-          $set: {
-            tozamakonAccessToken: data.access_token,
-          },
-        });
+          await Company.findByIdAndUpdate(session._id, {
+            $set: {
+              tozamakonAccessToken: data.access_token,
+            },
+          });
 
-        error.config.headers["Authorization"] = `Bearer ${data.access_token}`;
-        return instance.request(error.config);
+          error.config.headers["Authorization"] = `Bearer ${data.access_token}`;
+          return instance.request(error.config);
+        } catch (loginError) {
+          return Promise.reject(loginError); // login noto‘g‘ri bo‘lsa, to‘xtatish
+        }
       }
 
       return Promise.reject(error);
