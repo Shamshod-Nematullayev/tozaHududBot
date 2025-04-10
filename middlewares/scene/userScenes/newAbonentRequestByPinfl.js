@@ -8,7 +8,7 @@ const { Abonent } = require("../../../models/Abonent");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { Mahalla } = require("../../../models/Mahalla");
 const { NewAbonent } = require("../../../models/NewAbonents");
-const { tozaMakonApi } = require("../../../api/tozaMakon");
+const { createTozaMakonApi } = require("../../../api/tozaMakon");
 const { Admin } = require("../../../requires");
 
 const enterFunc = (ctx) => {
@@ -78,6 +78,10 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         ...customDates,
       };
       // 61206035500020;AD8815043;
+      const tozaMakonApi = createTozaMakonApi(
+        inspektor.companyId || admin.companyId
+      );
+      ctx.wizard.state.tozaMakonApi = tozaMakonApi;
       const houses = await tozaMakonApi.get(
         "/user-service/houses/pinfl/" + ctx.message.text
       );
@@ -159,6 +163,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       if (key !== "mahalla") {
         throw "bad request";
       }
+      const tozaMakonApi = ctx.wizard.state.tozaMakonApi;
       await ctx.deleteMessage();
       ctx.wizard.state.mahallaId = mahallaId;
       // tanlangan mahallaga doir qishloqlarni olish
@@ -243,6 +248,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           "Yashovchi soni 15 dan yuqori bo'lishi mumkin emas. Iltimos tekshib ko'ring"
         );
       // bo'sh bo'lgan hisob raqamini olish
+      const tozaMakonApi = ctx.wizard.state.tozaMakonApi;
       const generatedAccountNumber = (
         await tozaMakonApi.get(
           "/user-service/residents/account-numbers/generate",

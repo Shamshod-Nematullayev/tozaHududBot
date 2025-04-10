@@ -18,10 +18,12 @@ const sendEtkMfyReport = async () => {
     for (const mfy of mahallas) {
       const abonentsCount = await Abonent.countDocuments({
         mahallas_id: mfy.id,
+        companyId: 1144,
       });
       const etkConfirmedAbonentsCount = await Abonent.countDocuments({
         "ekt_kod_tasdiqlandi.confirm": true,
         mahallas_id: mfy.id,
+        companyId: 1144,
       });
       rows.push({
         // ...mfy,
@@ -76,5 +78,4 @@ const sendEtkMfyReport = async () => {
     console.error(error);
   }
 };
-
 module.exports = { sendEtkMfyReport };
