@@ -1,4 +1,4 @@
-require("./haveUsername");
+// require("./haveUsername");
 require("./lotinKiril");
 require("./scenes");
 require("./notGroup");

@@ -3,6 +3,7 @@ const { Mahalla } = require("../../models/Mahalla");
 
 module.exports.getAllInspectors = async (req, res) => {
   try {
+    console.log(req.user);
     const inspectors = await Nazoratchi.find({ companyId: req.user.companyId });
     const mahallalar = await Mahalla.find({
       reja: { $gt: 0 },
