@@ -1,9 +1,11 @@
-const { Scenes } = require("telegraf");
+const { Scenes, Markup } = require("telegraf");
 const { keyboards } = require("../../../lib/keyboards");
 const { messages } = require("../../../lib/messages");
 const { Abonent } = require("../../../models/Abonent");
 const isCancel = require("../../smallFunctions/isCancel");
 const { kirillga, lotinga } = require("../../smallFunctions/lotinKiril");
+const { Nazoratchi } = require("../../../requires");
+const { Mahalla } = require("../../../models/Mahalla");
 
 const searchAbonentbyName = new Scenes.WizardScene(
   "SEARCH_BY_NAME",
@@ -56,8 +58,23 @@ const searchAbonentbyName = new Scenes.WizardScene(
     }
   }
 );
-searchAbonentbyName.enter((ctx) => {
-  ctx.reply(messages.enterMahalla, keyboards.mahallalar.oneTime());
+searchAbonentbyName.enter(async (ctx) => {
+  // mahalla_id
+  const inspector = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
+  if (!inspector)
+    return ctx.reply(
+      "Kechirasiz, ushbu amaliyotdan foydalanish uchun sizda ruxsat yo'q"
+    );
+  const mahallalar = await Mahalla.find({
+    companyId: inspector.companyId,
+  }).lean();
+  const sortedMahallalar = mahallalar.sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+  const buttons = sortedMahallalar.map((mfy) => [
+    Markup.button.callback(mfy.name, "mahalla_" + mfy.id),
+  ]);
+  ctx.reply(messages.enterMahalla, Markup.inlineKeyboard(buttons));
 });
 searchAbonentbyName.leave((ctx) => {
   ctx.reply(messages.startGreeting, keyboards.mainKeyboard.resize());

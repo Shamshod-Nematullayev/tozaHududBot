@@ -13,7 +13,7 @@ function bugungiSana() {
 
 const sendEtkMfyReport = async (companyId = 1144) => {
   try {
-    const mahallas = await Mahalla.find({ reja: { $gt: 0 } });
+    const mahallas = await Mahalla.find({ reja: { $gt: 0 }, companyId });
     const rows = [];
     for (const mfy of mahallas) {
       const abonentsCount = await Abonent.countDocuments({
@@ -65,7 +65,8 @@ const sendEtkMfyReport = async (companyId = 1144) => {
         const buffer = Buffer.from(binaryData, "binary");
 
         bot.telegram.sendPhoto(
-          process.env.NAZORATCHILAR_GURUPPASI,
+          // process.env.NAZORATCHILAR_GURUPPASI,
+          process.env.ME,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,

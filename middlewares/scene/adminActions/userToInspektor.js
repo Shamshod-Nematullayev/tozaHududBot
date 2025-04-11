@@ -82,6 +82,8 @@ const userToInspektor = new Scenes.WizardScene(
           ctx.scene.leave();
           break;
       }
+      ctx.reply("OK", keyboards.adminKeyboard.resize());
+      ctx.scene.leave();
     } catch (error) {
       console.log("user_to_inspektor scene 3");
       throw error;

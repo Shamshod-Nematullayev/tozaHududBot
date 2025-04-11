@@ -56,8 +56,13 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       }
 
       const mahallalarButtons = admin
-        ? await keyboards.nazoratchigaBiriktirilganMahallalar()
-        : await keyboards.nazoratchigaBiriktirilganMahallalar(inspektor.id);
+        ? await keyboards.nazoratchigaBiriktirilganMahallalar(
+            inspektor.companyId || admin.companyId
+          )
+        : await keyboards.nazoratchigaBiriktirilganMahallalar(
+            inspektor.companyId,
+            inspektor.id
+          );
 
       if (!mahallalarButtons) {
         return ctx.reply(

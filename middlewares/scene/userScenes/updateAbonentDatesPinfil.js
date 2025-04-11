@@ -44,6 +44,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           messages.enterFullNamber,
           keyboards.cancelBtn.resize()
         );
+      console.log(inspektor);
       const abonent = await Abonent.findOne({
         licshet: ctx.message.text,
         companyId: inspektor.companyId,

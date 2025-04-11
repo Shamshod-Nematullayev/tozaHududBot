@@ -1,5 +1,5 @@
 const nodeHtmlToImage = require("../helpers/puppeteer-wrapper");
-const { Abonent, Nazoratchi, bot } = require("../requires");
+const { Nazoratchi, bot } = require("../requires");
 const ejs = require("ejs");
 const { EtkKodRequest } = require("../models/EtkKodRequest");
 
@@ -88,7 +88,8 @@ async function sendKunlikEtkReports() {
         const buffer = Buffer.from(binaryData, "binary");
         // console.log(inspectors);
         bot.telegram.sendPhoto(
-          process.env.NAZORATCHILAR_GURUPPASI,
+          // process.env.NAZORATCHILAR_GURUPPASI,
+          process.env.ME,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,

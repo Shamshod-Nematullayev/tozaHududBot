@@ -77,8 +77,8 @@ async function sendPinflMfyReport() {
           const buffer = Buffer.from(binaryData, "binary");
 
           await bot.telegram.sendPhoto(
-            // company.GROUP_ID_NAZORATCHILAR,
-            process.env.ME
+            company.GROUP_ID_NAZORATCHILAR,
+            // process.env.ME,
             { source: buffer },
             {
               caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
@@ -92,5 +92,4 @@ async function sendPinflMfyReport() {
     }
   });
 }
-
 module.exports = { sendPinflMfyReport };
