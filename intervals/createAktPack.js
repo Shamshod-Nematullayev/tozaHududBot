@@ -43,6 +43,7 @@ async function createAktPack() {
     const companies = await Company.find({ active: true }).lean();
     let createdCount = 0;
     for (let company of companies) {
+      if (company.id == 1265) continue;
       const users = await Admin.find({
         companyId: company.id,
         roles: "billing",
