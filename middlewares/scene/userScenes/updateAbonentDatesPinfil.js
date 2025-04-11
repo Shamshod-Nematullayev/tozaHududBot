@@ -58,7 +58,10 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       ctx.wizard.state.abonent = abonent;
       if (abonent.shaxsi_tasdiqlandi && abonent.shaxsi_tasdiqlandi.confirm) {
         ctx.reply(
-          `Ushbu abonent ${abonent.shaxsi_tasdiqlandi.inspector.name} tomonidan allaqachon shaxsi tasdiqlangan! Baribir o'zgartirmoqchimisiz?`,
+          `Ushbu abonent ${
+            abonent.shaxsi_tasdiqlandi.inspector?.name ||
+            abonent.shaxsi_tasdiqlandi.inspector_name
+          } tomonidan allaqachon shaxsi tasdiqlangan! Baribir o'zgartirmoqchimisiz?`,
           createInlineKeyboard([
             [
               ["Xa 👌", "yes"],

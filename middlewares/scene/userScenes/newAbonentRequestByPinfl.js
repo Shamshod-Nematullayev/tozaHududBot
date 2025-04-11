@@ -168,7 +168,9 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       if (key !== "mahalla") {
         throw "bad request";
       }
-      const tozaMakonApi = ctx.wizard.state.tozaMakonApi;
+      const tozaMakonApi = createTozaMakonApi(
+        ctx.wizard.state.inspektor.companyId
+      );
       await ctx.deleteMessage();
       ctx.wizard.state.mahallaId = mahallaId;
       // tanlangan mahallaga doir qishloqlarni olish
@@ -253,7 +255,9 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           "Yashovchi soni 15 dan yuqori bo'lishi mumkin emas. Iltimos tekshib ko'ring"
         );
       // bo'sh bo'lgan hisob raqamini olish
-      const tozaMakonApi = ctx.wizard.state.tozaMakonApi;
+      const tozaMakonApi = createTozaMakonApi(
+        ctx.wizard.state.inspektor.companyId
+      );
       const generatedAccountNumber = (
         await tozaMakonApi.get(
           "/user-service/residents/account-numbers/generate",
@@ -277,45 +281,54 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         })
       ).data;
       // yangi abonent ochish
-      let newAbonent = await tozaMakonApi.post("/user-service/residents", {
-        accountNumber: generatedAccountNumber,
-        active: true,
-        citizen: passportData,
-        companyId: 1144,
-        contractDate: null,
-        contractNumber: null,
-        description:
-          "Added from telegram bot " + ctx.wizard.state.inspektor.name,
-        electricityAccountNumber: null,
-        electricityCoato: null,
-        homePhone: null,
-        house: {
-          cadastralNumber: ctx.wizard.state.cadastr
-            ? ctx.wizard.state.cadastr
-            : "00:00:00:00:00:0000",
-          flatNumber: null,
-          homeIndex: null,
-          homeNumber: 0,
-          inhabitantCnt: ctx.message.text,
-          temporaryCadastralNumber: null,
-          type: "HOUSE",
-        },
-        isCreditor: "false",
-        mahallaId: ctx.wizard.state.mahallaId,
-        nSaldo: 0,
-        residentType: "INDIVIDUAL",
-        streetId: ctx.wizard.state.street_id,
-      });
-      if (!newAbonent || newAbonent.status !== 201) {
-        ctx.reply(
-          "Abonent qo'shishda xatolik yuz berdi \n" + newAbonent.data.message
+      let newAbonent;
+      try {
+        newAbonent = await tozaMakonApi.post("/user-service/residents", {
+          accountNumber: generatedAccountNumber,
+          active: true,
+          citizen: passportData,
+          companyId: ctx.wizard.state.inspektor.companyId,
+          contractDate: null,
+          contractNumber: null,
+          description:
+            "Added from telegram bot " + ctx.wizard.state.inspektor.name,
+          electricityAccountNumber: null,
+          electricityCoato: null,
+          homePhone: null,
+          house: {
+            cadastralNumber: ctx.wizard.state.cadastr
+              ? ctx.wizard.state.cadastr
+              : "00:00:00:00:00:0000",
+            flatNumber: null,
+            homeIndex: null,
+            homeNumber: 0,
+            inhabitantCnt: ctx.message.text,
+            temporaryCadastralNumber: null,
+            type: "HOUSE",
+          },
+          isCreditor: "false",
+          mahallaId: ctx.wizard.state.mahallaId,
+          nSaldo: 0,
+          residentType: "INDIVIDUAL",
+          streetId: ctx.wizard.state.street_id,
+        });
+      } catch (error) {
+        return ctx.reply(
+          "Abonent qo'shishda xatolik yuz berdi " +
+            error.response?.data?.message
         );
-        console.error(newAbonent.data);
       }
-      await tozaMakonApi.patch("/user-service/residents/identified", {
-        identified: true,
-        residentIds: [newAbonent.data],
-      });
+      try {
+        await tozaMakonApi.patch("/user-service/residents/identified", {
+          identified: true,
+          residentIds: [newAbonent.data],
+        });
+      } catch (error) {
+        ctx.reply(
+          "Idinfikatsiyadan o'tkazishda xatolik yuz berdi " +
+            error.response?.data?.message
+        );
+      }
       newAbonent = newAbonent.data;
       // natijani ma'lumotlar bazasiga saqlash, yangi abonentlar va billing abonentlarga
       await NewAbonent.create({
@@ -345,6 +358,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           confirm: true,
           inspector: ctx.wizard.state.inspektor,
         },
+        companyId: ctx.wizard.state.inspektor.companyId,
       });
       // kadastr raqamini o'chirish
       if (ctx.wizard.state.cadastr == "00:00:00:90:0000") {
@@ -390,7 +404,12 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       );
       ctx.scene.leave();
     } catch (error) {
-      console.error(error);
+      try {
+        ctx.reply(error.response?.data?.message);
+        console.error(error);
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 );
