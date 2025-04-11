@@ -1,8 +1,7 @@
 const nodeHtmlToImage = require("../helpers/puppeteer-wrapper");
-const { Mahalla } = require("../models/Mahalla");
 const ejs = require("ejs");
-const { bot } = require("../requires");
-const { tozaMakonApi } = require("../api/tozaMakon");
+const { bot, Company } = require("../requires");
+const { createTozaMakonApi } = require("../api/tozaMakon");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const formatDate = (date) => {
   const year = date.getFullYear();
@@ -11,9 +10,11 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-async function sendMFYIncomeReport(ctx = false, companyId = 1144) {
+async function sendMFYIncomeReport(companyId = 1144, ctx = false) {
   try {
     const now = new Date();
+    const company = await Company.findOne({ id: companyId });
+    const tozaMakonApi = createTozaMakonApi(companyId);
     const incomesFromEkopay = (
       await tozaMakonApi.get(
         "/billing-service/reports/payment-partners/incomes",
@@ -95,7 +96,7 @@ async function sendMFYIncomeReport(ctx = false, companyId = 1144) {
         if (ctx) return ctx.replyWithPhoto({ source: buffer });
         else
           bot.telegram.sendPhoto(
-            process.env.NAZORATCHILAR_GURUPPASI,
+            company.GROUP_ID_NAZORATCHILAR,
             { source: buffer },
             {
               caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
@@ -108,5 +109,4 @@ async function sendMFYIncomeReport(ctx = false, companyId = 1144) {
     console.error(new Error(err));
   }
 }
-
 module.exports = { sendMFYIncomeReport };

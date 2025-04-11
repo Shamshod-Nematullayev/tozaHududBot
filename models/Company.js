@@ -41,6 +41,7 @@ const schema = new Schema(
     ekopayLogin: String,
     ekopayPassword: String,
     ekopaySessionId: String,
+    ekopayParentId: String,
     ekopayToken: String,
     type: {
       type: String,

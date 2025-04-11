@@ -1,3 +1,4 @@
+const { Company } = require("../requires");
 const { createAktPack } = require("./createAktPack");
 const { sendKunlikPinflReports } = require("./kunlikPinflReports");
 const { lastPayReportInspectors } = require("./lastPayReportInspectors");
@@ -47,7 +48,12 @@ const alarm = (times, callback) => {
 };
 alarm(["09:01"], createAktPack);
 
-alarm(["09:00", "12:00", "17:00"], sendMFYIncomeReport);
+alarm(["09:00", "12:00", "17:00"], async () => {
+  const companies = await Company.find();
+  companies.forEach((company) => {
+    sendMFYIncomeReport(company.id);
+  });
+});
 // alarm(
 //   [
 //     "09:00",
@@ -137,5 +143,10 @@ alarm(
     "20:00",
     "21:00",
   ],
-  nazoratchilarKunlikTushum
+  async () => {
+    const companies = await Company.find();
+    companies.forEach((company) => {
+      nazoratchilarKunlikTushum(company.id);
+    });
+  }
 );

@@ -11,19 +11,19 @@ function bugungiSana() {
   }.${date.getFullYear()}`;
 }
 
-const sendEtkMfyReport = async () => {
+const sendEtkMfyReport = async (companyId = 1144) => {
   try {
     const mahallas = await Mahalla.find({ reja: { $gt: 0 } });
     const rows = [];
     for (const mfy of mahallas) {
       const abonentsCount = await Abonent.countDocuments({
         mahallas_id: mfy.id,
-        companyId: 1144,
+        companyId,
       });
       const etkConfirmedAbonentsCount = await Abonent.countDocuments({
         "ekt_kod_tasdiqlandi.confirm": true,
         mahallas_id: mfy.id,
-        companyId: 1144,
+        companyId,
       });
       rows.push({
         // ...mfy,
