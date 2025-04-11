@@ -9,6 +9,10 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  companyId: {
+    type: Number,
+    required: true,
+  },
   reja: {
     type: Number,
   },
@@ -35,10 +39,6 @@ const schema = new mongoose.Schema({
     default: false,
   },
   publicOfferFileId: String,
-  companyId: {
-    type: Number,
-    required: true,
-  },
 });
 
 module.exports.Mahalla = mongoose.model("mahalla", schema);

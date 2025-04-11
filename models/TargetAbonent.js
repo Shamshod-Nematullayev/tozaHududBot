@@ -14,6 +14,10 @@ const schema = new mongoose.Schema({
   inspector_id: String,
   inspector_name: String,
   document_id: String,
+  companyId: {
+    type: Number,
+    required: true,
+  },
   status: {
     type: String,
     enum: [

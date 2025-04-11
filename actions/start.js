@@ -29,9 +29,6 @@ composer.start(async (ctx) => {
         ctx.reply(messages.heyAdmin, keyboards.adminKeyboard.resize());
       } else {
         const user = await User.findOne({ "user.id": ctx.chat.id });
-        if (user.is_stm_xodimi) {
-          return ctx.reply("Asosiy menyu", keyboards.stm_xodimi_main_keyboard);
-        }
         ctx.reply(messages.startGreeting, keyboards.mainKeyboard.resize());
       }
     }

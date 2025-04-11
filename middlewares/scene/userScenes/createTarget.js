@@ -75,6 +75,7 @@ const createTargetScene = new WizardScene(
       ctx.wizard.state.inspector = {
         id: inspector.id,
         name: inspector.name,
+        companyId: inspector.companyId,
       };
       ctx.wizard.state.request = "tasdiqlash";
       ctx.wizard.next();
@@ -103,6 +104,7 @@ const createTargetScene = new WizardScene(
               mahalla_id: abonent.mahalla_id,
               inspector_id: inspector.id,
               inspector_name: inspector.name,
+              companyId: inspector.companyId,
             });
             ctx.wizard.state.request = "yana kiritasizmi";
             ctx.reply(

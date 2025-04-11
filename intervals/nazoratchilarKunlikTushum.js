@@ -1,23 +1,24 @@
-const { Nazoratchi, bot } = require("../requires");
+const { Nazoratchi, bot, Company } = require("../requires");
 const ejs = require("ejs");
 const generateImage = require("../helpers/puppeteer-wrapper");
 const { ekopayApi } = require("../api/ekopayApi");
 
-async function nazoratchilarKunlikTushum() {
+async function nazoratchilarKunlikTushum(companyId = 1144) {
   try {
     const date = new Date();
     const dateStr = `${date.getDate()}.${
       date.getMonth() + 1
     }.${date.getFullYear()}`;
+    const company = await Company.findOne({ id: companyId });
     const { data } = await ekopayApi.get(
-      `/ecopay/transaction-report;descending=false;page=1;perPage=100?parent_id=32&date_from=${dateStr}&date_to=${dateStr}&companies_id=1144&sys_companies_id=503`,
+      `/ecopay/transaction-report;descending=false;page=1;perPage=100?parent_id=${company.ekopayParentId}&date_from=${dateStr}&date_to=${dateStr}&companies_id=${companyId}&sys_companies_id=503`,
       {
         headers: {
           login: "dxsh24107",
         },
       }
     );
-    const inspectors = await Nazoratchi.find({ activ: true });
+    const inspectors = await Nazoratchi.find({ activ: true, companyId });
     const now = new Date();
     const dateString = `${now.getFullYear()}.${
       now.getMonth() + 1
@@ -63,7 +64,7 @@ async function nazoratchilarKunlikTushum() {
         });
         const buffer = Buffer.from(binaryData, "binary");
         bot.telegram.sendPhoto(
-          process.env.NAZORATCHILAR_GURUPPASI,
+          company.GROUP_ID_NAZORATCHILAR,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
@@ -76,5 +77,4 @@ async function nazoratchilarKunlikTushum() {
     console.error(err);
   }
 }
-
 module.exports = { nazoratchilarKunlikTushum };

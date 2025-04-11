@@ -12,7 +12,7 @@ function bugungiSana() {
 
 //   main function
 
-async function sendKunlikPinflReports() {
+async function sendKunlikPinflReports(companyId = 1144) {
   try {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -20,11 +20,12 @@ async function sendKunlikPinflReports() {
     const abonents = await Abonent.find({
       "shaxsi_tasdiqlandi.confirm": true,
       "shaxsi_tasdiqlandi.updated_at": { $gt: today },
+      companyId,
     });
     const soatlik = abonents.filter(
       (abonent) => new Date(abonent.shaxsi_tasdiqlandi.updated_at) > oneHourAgo
     );
-    let inspectors = await Nazoratchi.find({ activ: true });
+    let inspectors = await Nazoratchi.find({ activ: true, companyId });
     inspectors.forEach((nazoratchi) => {
       nazoratchi.counterOfConfirm = 0;
       nazoratchi.counterOfConfirmHourly = 0;
@@ -66,7 +67,6 @@ async function sendKunlikPinflReports() {
       allConfirmedHourly += inspector.counterOfConfirmHourly;
     });
 
-    console.log(allConfirmedHourly, inspectors);
     ejs.renderFile(
       "./views/kunlikMalumotKiritishHisoboti.ejs",
       {
@@ -88,7 +88,8 @@ async function sendKunlikPinflReports() {
         const buffer = Buffer.from(binaryData, "binary");
 
         bot.telegram.sendPhoto(
-          process.env.NAZORATCHILAR_GURUPPASI,
+          // process.env.NAZORATCHILAR_GURUPPASI,
+          process.env.ME,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
@@ -101,5 +102,4 @@ async function sendKunlikPinflReports() {
     console.error(error);
   }
 }
-
 module.exports = { sendKunlikPinflReports };

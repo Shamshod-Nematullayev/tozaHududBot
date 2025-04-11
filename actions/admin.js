@@ -75,18 +75,11 @@ composer.command("change_password", async (ctx) => {
   ctx.scene.enter("changePasswordScene");
 });
 
-composer.hears(
-  ["👨‍💻 Ish maydoni", kirillga("👨‍💻 Ish maydoni")],
-  (ctx, next) => {
-    ctx.reply("test");
-    next();
-  },
-  async (ctx) => {
-    if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+composer.hears(["👨‍💻 Ish maydoni", kirillga("👨‍💻 Ish maydoni")], async (ctx) => {
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
 
-    ctx.reply(messages.chooseMenu, keyboards.adminWorkSpace);
-  }
-);
+  ctx.reply(messages.chooseMenu, keyboards.adminWorkSpace);
+});
 
 composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
   try {

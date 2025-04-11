@@ -1,6 +1,4 @@
 const router = require("express").Router();
-const { Nazoratchi } = require("../models/Nazoratchi");
-const { Mahalla } = require("../models/Mahalla");
 const {
   getAllInspectors,
   setInspectorToMfy,
