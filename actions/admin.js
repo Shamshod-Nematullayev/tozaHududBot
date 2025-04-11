@@ -24,8 +24,9 @@ const {
 async function isAdmin(ctx) {
   if (!ctx) return false;
 
-  const admins = await Admin.find();
-  return admins.some((admin) => admin.user_id === ctx.from.id);
+  const admin = await Admin.findOne({ user_id: ctx.from.id });
+  if (!admin) return false;
+  return true;
 }
 
 // Main codes =====================================================================================
