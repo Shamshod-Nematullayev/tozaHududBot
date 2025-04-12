@@ -119,7 +119,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       //   requestni o'chirib yuborish
       await req.deleteOne();
       //   telegram kanaldagi postni yangilash
-      const company = await Company.findOne({ id: req.companyId });
+      const company = await Company.findOne({ id: req.companyId || 1144 });
       await ctx.telegram.editMessageCaption(
         company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
         ctx.update.callback_query.message.message_id,

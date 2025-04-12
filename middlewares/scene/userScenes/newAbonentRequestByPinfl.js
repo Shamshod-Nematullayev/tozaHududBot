@@ -9,7 +9,7 @@ const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { Mahalla } = require("../../../models/Mahalla");
 const { NewAbonent } = require("../../../models/NewAbonents");
 const { createTozaMakonApi } = require("../../../api/tozaMakon");
-const { Admin } = require("../../../requires");
+const { Admin, Company } = require("../../../requires");
 
 const enterFunc = (ctx) => {
   ctx.reply("Xonadon egasining PINFL raqamini kiriting!");
@@ -392,10 +392,13 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           },
         });
       }
+      const company = await Company.findOne({
+        id: ctx.wizard.state.inspektor.companyId,
+      });
       // so'rov yuborivchiga natijani yetkazish
       if (ctx.wizard.state.inspektor.id !== 17413)
         ctx.telegram.sendMessage(
-          process.env.NAZORATCHILAR_GURUPPASI,
+          company.GROUP_ID_NAZORATCHILAR,
           `${ctx.wizard.state.inspektor.name} тизимга янги абонент киритди 👍 <code>${generatedAccountNumber}</code>`,
           { parse_mode: "HTML" }
         );
