@@ -54,10 +54,16 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       user_id: ctx.from.id,
       companyId: req.companyId,
     });
-    // if (!admin)
-    //   return await ctx.answerCbQuery(
-    //     "Amaliyotni bajarish uchn yetarli huquqga ega emassiz"
-    //   );
+    if (!admin)
+      return await ctx.answerCbQuery(
+        "Amaliyotni bajarish uchn yetarli huquqga ega emassiz"
+      );
+    const company = await Company.findOne({ id: req.companyId || 1144 });
+    if (!company.active) {
+      return await ctx.answerCbQuery(
+        "Dastur faoliyati vaqtincha cheklangan. \nIltimos, xizmatlardan foydalanishni davom ettirish uchun to‘lovni amalga oshiring."
+      );
+    }
 
     // Tasdiqlangan bo'lsa
     if (JSON.parse(tasdiqlandi)) {
@@ -207,7 +213,6 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       //   requestni o'chirib yuborish
       await req.deleteOne();
       //   telegram kanaldagi postni yangilash
-      const company = await Company.findOne({ id: req.companyId || 1144 });
       await ctx.telegram.editMessageCaption(
         company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
         ctx.update.callback_query.message.message_id,
