@@ -54,6 +54,10 @@ const schema = new mongoose.Schema(
         "rad_etildi",
       ],
     },
+    companyId: {
+      type: Number,
+      required: true,
+    },
   },
   {
     timestamps: true,

@@ -58,8 +58,9 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       return await ctx.answerCbQuery(
         "Amaliyotni bajarish uchn yetarli huquqga ega emassiz"
       );
-    const company = await Company.findOne({ id: req.companyId || 1144 });
-    if (!company.active) {
+    const company = await Company.findOne({ id: req.companyId });
+    const now = new Date();
+    if (!company.active || company.activeExpiresDate < now) {
       return await ctx.answerCbQuery(
         "Dastur faoliyati vaqtincha cheklangan. \nIltimos, xizmatlardan foydalanishni davom ettirish uchun to‘lovni amalga oshiring."
       );
