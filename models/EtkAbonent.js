@@ -14,6 +14,10 @@ const schema = new Schema({
     type: String,
     required: true,
   },
+  companyId: {
+    type: Number,
+    required: true,
+  },
 });
 
 module.exports.EtkAbonent = model("etk_abonent", schema);

@@ -13,16 +13,19 @@ const caotoNames = [
     title: "Qoradaryo TETK",
     caoto: 18214,
     region: 18,
+    companyId: 1144,
   },
   {
     title: "Xatirchi TETK",
     caoto: 12251,
     region: 12,
+    companyId: 1144,
   },
   {
     title: "Kattaqo'rg'on TETK",
     caoto: 18215,
     region: 18,
+    companyId: 1144,
   },
 ];
 
@@ -52,9 +55,13 @@ const updateElektrKod = new Scenes.WizardScene(
       }
       ctx.wizard.state.inspector_id = inspektor.id;
       ctx.wizard.state.inspector_name = inspektor.name;
+      ctx.wizard.state.companyId = inspektor.companyId;
 
       ctx.wizard.state.KOD = ctx.message.text;
-      const abonent = await Abonent.findOne({ licshet: ctx.wizard.state.KOD });
+      const abonent = await Abonent.findOne({
+        licshet: ctx.wizard.state.KOD,
+        companyId: ctx.wizard.state.companyId,
+      });
       ctx.wizard.state.abonent = abonent;
       if (!abonent) {
         ctx.reply(
@@ -101,9 +108,12 @@ const updateElektrKod = new Scenes.WizardScene(
       }
       const findedETKAbonents = await EtkAbonent.find({
         accountNumber: ctx.message.text,
+        companyId: ctx.wizard.state.companyId,
       });
       if (!findedETKAbonents[0]) {
-        for (let caoto of caotoNames) {
+        for (let caoto of caotoNames.filter(
+          (c) => c.companyId == ctx.wizard.state.companyId
+        )) {
           const { data } = await axios.post(
             "https://api-e3abced5.payme.uz/api/cheque.create",
             {
