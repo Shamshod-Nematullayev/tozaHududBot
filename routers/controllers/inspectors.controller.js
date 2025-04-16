@@ -38,6 +38,7 @@ module.exports.getAllInspectors = async (req, res) => {
     });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error" });
+    console.error(error.message);
   }
 };
 
