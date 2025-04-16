@@ -631,3 +631,86 @@ module.exports.createDublicateAct = async (req, res) => {
     res.status(500).json({ ok: false, message: "Internal server error 500" });
   }
 };
+
+module.exports.sendAbonentsListToTelegram = async (req, res) => {
+  try {
+    const { minSaldo, maxSaldo, onlyNotIdentited, mahalla_name } = req.query;
+    const files = req.files;
+    const company = await Company.findOne({ id: req.user.companyId });
+
+    if (!files || files.length === 0) {
+      return res.status(400).send("Hech qanday fayl yuklanmadi!");
+    }
+
+    // Yuklangan fayllarni Telegram media group formatiga o‘tkazish
+
+    const mediaGroup = files.map((file) => ({
+      type: "photo",
+      media: { source: file.buffer }, // Faylni `buffer` orqali yuboramiz
+    }));
+
+    // Media groupni Telegram guruhiga yuborish
+    await bot.telegram.sendMediaGroup(
+      company.GROUP_ID_NAZORATCHILAR,
+      mediaGroup
+    );
+
+    await bot.telegram.sendMessage(
+      process.env.NAZORATCHILAR_GURUPPASI,
+      generateMessage({
+        minSaldo,
+        maxSaldo,
+        onlyNotIdentified: onlyNotIdentited,
+        electricCode,
+        mahalla_name,
+      })
+    );
+
+    res.status(200).send("Rasmlar muvaffaqiyatli yuborildi!");
+  } catch (error) {
+    console.error("Xatolik yuz berdi:", error.message);
+    res.status(500).json({
+      ok: false,
+      message: "Internal server error 500",
+    });
+  }
+};
+
+function generateMessage({
+  minSaldo,
+  maxSaldo,
+  onlyNotIdentified,
+  electricCode,
+  mahalla_name,
+}) {
+  let parts = [];
+  // 1. Qarz chegarasi
+  if (minSaldo != null && maxSaldo != null) {
+    parts.push(
+      `${minSaldo} dan yuqori va ${maxSaldo} dan kam qarzdorligi bo‘lgan`
+    );
+  } else if (minSaldo != null) {
+    parts.push(`${minSaldo} dan yuqori qarzdorligi bo‘lgan`);
+  } else if (maxSaldo != null) {
+    parts.push(`${maxSaldo} dan kam qarzdorligi bo‘lgan`);
+  }
+
+  // 2. Shaxsi tasdiqlanmagan
+  if (onlyNotIdentified) {
+    parts.push("shaxsi tasdiqlanmagan");
+  }
+
+  // 3. Elektr kodi holati
+  if (electricCode === true) {
+    parts.push("elektr kodi kiritilgan");
+  } else if (electricCode === false) {
+    parts.push("elektr kodi kiritilmagan");
+  }
+  // 4. Yakuniy matn
+  if (parts.length === 0)
+    return `${mahalla_name} mahalla aholi nazoratchisi uchun ro'yxat`;
+
+  return `Ro'yxat: ${mahalla_name} mahalla ${parts.join(
+    ", "
+  )} aholi nazoratchisi uchun.`;
+}

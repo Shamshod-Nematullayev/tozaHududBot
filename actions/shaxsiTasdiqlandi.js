@@ -5,15 +5,66 @@ const { CustomDataRequest } = require("../models/CustomDataRequest");
 const { Nazoratchi } = require("../models/Nazoratchi");
 const { Company } = require("../models/Company");
 const { Abonent } = require("../models/Abonent");
+const { Admin } = require("../requires");
+const FormData = require("form-data");
+const { find_one_by_pinfil_from_mvd } = require("../api/mvd-pinfil");
 
 const composer = new Composer();
+
+function base64ToBlob(base64, mimeType = "") {
+  const byteCharacters = atob(base64);
+  const byteArrays = [];
+
+  for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+    const slice = byteCharacters.slice(offset, offset + 512);
+    const byteNumbers = new Array(slice.length)
+      .fill()
+      .map((_, i) => slice.charCodeAt(i));
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+
+  return new Blob(byteArrays, { type: mimeType });
+}
+function subtractTenYears(dateString) {
+  const [year, month, day] = dateString.split("-").map(Number);
+
+  const date = new Date(year, month - 1, day); // JSda oy 0-based
+  date.setFullYear(date.getFullYear() - 10); // 10 yil orqaga
+
+  // Formatni tiklaymiz: YYYY-MM-DD
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+
+  return `${yyyy}-${mm}-${dd}`;
+}
 
 composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
   try {
     // kerakli ma'lumotlarni tayyorlash
     const [_, _id, tasdiqlandi] = ctx.callbackQuery.data.split("_");
     const req = await CustomDataRequest.findById(_id);
+    if (!req) {
+      await ctx.answerCbQuery("Shaxsini tasdiqlash so'rovi bazada topilmadi");
+      return await ctx.deleteMessage();
+    }
     const inspector = await Nazoratchi.findById(req.inspector_id);
+    const admin = await Admin.findOne({
+      user_id: ctx.from.id,
+      companyId: req.companyId,
+    });
+    if (!admin)
+      return await ctx.answerCbQuery(
+        "Amaliyotni bajarish uchn yetarli huquqga ega emassiz"
+      );
+    const company = await Company.findOne({ id: req.companyId });
+    const now = new Date();
+    if (!company.active || company.activeExpiresDate < now) {
+      return await ctx.answerCbQuery(
+        "Dastur faoliyati vaqtincha cheklangan. \nIltimos, xizmatlardan foydalanishni davom ettirish uchun to‘lovni amalga oshiring."
+      );
+    }
 
     // Tasdiqlangan bo'lsa
     if (JSON.parse(tasdiqlandi)) {
@@ -28,14 +79,58 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       }
       //   billingga yangilov so'rovini yuborish
       const tozaMakonApi = createTozaMakonApi(req.companyId);
-      const pasportData = await tozaMakonApi.get("/user-service/citizens", {
-        params: {
-          passport: req.data.passport_serial + req.data.passport_number,
-          pinfl: req.data.pinfl,
-        },
-      });
-      if (pasportData.data.code) {
-        return await ctx.answerCbQuery(pasportData.data.message);
+      let pasportData;
+      try {
+        pasportData = await tozaMakonApi.get("/user-service/citizens", {
+          params: {
+            passport: req.data.passport_serial + req.data.passport_number,
+            pinfl: req.data.pinfl,
+          },
+        });
+        if (!pasportData.data.photo) {
+          const formData = new FormData();
+          const customDates = await find_one_by_pinfil_from_mvd(req.data.pinfl);
+          if (!customDates.success) {
+            return ctx.answerCbQuery(customDates.message);
+          }
+          // MIME turini ajratamiz
+          const mimeMatch = customDates.photo.match(/^data:(.+);base64,(.*)$/);
+          const mimeType = mimeMatch[1];
+          const base64Data = mimeMatch[2];
+          // Blobga o‘girib, FormData ichiga qo‘shamiz
+          const blob = base64ToBlob(base64Data, mimeType);
+
+          formData.append("file", blob, "image.jpg");
+          const bucket = (
+            await tozaMakonApi.post("/file-service/buckets/upload", formData, {
+              params: {
+                folderType: "RESIDENT_IMAGE",
+              },
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            })
+          ).data;
+          pasportData = {
+            birthDate: req.data.birth_date,
+            email: null,
+            firstName: req.data.first_name,
+            foreignCitizen: false,
+            id: abonent.id,
+            inn: null,
+            lastName: req.data.last_name,
+            passport: req.data.passport_serial + req.data.passport_number,
+            passportExpireDate: req.data.details.doc_end_date,
+            passportGivenDate: subtractTenYears(req.data.details.doc_end_date),
+            passportIssuer: req.data.details.division,
+            patronymic: req.data.middle_name,
+            photo: bucket.fileId,
+            pnfl: req.data.pinfl,
+          };
+          return console.log(pasportData);
+        }
+      } catch (error) {
+        ctx.answerCbQuery(error.response.data.message);
       }
       const abonentDatasResponse = await tozaMakonApi.get(
         `/user-service/residents/${abonent.id}?include=translates`
@@ -119,7 +214,6 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       //   requestni o'chirib yuborish
       await req.deleteOne();
       //   telegram kanaldagi postni yangilash
-      const company = await Company.findOne({ id: req.companyId });
       await ctx.telegram.editMessageCaption(
         company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
         ctx.update.callback_query.message.message_id,

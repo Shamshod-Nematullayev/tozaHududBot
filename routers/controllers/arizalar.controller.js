@@ -213,6 +213,7 @@ module.exports.changeArizaAct = async (req, res) => {
     }
 
     // Arizani yangilash
+    const date = new Date();
     const updatedAriza = await Ariza.findByIdAndUpdate(
       ariza._id,
       {
@@ -222,7 +223,7 @@ module.exports.changeArizaAct = async (req, res) => {
           akt_pachka_id: act.actPackId,
           akt_id: act.id,
           aktInfo: act,
-          akt_date: act.createdAt,
+          akt_date: date,
         },
         $push: { actHistory: ariza.aktInfo },
       },

@@ -13,6 +13,7 @@ const {
   getAbonentsByMfyId,
   createDublicateAct,
   getActiveMfy,
+  sendAbonentsListToTelegram,
 } = require("./controllers/billing.controller");
 
 const router = require("express").Router();
@@ -140,48 +141,7 @@ router.put("/barchasiga-abarotka-berilmadi", async (req, res) => {
 router.post(
   "/send-abonents-list-to-telegram/",
   uploadAsBlob.any(),
-  async (req, res) => {
-    try {
-      const { minSaldo, maxSaldo, onlyNotIdentited, mahalla_name } = req.query;
-      const files = req.files;
-
-      if (!files || files.length === 0) {
-        return res.status(400).send("Hech qanday fayl yuklanmadi!");
-      }
-
-      // Yuklangan fayllarni Telegram media group formatiga o‘tkazish
-
-      const mediaGroup = files.map((file) => ({
-        type: "photo",
-        media: { source: file.buffer }, // Faylni `buffer` orqali yuboramiz
-      }));
-
-      // Media groupni Telegram guruhiga yuborish
-      await bot.telegram.sendMediaGroup(
-        process.env.NAZORATCHILAR_GURUPPASI,
-        mediaGroup
-      );
-      let caption = `${mahalla_name} ${
-        minSaldo ? minSaldo + " dan yuqori" : ""
-      } ${
-        maxSaldo ? maxSaldo + " dan past" : ""
-      } qarzdorligi mavjud abonentlar ro'yxati biriktirilgan aholi nazoratchisi uchun`;
-      if (onlyNotIdentited)
-        caption = `${mahalla_name} mahallasi shaxsi tasdiqlanmagan abonentlar ro'yxati, aholi nazoratchisi uchun`;
-      await bot.telegram.sendMessage(
-        process.env.NAZORATCHILAR_GURUPPASI,
-        caption
-      );
-
-      res.status(200).send("Rasmlar muvaffaqiyatli yuborildi!");
-    } catch (error) {
-      console.error("Xatolik yuz berdi:", error.message);
-      res.status(500).json({
-        ok: false,
-        message: "Internal server error 500",
-      });
-    }
-  }
+  sendAbonentsListToTelegram
 );
 
 router.post(

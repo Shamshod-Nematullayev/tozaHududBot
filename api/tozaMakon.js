@@ -60,7 +60,7 @@ tozaMakonApi.interceptors.response.use(
   }
 );
 
-function createTozaMakonApi(companyId) {
+function createTozaMakonApi(companyId = 1144) {
   const instance = axios.create({
     baseURL: "https://api.tozamakon.eco",
     headers: {

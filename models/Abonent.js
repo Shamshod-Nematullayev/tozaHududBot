@@ -18,6 +18,7 @@ const isConfirmSchema = new Schema({
   inspector_id: Number,
   inspector_name: String,
   inspector: inspectorSchema,
+  updated_at: Date,
 });
 const schema = new Schema(
   {

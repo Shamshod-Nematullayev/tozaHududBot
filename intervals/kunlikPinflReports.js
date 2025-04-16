@@ -1,5 +1,5 @@
 const nodeHtmlToImage = require("../helpers/puppeteer-wrapper");
-const { Abonent, Nazoratchi, bot } = require("../requires");
+const { Abonent, Nazoratchi, bot, Company } = require("../requires");
 const ejs = require("ejs");
 
 // small function
@@ -14,6 +14,7 @@ function bugungiSana() {
 
 async function sendKunlikPinflReports(companyId = 1144) {
   try {
+    const company = await Company.findOne({ id: companyId });
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
@@ -88,8 +89,7 @@ async function sendKunlikPinflReports(companyId = 1144) {
         const buffer = Buffer.from(binaryData, "binary");
 
         bot.telegram.sendPhoto(
-          // process.env.NAZORATCHILAR_GURUPPASI,
-          process.env.ME,
+          company.GROUP_ID_NAZORATCHILAR,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,

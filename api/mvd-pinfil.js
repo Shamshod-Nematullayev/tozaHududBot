@@ -32,7 +32,7 @@ const find_one_by_pinfil_from_mvd = async (pinfil) => {
     data = await res.json();
     if (data.success === false) return data;
 
-    if (data.statusCode > 400) {
+    if (data.statusCode >= 400) {
       return { ...data, success: false };
     }
     const { scp_data } = data;
