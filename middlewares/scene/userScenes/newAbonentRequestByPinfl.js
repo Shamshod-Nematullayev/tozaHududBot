@@ -12,7 +12,7 @@ const { createTozaMakonApi } = require("../../../api/tozaMakon");
 const { Admin, Company } = require("../../../requires");
 
 const enterFunc = (ctx) => {
-  ctx.reply("Xonadon egasining PINFL raqamini kiriting!");
+  ctx.reply("Xonadon egasining PINFL raqamini kiriting!", keyboards.cancelBtn);
 };
 // 0 - jshshir
 // 1 - xonadon kadastr raqami
@@ -25,6 +25,14 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
     try {
       const admin = await Admin.findOne({ user_id: ctx.from.id });
       const inspektor = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
+      const company = await Company.findOne({
+        id: inspektor.companyId || admin.companyId,
+      });
+      if (!company.canInspectorsCreateAbonent && !admin) {
+        return ctx.reply(
+          "Sizning tashkilotingiz nazoratchilar uchun yangi abonent yaratishga ruxsat bermagan"
+        );
+      }
       if (!inspektor && !admin) {
         ctx.reply(
           "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!"
@@ -50,8 +58,10 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       });
       if (existAbonent) {
         ctx.reply(
-          `Ushbu abonentga allaqachon ${existAbonent.licshet} hisob raqami ochilgan`
+          `Ushbu abonentga allaqachon ${existAbonent.licshet} hisob raqami ochilgan`,
+          keyboards.mainKeyboard
         );
+        ctx.scene.leave();
         return;
       }
 

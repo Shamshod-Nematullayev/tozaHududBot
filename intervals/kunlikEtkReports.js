@@ -1,7 +1,6 @@
 const nodeHtmlToImage = require("../helpers/puppeteer-wrapper");
 const { Nazoratchi, bot, Company, Abonent } = require("../requires");
 const ejs = require("ejs");
-const { EtkKodRequest } = require("../models/EtkKodRequest");
 
 // small function
 function bugungiSana() {
@@ -90,8 +89,7 @@ async function sendKunlikEtkReports(companyId = 1144) {
         });
         const buffer = Buffer.from(binaryData, "binary");
         bot.telegram.sendPhoto(
-          // process.env.NAZORATCHILAR_GURUPPASI,
-          process.env.ME,
+          company.GROUP_ID_NAZORATCHILAR,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,

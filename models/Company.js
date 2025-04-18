@@ -58,6 +58,10 @@ const schema = new Schema(
     },
     akt_pachka_ids: aktPackTypesSchema,
     active: Boolean,
+    canInspectorsCreateAbonent: {
+      type: Boolean,
+      default: false,
+    },
     activeExpiresDate: Date,
     CHANNEL_ID_SHAXSI_TASDIQLANDI: String,
     GROUP_ID_NAZORATCHILAR: String,

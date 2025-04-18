@@ -102,7 +102,10 @@ userToInspektor.on("text", async (ctx, next) => {
 });
 
 userToInspektor.enter((ctx) => {
-  ctx.reply("Foydalanuvchi telegram ID raqamini kiriting!");
+  ctx.reply(
+    "Foydalanuvchi telegram ID raqamini kiriting!",
+    keyboards.cancelBtn
+  );
 });
 
 module.exports = { userToInspektor };

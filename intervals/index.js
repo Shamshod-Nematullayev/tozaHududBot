@@ -52,7 +52,9 @@ alarm(["09:01"], createAktPack);
 alarm(["09:00", "12:00", "17:00"], async () => {
   const companies = await Company.find();
   companies.forEach((company) => {
-    sendMFYIncomeReport(company.id);
+    if (!company.id != 621) {
+      sendMFYIncomeReport(company.id);
+    }
   });
 });
 alarm(
@@ -70,9 +72,35 @@ alarm(
     "19:05",
     "20:05",
     "21:05",
+    "22:05",
   ],
   () => {
     sendKunlikPinflReports(1265);
+    sendKunlikPinflReports(1143);
+    sendKunlikPinflReports(621);
+  }
+);
+alarm(
+  [
+    "09:05",
+    "10:05",
+    "11:05",
+    "12:05",
+    "13:05",
+    "14:05",
+    "15:05",
+    "16:05",
+    "17:05",
+    "18:05",
+    "19:05",
+    "20:05",
+    "21:05",
+    "22:05",
+  ],
+  () => {
+    sendKunlikEtkReports(1265);
+    sendKunlikEtkReports(1143);
+    sendKunlikEtkReports(621);
   }
 );
 alarm(
@@ -94,7 +122,7 @@ alarm(
   ],
   sendPinflMfyReport
 );
-sendKunlikEtkReports();
+
 // alarm(
 //   [
 //     "09:00",
@@ -150,7 +178,9 @@ alarm(
   async () => {
     const companies = await Company.find();
     companies.forEach((company) => {
-      nazoratchilarKunlikTushum(company.id);
+      if (!company.id != 621) {
+        nazoratchilarKunlikTushum(company.id);
+      }
     });
   }
 );
