@@ -16,7 +16,14 @@ const schema = new mongoose.Schema({
   reja: {
     type: Number,
   },
-  biriktirilganNazoratchi: Object,
+  biriktirilganNazoratchi: {
+    required: true,
+    type: Object,
+    default: {
+      inspector_name: null,
+      inspactor_id: null,
+    },
+  },
   groups: {
     type: Array,
     default: [],
