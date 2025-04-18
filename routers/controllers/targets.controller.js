@@ -19,11 +19,14 @@ module.exports.getTargets = async (req, res) => {
     if (mahalla_id) filters.mahalla_id = mahalla_id;
     if (inspector_id) filters.inspector_id = inspector_id;
     if (status) filters.status = status;
-    const targets = await Target.find(filters)
+    const targets = await Target.find({ ...filters, status: "yangi" })
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
-    const totalCount = await Target.countDocuments(filters);
+    const totalCount = await Target.countDocuments({
+      ...filters,
+      status: "yangi",
+    });
     res.status(200).json({
       data: targets,
       meta: {
