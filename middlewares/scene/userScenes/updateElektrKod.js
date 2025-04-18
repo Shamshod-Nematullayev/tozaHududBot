@@ -27,6 +27,12 @@ const caotoNames = [
     region: 18,
     companyId: 1144,
   },
+  {
+    title: "Paxtachi TETK",
+    caoto: 18230,
+    region: 18,
+    companyId: 1265,
+  },
 ];
 
 const updateElektrKod = new Scenes.WizardScene(
@@ -207,6 +213,17 @@ const updateElektrKod = new Scenes.WizardScene(
             electricityCoato: etkAbonent.caotoNumber,
             id: abonent.id,
           });
+          try {
+            await tozaMakonApi.patch("/user-service/residents/identified", {
+              identified: true,
+              residentIds: [abonent.id],
+            });
+          } catch (error) {
+            ctx.reply(
+              "Idinfikatsiyadan o'tkazishda xatolik yuz berdi " +
+                error.response?.data?.message
+            );
+          }
           await Abonent.findByIdAndUpdate(abonent._id, {
             $set: {
               ekt_kod_tasdiqlandi: {

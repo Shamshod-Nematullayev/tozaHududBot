@@ -1,5 +1,5 @@
 const nodeHtmlToImage = require("../helpers/puppeteer-wrapper");
-const { Nazoratchi, bot } = require("../requires");
+const { Nazoratchi, bot, Company, Abonent } = require("../requires");
 const ejs = require("ejs");
 const { EtkKodRequest } = require("../models/EtkKodRequest");
 
@@ -13,33 +13,32 @@ function bugungiSana() {
 
 //   main function
 
-async function sendKunlikEtkReports() {
+async function sendKunlikEtkReports(companyId = 1144) {
   try {
+    const company = await Company.findOne({ id: companyId });
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    // const abonents = await Abonent.find({
-    //   "ekt_kod_tasdiqlandi.confirm": true,
-    //   "ekt_kod_tasdiqlandi.updated_at": { $gt: today },
-    // });
-    const abonents = await EtkKodRequest.find({
-      update_at: { $gt: today },
+    const abonents = await Abonent.find({
+      "ekt_kod_tasdiqlandi.confirm": true,
+      "ekt_kod_tasdiqlandi.updated_at": { $gt: today },
     });
     const soatlik = abonents.filter(
-      (abonent) => new Date(abonent.update_at) > oneHourAgo
+      (abonent) => new Date(abonent.ekt_kod_tasdiqlandi.updated_at) > oneHourAgo
     );
-    let inspectors = await Nazoratchi.find({ activ: true });
-    inspectors.forEach((nazoratchi) => {
-      nazoratchi.counterOfConfirm = 0;
-      nazoratchi.counterOfConfirmHourly = 0;
-    });
+    let inspectors = await Nazoratchi.find({ activ: true, companyId });
+
     abonents.forEach((abonent) => {
       const nazoratchi = inspectors.find(
-        (nazoratchi) => nazoratchi.id == abonent.inspector_id
-        // nazoratchi.id === abonent.ekt_kod_tasdiqlandi.inspector_id
+        (nazoratchi) =>
+          nazoratchi.id == abonent.ekt_kod_tasdiqlandi.inspector_id
       );
       if (nazoratchi) {
-        nazoratchi.counterOfConfirm++;
+        if (!nazoratchi.counterOfConfirm) {
+          nazoratchi.counterOfConfirm = 1;
+        } else {
+          nazoratchi.counterOfConfirm++;
+        }
       }
     });
     soatlik.forEach((abonent) => {
@@ -47,13 +46,17 @@ async function sendKunlikEtkReports() {
         (nazoratchi) => nazoratchi.id == abonent.inspector_id
       );
       if (nazoratchi) {
-        nazoratchi.counterOfConfirmHourly++;
+        if (!nazoratchi.counterOfConfirmHourly) {
+          nazoratchi.counterOfConfirmHourly = 1;
+        } else {
+          nazoratchi.counterOfConfirmHourly++;
+        }
       }
     });
     inspectors = inspectors.map((inspector) => ({
       name: inspector.name,
-      counterOfConfirm: inspector.counterOfConfirm,
-      counterOfConfirmHourly: inspector.counterOfConfirmHourly,
+      counterOfConfirm: inspector.counterOfConfirm || 0,
+      counterOfConfirmHourly: inspector.counterOfConfirmHourly || 0,
     }));
     inspectors.sort(
       (inspector1, inspector2) =>
@@ -86,7 +89,6 @@ async function sendKunlikEtkReports() {
           selector: "div",
         });
         const buffer = Buffer.from(binaryData, "binary");
-        // console.log(inspectors);
         bot.telegram.sendPhoto(
           // process.env.NAZORATCHILAR_GURUPPASI,
           process.env.ME,
@@ -102,14 +104,5 @@ async function sendKunlikEtkReports() {
     console.error(error);
   }
 }
-
-setInterval(() => {
-  const now = new Date();
-  if (now.getMinutes() == 5) {
-    if (now.getHours() > 7 && now.getHours() < 20) {
-      sendKunlikEtkReports();
-    }
-  }
-}, 1000 * 60);
 
 module.exports = { sendKunlikEtkReports };

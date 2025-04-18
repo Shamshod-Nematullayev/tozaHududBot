@@ -1,5 +1,6 @@
 const { Company } = require("../requires");
 const { createAktPack } = require("./createAktPack");
+const { sendKunlikEtkReports } = require("./kunlikEtkReports");
 const { sendKunlikPinflReports } = require("./kunlikPinflReports");
 const { lastPayReportInspectors } = require("./lastPayReportInspectors");
 const { nazoratchilarKunlikTushum } = require("./nazoratchilarKunlikTushum");
@@ -93,6 +94,7 @@ alarm(
   ],
   sendPinflMfyReport
 );
+sendKunlikEtkReports();
 // alarm(
 //   [
 //     "09:00",
