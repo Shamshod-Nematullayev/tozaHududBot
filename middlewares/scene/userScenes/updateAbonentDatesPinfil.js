@@ -110,30 +110,20 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       ctx.wizard.state.pinfl = ctx.message.text;
       ctx.wizard.state.customDates = customDates;
       // nazoratchiga tasdiqlash uchun yuborish
-      let filename = "./uploads/" + Date.now() + ".png";
-      if (!customDates.photo) {
-        filename = "./lib/personicon.png";
-      }
-      fs.writeFile(filename, customDates.photo, "base64", async (err) => {
-        if (err) {
-          console.log(customDates);
-          throw err;
+      const buffer = Buffer.from(customDates.photo, "base64");
+      await ctx.replyWithPhoto(
+        { source: buffer },
+        {
+          caption: `<b>${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}</b> <i>${customDates.birth_date}</i>\n Siz shu kishini nazarda tutyapsizmi?`,
+          reply_markup: createInlineKeyboard([
+            [
+              ["Xa 👌", "yes"],
+              ["Yo'q 🙅‍♂️", "no"],
+            ],
+          ]).reply_markup,
+          parse_mode: "HTML",
         }
-        ctx.wizard.state.filename = filename;
-        await ctx.replyWithPhoto(
-          { source: filename },
-          {
-            caption: `<b>${customDates.last_name} ${customDates.first_name} ${customDates.middle_name}</b> <i>${customDates.birth_date}</i>\n Siz shu kishini nazarda tutyapsizmi?`,
-            reply_markup: createInlineKeyboard([
-              [
-                ["Xa 👌", "yes"],
-                ["Yo'q 🙅‍♂️", "no"],
-              ],
-            ]).reply_markup,
-            parse_mode: "HTML",
-          }
-        );
-      });
+      );
       ctx.wizard.next();
     } catch (error) {
       ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
@@ -169,39 +159,36 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
             reUpdating: ctx.wizard.state.reUpdating,
             companyId: ctx.wizard.state.companyId,
           });
-          let filename = ctx.wizard.state.filename;
-          fs.writeFile(filename, customDates.photo, "base64", async (err) => {
-            if (err) throw err;
-            let text = `KOD: ${ctx.wizard.state.abonent.licshet}\nPasport: ${customDates.last_name} ${customDates.first_name} ${customDates.middle_name} ${customDates.birth_date}\nBilling: ${ctx.wizard.state.abonent.fio}\nInspector: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`;
-            if (ctx.wizard.state.reUpdating)
-              text =
-                "‼️<b>DIQQAT</b>‼️\nUshbu abonent ikkinchi marta shaxsi tasdiqlanmoqda\n" +
-                text;
+          const buffer = Buffer.from(customDates.photo, "base64");
+          let text = `KOD: ${ctx.wizard.state.abonent.licshet}\nPasport: ${customDates.last_name} ${customDates.first_name} ${customDates.middle_name} ${customDates.birth_date}\nBilling: ${ctx.wizard.state.abonent.fio}\nInspector: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`;
+          if (ctx.wizard.state.reUpdating)
+            text =
+              "‼️<b>DIQQAT</b>‼️\nUshbu abonent ikkinchi marta shaxsi tasdiqlanmoqda\n" +
+              text;
 
-            const company = await Company.findOne({
-              id: ctx.wizard.state.companyId,
-            });
-            await ctx.telegram.sendPhoto(
-              company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
-              { source: filename },
-              {
-                caption: text,
-                reply_markup: createInlineKeyboard([
-                  [
-                    ["✅✅", "shaxsitasdiqlandi_" + req._id + "_true"],
-                    ["🙅‍♂️🙅‍♂️", "shaxsitasdiqlandi_" + req._id + "_false"],
-                  ],
-                ]).oneTime().reply_markup,
-                parse_mode: "HTML",
-              }
-            );
-            ctx.reply(
-              "Rahmat 😇\nMa'lumotlar tizim adminiga o'rganish uchun yuborildi..\n Yana kiritishni hohlaysizmi? 🙂",
-              createInlineKeyboard([[["Xa", "xa"]], [["Yo'q", "yoq"]]])
-            );
-
-            ctx.wizard.next();
+          const company = await Company.findOne({
+            id: ctx.wizard.state.companyId,
           });
+          await ctx.telegram.sendPhoto(
+            company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+            { source: buffer },
+            {
+              caption: text,
+              reply_markup: createInlineKeyboard([
+                [
+                  ["✅✅", "shaxsitasdiqlandi_" + req._id + "_true"],
+                  ["🙅‍♂️🙅‍♂️", "shaxsitasdiqlandi_" + req._id + "_false"],
+                ],
+              ]).oneTime().reply_markup,
+              parse_mode: "HTML",
+            }
+          );
+          ctx.reply(
+            "Rahmat 😇\nMa'lumotlar tizim adminiga o'rganish uchun yuborildi..\n Yana kiritishni hohlaysizmi? 🙂",
+            createInlineKeyboard([[["Xa", "xa"]], [["Yo'q", "yoq"]]])
+          );
+
+          ctx.wizard.next();
           break;
         case "no":
           await ctx.deleteMessage();
