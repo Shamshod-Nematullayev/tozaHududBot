@@ -8,9 +8,12 @@ const {
   messages,
   keyboards,
   Nazoratchi,
+  Admin,
+  Abonent,
 } = require("../requires");
 const { Target } = require("../models/TargetAbonent");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
+const { createTozaMakonApi } = require("../api/tozaMakon");
 
 const composer = new Composer();
 composer.command("user", (ctx) => {
@@ -18,12 +21,12 @@ composer.command("user", (ctx) => {
     parse_mode: "HTML",
   });
 });
-composer.hears(
-  ["👤Yangi abonent ochish", kirillga("👤Yangi abonent ochish")],
-  (ctx) => {
-    ctx.scene.enter("new_abonent_request");
-  }
-);
+// composer.hears(
+//   ["👤Yangi abonent ochish", kirillga("👤Yangi abonent ochish")],
+//   (ctx) => {
+//     ctx.scene.enter("new_abonent_request");
+//   }
+// );
 composer.hears(["🔎Izlash", kirillga("🔎Izlash")], (ctx) => {
   ctx.scene.enter("SEARCH_BY_NAME");
 });
@@ -167,6 +170,50 @@ actions.forEach((action) => {
       console.error(error);
     }
   });
+});
+
+composer.hears(/add-abonent_/, async (ctx) => {
+  try {
+    const admin = await Admin.findOne({ user_id: ctx.from.id });
+    if (!admin) return ctx.reply("Sizda huquq yo'q");
+    const licshet = ctx.message.text.split("_")[1];
+    const abonent = await Abonent.findOne({ licshet });
+    if (abonent) return ctx.reply("Bu abonent tizimda allaqachon mavjud");
+
+    const tozaMakonApi = createTozaMakonApi(admin.companyId);
+
+    let abonentData = (
+      await tozaMakonApi.get("/user-service/residents", {
+        params: {
+          districtId: 47,
+          sort: "id,DESC",
+          page: 0,
+          size: 5,
+          accountNumber: licshet,
+        },
+      })
+    ).data.content;
+    if (abonentData.length != 1) return ctx.reply("Billingda topilmadi");
+    abonentData = abonentData[0];
+    await Abonent.create({
+      fio: abonentData.fullName,
+      licshet: abonentData.accountNumber,
+      energy_licshet: abonentData.electricityAccountNumber,
+      kadastr_number: abonentData.cadastralNumber,
+      mahalla_name: abonentData.mahallaName,
+      mahallas_id: abonentData.mahallaId,
+      streets_id: abonentData.streetId,
+      phone: abonentData.phone,
+      pinfl: abonentData.pinfl,
+      passport_number: abonentData.passport,
+      id: abonentData.id,
+      companyId: admin.companyId,
+    });
+    await ctx.reply("Abonent muvaffaqqiyatli yaratildi");
+  } catch (error) {
+    console.log(error.message);
+    ctx.reply("Error" + error.message);
+  }
 });
 
 bot.use(composer);

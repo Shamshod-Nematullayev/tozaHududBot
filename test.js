@@ -43,3 +43,62 @@ const func = async () => {
   console.log("Jarayon yakullandi");
 };
 // func();
+
+const updateTM = async () => {
+  const accNumbers = require("./main.json");
+  let counter = 0;
+  for (let licshet of accNumbers) {
+    const abonent = await Abonent.findOne({ licshet });
+    try {
+      counter++;
+      console.log(counter);
+      const pasportData = await tozaMakonApi.get("/user-service/citizens", {
+        params: {
+          passport: abonent.passport_number
+            ? abonent.passport_number.split("-").join("")
+            : "",
+          pinfl: abonent.pinfl,
+        },
+      });
+      const abonentDatasResponse = await tozaMakonApi.get(
+        `/user-service/residents/${abonent.id}?include=translates`
+      );
+      const data = abonentDatasResponse.data;
+      const updateResponse = await tozaMakonApi.put(
+        "/user-service/residents/" + abonent.id,
+        {
+          id: abonent.id,
+          accountNumber: abonent.licshet,
+          residentType: "INDIVIDUAL",
+          electricityAccountNumber: data.electricityAccountNumber,
+          electricityCoato: data.electricityCoato,
+          companyId: data.companyId,
+          streetId: data.streetId,
+          mahallaId: data.mahallaId,
+          contractNumber: data.contractNumber,
+          contractDate: data.contractDate,
+          homePhone: null,
+          active: data.active,
+          description: data.description,
+          citizen: {
+            ...pasportData.data,
+            phone: data.citizen.phone,
+          },
+          house: {
+            ...data.house,
+            cadastralNumber: data.house.cadastralNumber
+              ? data.house.cadastralNumber
+              : null,
+          },
+        }
+      );
+      await tozaMakonApi.patch("/user-service/residents/identified", {
+        identified: true,
+        residentIds: [abonent.id],
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+};
+// updateTM();

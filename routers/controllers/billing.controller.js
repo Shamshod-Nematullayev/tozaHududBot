@@ -714,3 +714,20 @@ function generateMessage({
     ", "
   )} aholi nazoratchisi uchun.`;
 }
+
+module.exports.getMfyById = async (req, res) => {
+  try {
+    const mahalla = await Mahalla.findOne({
+      id: req.params.mfy_id,
+      companyId: req.user.companyId,
+    });
+    if (!mahalla) return res.json({ ok: false, message: "MFY not found" });
+
+    const company = await Company.findOne({ id: req.user.companyId });
+
+    res.json({ ok: true, data: mahalla, company });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+};

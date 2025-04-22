@@ -24,10 +24,25 @@ const aktPackTypesSchema = new Schema({
   death: aktPackSchema,
   gps: aktPackSchema,
 });
+const employeerSchema = new Schema({
+  user_id: String,
+  fullName: {
+    type: String,
+    required: true,
+  },
+});
 const schema = new Schema(
   {
     id: {
       type: Number,
+      required: true,
+    },
+    locationName: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
       required: true,
     },
     tozamakonAccessToken: String,
@@ -65,6 +80,15 @@ const schema = new Schema(
     activeExpiresDate: Date,
     CHANNEL_ID_SHAXSI_TASDIQLANDI: String,
     GROUP_ID_NAZORATCHILAR: String,
+    manager: {
+      type: employeerSchema,
+      required: true,
+    },
+    gpsOperator: employeerSchema,
+    billingAdmin: {
+      type: employeerSchema,
+      required: true,
+    },
   },
   {
     timestamps: true,

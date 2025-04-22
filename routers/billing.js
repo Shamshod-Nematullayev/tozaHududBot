@@ -14,6 +14,7 @@ const {
   createDublicateAct,
   getActiveMfy,
   sendAbonentsListToTelegram,
+  getMfyById,
 } = require("./controllers/billing.controller");
 
 const router = require("express").Router();
@@ -161,17 +162,7 @@ router.post(
   }
 );
 
-router.get("/get-mfy-by-id/:mfy_id", async (req, res) => {
-  try {
-    const mahalla = await Mahalla.findOne({ id: req.params.mfy_id });
-    if (!mahalla) return res.json({ ok: false, message: "MFY not found" });
-
-    res.json({ ok: true, data: mahalla });
-  } catch (error) {
-    res.json({ ok: false, message: "Internal server error 500" });
-    console.error(error);
-  }
-});
+router.get("/get-mfy-by-id/:mfy_id", getMfyById);
 
 router.get("/get-abonent-acts/:abonentId", getAbonentActs);
 

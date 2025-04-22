@@ -56,7 +56,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
     });
     if (!admin)
       return await ctx.answerCbQuery(
-        "Amaliyotni bajarish uchn yetarli huquqga ega emassiz"
+        "Amaliyotni bajarish uchun yetarli huquqga ega emassiz"
       );
     const company = await Company.findOne({ id: req.companyId });
     const now = new Date();
