@@ -164,6 +164,12 @@ const actions = [
 actions.forEach((action) => {
   composer.action(action, async (ctx) => {
     try {
+      const nazoratchi = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
+      if (!nazoratchi) {
+        return await ctx.reply(
+          "Ushbu amaliyotni bajarish uchun yetarli huquqqa ega emassiz"
+        );
+      }
       ctx.scene.enter(action);
       await ctx.deleteMessage();
     } catch (error) {
