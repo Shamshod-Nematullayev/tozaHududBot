@@ -5,6 +5,7 @@ const { sendKunlikPinflReports } = require("./kunlikPinflReports");
 const { lastPayReportInspectors } = require("./lastPayReportInspectors");
 const { nazoratchilarKunlikTushum } = require("./nazoratchilarKunlikTushum");
 const { sendEtkMfyReport } = require("./sendEtkMfyReport");
+const { sendIdentifietMfyReport } = require("./sendIdentifietMfyReport");
 const { sendMFYIncomeReport } = require("./sendMFYIncomeReport");
 const { sendPinflMfyReport } = require("./sendPinflMfyReport");
 const { addUpdateArizaAktTask } = require("./updateArizaAkt");
@@ -120,7 +121,11 @@ alarm(
     "21:00",
     "22:00",
   ],
-  sendPinflMfyReport
+  () => {
+    sendPinflMfyReport(1144);
+    sendPinflMfyReport(1143);
+    sendIdentifietMfyReport(1265);
+  }
 );
 
 // alarm(

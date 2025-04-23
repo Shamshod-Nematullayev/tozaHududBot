@@ -65,7 +65,7 @@ function useTelegramBot() {
   require("./core/bot");
   require("./middlewares");
   require("./actions");
-  // require("./intervals");
+  require("./intervals");
 }
 useTelegramBot();
 // require("./test");

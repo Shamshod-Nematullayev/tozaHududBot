@@ -248,7 +248,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
 );
 
 updateAbonentDatesByPinfl.enter((ctx) => {
-  ctx.reply(`Abonent shaxsiy raqamini kiriting`);
+  ctx.reply(`Abonent shaxsiy raqamini kiriting`, keyboards.cancelBtn);
 });
 
 updateAbonentDatesByPinfl.on("text", (ctx, next) => {

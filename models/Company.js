@@ -45,6 +45,10 @@ const schema = new Schema(
       type: String,
       required: true,
     },
+    regionId: {
+      type: Number,
+      required: true,
+    },
     tozamakonAccessToken: String,
     user_id: Number,
     login: String,

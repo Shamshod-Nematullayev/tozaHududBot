@@ -1,4 +1,7 @@
-const { tozaMakonApi } = require("./api/tozaMakon");
+const { tozaMakonApi, createTozaMakonApi } = require("./api/tozaMakon");
+const {
+  extractBirthDateString,
+} = require("./helpers/extractBirthDateFromPinfl");
 const { Ariza } = require("./models/Ariza");
 const { SudAkt } = require("./models/SudAkt");
 const { Abonent } = require("./requires");
@@ -102,3 +105,98 @@ const updateTM = async () => {
   }
 };
 // updateTM();
+
+async function getFrozenAbonents() {
+  try {
+    const rows = [];
+    console.log("Jarayon boshlandi");
+    for (let i = 0; i < 185; i++) {
+      const { data } = await tozaMakonApi.get(
+        `/user-service/residents?districtId=47&sort=id,DESC&page=${i}&size=300&companyId=1144`
+      );
+      rows.push(
+        ...data.content
+          .filter((row) => row.isFrozen == true)
+          .map((row) => row.accountNumber)
+      );
+      console.log(i);
+    }
+    require("fs").writeFileSync("./main.json", JSON.stringify(rows));
+    console.log("Jarayon yakullandi");
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+// getFrozenAbonents();
+//{
+//   "homeNum": "79",
+//   "pinfl": "33003633920039",
+//   "cadastr": "14:05:01:01:16:0085",
+//   "accountNumber": "105120550078",
+//   "id": "12530657"
+// }[] // this is on main.json
+async function updateFrozenAbonentsToIdentied() {
+  console.log(
+    "Muzlatilgan abonentlarni identifikatsiya qilish jarayoni boshlandi"
+  );
+  const rows = require("./main.json");
+  const errors = [];
+  let i = rows.length;
+  let operationsCount = 1;
+  const tozaMakonApi = createTozaMakonApi(1144);
+  for (const row of rows) {
+    console.log(i, row.accountNumber);
+    // if (i == rows.length - operationsCount) break;
+    i--;
+    try {
+      const pasportData = (
+        await tozaMakonApi.get("/user-service/citizens", {
+          params: {
+            pinfl: row.pinfl,
+            birthdate: extractBirthDateString(row.pinfl),
+          },
+        })
+      ).data;
+      const currentAbonentData = (
+        await tozaMakonApi.get(
+          `/user-service/residents/${row.id}?include=translates`
+        )
+      ).data;
+
+      await tozaMakonApi.put("/user-service/residents/" + row.id, {
+        id: row.id,
+        accountNumber: row.accountNumber,
+        residentType: "INDIVIDUAL",
+        electricityAccountNumber: currentAbonentData.electricityAccountNumber,
+        electricityCoato: currentAbonentData.electricityCoato,
+        companyId: currentAbonentData.companyId,
+        streetId: 461764,
+        mahallaId: 61552,
+        contractNumber: currentAbonentData.contractNumber,
+        contractDate: currentAbonentData.contractDate,
+        homePhone: null,
+        active: currentAbonentData.active,
+        description: `Fake id for delete on future`,
+        citizen: {
+          ...pasportData,
+          phone: currentAbonentData.citizen.phone,
+        },
+        house: {
+          ...currentAbonentData.house,
+          homeIndex: "del",
+          cadastralNumber: row.cadastr,
+        },
+      });
+      await tozaMakonApi.patch("/user-service/residents/identified", {
+        identified: true,
+        residentIds: [row.id],
+      });
+    } catch (error) {
+      errors.push({ row, message: error.message });
+    }
+  }
+  console.error(errors);
+  console.log("Jarayon yakullandi");
+}
+// updateFrozenAbonentsToIdentied();

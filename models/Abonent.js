@@ -67,6 +67,7 @@ const schema = new Schema(
     },
     ekt_kod_tasdiqlandi: isConfirmSchema,
     street_tasdiqlandi: isConfirmSchema,
+    phone_tasdiqlandi: isConfirmSchema,
     bumadi: Boolean,
     companyId: {
       type: Number,
