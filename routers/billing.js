@@ -15,6 +15,7 @@ const {
   getActiveMfy,
   sendAbonentsListToTelegram,
   getMfyById,
+  getAbonentDataByLicshet,
 } = require("./controllers/billing.controller");
 
 const router = require("express").Router();
@@ -60,37 +61,7 @@ router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
     console.error(error);
   }
 });
-router.get("/get-abonent-data-by-licshet/:licshet", async (req, res) => {
-  try {
-    // const abonentData = await getAbonentDataByLicshet({
-    //   licshet: req.params.licshet,
-    // });
-    const abonentData = await Abonent.findOne({ licshet: req.params.licshet });
-    if (!abonentData) {
-      return res.status(404).json({
-        ok: false,
-        message: "Abonent mongodbda mavjud emas",
-      });
-    }
-
-    const response = await tozaMakonApi.get(
-      "/user-service/residents/" + abonentData.id
-    );
-    if (response.status !== 200) {
-      return response.json({
-        ok: false,
-        message: "Abonent dastlabki ma'lumotlarini oliishda xatolik",
-      });
-    }
-    res.json({
-      ok: true,
-      abonentData: response.data,
-    });
-  } catch (error) {
-    res.json({ ok: false, message: "Internal server error 500" });
-    console.error(error);
-  }
-});
+router.get("/get-abonent-data-by-licshet/:licshet", getAbonentDataByLicshet);
 
 router.get("/get-abonents-by-mfy-id/:mfy_id", getAbonentsByMfyId);
 

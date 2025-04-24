@@ -1,10 +1,15 @@
 const mongoose = require("mongoose");
+const { Company } = require("./Company");
 
 const schema = new mongoose.Schema(
   {
     value: Number,
     name: String,
     last_update: Date,
+    companyId: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );
@@ -24,11 +29,14 @@ module.exports = { Counter };
     "ariza_tartib_raqami",
     "sudga_ariza_tartib_raqami",
   ];
-  async function checkAndCreateCounter(name) {
-    const counter = await Counter.findOne({ name });
+  const companies = await Company.find({ active: true });
+  companies.forEach((company) => {
+    counterNames.forEach((name) => checkAndCreateCounter(name, company.id));
+  });
+  async function checkAndCreateCounter(name, companyId) {
+    const counter = await Counter.findOne({ name, companyId });
     if (!counter) {
-      await Counter.create({ name, value: 0 });
+      await Counter.create({ name, value: 0, companyId });
     }
   }
-  counterNames.forEach((name) => checkAndCreateCounter(name));
 })();

@@ -1,5 +1,5 @@
 const PDFMerger = require("pdf-merger-js");
-const { tozaMakonApi } = require("../../api/tozaMakon");
+const { tozaMakonApi, createTozaMakonApi } = require("../../api/tozaMakon");
 const { Abonent } = require("../../models/Abonent");
 const { Counter } = require("../../models/Counter");
 const { IncomingDocument } = require("../../models/IncomingDocument");
@@ -728,6 +728,39 @@ module.exports.getMfyById = async (req, res) => {
     res.json({ ok: true, data: mahalla, company });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+};
+
+module.exports.getAbonentDataByLicshet = async (req, res) => {
+  try {
+    const abonentData = await Abonent.findOne({
+      licshet: req.params.licshet,
+      companyId: req.user.companyId,
+    });
+    if (!abonentData) {
+      return res.status(404).json({
+        ok: false,
+        message: "Abonent mongodbda topilmadi",
+      });
+    }
+
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+    const data = (
+      await tozaMakonApi.get("/user-service/residents/" + abonentData.id)
+    ).data;
+
+    if (!data) throw new Error("Toza makondan ma'lumot olishda xatolik");
+
+    res.json({
+      ok: true,
+      abonentData: data,
+    });
+  } catch (error) {
+    res.json({
+      ok: false,
+      message: "Internal server error 500 " + error.message,
+    });
     console.error(error);
   }
 };

@@ -92,5 +92,9 @@ const schema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  companyId: {
+    type: Number,
+    required: true,
+  },
 });
 module.exports.Ariza = mongoose.model("ariza", schema, "arizalar");
