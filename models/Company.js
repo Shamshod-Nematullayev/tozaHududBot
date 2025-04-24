@@ -93,6 +93,10 @@ const schema = new Schema(
       type: employeerSchema,
       required: true,
     },
+    abonentsPrefix: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

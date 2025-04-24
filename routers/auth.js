@@ -1,7 +1,7 @@
 const { Admin } = require("../models/Admin");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { bot } = require("../requires");
+const { bot, Company } = require("../requires");
 const { default: axios } = require("axios");
 
 const router = require("express").Router();
@@ -59,6 +59,7 @@ router.post("/login", async (req, res, next) => {
         { responseType: "arraybuffer" }
       );
     }
+    const company = await Company.findOne({ id: admin.companyId });
     res.status(200).json({
       ok: true,
       accessToken,
@@ -66,6 +67,7 @@ router.post("/login", async (req, res, next) => {
       telegram_id: admin.user_id,
       fullName: admin.fullName,
       photo: photo.data,
+      abonentsPrefix: company.abonentsPrefix,
     });
   } catch (ex) {
     next(ex);

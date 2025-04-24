@@ -12,6 +12,10 @@ const schema = new mongoose.Schema({
   doc_num: Number,
   doc_type: String,
   comment: String,
+  companyId: {
+    type: Number,
+    required: true,
+  },
 });
 
 const IncomingDocument = mongoose.model("IncomingDocument", schema);

@@ -10,6 +10,13 @@ const { default: axios } = require("axios");
 const { PDFDocument } = require("pdf-lib");
 const { kirillga } = require("../../middlewares/smallFunctions/lotinKiril");
 const { Mahalla } = require("../../models/Mahalla");
+// small functions
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 module.exports.downloadFileFromBilling = async (req, res) => {
   try {
@@ -91,6 +98,7 @@ module.exports.getAbonentActs = async (req, res) => {
 
 module.exports.createFullAct = async (req, res) => {
   try {
+    // initial values
     const {
       next_inhabitant_count,
       akt_sum,
@@ -101,6 +109,10 @@ module.exports.createFullAct = async (req, res) => {
       ariza_id,
       photos,
     } = req.body;
+    const companyId = req.user.companyId;
+    const date = new Date();
+
+    // validate
     if (
       [next_inhabitant_count, akt_sum, amountWithoutQQS].some(isNaN) &&
       document_type !== "viza"
@@ -119,7 +131,7 @@ module.exports.createFullAct = async (req, res) => {
         message: "[akt_sum, amountWithoutQQS] fields are not valid",
       });
     }
-    const abonent = await Abonent.findOne({ licshet });
+    const abonent = await Abonent.findOne({ licshet, companyId });
     if (!abonent)
       return res.status(404).json({
         ok: false,
@@ -165,7 +177,10 @@ module.exports.createFullAct = async (req, res) => {
       }
     );
 
-    let counter = await Counter.findOne({ name: "incoming_document_number" });
+    let counter = await Counter.findOne({
+      name: "incoming_document_number",
+      companyId,
+    });
     await IncomingDocument.create({
       abonent: licshet,
       doc_type: document_type,
@@ -174,6 +189,7 @@ module.exports.createFullAct = async (req, res) => {
       comment: description,
       date: Date.now(),
       doc_num: counter.value + 1,
+      companyId,
     });
     await counter.updateOne({
       $set: {
@@ -183,6 +199,7 @@ module.exports.createFullAct = async (req, res) => {
     });
 
     // akt faylini tozaMakon ga saqlash
+    const tozaMakonApi = createTozaMakonApi(companyId);
     const formData = new FormData();
     formData.append("file", req.file.buffer, req.file.originalname);
 
@@ -195,16 +212,47 @@ module.exports.createFullAct = async (req, res) => {
         },
       }
     );
-    console.log(req.user);
-    const packIds = (await Company.findOne({ id: req.user.companyId }))
-      .akt_pachka_ids;
+    const packIds = (await Company.findOne({ id: companyId })).akt_pachka_ids;
+    let actPackId = packIds[document_type]?.id;
+    if (
+      !actPackId ||
+      packIds[document_type].month != date.getMonth + 1 ||
+      packIds[document_type].year != date.getFullYear()
+    ) {
+      // akt pachkasi yo'q bo'lsa
+      const packId = (
+        await tozaMakonApi.post("/billing-service/act-packs", {
+          companyId,
+          createdDate: formatDate(new Date()),
+          description: `added by th-dashboard`,
+          isActive: true,
+          isSpecialPack: false,
+          name: packIds[document_type].name || packNames[document_type],
+          packType: packIds[document_type].type || packTypes[document_type],
+        })
+      ).data;
+      await Company.findOneAndUpdate(
+        { id: companyId },
+        {
+          $set: {
+            [`akt_pachka_ids.${document_type}.id`]: packId,
+            [`akt_pachka_ids.${document_type}.month`]:
+              new Date().getMonth() + 1,
+            [`akt_pachka_ids.${document_type}.year`]: new Date().getFullYear(),
+            [`akt_pachka_ids.${document_type}.type`]:
+              packIds[document_type].type || packTypes[pack],
+          },
+        }
+      );
+      actPackId = packId;
+    }
     if (!isNaN(akt_sum)) {
       const calculateKSaldo = (
         await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
           params: {
             amount: Math.abs(akt_sum),
             residentId: abonent.id,
-            actPackId: packIds[document_type].id,
+            actPackId: actPackId,
             actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
           },
         })
@@ -214,9 +262,8 @@ module.exports.createFullAct = async (req, res) => {
         next_inhabitant_count && "undefined" != next_inhabitant_count
           ? { inhabitantCount: next_inhabitant_count }
           : {};
-      const date = new Date();
       const aktResponse = await tozaMakonApi.post("/billing-service/acts", {
-        actPackId: packIds[document_type].id,
+        actPackId: actPackId,
         actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
         amount: Number(akt_sum),
         amountWithQQS: Number(akt_sum) - (Number(amountWithoutQQS) || 0),

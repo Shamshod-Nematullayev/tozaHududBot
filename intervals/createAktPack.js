@@ -28,7 +28,6 @@ function formatDate(date) {
 }
 
 function checkPackExist(pack, company) {
-  console.log("GO");
   const date = new Date();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
@@ -38,7 +37,7 @@ function checkPackExist(pack, company) {
   }
   return false;
 }
-async function createAktPack() {
+async function createAktPack(companyId) {
   try {
     const companies = await Company.find({ active: true }).lean();
     let createdCount = 0;
@@ -111,4 +110,4 @@ async function createAktPack() {
   }
 }
 
-module.exports = { createAktPack };
+module.exports = { createAktPack, packNames, packTypes };

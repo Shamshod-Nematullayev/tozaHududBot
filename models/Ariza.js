@@ -15,7 +15,6 @@ const schema = new mongoose.Schema({
   },
   document_number: {
     required: true,
-    unique: true,
     type: Number,
   },
   licshet: {
@@ -97,4 +96,5 @@ const schema = new mongoose.Schema({
     required: true,
   },
 });
+schema.index({ companyId: 1, document_number: 1 }, { unique: true });
 module.exports.Ariza = mongoose.model("ariza", schema, "arizalar");

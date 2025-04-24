@@ -90,12 +90,12 @@ module.exports.getArizaById = async (req, res) => {
       _id: req.params._id,
       companyId: req.user.companyId,
     }).lean();
-    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
     if (!ariza)
       return res.status(404).json({
         ok: false,
         message: "Ariza topilmadi",
       });
+    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
     ariza.fio = abonent.fio;
     ariza.abonentId = abonent.id;
     res.json({
