@@ -79,6 +79,7 @@ alarm(
     sendKunlikPinflReports(1265);
     sendKunlikPinflReports(1143);
     sendKunlikPinflReports(621);
+    sendKunlikPinflReports(337);
   }
 );
 alarm(
