@@ -68,6 +68,7 @@ router.post("/login", async (req, res, next) => {
       fullName: admin.fullName,
       photo: photo.data,
       abonentsPrefix: company.abonentsPrefix,
+      roles: admin.roles,
     });
   } catch (ex) {
     next(ex);

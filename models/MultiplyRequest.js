@@ -37,6 +37,10 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  companyId: {
+    type: Number,
+    required: true,
+  },
 });
 
 const MultiplyRequest = mongoose.model("multipy_request", schema);
