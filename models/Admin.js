@@ -12,5 +12,6 @@ const schema = new mongoose.Schema({
   profilePhotoId: String,
   companyId: Number,
   roles: Array,
+  pnfl: String,
 });
 module.exports.Admin = mongoose.model("admin", schema, "admin");

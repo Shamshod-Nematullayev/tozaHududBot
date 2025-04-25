@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { bot, Company } = require("../requires");
 const { default: axios } = require("axios");
+const isAuth = require("../middlewares/isAuth");
+const { message } = require("telegraf/filters");
 
 const router = require("express").Router();
 
@@ -45,11 +47,13 @@ router.post("/login", async (req, res, next) => {
       process.env.REFRESH_JWT_KEY,
       { expiresIn: "12h" }
     );
-    await admin.updateOne({
-      $set: {
-        refreshToken: refreshToken,
-      },
-    });
+    await admin
+      .updateOne({
+        $set: {
+          refreshToken: refreshToken,
+        },
+      })
+      .lean();
     const ctx = await bot.telegram.getChat(admin.user_id);
     let photo = { data: null };
     if (ctx.photo) {
@@ -60,6 +64,8 @@ router.post("/login", async (req, res, next) => {
       );
     }
     const company = await Company.findOne({ id: admin.companyId });
+    delete admin.password;
+    delete admin.refreshToken;
     res.status(200).json({
       ok: true,
       accessToken,
@@ -68,7 +74,13 @@ router.post("/login", async (req, res, next) => {
       fullName: admin.fullName,
       photo: photo.data,
       abonentsPrefix: company.abonentsPrefix,
-      roles: admin.roles,
+      user: {
+        login: admin.login,
+        fullName: admin.fullName,
+        pnfl: admin.pnfl,
+        companyId: admin.companyId,
+        roles: admin.roles,
+      },
     });
   } catch (ex) {
     next(ex);
@@ -101,6 +113,37 @@ router.post("/logout", async (req, res) => {
   await Admin.updateOne({ refreshToken }, { refreshToken: null });
 
   res.status(200).json({ message: "Logged out successfully" });
+});
+
+router.put("/change-password", isAuth, async (req, res) => {
+  try {
+    if (!req.body.newPassword || !req.body.login || !req.body.password) {
+      return res.status(400).json({
+        message: "All fields are required. newPassword, login, password",
+      });
+    }
+    const admin = await Admin.findOne({ login: req.body.login });
+    const validPassword = await bcrypt.compare(
+      req.body.password,
+      admin.password
+    );
+    if (!validPassword) {
+      return res.status(401).json({
+        ok: false,
+        message: "Parol mos kelmadi",
+      });
+    }
+    await Admin.findByIdAndUpdate(admin._id, {
+      $set: {
+        password: await bcrypt.hash(req.body.newPassword, 10),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Internal server error",
+    });
+  }
 });
 
 module.exports = router;
