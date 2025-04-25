@@ -4,7 +4,7 @@ const {
 } = require("./helpers/extractBirthDateFromPinfl");
 const { Ariza } = require("./models/Ariza");
 const { SudAkt } = require("./models/SudAkt");
-const { Abonent } = require("./requires");
+const { Abonent, Company } = require("./requires");
 
 const func = async () => {
   const sudAktlari = await SudAkt.find({
@@ -200,3 +200,58 @@ async function updateFrozenAbonentsToIdentied() {
   console.log("Jarayon yakullandi");
 }
 // updateFrozenAbonentsToIdentied();
+
+async function aktPachkasiniChange() {
+  const idList = ["67fde7c3a6357f6e37606905"];
+  const date = new Date();
+  const company = await Company.findOne({ id: 1144 });
+  const tozaMakonApi = createTozaMakonApi(1144);
+  for (let id of idList) {
+    const ariza = await Ariza.findById(id);
+    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
+    console.log(id);
+    let next_inhabitant_count = ariza.next_prescribed_cnt;
+    const inhabitantCounts = { inhabitantCount: next_inhabitant_count };
+
+    const calculateKSaldo = (
+      await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+        params: {
+          amount: ariza.aktInfo.amount,
+          residentId: abonent.id,
+          actPackId: company.akt_pachka_ids[ariza.document_type].id,
+          actType: ariza.aktInfo.actType,
+        },
+      })
+    ).data;
+    const aktResponseData = (
+      await tozaMakonApi.post("/billing-service/acts", {
+        actPackId: company.akt_pachka_ids[ariza.document_type].id,
+        actType: ariza.aktInfo.actType,
+        amount: ariza.aktInfo.amount,
+        amountWithQQS: ariza.aktInfo.amountWithQQS,
+        amountWithoutQQS: ariza.aktInfo.amountWithoutQQS,
+        description: ariza.aktInfo.description,
+        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        fileId: ariza.aktInfo.fileId,
+        kSaldo: calculateKSaldo,
+        residentId: abonent.id,
+        ...inhabitantCounts,
+      })
+    ).data;
+    await Ariza.findByIdAndUpdate(ariza._id, {
+      $set: {
+        akt_pachka_id: aktResponseData.actPackId,
+        akt_id: aktResponseData.id,
+        aktInfo: {
+          ...aktResponseData,
+        },
+        akt_date: aktResponseData.createdAt,
+      },
+    });
+
+    await tozaMakonApi.delete("/billing-service/acts/" + ariza.akt_id);
+  }
+  console.log("Yakullandi");
+}
+// aktPachkasiniChange();

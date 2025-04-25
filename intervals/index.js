@@ -103,6 +103,7 @@ alarm(
     sendKunlikEtkReports(1265);
     sendKunlikEtkReports(1143);
     sendKunlikEtkReports(621);
+    sendKunlikEtkReports(1266);
   }
 );
 alarm(
@@ -128,7 +129,6 @@ alarm(
     sendIdentifietMfyReport(1265);
   }
 );
-
 // alarm(
 //   [
 //     "09:00",
@@ -184,7 +184,7 @@ alarm(
   async () => {
     const companies = await Company.find();
     companies.forEach((company) => {
-      if (!company.id != 621) {
+      if (!company.id != 621 || !company.id != 337) {
         nazoratchilarKunlikTushum(company.id);
       }
     });

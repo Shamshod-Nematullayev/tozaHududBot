@@ -10,6 +10,7 @@ const { default: axios } = require("axios");
 const { PDFDocument } = require("pdf-lib");
 const { kirillga } = require("../../middlewares/smallFunctions/lotinKiril");
 const { Mahalla } = require("../../models/Mahalla");
+const { packNames, packTypes } = require("../../intervals/createAktPack");
 // small functions
 function formatDate(date) {
   const year = date.getFullYear();
@@ -216,7 +217,7 @@ module.exports.createFullAct = async (req, res) => {
     let actPackId = packIds[document_type]?.id;
     if (
       !actPackId ||
-      packIds[document_type].month != date.getMonth + 1 ||
+      packIds[document_type].month != date.getMonth() + 1 ||
       packIds[document_type].year != date.getFullYear()
     ) {
       // akt pachkasi yo'q bo'lsa
@@ -460,6 +461,7 @@ module.exports.createDublicateActByAriza = async (req, res) => {
 
 module.exports.getAbonentsByMfyId = async (req, res) => {
   try {
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
     const abonents = await Abonent.find({
       mahallas_id: req.params.mfy_id,
     });
@@ -681,7 +683,9 @@ module.exports.createDublicateAct = async (req, res) => {
 
 module.exports.sendAbonentsListToTelegram = async (req, res) => {
   try {
-    const { minSaldo, maxSaldo, onlyNotIdentited, mahalla_name } = req.query;
+    let { minSaldo, maxSaldo, onlyNotIdentited, mahalla_name, electricCode } =
+      req.query;
+    onlyNotIdentited = onlyNotIdentited === "true";
     const files = req.files;
     const company = await Company.findOne({ id: req.user.companyId });
 
@@ -703,7 +707,7 @@ module.exports.sendAbonentsListToTelegram = async (req, res) => {
     );
 
     await bot.telegram.sendMessage(
-      process.env.NAZORATCHILAR_GURUPPASI,
+      company.GROUP_ID_NAZORATCHILAR,
       generateMessage({
         minSaldo,
         maxSaldo,
@@ -732,13 +736,13 @@ function generateMessage({
 }) {
   let parts = [];
   // 1. Qarz chegarasi
-  if (minSaldo != null && maxSaldo != null) {
+  if (minSaldo && maxSaldo) {
     parts.push(
       `${minSaldo} dan yuqori va ${maxSaldo} dan kam qarzdorligi bo‘lgan`
     );
-  } else if (minSaldo != null) {
+  } else if (minSaldo) {
     parts.push(`${minSaldo} dan yuqori qarzdorligi bo‘lgan`);
-  } else if (maxSaldo != null) {
+  } else if (maxSaldo) {
     parts.push(`${maxSaldo} dan kam qarzdorligi bo‘lgan`);
   }
 
@@ -748,18 +752,18 @@ function generateMessage({
   }
 
   // 3. Elektr kodi holati
-  if (electricCode === true) {
+  if (electricCode === "tasdiqlangan") {
     parts.push("elektr kodi kiritilgan");
-  } else if (electricCode === false) {
+  } else if (electricCode === "tasdiqlanmagan") {
     parts.push("elektr kodi kiritilmagan");
   }
   // 4. Yakuniy matn
   if (parts.length === 0)
-    return `${mahalla_name} mahalla aholi nazoratchisi uchun ro'yxat`;
+    return `${mahalla_name} abonentlar aholi nazoratchisi uchun ro'yxat`;
 
-  return `Ro'yxat: ${mahalla_name} mahalla ${parts.join(
+  return `Ro'yxat: ${mahalla_name} ${parts.join(
     ", "
-  )} aholi nazoratchisi uchun.`;
+  )} abonentlar aholi nazoratchisi uchun.`;
 }
 
 module.exports.getMfyById = async (req, res) => {

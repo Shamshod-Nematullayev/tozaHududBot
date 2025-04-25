@@ -2,7 +2,7 @@ const { Mahalla } = require("../models/Mahalla");
 const { Abonent } = require("../models/Abonent");
 const ejs = require("ejs");
 const nodeHtmlToImage = require("node-html-to-image");
-const { bot } = require("../requires");
+const { bot, Company } = require("../requires");
 
 function bugungiSana() {
   const date = new Date();
@@ -13,6 +13,7 @@ function bugungiSana() {
 
 const sendEtkMfyReport = async (companyId = 1144) => {
   try {
+    const company = await Company.findOne({ id: companyId });
     const mahallas = await Mahalla.find({ reja: { $gt: 0 }, companyId });
     const rows = [];
     for (const mfy of mahallas) {
@@ -65,8 +66,7 @@ const sendEtkMfyReport = async (companyId = 1144) => {
         const buffer = Buffer.from(binaryData, "binary");
 
         bot.telegram.sendPhoto(
-          // process.env.NAZORATCHILAR_GURUPPASI,
-          process.env.ME,
+          company.GROUP_ID_NAZORATCHILAR,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,

@@ -73,7 +73,7 @@ mongoose
   .connect(process.env.MONGO)
   .then(async () => {
     console.log(`Ma'lumotlar bazasiga ulandi`);
-    // require("./test");
+    require("./test");
   })
   .catch((err) => {
     throw err;
