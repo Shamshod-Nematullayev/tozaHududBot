@@ -1,6 +1,12 @@
-const { default: mongoose } = require("mongoose");
+const { default: mongoose, version } = require("mongoose");
 
-module.exports.arizaDocumentTypes = ["dvaynik", "odam_soni", "viza", "death", "gps"]
+module.exports.arizaDocumentTypes = [
+  "dvaynik",
+  "odam_soni",
+  "viza",
+  "death",
+  "gps",
+];
 
 const schema = new mongoose.Schema({
   asosiy_licshet: String,
@@ -97,6 +103,14 @@ const schema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  version: {
+    type: Number,
+    required: true,
+    default: 1,
+  },
 });
-schema.index({ companyId: 1, document_number: 1 }, { unique: true });
+schema.index(
+  { companyId: 1, document_number: 1, version: 1, document_type: 1 },
+  { unique: true }
+);
 module.exports.Ariza = mongoose.model("ariza", schema, "arizalar");
