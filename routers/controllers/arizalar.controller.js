@@ -194,6 +194,7 @@ module.exports.createAriza = async (req, res) => {
     const counter = await Counter.findOne({
       name: "ariza_tartib_raqami",
       companyId: req.user.companyId,
+      arizaDocumentType: document_type
     });
     const newAriza = await Ariza.create({
       licshet: licshet,
