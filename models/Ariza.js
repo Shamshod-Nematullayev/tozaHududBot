@@ -1,5 +1,7 @@
 const { default: mongoose } = require("mongoose");
 
+module.exports.arizaDocumentTypes = ["dvaynik", "odam_soni", "viza", "death", "gps"]
+
 const schema = new mongoose.Schema({
   asosiy_licshet: String,
   ikkilamchi_licshet: String,
@@ -10,7 +12,7 @@ const schema = new mongoose.Schema({
   },
   document_type: {
     type: String,
-    enum: ["dvaynik", "odam_soni", "viza", "death", "gps"],
+    enum: this.arizaDocumentTypes,
     required: true,
   },
   document_number: {

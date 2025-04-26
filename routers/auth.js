@@ -128,7 +128,7 @@ router.put("/change-password", isAuth, async (req, res) => {
       admin.password
     );
     if (!validPassword) {
-      return res.status(401).json({
+      return res.status(400).json({
         ok: false,
         message: "Parol mos kelmadi",
       });
@@ -137,6 +137,10 @@ router.put("/change-password", isAuth, async (req, res) => {
       $set: {
         password: await bcrypt.hash(req.body.newPassword, 10),
       },
+    });
+    res.status(200).json({
+      ok: true,
+      message: "Parol muvaffaqqiyatli o'zgartirildi",
     });
   } catch (error) {
     res.status(500).json({

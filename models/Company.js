@@ -97,6 +97,10 @@ const schema = new Schema(
       type: String,
       required: true,
     },
+    districtId: {
+      type: Number,
+      required: true,
+    },
   },
   {
     timestamps: true,

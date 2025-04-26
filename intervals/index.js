@@ -53,7 +53,7 @@ alarm(["09:01"], createAktPack);
 alarm(["09:00", "12:00", "17:00"], async () => {
   const companies = await Company.find();
   companies.forEach((company) => {
-    if (!company.id != 621) {
+    if (company.id != 621 || company.id != 337) {
       sendMFYIncomeReport(company.id);
     }
   });
