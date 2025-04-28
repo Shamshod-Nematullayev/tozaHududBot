@@ -29,9 +29,11 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         id: inspektor.companyId || admin.companyId,
       });
       if (!company.canInspectorsCreateAbonent && !admin) {
-        return ctx.reply(
+        await ctx.reply(
           "Sizning tashkilotingiz nazoratchilar uchun yangi abonent yaratishga ruxsat bermagan"
         );
+        ctx.scene.leave();
+        return;
       }
       if (!inspektor && !admin) {
         ctx.reply(

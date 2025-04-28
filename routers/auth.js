@@ -81,6 +81,15 @@ router.post("/login", async (req, res, next) => {
         companyId: admin.companyId,
         roles: admin.roles,
       },
+      company: {
+        id: company.id,
+        name: company.name,
+        locationName: company.locationName,
+        phone: company.phone,
+        managerName: company.manager?.fullName,
+        billingAdminName: company.billingAdmin?.fullName,
+        gpsOperatorName: company.gpsOperator?.fullName,
+      },
     });
   } catch (ex) {
     next(ex);
