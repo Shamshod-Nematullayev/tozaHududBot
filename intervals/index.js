@@ -9,184 +9,73 @@ const { sendIdentifietMfyReport } = require("./sendIdentifietMfyReport");
 const { sendMFYIncomeReport } = require("./sendMFYIncomeReport");
 const { sendPinflMfyReport } = require("./sendPinflMfyReport");
 const { addUpdateArizaAktTask } = require("./updateArizaAkt");
-const alarm = (times, callback) => {
-  if (!Array.isArray(times)) {
-    times = [times]; // Agar bitta vaqt yuborilgan bo'lsa, uni arrayga o'raymiz
-  }
 
-  setInterval(() => {
-    const now = new Date();
-    const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(
-      now.getMinutes()
-    ).padStart(2, "0")}`;
-    const currentDate = `${String(now.getDate()).padStart(2, "0")}.${String(
-      now.getMonth() + 1
-    ).padStart(2, "0")}`;
-    const currentYear = `${String(now.getDate()).padStart(2, "0")}.${String(
-      now.getMonth() + 1
-    ).padStart(2, "0")}.${now.getFullYear()}`;
+const Agenda = require("agenda");
 
-    times.forEach((time) => {
-      const [timePart, datePart] = time.split(" ");
+const agenda = new Agenda({
+  db: { address: process.env.MONGO, collection: "agendaJobs" },
+});
 
-      if (datePart) {
-        // Sana bor (masalan, "01.02")
-        if (
-          datePart.length === 5 &&
-          datePart === currentDate // Oyda bir marta
-        ) {
-          if (timePart === currentTime) {
-            callback();
-          }
-        }
-      } else {
-        // Faqat vaqt (masalan, "14:00")
-        if (timePart === currentTime) {
-          callback();
-        }
-      }
-    });
-  }, 60 * 1000); // Har daqiqada tekshiramiz
-};
-alarm(["09:01"], createAktPack);
+// Define tasks with Agenda
+agenda.define("createAktPackTask", async () => {
+  createAktPack();
+});
 
-alarm(["09:00", "12:00", "17:00"], async () => {
+agenda.define("sendKunlikPinflReportsTask", async () => {
+  await sendKunlikPinflReports(1265);
+  await sendKunlikPinflReports(1143);
+  await sendKunlikPinflReports(621);
+  await sendKunlikPinflReports(337);
+});
+
+agenda.define("sendKunlikEtkReportsTask", async () => {
+  await sendKunlikEtkReports(1265);
+  await sendKunlikEtkReports(1143);
+  await sendKunlikEtkReports(1266);
+  await sendKunlikEtkReports(621);
+  await sendKunlikEtkReports(337);
+});
+
+agenda.define("sendMFYIncomeReportTask", async () => {
+  await sendMFYIncomeReport(1265);
+  await sendMFYIncomeReport(1143);
+  await sendMFYIncomeReport(1266);
+});
+
+agenda.define("sendPinflMfyReportTask", async () => {
+  sendPinflMfyReport(1144);
+  sendPinflMfyReport(1143);
+  sendIdentifietMfyReport(1265);
+});
+
+agenda.define("sendEtkMfyReportTask", async () => {
+  sendEtkMfyReport(1144);
+  sendEtkMfyReport(1143);
+  sendIdentifietMfyReport(1265);
+});
+
+agenda.define("nazoratchilarKunlikTushumTask", async () => {
   const companies = await Company.find();
   companies.forEach((company) => {
-    if (company.ekopayLogin != 621 || company.id != 337) {
-      sendMFYIncomeReport(company.id);
+    if (company.ekopayLogin) {
+      nazoratchilarKunlikTushum(company.id);
     }
   });
 });
-alarm(
-  [
-    "09:05",
-    "10:05",
-    "11:05",
-    "12:05",
-    "13:05",
-    "14:05",
-    "15:05",
-    "16:05",
-    "17:05",
-    "18:05",
-    "19:05",
-    "20:05",
-    "21:05",
-    "22:05",
-  ],
-  () => {
-    sendKunlikPinflReports(1265);
-    sendKunlikPinflReports(1143);
-    sendKunlikPinflReports(621);
-    sendKunlikPinflReports(337);
-  }
-);
-alarm(
-  [
-    "09:05",
-    "10:05",
-    "11:05",
-    "12:05",
-    "13:05",
-    "14:05",
-    "15:05",
-    "16:05",
-    "17:05",
-    "18:05",
-    "19:05",
-    "20:05",
-    "21:05",
-    "22:05",
-  ],
-  () => {
-    sendKunlikEtkReports(1265);
-    sendKunlikEtkReports(1143);
-    sendKunlikEtkReports(621);
-    sendKunlikEtkReports(1266);
-  }
-);
-alarm(
-  [
-    "09:00",
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-    "15:00",
-    "16:00",
-    "17:00",
-    "18:00",
-    "19:00",
-    "20:00",
-    "21:00",
-    "22:00",
-  ],
-  () => {
-    sendPinflMfyReport(1144);
-    sendPinflMfyReport(1143);
-    sendIdentifietMfyReport(1265);
-  }
-);
-// alarm(
-//   [
-//     "09:00",
-//     "10:00",
-//     "11:00",
-//     "12:00",
-//     "13:00",
-//     "14:00",
-//     "15:00",
-//     "16:00",
-//     "17:00",
-//     "18:00",
-//     "19:00",
-//     "20:00",
-//     "21:00",
-//   ],
-//   lastPayReportInspectors
-// );
-alarm(
-  [
-    "09:00",
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-    "15:00",
-    "16:00",
-    "17:00",
-    "18:00",
-    "19:00",
-    "20:00",
-    "21:00",
-  ],
-  sendEtkMfyReport
-);
-alarm(
-  [
-    "09:00",
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-    "15:00",
-    "16:00",
-    "17:00",
-    "18:00",
-    "19:00",
-    "20:00",
-    "21:00",
-  ],
-  async () => {
-    const companies = await Company.find();
-    companies.forEach((company) => {
-      if (company.ekopayLogin) {
-        nazoratchilarKunlikTushum(company.id);
-      }
-    });
-  }
-);
+
+// Schedule jobs
+
+agenda.on("ready", () => {
+  console.log("Agenda is ready to use!");
+  agenda.start();
+  // agenda.every("0 9 * * *", "createAktPackTask"); // 09:00 every day
+  agenda.every("0 9,12,17 * * *", "sendMFYIncomeReportTask"); // 09:00, 12:00, 17:00
+  agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask"); // 09:05 to 22:05 every day
+  agenda.every("5 9-22 * * *", "sendKunlikEtkReportsTask"); // 09:05 to 22:05 every day
+  agenda.every("0 9-22 * * *", "sendPinflMfyReportTask"); // 09:00 to 22:00 every day
+  agenda.every("0 9-22 * * *", "sendEtkMfyReportTask"); // 09:00 to 22:00 every day
+  agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask"); // 09:00 to 22:00 every day
+});
+agenda.on("error", (error) => {
+  console.error("Agenda error:", error);
+});

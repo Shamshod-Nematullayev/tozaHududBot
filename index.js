@@ -65,7 +65,6 @@ function useTelegramBot() {
   require("./core/bot");
   require("./middlewares");
   require("./actions");
-  require("./intervals");
 }
 useTelegramBot();
 // require("./test");
@@ -73,6 +72,7 @@ mongoose
   .connect(process.env.MONGO)
   .then(async () => {
     console.log(`Ma'lumotlar bazasiga ulandi`);
+    require("./intervals");
     require("./test");
   })
   .catch((err) => {
