@@ -53,7 +53,7 @@ alarm(["09:01"], createAktPack);
 alarm(["09:00", "12:00", "17:00"], async () => {
   const companies = await Company.find();
   companies.forEach((company) => {
-    if (company.id != 621 || company.id != 337) {
+    if (company.ekopayLogin != 621 || company.id != 337) {
       sendMFYIncomeReport(company.id);
     }
   });
@@ -184,7 +184,7 @@ alarm(
   async () => {
     const companies = await Company.find();
     companies.forEach((company) => {
-      if (!company.id != 621 || !company.id != 337) {
+      if (company.ekopayLogin) {
         nazoratchilarKunlikTushum(company.id);
       }
     });
