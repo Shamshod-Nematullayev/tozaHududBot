@@ -25,9 +25,31 @@ const citizenSchema = new Schema({
 const schema = new Schema({
   citizen: citizenSchema,
   nazoratchi_id: String,
-  mahalla_id: String,
+  mahallaId: {
+    type: String,
+    required: true,
+  },
+  streetId: {
+    type: String,
+    required: true,
+  },
   abonent_name: String,
-  licshet: String,
+  accountNumber: {
+    type: String,
+    required: true,
+  },
+  cadastr: String,
+  inhabitant_cnt: {
+    type: Number,
+    required: true,
+  },
+  etkCustomerCode: String,
+  etkCaoto: String,
+  senderId: Number,
+  companyId: {
+    type: Number,
+    required: true,
+  }
 });
 
 module.exports.NewAbonent = model("new_abonent", schema);
