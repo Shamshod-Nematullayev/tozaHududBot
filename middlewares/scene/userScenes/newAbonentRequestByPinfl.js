@@ -10,6 +10,9 @@ const { Mahalla } = require("../../../models/Mahalla");
 const { NewAbonent } = require("../../../models/NewAbonents");
 const { createTozaMakonApi } = require("../../../api/tozaMakon");
 const { Admin, Company } = require("../../../requires");
+const {
+  extractBirthDateString,
+} = require("../../../helpers/extractBirthDateFromPinfl");
 
 const enterFunc = (ctx) => {
   ctx.reply("Xonadon egasining PINFL raqamini kiriting!", keyboards.cancelBtn);
@@ -83,6 +86,21 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         );
       }
       ctx.wizard.state.mahallalarButtons = mahallalarButtons;
+
+      const birthdate = extractBirthDateString(ctx.message.text);
+
+      const citizen = (
+        await createTozaMakonApi(inspektor.companyId || admin.companyId).get(
+          "/user-service/citizens",
+          {
+            params: {
+              pinfl: ctx.message.text,
+              birthdate,
+            },
+          }
+        )
+      ).data;
+
       const customDates = await find_one_by_pinfil_from_mvd(ctx.message.text);
       if (!customDates.success) {
         ctx.reply(customDates.message, keyboards.cancelBtn);
@@ -379,7 +397,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         );
         if (!abonentDatasResponse || abonentDatasResponse.status !== 200) {
           return await ctx.answerCbQuery(
-            "Abonent dastlabki ma'lumotlarini oliishda xatolik"
+            "Abonent dastlabki ma'lumotlarini olishda xatolik"
           );
         }
         const data = abonentDatasResponse.data;

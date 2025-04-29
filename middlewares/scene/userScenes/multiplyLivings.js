@@ -71,7 +71,7 @@ const multiplyLivingsScene = new Scenes.WizardScene(
       ctx.reply(messages.accepted);
       ctx.scene.leave();
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 );

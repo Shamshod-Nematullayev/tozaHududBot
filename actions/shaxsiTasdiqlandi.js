@@ -75,7 +75,9 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         abonent.shaxsi_tasdiqlandi.confirm &&
         !req.reUpdating
       ) {
-        return ctx.answerCbQuery("Bu abonent ma'lumoti kiritilib bo'lingan");
+        return await ctx.answerCbQuery(
+          "Bu abonent ma'lumoti kiritilib bo'lingan"
+        );
       }
       //   billingga yangilov so'rovini yuborish
       const tozaMakonApi = createTozaMakonApi(req.companyId);
@@ -91,7 +93,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
           const formData = new FormData();
           const customDates = await find_one_by_pinfil_from_mvd(req.data.pinfl);
           if (!customDates.success) {
-            return ctx.answerCbQuery(customDates.message);
+            return await ctx.answerCbQuery(customDates.message);
           }
           // MIME turini ajratamiz
           const mimeMatch = customDates.photo.match(/^data:(.+);base64,(.*)$/);
@@ -130,7 +132,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
           return console.log(pasportData);
         }
       } catch (error) {
-        ctx.answerCbQuery(error.response.data.message);
+        await ctx.answerCbQuery(error.response.data.message);
       }
       const abonentDatasResponse = await tozaMakonApi.get(
         `/user-service/residents/${abonent.id}?include=translates`

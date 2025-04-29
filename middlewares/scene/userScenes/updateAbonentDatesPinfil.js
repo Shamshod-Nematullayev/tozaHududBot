@@ -191,8 +191,8 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           ctx.wizard.next();
           break;
         case "no":
-          await ctx.deleteMessage();
-          ctx.reply("Bekor qilindi. Demak PINFL raqami noto'g'ri ekan");
+          ctx.deleteMessage();
+          await ctx.reply("Bekor qilindi. Demak PINFL raqami noto'g'ri ekan");
           ctx.scene.leave();
           break;
       }

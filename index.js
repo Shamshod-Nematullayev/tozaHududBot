@@ -6,6 +6,10 @@ if (!process.env.SECRET_JWT_KEY || !process.env.REFRESH_JWT_KEY) {
   );
   process.exit(1);
 }
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+});
+
 // process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 const { default: mongoose } = require("mongoose");
 const express = require("express");

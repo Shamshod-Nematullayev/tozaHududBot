@@ -131,9 +131,6 @@ composer.action("ulim_guvohnomasini_qabul_qilish", async (ctx) => {
     await ctx.answerCbQuery(messages.sended);
   } catch (error) {
     console.error(error);
-    // Handle errors here
-    // You might want to return an error message to the user or log it for further investigation
-    ctx.reply("An error occurred while processing your request.");
   }
 });
 
