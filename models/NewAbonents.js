@@ -62,4 +62,10 @@ const schema = new Schema({
   },
 });
 
+module.exports.StatusNewAbonent = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+};
+
 module.exports.NewAbonent = model("new_abonent", schema);
