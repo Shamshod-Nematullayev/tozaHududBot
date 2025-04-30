@@ -29,15 +29,20 @@ const schema = new Schema({
     type: String,
     required: true,
   },
+  mahallaName: {
+    type: String,
+    required: true,
+  },
+  streetName: {
+    type: String,
+    required: true,
+  },
   streetId: {
     type: String,
     required: true,
   },
   abonent_name: String,
-  accountNumber: {
-    type: String,
-    required: true,
-  },
+  accountNumber: String,
   cadastr: String,
   inhabitant_cnt: {
     type: Number,
@@ -49,7 +54,7 @@ const schema = new Schema({
   companyId: {
     type: Number,
     required: true,
-  }
+  },
 });
 
 module.exports.NewAbonent = model("new_abonent", schema);

@@ -21,12 +21,12 @@ composer.command("user", (ctx) => {
     parse_mode: "HTML",
   });
 });
-// composer.hears(
-//   ["👤Yangi abonent ochish", kirillga("👤Yangi abonent ochish")],
-//   (ctx) => {
-//     ctx.scene.enter("new_abonent_request");
-//   }
-// );
+composer.hears(
+  ["👤Yangi abonent ochish", kirillga("👤Yangi abonent ochish")],
+  (ctx) => {
+    ctx.scene.enter("new_abonent_request");
+  }
+);
 composer.hears(["🔎Izlash", kirillga("🔎Izlash")], (ctx) => {
   ctx.scene.enter("SEARCH_BY_NAME");
 });
