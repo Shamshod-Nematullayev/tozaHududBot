@@ -55,6 +55,11 @@ const schema = new Schema({
     type: Number,
     required: true,
   },
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+  },
 });
 
 module.exports.NewAbonent = model("new_abonent", schema);
