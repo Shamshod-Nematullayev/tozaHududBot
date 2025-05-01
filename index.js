@@ -31,6 +31,7 @@ app.use(
 // use routers
 app.use("/api/auth", require("./routers/auth"));
 app.use("/api/statistics", isAuth, require("./routers/statisticsRouter"));
+app.use("/api/notification", isAuth, require("./routers/notificationRouter"));
 // app.use("/api/court-service", isAuth, require("./routers/sudRouter"));
 // app.use("/api/targets", isAuth, require("./routers/targetsRouter"));
 // app.use("/api/bildirgilar", isAuth, require("./routers/bildirgilarRouter"));
@@ -41,7 +42,11 @@ app.use("/api/inspectors", isAuth, require("./routers/inspectorsRouter"));
 app.use("/api/abonents", isAuth, require("./routers/abonentsRouter"));
 app.use("/api/billing", isAuth, require("./routers/billing"));
 app.use("/api/arizalar", isAuth, require("./routers/arizalarRouter"));
-app.use("/api/notification", isAuth, require("./routers/notificationRouter"));
+app.use(
+  "/api/pendingNewAbonents",
+  isAuth,
+  require("./routers/newAbonentsRouter")
+);
 app.use(
   "/api/yashovchi-soni-xatlov",
   isAuth,

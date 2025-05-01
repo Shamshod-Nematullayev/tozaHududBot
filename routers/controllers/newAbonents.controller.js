@@ -10,20 +10,23 @@ module.exports.getPendingNewAbonents = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
 
     const skip = (page - 1) * limit;
+    console.log(page, limit, skip, companyId, StatusNewAbonent.PENDING);
     const count = await NewAbonent.countDocuments({
       status: StatusNewAbonent.PENDING,
-      id: companyId,
+      companyId: companyId,
     });
     const pendingNewAbonents = await NewAbonent.find({
-      status: "pending",
-      id: companyId,
+      status: StatusNewAbonent.PENDING,
+      companyId: companyId,
     })
       .skip(skip)
       .limit(limit);
     res.json({ ok: true, count, pendingNewAbonents });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ ok: false, error: "Server error " + error.message });
+    res
+      .status(500)
+      .json({ ok: false, message: "Server error " + error.message });
   }
 };
 
@@ -34,12 +37,14 @@ module.exports.getOnePendingNewAbonent = async (req, res) => {
       _id: req.params._id,
     });
     if (!pendingAbonent) {
-      return res.status(404).json({ ok: false, error: "Abonent not found" });
+      return res.status(404).json({ ok: false, message: "Abonent not found" });
     }
     res.json({ ok: true, data: pendingAbonent });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ ok: false, error: "Server error " + error.message });
+    res
+      .status(500)
+      .json({ ok: false, message: "Server error " + error.message });
   }
 };
 
@@ -51,7 +56,7 @@ module.exports.cancelPendingNewAbonent = async (req, res) => {
     if (!description) {
       return res
         .status(400)
-        .json({ ok: false, error: "Description is required" });
+        .json({ ok: false, message: "Description is required" });
     }
     const pendingAbonent = await NewAbonent.findOneAndUpdate(
       { _id, companyId },
@@ -59,7 +64,7 @@ module.exports.cancelPendingNewAbonent = async (req, res) => {
       { new: true }
     );
     if (!pendingAbonent) {
-      return res.status(404).json({ ok: false, error: "Abonent not found" });
+      return res.status(404).json({ ok: false, message: "Abonent not found" });
     }
     res.json({ ok: true, data: pendingAbonent });
     bot.sendMessage(
@@ -68,7 +73,9 @@ module.exports.cancelPendingNewAbonent = async (req, res) => {
     );
   } catch (error) {
     console.error(error);
-    res.status(500).json({ ok: false, error: "Server error " + error.message });
+    res
+      .status(500)
+      .json({ ok: false, message: "Server error " + error.message });
   }
 };
 
@@ -82,14 +89,16 @@ module.exports.acceptPendingNewAbonent = async (req, res) => {
       { new: true }
     );
     if (!pendingAbonent) {
-      return res.status(404).json({ ok: false, error: "Abonent not found" });
+      return res.status(404).json({ ok: false, message: "Abonent not found" });
     }
     const nazoratchi = await Nazoratchi.findOne({
       companyId,
       id: pendingAbonent.nazoratchi_id,
     });
     if (!nazoratchi) {
-      return res.status(404).json({ ok: false, error: "Nazoratchi not found" });
+      return res
+        .status(404)
+        .json({ ok: false, message: "Nazoratchi not found" });
     }
     const tozaMakonApi = createTozaMakonApi(req.user.companyId);
     const generatedAccountNumber = (
@@ -130,6 +139,8 @@ module.exports.acceptPendingNewAbonent = async (req, res) => {
     );
   } catch (error) {
     console.error(error);
-    res.status(500).json({ ok: false, error: "Server error " + error.message });
+    res
+      .status(500)
+      .json({ ok: false, message: "Server error " + error.message });
   }
 };
