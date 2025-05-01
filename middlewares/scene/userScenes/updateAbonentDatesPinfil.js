@@ -15,7 +15,10 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
   async (ctx) => {
     try {
       ctx.wizard.state.reUpdating = false;
-      const inspektor = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
+      const inspektor = await Nazoratchi.findOne({
+        telegram_id: ctx.from.id,
+        activ: true,
+      });
       if (!inspektor) {
         ctx.reply(
           "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!"

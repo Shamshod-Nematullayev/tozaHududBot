@@ -1,7 +1,7 @@
 const { WizardScene } = require("telegraf/scenes");
 const { Abonent, keyboards, htmlPDF, fs } = require("../../../requires");
 const ejs = require("ejs");
-const { tozaMakonApi } = require("../../../api/tozaMakon");
+const { createTozaMakonApi } = require("../../../api/tozaMakon");
 
 const getAbonentCard = new WizardScene(
   "getAbonentCard",
@@ -25,6 +25,8 @@ const getAbonentCard = new WizardScene(
       }
       const abonent = await Abonent.findOne({ licshet: text });
       if (!abonent) return ctx.reply("Abonent topilmadi");
+
+      const tozaMakonApi = createTozaMakonApi(abonent.companyId);
       const data = (
         await tozaMakonApi(
           `/user-service/residents/${abonent.id}/print-card?lang=UZ`

@@ -59,7 +59,10 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
   async (ctx) => {
     try {
       const admin = await Admin.findOne({ user_id: ctx.from.id });
-      const inspektor = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
+      const inspektor = await Nazoratchi.findOne({
+        telegram_id: ctx.from.id,
+        activ: true,
+      });
       const company = await Company.findOne({
         id: inspektor.companyId || admin.companyId,
       });
