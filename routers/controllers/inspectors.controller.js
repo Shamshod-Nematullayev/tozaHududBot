@@ -1,6 +1,7 @@
 const { Nazoratchi } = require("../../models/Nazoratchi");
 const { Mahalla } = require("../../models/Mahalla");
 const { createTozaMakonApi } = require("../../api/tozaMakon");
+const { User } = require("../../models/User");
 
 module.exports.getAllInspectors = async (req, res) => {
   try {
@@ -16,6 +17,7 @@ module.exports.getAllInspectors = async (req, res) => {
         _id: person._id,
         id: person.id,
         name: person.name,
+        activ: person.activ,
         biriktirilgan: [],
       };
       mahallalar.forEach((mfy) => {
@@ -83,6 +85,9 @@ module.exports.unsetInspectorToMfy = async (req, res) => {
 
 module.exports.getInspectorsFromTozaMakon = async (req, res) => {
   try {
+    const inspectorsOnDB = await Nazoratchi.find({
+      companyId: req.user.companyId,
+    });
     const tozaMakonApi = createTozaMakonApi(req.user.companyId);
     const inspectors = (
       await tozaMakonApi.get("/user-service/employees", {
@@ -94,11 +99,18 @@ module.exports.getInspectorsFromTozaMakon = async (req, res) => {
         },
       })
     ).data.content;
-    const rows = inspectors.map((inspector) => {
-      return {
+    const rows = [];
+    console.log(inspectors.length);
+    inspectors.forEach((inspector) => {
+      const inspektor = {
         id: inspector.id,
         name: inspector.fullName,
+        activ: true,
       };
+      const found = inspectorsOnDB.find((i) => i.id == inspector.id);
+      if (!found) {
+        rows.push(inspektor);
+      }
     });
     res.json({ ok: true, rows });
   } catch (error) {
@@ -108,53 +120,112 @@ module.exports.getInspectorsFromTozaMakon = async (req, res) => {
 };
 
 module.exports.addInspector = async (req, res) => {
-  const { id, name } = req.body;
-  if (!id || !name) {
-    return res
-      .status(400)
-      .json({ ok: false, message: "id va name kiritilishi shart" });
+  try {
+    const { id, name } = req.body;
+    if (!id || !name) {
+      return res
+        .status(400)
+        .json({ ok: false, message: "id va name kiritilishi shart" });
+    }
+    const inspector = await Nazoratchi.create({
+      id,
+      name,
+      companyId: req.user.companyId,
+      activ: true,
+    });
+    res.json({ ok: true, inspector });
+  } catch (error) {
+    console.error(error);
+    res.json({ ok: false, message: "Internal server error" });
   }
-  const inspector = await Nazoratchi.create({
-    id,
-    name,
-    companyId: req.user.companyId,
-    activ: true,
-  });
-  res.json({ ok: true, inspector });
 };
 
 module.exports.setInspectorTelegramId = async (req, res) => {
-  const { telegramId } = req.body;
-  if (!telegramId) {
-    return res
-      .status(400)
-      .json({ ok: false, message: "telegramId kiritilishi shart" });
+  try {
+    const { telegramId, inspectorId } = req.body;
+    if (!telegramId) {
+      return res
+        .status(400)
+        .json({ ok: false, message: "telegramId kiritilishi shart" });
+    }
+
+    const user = await User.findOne({
+      "user.id": Number(telegramId),
+    });
+    if (!user) {
+      return res.status(404).json({
+        ok: false,
+        message: "Ushbu foydalanuvchi id tizimda ro'yxatdan o'tmagan",
+      });
+    }
+    if (user.nazoratchiQilingan) {
+      return res.status(400).json({
+        ok: false,
+        message:
+          "Ushbu foydalanuvchi id raqami allaqachon nazoratchiga biriktirilgan",
+      });
+    }
+    const inspector = await Nazoratchi.findOneAndUpdate(
+      { id: inspectorId },
+      { $set: { telegram_id: [Number(telegramId)] } },
+      { new: true }
+    );
+    if (!inspector) {
+      return res
+        .status(404)
+        .json({ ok: false, message: "Inspector not found" });
+    }
+
+    await user.updateOne({
+      $set: {
+        nazoratchiQilingan: true,
+      },
+    });
+    res.json({ ok: true, inspector });
+  } catch (error) {
+    console.error(error);
+    res.json({ ok: false, message: "Internal server error" });
   }
-  const inspector = await Nazoratchi.findOneAndUpdate(
-    { id: req.params.id },
-    { telegramId },
-    { new: true }
-  );
-  if (!inspector) {
-    return res.status(404).json({ ok: false, message: "Inspector not found" });
-  }
-  res.json({ ok: true, inspector });
 };
 
 module.exports.setInspectorInactive = async (req, res) => {
-  const { inactive } = req.body;
-  if (inactive === undefined) {
-    return res
-      .status(400)
-      .json({ ok: false, message: "inactive kiritilishi shart" });
+  try {
+    const { inactive } = req.body;
+    if (inactive === undefined) {
+      return res
+        .status(400)
+        .json({ ok: false, message: "inactive kiritilishi shart" });
+    }
+    const inspector = await Nazoratchi.findOneAndUpdate(
+      { id: req.params.id },
+      { activ: inactive },
+      { new: true }
+    );
+    if (!inspector) {
+      return res
+        .status(404)
+        .json({ ok: false, message: "Inspector not found" });
+    }
+    res.json({ ok: true, inspector });
+  } catch (error) {
+    console.error(error);
+    res.json({ ok: false, message: "Internal server error" });
   }
-  const inspector = await Nazoratchi.findOneAndUpdate(
-    { id: req.params.id },
-    { activ: inactive },
-    { new: true }
-  );
-  if (!inspector) {
-    return res.status(404).json({ ok: false, message: "Inspector not found" });
+};
+
+module.exports.checkTelegramId = async (req, res) => {
+  try {
+    console.log(req.params.user_id);
+    const user = await User.findOne({ "user.id": Number(req.params.user_id) });
+    if (!user) {
+      return res.status(404).json({
+        ok: false,
+        message: "Ushbu foydalanuvchi id tizimda ro'yxatdan o'tmagan",
+      });
+    }
+    res.json({ ok: true, user: user.user });
+  } catch (error) {
+    console.error(error);
+    res.json({ ok: false, message: "Internal server error" });
   }
-  res.json({ ok: true, inspector });
 };

@@ -53,7 +53,6 @@ const userToInspektor = new Scenes.WizardScene(
         { "user.id": Number(ctx.wizard.state.telegram_id) },
         { $set: { nazoratchiQilingan: true } }
       );
-      console.log(a);
       await Nazoratchi.findOneAndUpdate(
         { id: ctx.update.callback_query?.data },
         { $push: { telegram_id: parseInt(ctx.wizard.state.telegram_id) } }
