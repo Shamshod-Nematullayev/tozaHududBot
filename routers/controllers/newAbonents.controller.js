@@ -1,7 +1,7 @@
 const { NewAbonent, StatusNewAbonent } = require("../../models/NewAbonents");
 const { bot } = require("../../core/bot");
 const { createTozaMakonApi } = require("../../api/tozaMakon");
-const { Nazoratchi } = require("../../requires");
+const { Nazoratchi, Abonent } = require("../../requires");
 
 module.exports.getPendingNewAbonents = async (req, res) => {
   try {
@@ -83,11 +83,7 @@ module.exports.acceptPendingNewAbonent = async (req, res) => {
   try {
     const { _id } = req.params;
     const { companyId } = req.user;
-    const pendingAbonent = await NewAbonent.findOneAndUpdate(
-      { _id, companyId },
-      { status: StatusNewAbonent.APPROVED },
-      { new: true }
-    );
+    const pendingAbonent = await NewAbonent.findOne({ _id, companyId });
     if (!pendingAbonent) {
       return res.status(404).json({ ok: false, message: "Abonent not found" });
     }
@@ -106,7 +102,7 @@ module.exports.acceptPendingNewAbonent = async (req, res) => {
         `/user-service/residents/account-numbers/generate?residentType=INDIVIDUAL&mahallaId=${pendingAbonent.mahallaId}`
       )
     ).data;
-    const { data } = await tozaMakonApi.post("/abonents", {
+    const { data } = await tozaMakonApi.post("/user-service/residents", {
       accountNumber: generatedAccountNumber,
       active: true,
       citizen: pendingAbonent.citizen,
@@ -132,8 +128,36 @@ module.exports.acceptPendingNewAbonent = async (req, res) => {
       residentType: "INDIVIDUAL",
       streetId: pendingAbonent.streetId,
     });
+    await Abonent.create({
+      createdAt: new Date(),
+      fio: pendingAbonent.abonent_name,
+      licshet: generatedAccountNumber,
+      mahallas_id: pendingAbonent.mahallaId,
+      prescribed_cnt: pendingAbonent.inhabitant_cnt,
+      id: data,
+      kadastr_number: pendingAbonent.cadastr,
+      pinfl: pendingAbonent.citizen.pnfl,
+      mahalla_name: pendingAbonent.mahallaName,
+      passport_number: pendingAbonent.citizen.passport,
+      streets_id: pendingAbonent.streetId,
+      shaxsi_tasdiqlandi: {
+        confirm: true,
+        inspector: {
+          _id: nazoratchi._id,
+          name: nazoratchi.name,
+        },
+        inspector_id: nazoratchi.id,
+        inspector_name: nazoratchi.name,
+      },
+      companyId: pendingAbonent.companyId,
+    });
+    await pendingAbonent.updateOne({
+      status: StatusNewAbonent.ACCEPTED,
+      accountNumber: generatedAccountNumber,
+    });
+
     res.json({ ok: true, data: pendingAbonent });
-    bot.sendMessage(
+    bot.telegram.sendMessage(
       pendingAbonent.senderId,
       `Fuqaro: ${pendingAbonent.citizen.lastName} ${pendingAbonent.citizen.firstName} ${pendingAbonent.citizen.patronymic}\nSizning ushbu fuqaroga yangi abonent ochish haqidagi arizangiz qabul qilindi. \n\nSizning yangi abonent raqamingiz: <code>${pendingAbonent.accountNumber}</code>`
     );
