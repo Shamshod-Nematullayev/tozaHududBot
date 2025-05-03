@@ -10,61 +10,78 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-async function sendMFYIncomeReport(companyId = 1144, ctx = false) {
+async function sendMFYIncomeReport(
+  companyId = 1144,
+  onlyEkopay = true,
+  onlyToday = false
+) {
   try {
     const now = new Date();
     const company = await Company.findOne({ id: companyId });
     const tozaMakonApi = createTozaMakonApi(companyId);
-    const incomesFromEkopay = (
-      await tozaMakonApi.get(
-        "/billing-service/reports/payment-partners/incomes",
-        {
-          params: {
-            reportType: "MAHALLA",
-            companyId: companyId, // hozircha hard kod
-            regionId: 5,
-            districtId: 47,
-            fromDate: formatDate(
-              new Date(now.getFullYear(), now.getMonth(), 1)
-            ),
-            toDate: formatDate(now),
-          },
-        }
-      )
-    ).data;
+    let incomesFromEkopay;
+    if (onlyEkopay) {
+      incomesFromEkopay = (
+        await tozaMakonApi.get(
+          "/billing-service/reports/payment-partners/incomes",
+          {
+            params: {
+              reportType: "MAHALLA",
+              companyId: companyId, // hozircha hard kod
+              regionId: 5,
+              districtId: 47,
+              fromDate: formatDate(
+                new Date(now.getFullYear(), now.getMonth(), 1)
+              ),
+              toDate: formatDate(now),
+            },
+          }
+        )
+      ).data;
+    }
 
     let allAccrual = 0;
     let allTransactionAmount = 0;
     const sana = `${now.getDate()} ${
       now.getMonth() + 1
     } ${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`;
+
     let mahallas = (
       await tozaMakonApi.get("/report-service/reports/v2/mfa-16", {
         params: {
           companyId: companyId,
           regionId: company.regionId,
           districtId: company.districtId,
-          dateFrom: formatDate(new Date(now.getFullYear(), now.getMonth(), 1)),
+          dateFrom: formatDate(
+            new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              onlyToday ? now.getDate() : 1
+            )
+          ),
           dateTo: formatDate(now),
           period: `${now.getMonth() + 1}.${now.getFullYear()}`,
         },
       })
     ).data;
     mahallas = mahallas.map((mfy) => {
+      let income = 0;
+      if (onlyEkopay) {
+        income = incomesFromEkopay
+          .find((item) => item.id == mfy.id)
+          .partnerTransactions.find(
+            (elem) => elem.partnerName == "EcoPay"
+          ).transactionAmount;
+      } else {
+        income = mfy.totalAmount;
+      }
       allAccrual += mfy.totalAccrual;
-      allTransactionAmount += incomesFromEkopay
-        .find((item) => item.id == mfy.id)
-        .partnerTransactions.find(
-          (elem) => elem.partnerName == "EcoPay"
-        ).transactionAmount;
+      allTransactionAmount += income;
       return {
         id: mfy.id,
         xisoblandi: mfy.totalAccrual,
         name: kirillga(mfy.name.split("(")[0]),
-        tushum: incomesFromEkopay
-          .find((item) => item.id == mfy.id)
-          .partnerTransactions.find((elem) => elem.partnerName == "EcoPay")
-          .transactionAmount,
+        tushum: income,
       };
     });
     mahallas = mahallas.filter((item) => item.xisoblandi);
@@ -80,6 +97,7 @@ async function sendMFYIncomeReport(companyId = 1144, ctx = false) {
         jamiTushum: allTransactionAmount,
         jamiXisoblandi: allAccrual,
         sana,
+        company,
       },
       {},
       async (err, res) => {
@@ -93,17 +111,11 @@ async function sendMFYIncomeReport(companyId = 1144, ctx = false) {
         });
         const buffer = Buffer.from(binaryData, "binary");
 
-        if (ctx) return ctx.replyWithPhoto({ source: buffer });
-        else
-          bot.telegram.sendPhoto(
-            company.GROUP_ID_NAZORATCHILAR,
-            // process.env.ME,
-            { source: buffer },
-            {
-              caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
-              parse_mode: "HTML",
-            }
-          );
+        bot.telegram.sendPhoto(
+          company.GROUP_ID_NAZORATCHILAR,
+          // process.env.ME,
+          { source: buffer }
+        );
       }
     );
   } catch (err) {

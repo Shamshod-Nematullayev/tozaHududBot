@@ -4,24 +4,42 @@ const { messages } = require("../../../lib/messages");
 const { MultiplyRequest } = require("../../../models/MultiplyRequest");
 const isCancel = require("../../smallFunctions/isCancel");
 const { Abonent } = require("../../../models/Abonent");
-const { tozaMakonApi } = require("../../../api/tozaMakon");
+const { createTozaMakonApi } = require("../../../api/tozaMakon");
+const { Nazoratchi, Company } = require("../../../requires");
 
 const multiplyLivingsScene = new Scenes.WizardScene(
   "multiply_livings",
   async (ctx) => {
     try {
       // validate
+      const inspector = await Nazoratchi.findOne({
+        activ: true,
+        telegram_id: ctx.from.id,
+      });
+      if (!inspector) {
+        ctx.scene.leave();
+        return ctx.reply(
+          "Ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz"
+        );
+      }
+      const company = await Company.findOne({ id: inspector.companyId });
       if (ctx.message.text.length != 12)
         return ctx.reply(
           messages.enterFullNamber,
           keyboards.cancelBtn.resize()
         );
       // main logic
-      const abonent = await Abonent.findOne({ licshet: ctx.message.text });
+      const abonent = await Abonent.findOne({
+        licshet: ctx.message.text,
+        companyId: company.id,
+      });
       if (!abonent) {
         return ctx.reply(messages.abonentNotFound);
       }
-      const request = await MultiplyRequest.findOne({ KOD: ctx.message.text });
+      const request = await MultiplyRequest.findOne({
+        KOD: ctx.message.text,
+        companyId: company.id,
+      });
       if (request) {
         return ctx.reply(
           `Ushbu abonent yashovchi sonini ko'paytirish uchun allaqachon so'rov yuborilgan   `
@@ -33,6 +51,7 @@ const multiplyLivingsScene = new Scenes.WizardScene(
         fio: abonent.fio,
         mahalla_name: abonent.mahalla_name,
         mfy_id: abonent.mahallas_id,
+        companyId: abonent.companyId,
       };
       ctx.wizard.state.KOD = ctx.message.text;
       ctx.replyWithHTML(
@@ -48,12 +67,15 @@ const multiplyLivingsScene = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
+      const tozaMakonApi = createTozaMakonApi(
+        ctx.wizard.state.abonent.companyId
+      );
       const abonentData = (
         await tozaMakonApi.get(
           "/user-service/residents/" + ctx.wizard.state.abonent.id
         )
       ).data;
-      if (abonentData.house.inhabitantCnt >= parseInt(ctx.message.text))
+      if (abonentData.house?.inhabitantCnt >= parseInt(ctx.message.text))
         return ctx.reply("yashovchi soni joriy holatdan koʻra katta emas!");
 
       ctx.scene.state.YASHOVCHILAR = parseInt(ctx.message.text);
@@ -66,11 +88,13 @@ const multiplyLivingsScene = new Scenes.WizardScene(
         mahallaId: abonent.mfy_id,
         fio: abonent.fio,
         mahallaName: abonent.mahalla_name,
+        companyId: ctx.wizard.state.abonent.companyId,
       });
       await request.save();
-      ctx.reply(messages.accepted);
+      await ctx.reply(messages.accepted);
       ctx.scene.leave();
     } catch (error) {
+      ctx.reply("Kutilmagan xatolik yuz berdi");
       console.error(error);
     }
   }

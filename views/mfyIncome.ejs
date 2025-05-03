@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <title>Document</title>
     <style>
       body {
         font-family: sans-serif;
@@ -29,14 +27,14 @@
         border: 1px solid black;
         padding: 2px 5px;
         margin: 0;
-        border-collapse: collapse; 
-	}
+        border-collapse: collapse;
+      }
       td {
         text-align: right;
       }
-      tr:nth-child(2){
-	width: 280px;
-}
+      tr:nth-child(2) {
+        width: 280px;
+      }
       p {
         text-decoration: underline;
       }
@@ -58,11 +56,11 @@
   </head>
   <body>
     <div>
-      <i style="color: blue" id="oliy_ong">Oliy Ong</i>
+      <i style="color: #00512f" id="oliy_ong">GreenZone</i>
       <h2>Тушумлар таҳлили</h2>
       <h3><%= sana %></h3>
       <!-- <h3>${newJSON.davr}</h3>-->
-      <h3>Каттақўрғон туман / "ANVARJON BIZNES INVEST" MCHJ</h3>
+      <h3><%= company.locationName %> / <%= company.name %></h3>
       <table cellscasing="0">
         <tr>
           <th>№</th>
@@ -114,7 +112,6 @@
         </tr>
         <% }%>
       </table>
-      <footer><b>Бажарувчи: Шамшод Неъматуллаев</b></footer>
     </div>
   </body>
 </html>
