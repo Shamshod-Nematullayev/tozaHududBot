@@ -33,6 +33,12 @@ const caotoNames = [
     region: 18,
     companyId: 1265,
   },
+  {
+    title: "Nurobod ETK",
+    caoto: 18235,
+    region: 18,
+    companyId: 1263,
+  },
 ];
 
 const updateElektrKod = new Scenes.WizardScene(
