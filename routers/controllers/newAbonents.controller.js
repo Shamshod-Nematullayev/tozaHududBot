@@ -159,7 +159,8 @@ module.exports.acceptPendingNewAbonent = async (req, res) => {
     res.json({ ok: true, data: pendingAbonent });
     bot.telegram.sendMessage(
       pendingAbonent.senderId,
-      `Fuqaro: ${pendingAbonent.citizen.lastName} ${pendingAbonent.citizen.firstName} ${pendingAbonent.citizen.patronymic}\nSizning ushbu fuqaroga yangi abonent ochish haqidagi arizangiz qabul qilindi. \n\nSizning yangi abonent raqamingiz: <code>${pendingAbonent.accountNumber}</code>`
+      `Fuqaro: ${pendingAbonent.citizen.lastName} ${pendingAbonent.citizen.firstName} ${pendingAbonent.citizen.patronymic}\nSizning ushbu fuqaroga yangi abonent ochish haqidagi arizangiz qabul qilindi. \n\nSizning yangi abonent raqamingiz: <code>${generatedAccountNumber}</code>`,
+      { parse_mode: "HTML" }
     );
   } catch (error) {
     console.error(error);

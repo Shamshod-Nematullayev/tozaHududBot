@@ -265,7 +265,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
     } catch (error) {
       console.error(error);
     }
-    console.error(error);
+    console.error(error, ctx.message);
   }
 });
 

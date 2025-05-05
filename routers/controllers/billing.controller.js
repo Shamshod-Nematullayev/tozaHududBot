@@ -213,7 +213,8 @@ module.exports.createFullAct = async (req, res) => {
         },
       }
     );
-    const packIds = (await Company.findOne({ id: companyId })).akt_pachka_ids;
+    const packIds =
+      (await Company.findOne({ id: companyId })).akt_pachka_ids || {};
     let actPackId = packIds[document_type]?.id;
     if (
       !actPackId ||
@@ -228,8 +229,8 @@ module.exports.createFullAct = async (req, res) => {
           description: `added by th-dashboard`,
           isActive: true,
           isSpecialPack: false,
-          name: packIds[document_type].name || packNames[document_type],
-          packType: packIds[document_type].type || packTypes[document_type],
+          name: packIds[document_type]?.name || packNames[document_type],
+          packType: packIds[document_type]?.type || packTypes[document_type],
         })
       ).data;
       await Company.findOneAndUpdate(
@@ -241,7 +242,7 @@ module.exports.createFullAct = async (req, res) => {
               new Date().getMonth() + 1,
             [`akt_pachka_ids.${document_type}.year`]: new Date().getFullYear(),
             [`akt_pachka_ids.${document_type}.type`]:
-              packIds[document_type].type || packTypes[pack],
+              packIds[document_type]?.type || packTypes[document_type],
           },
         }
       );

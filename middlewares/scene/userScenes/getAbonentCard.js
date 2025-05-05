@@ -2,6 +2,7 @@ const { WizardScene } = require("telegraf/scenes");
 const { Abonent, keyboards, htmlPDF, fs } = require("../../../requires");
 const ejs = require("ejs");
 const { createTozaMakonApi } = require("../../../api/tozaMakon");
+const puppeter = require("puppeteer");
 
 const getAbonentCard = new WizardScene(
   "getAbonentCard",
@@ -43,19 +44,24 @@ const getAbonentCard = new WizardScene(
           }
         );
       });
-      htmlPDF
-        .create(html, {
-          format: "A4",
-          orientation: "portrait",
-        })
-        .toBuffer(async (err, buffer) => {
-          if (err) throw err;
-          await ctx.replyWithDocument({
-            source: buffer,
-            filename: ctx.message.text + ".pdf",
-          });
-          ctx.scene.leave();
-        });
+      const browser = await puppeter.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
+      const page = await browser.newPage();
+      await page.setContent(html, { waitUntil: "networkidle0" });
+      const buffer = await page.pdf({
+        format: "A4",
+        printBackground: true,
+      });
+      await page.close();
+
+      await ctx.replyWithDocument({
+        source: Buffer.from(buffer),
+        filename: ctx.message.text + ".pdf",
+      });
+
+      ctx.scene.leave();
     } catch (error) {
       console.error(error);
       ctx.reply("Xatolik kuzatildi");
