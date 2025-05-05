@@ -71,7 +71,7 @@ agenda.on("ready", () => {
   console.log("Agenda is ready to use!");
   agenda.start();
   // agenda.every("0 9 * * *", "createAktPackTask"); // 09:00 every day
-  agenda.every("0 9-17 * * *", "sendMFYIncomeReportTask"); // 09:00 to 17:00 every day
+  agenda.every("0 9-22 * * *", "sendMFYIncomeReportTask"); // 09:00 to 17:00 every day
   agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask"); // 09:05 to 22:05 every day
   agenda.every("5 9-22 * * *", "sendKunlikEtkReportsTask"); // 09:05 to 22:05 every day
   agenda.every("0 9-22 * * *", "sendPinflMfyReportTask"); // 09:00 to 22:00 every day
