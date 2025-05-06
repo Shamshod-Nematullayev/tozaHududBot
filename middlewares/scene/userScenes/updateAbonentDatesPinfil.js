@@ -130,7 +130,6 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       ctx.wizard.next();
     } catch (error) {
       ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
-      console.error(error);
     }
   },
   async (ctx) => {
@@ -201,7 +200,6 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       }
     } catch (error) {
       ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
-      console.error(error);
     }
   },
   async (ctx) => {
@@ -227,7 +225,6 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       }
     } catch (error) {
       ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
-      console.error(error);
     }
   },
   async (ctx) => {
@@ -249,7 +246,6 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       }
     } catch (error) {
       ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
-      console.error(error);
     }
   }
 );
