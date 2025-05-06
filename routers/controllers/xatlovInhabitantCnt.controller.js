@@ -286,6 +286,10 @@ module.exports.confirmDalolatnoma = async (req, res) => {
         .json({ ok: false, message: "Failed to create act" });
     }
     await request.updateOne({ $set: { actId: responseAkt.data.id } });
+    await tozaMakonApi.patch("/billing-service/acts", {
+      actStatus: "CONFIRMED",
+      id: [responseAkt.data.id],
+    });
     res.status(200).json({ ok: true });
   } catch (error) {
     res.status(500).json({ ok: false, message: "Internal Server Error" });
