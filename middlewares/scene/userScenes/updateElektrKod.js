@@ -7,39 +7,7 @@ const { EtkKodRequest } = require("../../../models/EtkKodRequest");
 const { tozaMakonApi } = require("../../../api/tozaMakon");
 const { EtkAbonent } = require("../../../models/EtkAbonent");
 const { default: axios } = require("axios");
-
-const caotoNames = [
-  {
-    title: "Qoradaryo TETK",
-    caoto: 18214,
-    region: 18,
-    companyId: 1144,
-  },
-  {
-    title: "Xatirchi TETK",
-    caoto: 12251,
-    region: 12,
-    companyId: 1144,
-  },
-  {
-    title: "Kattaqo'rg'on TETK",
-    caoto: 18215,
-    region: 18,
-    companyId: 1144,
-  },
-  {
-    title: "Paxtachi TETK",
-    caoto: 18230,
-    region: 18,
-    companyId: 1265,
-  },
-  {
-    title: "Nurobod ETK",
-    caoto: 18235,
-    region: 18,
-    companyId: 1263,
-  },
-];
+const { caotoNames } = require("../../../constants");
 
 const updateElektrKod = new Scenes.WizardScene(
   "updateElektrKod",

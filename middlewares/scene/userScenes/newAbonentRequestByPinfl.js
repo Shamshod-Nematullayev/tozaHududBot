@@ -14,33 +14,7 @@ const {
 } = require("../../../helpers/extractBirthDateFromPinfl");
 const { EtkAbonent } = require("../../../models/EtkAbonent");
 const { default: axios } = require("axios");
-
-const caotoNames = [
-  {
-    title: "Qoradaryo TETK",
-    caoto: 18214,
-    region: 18,
-    companyId: 1144,
-  },
-  {
-    title: "Xatirchi TETK",
-    caoto: 12251,
-    region: 12,
-    companyId: 1144,
-  },
-  {
-    title: "Kattaqo'rg'on TETK",
-    caoto: 18215,
-    region: 18,
-    companyId: 1144,
-  },
-  {
-    title: "Paxtachi TETK",
-    caoto: 18230,
-    region: 18,
-    companyId: 1265,
-  },
-];
+const { caotoNames } = require("../../../constants");
 
 const enterFunc = (ctx) => {
   ctx.reply("Xonadon egasining PINFL raqamini kiriting!", keyboards.cancelBtn);
@@ -146,6 +120,9 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       const houses = (
         await tozaMakonApi.get("/user-service/houses/pinfl/" + ctx.message.text)
       ).data;
+      if (houses.message) {
+        return await ctx.reply(houses.message);
+      }
       await ctx.reply(
         `${citizen.lastName} ${citizen.firstName} ${citizen.patronymic}`
       );

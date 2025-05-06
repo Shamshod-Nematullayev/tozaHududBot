@@ -14,3 +14,35 @@ module.exports.OylikRejaBelgilashViloyat = `BQACAgIAAxkBAAEE2q5mb_GENCndgaODnaWE
 module.exports.INPUT_ABONENTS_LICSHET = `BQACAgIAAxkBAAEE9QABZn-1q0Qj4i1UThSKcirrbiLJ834AAo9DAAIfCQFIEb1x-j_e2t01BA`;
 module.exports.NOTIFICATIONS_CHANNEL_ID = -1002429873864;
 module.exports.TEST_BASE_CHANNEL_ID = -1001567163110;
+module.exports.caotoNames = [
+  {
+    title: "Qoradaryo TETK",
+    caoto: 18214,
+    region: 18,
+    companyId: 1144,
+  },
+  {
+    title: "Xatirchi TETK",
+    caoto: 12251,
+    region: 12,
+    companyId: 1144,
+  },
+  {
+    title: "Kattaqo'rg'on TETK",
+    caoto: 18215,
+    region: 18,
+    companyId: 1144,
+  },
+  {
+    title: "Paxtachi TETK",
+    caoto: 18230,
+    region: 18,
+    companyId: 1265,
+  },
+  {
+    title: "Nurobod ETK",
+    caoto: 18235,
+    region: 18,
+    companyId: 1263,
+  },
+];

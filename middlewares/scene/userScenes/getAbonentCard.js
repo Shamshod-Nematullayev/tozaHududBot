@@ -1,14 +1,21 @@
 const { WizardScene } = require("telegraf/scenes");
-const { Abonent, keyboards, htmlPDF, fs } = require("../../../requires");
+const {
+  Abonent,
+  keyboards,
+  htmlPDF,
+  fs,
+  Nazoratchi,
+} = require("../../../requires");
 const ejs = require("ejs");
 const { createTozaMakonApi } = require("../../../api/tozaMakon");
 const puppeter = require("puppeteer");
+const isCancel = require("../../smallFunctions/isCancel");
 
 const getAbonentCard = new WizardScene(
   "getAbonentCard",
   async (ctx) => {
     try {
-      await ctx.reply("Abonent hisob raqamini kiriting");
+      await ctx.reply("Abonent hisob raqamini kiriting", keyboards.cancelBtn);
       return ctx.wizard.next();
     } catch (error) {
       console.error(error);
@@ -18,13 +25,23 @@ const getAbonentCard = new WizardScene(
     try {
       const text = ctx.message.text;
       if (isNaN(text) || text.length < 12) {
-        ctx.scene.leave();
         return ctx.reply(
           "Abonent hisob raqamini to'g'ri kiriting",
-          keyboards.mainKeyboard
+          keyboards.cancelBtn
         );
       }
-      const abonent = await Abonent.findOne({ licshet: text });
+      const inspector = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
+      if (!inspector) {
+        ctx.reply(
+          "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!",
+          keyboards.mainKeyboard
+        );
+        return ctx.scene.leave();
+      }
+      const abonent = await Abonent.findOne({
+        licshet: text,
+        companyId: inspector.companyId,
+      });
       if (!abonent) return ctx.reply("Abonent topilmadi");
 
       const tozaMakonApi = createTozaMakonApi(abonent.companyId);
@@ -33,6 +50,7 @@ const getAbonentCard = new WizardScene(
           `/user-service/residents/${abonent.id}/print-card?lang=UZ`
         )
       ).data;
+      console.error(data);
       const html = await new Promise((resolve, reject) => {
         ejs.renderFile(
           "./views/abonentKarta.ejs",
@@ -68,5 +86,13 @@ const getAbonentCard = new WizardScene(
     }
   }
 );
+
+getAbonentCard.on("text", async (ctx, next) => {
+  if (isCancel(ctx?.message?.text)) {
+    ctx.reply("Amaliyot bekor qilindi", keyboards.mainKeyboard);
+    return ctx.scene.leave();
+  }
+  next();
+});
 
 module.exports = getAbonentCard;
