@@ -213,7 +213,8 @@ module.exports.createFullAct = async (req, res) => {
         },
       }
     );
-    const packIds = (await Company.findOne({ id: companyId })).akt_pachka_ids;
+    const packIds =
+      (await Company.findOne({ id: companyId })).akt_pachka_ids || {};
     let actPackId = packIds[document_type]?.id;
     if (
       !actPackId ||
@@ -228,8 +229,8 @@ module.exports.createFullAct = async (req, res) => {
           description: `added by th-dashboard`,
           isActive: true,
           isSpecialPack: false,
-          name: packIds[document_type].name || packNames[document_type],
-          packType: packIds[document_type].type || packTypes[document_type],
+          name: packIds[document_type]?.name || packNames[document_type],
+          packType: packIds[document_type]?.type || packTypes[document_type],
         })
       ).data;
       await Company.findOneAndUpdate(
@@ -241,7 +242,7 @@ module.exports.createFullAct = async (req, res) => {
               new Date().getMonth() + 1,
             [`akt_pachka_ids.${document_type}.year`]: new Date().getFullYear(),
             [`akt_pachka_ids.${document_type}.type`]:
-              packIds[document_type].type || packTypes[pack],
+              packIds[document_type]?.type || packTypes[document_type],
           },
         }
       );
@@ -337,9 +338,89 @@ module.exports.createDublicateActByAriza = async (req, res) => {
       }
     );
 
-    const packIds = (await Company.findOne({ id: req.user.companyId }))
-      .akt_pachka_ids;
+    const document_type = ariza.document_type;
+    let packIds =
+      (await Company.findOne({ id: req.user.companyId })).akt_pachka_ids || {};
+    let actPackId = packIds[document_type]?.id;
+    if (
+      !actPackId ||
+      packIds[document_type].month != date.getMonth() + 1 ||
+      packIds[document_type].year != date.getFullYear()
+    ) {
+      // akt pachkasi yo'q bo'lsa
+      const packId = (
+        await tozaMakonApi.post("/billing-service/act-packs", {
+          companyId: req.user.companyId,
+          createdDate: formatDate(new Date()),
+          description: `added by th-dashboard`,
+          isActive: true,
+          isSpecialPack: false,
+          name: packIds[document_type]?.name || packNames[document_type],
+          packType: packIds[document_type]?.type || packTypes[document_type],
+        })
+      ).data;
+      await Company.findOneAndUpdate(
+        { id: req.user.companyId },
+        {
+          $set: {
+            [`akt_pachka_ids.${document_type}.id`]: packId,
+            [`akt_pachka_ids.${document_type}.month`]:
+              new Date().getMonth() + 1,
+            [`akt_pachka_ids.${document_type}.year`]: new Date().getFullYear(),
+            [`akt_pachka_ids.${document_type}.type`]:
+              packIds[document_type]?.type || packTypes[document_type],
+          },
+        }
+      );
+      packIds[document_type] = {
+        id: packId,
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+        type: packIds[document_type]?.type || packTypes[document_type],
+        name: packIds[document_type]?.name || packNames[document_type],
+      };
+      actPackId = packId;
+    }
     if (akt_sum > 0) {
+      let actPackId = packIds.pul_kuchirish?.id;
+      if (
+        !actPackId ||
+        packIds.pul_kuchirish.month != date.getMonth() + 1 ||
+        packIds.pul_kuchirish.year != date.getFullYear()
+      ) {
+        // akt pachkasi yo'q bo'lsa
+        const packId = (
+          await tozaMakonApi.post("/billing-service/act-packs", {
+            companyId: req.user.companyId,
+            createdDate: formatDate(new Date()),
+            description: `added by th-dashboard`,
+            isActive: true,
+            isSpecialPack: false,
+            name: packIds.pul_kuchirish?.name || packNames.pul_kuchirish,
+            packType: packIds.pul_kuchirish?.type || packTypes.pul_kuchirish,
+          })
+        ).data;
+        await Company.findOneAndUpdate(
+          { id: req.user.companyId },
+          {
+            $set: {
+              [`akt_pachka_ids.pul_kuchirish.id`]: packId,
+              [`akt_pachka_ids.pul_kuchirish.month`]: new Date().getMonth() + 1,
+              [`akt_pachka_ids.pul_kuchirish.year`]: new Date().getFullYear(),
+              [`akt_pachka_ids.pul_kuchirish.type`]:
+                packIds.pul_kuchirish?.type || packTypes.pul_kuchirish,
+            },
+          }
+        );
+        packIds.pul_kuchirish = {
+          id: packId,
+          month: new Date().getMonth() + 1,
+          year: new Date().getFullYear(),
+          type: packIds.pul_kuchirish?.type || packTypes.pul_kuchirish,
+          name: packIds.pul_kuchirish?.name || packNames.pul_kuchirish,
+        };
+        actPackId = packId;
+      }
       // monay transfer to real account
       const calculateKSaldo = (
         await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {

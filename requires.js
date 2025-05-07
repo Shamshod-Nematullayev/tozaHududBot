@@ -3,7 +3,6 @@ const fs = require("fs");
 const https = require("https");
 const path = require("path");
 const xlsx = require("json-as-xlsx");
-const htmlPDF = require("html-pdf");
 const ejs = require("ejs");
 
 // required functions
@@ -32,7 +31,6 @@ module.exports = {
   https,
   path,
   xlsx,
-  htmlPDF,
   ejs,
   // required functions
   find_address_by_pinfil_from_mvd,

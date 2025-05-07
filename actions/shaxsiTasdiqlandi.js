@@ -259,11 +259,13 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
     }
   } catch (error) {
     try {
-      await ctx.answerCbQuery("Xatolik kuzatildi");
+      await ctx.answerCbQuery(
+        error?.response?.data?.message || "Xatolik kuzatildi"
+      );
     } catch (error) {
       console.error(error);
     }
-    console.error(error);
+    console.error(error, ctx.message);
   }
 });
 
