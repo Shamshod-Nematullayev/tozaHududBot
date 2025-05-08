@@ -27,39 +27,56 @@ app.use(
     credentials: true,
   })
 );
+mongoose
+  .connect(process.env.MONGO)
+  .then(async () => {
+    console.log(`Ma'lumotlar bazasiga ulandi`);
+    require("./intervals");
+    require("./test");
 
-// use routers
-app.use("/api/auth", require("./routers/auth"));
-app.use("/api/statistics", isAuth, require("./routers/statisticsRouter"));
-app.use("/api/notification", isAuth, require("./routers/notificationRouter"));
-// app.use("/api/court-service", isAuth, require("./routers/sudRouter"));
-// app.use("/api/targets", isAuth, require("./routers/targetsRouter"));
-// app.use("/api/bildirgilar", isAuth, require("./routers/bildirgilarRouter"));
-app.use("/api/fetchTelegram", isAuth, require("./routers/fetchTelegramRouter"));
-app.use("/api/pachkalar", isAuth, require("./routers/aktPachka"));
-app.use("/api/documents", isAuth, require("./routers/kiruvchiXujjatlar"));
-app.use("/api/inspectors", isAuth, require("./routers/inspectorsRouter"));
-app.use("/api/abonents", isAuth, require("./routers/abonentsRouter"));
-app.use("/api/billing", isAuth, require("./routers/billing"));
-app.use("/api/arizalar", isAuth, require("./routers/arizalarRouter"));
-app.use(
-  "/api/pendingNewAbonents",
-  isAuth,
-  require("./routers/newAbonentsRouter")
-);
-app.use(
-  "/api/yashovchi-soni-xatlov",
-  isAuth,
-  require("./routers/yashovchiSoniXatlov")
-);
+    // use routers
+    app.use("/api/auth", require("./routers/auth"));
+    app.use("/api/statistics", isAuth, require("./routers/statisticsRouter"));
+    app.use(
+      "/api/notification",
+      isAuth,
+      require("./routers/notificationRouter")
+    );
+    // app.use("/api/court-service", isAuth, require("./routers/sudRouter"));
+    // app.use("/api/targets", isAuth, require("./routers/targetsRouter"));
+    // app.use("/api/bildirgilar", isAuth, require("./routers/bildirgilarRouter"));
+    app.use(
+      "/api/fetchTelegram",
+      isAuth,
+      require("./routers/fetchTelegramRouter")
+    );
+    app.use("/api/pachkalar", isAuth, require("./routers/aktPachka"));
+    app.use("/api/documents", isAuth, require("./routers/kiruvchiXujjatlar"));
+    app.use("/api/inspectors", isAuth, require("./routers/inspectorsRouter"));
+    app.use("/api/abonents", isAuth, require("./routers/abonentsRouter"));
+    app.use("/api/billing", isAuth, require("./routers/billing"));
+    app.use("/api/arizalar", isAuth, require("./routers/arizalarRouter"));
+    app.use(
+      "/api/pendingNewAbonents",
+      isAuth,
+      require("./routers/newAbonentsRouter")
+    );
+    app.use(
+      "/api/yashovchi-soni-xatlov",
+      isAuth,
+      require("./routers/yashovchiSoniXatlov")
+    );
 
-app.use((req, res, next) => {
-  res.status(404).json({
-    ok: false,
-    message: `Cannot ${req.method} ${req.originalUrl}`,
+    app.use((req, res, next) => {
+      res.status(404).json({
+        ok: false,
+        message: `Cannot ${req.method} ${req.originalUrl}`,
+      });
+    });
+  })
+  .catch((err) => {
+    throw err;
   });
-});
-
 process.on("warning", (warning) => {
   console.warn(warning.stack);
 });
@@ -77,13 +94,3 @@ function useTelegramBot() {
 }
 useTelegramBot();
 // require("./test");
-mongoose
-  .connect(process.env.MONGO)
-  .then(async () => {
-    console.log(`Ma'lumotlar bazasiga ulandi`);
-    require("./intervals");
-    require("./test");
-  })
-  .catch((err) => {
-    throw err;
-  });
