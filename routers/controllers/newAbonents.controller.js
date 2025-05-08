@@ -174,13 +174,7 @@ module.exports.acceptPendingNewAbonent = async (req, res) => {
 module.exports.getFreeAbonentIdForNewAbonent = async (req, res) => {
   try {
     const { companyId } = req.user;
-    const { inHabitantCount } = req.params;
-    if (isNaN(inHabitantCount)) {
-      return res.status(400).json({
-        ok: false,
-        message: "inhabitantCnt param required",
-      });
-    }
+
     const freeAbonent = await FreeAbonent.findOne({
       companyId,
       inHabitantCount: 0,
@@ -202,11 +196,12 @@ module.exports.getFreeAbonentIdForNewAbonent = async (req, res) => {
 module.exports.castlingWithNewAbonent = async (req, res) => {
   try {
     const { companyId } = req.user;
-    const { id, newAbonentId } = req.body;
-    if (!id || !newAbonentId) {
-      return res
-        .status(400)
-        .json({ ok: false, message: "id and newAbonentId required" });
+    const { id, newAbonentId, accountNumber } = req.body;
+    if (!id || !accountNumber || !newAbonentId) {
+      return res.status(400).json({
+        ok: false,
+        message: "id, accountNumber, newAbonentId required",
+      });
     }
 
     const freeAbonent = await FreeAbonent.findOne({
@@ -239,26 +234,20 @@ module.exports.castlingWithNewAbonent = async (req, res) => {
     }
     const tozaMakonApi = createTozaMakonApi(companyId);
 
-    const generatedAccountNumber = (
-      await tozaMakonApi.get(
-        `/user-service/residents/account-numbers/generate?residentType=INDIVIDUAL&mahallaId=${newAbonent.mahallaId}`
-      )
-    ).data;
-
     await tozaMakonApi.put("/user-service/residents/" + freeAbonent.id, {
       id: freeAbonent.id,
-      accountNumber: generatedAccountNumber,
+      accountNumber: accountNumber,
       active: true,
       citizen: newAbonent.citizen,
       companyId: newAbonent.companyId,
       contractDate: null,
       contractNumber: null,
-      description: `${newAbonent.nazoratchi_id} tomonidan yangi abonent ochish uchun ariza qabul qilindi`,
+      description: `${nazoratchi.name} tomonidan yangi abonent ochish uchun ariza qabul qilindi`,
       electricityAccountNumber: newAbonent.etkCustomerCode,
       electricityCoato: newAbonent.etkCaoto,
       homePhone: null,
       house: {
-        cadastralNumber: newAbonent.cadastr,
+        cadastralNumber: newAbonent.cadastr || "0",
         flatNumber: null,
         homeIndex: null,
         homeNumber: 0,
@@ -273,16 +262,28 @@ module.exports.castlingWithNewAbonent = async (req, res) => {
       streetId: newAbonent.streetId,
     });
 
-    await freeAbonent.deleteOne();
+    await tozaMakonApi.patch(
+      "/billing-service/residents/" + freeAbonent.id + "/inhabitant",
+      {
+        inhabitantCount: String(newAbonent.inhabitant_cnt),
+      }
+    );
 
     res.json({
       ok: true,
       message: "Bo'sh abonent muvaffaqqiyatli almashtirildi",
     });
-
+    await freeAbonent.deleteOne();
+    await newAbonent.updateOne({
+      $set: {
+        status: StatusNewAbonent.APPROVED,
+        accountNumber: accountNumber,
+        residentId: freeAbonent.id,
+      },
+    });
     bot.telegram.sendMessage(
       newAbonent.senderId,
-      `Fuqaro: ${newAbonent.citizen.lastName} ${newAbonent.citizen.firstName} ${newAbonent.citizen.patronymic}\nSizning ushbu fuqaroga yangi abonent ochish haqidagi arizangiz qabul qilindi. \n\nSizning yangi abonent raqamingiz: <code>${generatedAccountNumber}</code>`,
+      `Fuqaro: ${newAbonent.abonent_name}\nSizning ushbu fuqaroga yangi abonent ochish haqidagi arizangiz qabul qilindi. \n\nSizning yangi abonent raqamingiz: <code>${accountNumber}</code>`,
       { parse_mode: "HTML" }
     );
     try {
@@ -294,7 +295,7 @@ module.exports.castlingWithNewAbonent = async (req, res) => {
     await Abonent.create({
       id: freeAbonent.id,
       fio: newAbonent.abonent_name,
-      licshet: generatedAccountNumber,
+      licshet: accountNumber,
       prescribed_cnt: newAbonent.inhabitant_cnt,
       kadastr_number: newAbonent.cadastr,
       pinfl: newAbonent.citizen.pnfl,
@@ -312,6 +313,31 @@ module.exports.castlingWithNewAbonent = async (req, res) => {
         inspector_name: nazoratchi.name,
       },
       companyId: newAbonent.companyId,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ ok: false, message: "Server error " + error.message });
+  }
+};
+
+module.exports.generateAccountNumber = async (req, res) => {
+  try {
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+    const { mahallaId } = req.query;
+    if (!mahallaId)
+      return res.status(400).json({
+        ok: false,
+        message: "mahallaId param required",
+      });
+    const accountNumber = (
+      await tozaMakonApi.get(
+        `/user-service/residents/account-numbers/generate?residentType=INDIVIDUAL&mahallaId=${mahallaId}`
+      )
+    ).data;
+    res.json({
+      ok: true,
+      accountNumber,
     });
   } catch (error) {
     res

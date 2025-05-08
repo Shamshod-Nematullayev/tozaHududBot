@@ -43,6 +43,7 @@ const schema = new Schema({
   },
   abonent_name: String,
   accountNumber: String,
+  residentId: Number,
   cadastr: String,
   inhabitant_cnt: {
     type: Number,
