@@ -120,9 +120,6 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       const houses = (
         await tozaMakonApi.get("/user-service/houses/pinfl/" + ctx.message.text)
       ).data;
-      if (houses.message) {
-        return await ctx.reply(houses.message);
-      }
       await ctx.reply(
         `${citizen.lastName} ${citizen.firstName} ${citizen.patronymic}`
       );

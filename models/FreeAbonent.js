@@ -9,7 +9,10 @@ const schema = new Schema({
     type: Number,
     required: true,
   },
-  cadastr: String,
+  accountNumber: {
+    type: String,
+    required: true,
+  },
   companyId: {
     type: Number,
     required: true,

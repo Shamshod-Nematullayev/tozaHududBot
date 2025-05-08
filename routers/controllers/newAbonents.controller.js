@@ -68,7 +68,7 @@ module.exports.cancelPendingNewAbonent = async (req, res) => {
       return res.status(404).json({ ok: false, message: "Abonent not found" });
     }
     res.json({ ok: true, data: pendingAbonent });
-    bot.sendMessage(
+    bot.telegram.sendMessage(
       pendingAbonent.senderId,
       `Fuqaro: ${pendingAbonent.citizen.lastName} ${pendingAbonent.citizen.firstName} ${pendingAbonent.citizen.patronymic}\nSizning ushbu fuqaroga yangi abonent ochish haqidagi arizangiz bekor qilindi. \n\nSababi: ${description}`
     );
@@ -183,7 +183,7 @@ module.exports.getFreeAbonentIdForNewAbonent = async (req, res) => {
     }
     const freeAbonent = await FreeAbonent.findOne({
       companyId,
-      inHabitantCount,
+      inHabitantCount: 0,
     });
     if (!freeAbonent) {
       return res
