@@ -28,7 +28,12 @@ app.use(
   })
 );
 mongoose
-  .connect(process.env.MONGO)
+  .connect(process.env.MONGO, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000, // serverga ulanish uchun kutish vaqti
+    socketTimeoutMS: 45000, // so'rov uchun vaqt
+  })
   .then(async () => {
     console.log(`Ma'lumotlar bazasiga ulandi`);
     // require("./test");
@@ -83,7 +88,8 @@ mongoose
     useTelegramBot();
   })
   .catch((err) => {
-    throw err;
+    console.error("MongoDB ulanishda xatolik:", err.message);
+    process.exit(1);
   });
 process.on("warning", (warning) => {
   console.warn(warning.stack);
@@ -93,5 +99,3 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
-
-// require("./test");
