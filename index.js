@@ -31,8 +31,7 @@ mongoose
   .connect(process.env.MONGO)
   .then(async () => {
     console.log(`Ma'lumotlar bazasiga ulandi`);
-    require("./intervals");
-    require("./test");
+    // require("./test");
 
     // use routers
     app.use("/api/auth", require("./routers/auth"));
@@ -73,6 +72,15 @@ mongoose
         message: `Cannot ${req.method} ${req.originalUrl}`,
       });
     });
+
+    // telegram bot
+    function useTelegramBot() {
+      require("./core/bot");
+      require("./middlewares");
+      require("./actions");
+      require("./intervals");
+    }
+    useTelegramBot();
   })
   .catch((err) => {
     throw err;
@@ -86,11 +94,4 @@ server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
 
-// telegram bot
-function useTelegramBot() {
-  require("./core/bot");
-  require("./middlewares");
-  require("./actions");
-}
-useTelegramBot();
 // require("./test");
