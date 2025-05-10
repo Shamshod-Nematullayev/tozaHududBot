@@ -73,6 +73,7 @@ const schema = new Schema(
       type: Number,
       required: true,
     },
+    ksaldo: Number,
   },
   {
     timestamps: true,

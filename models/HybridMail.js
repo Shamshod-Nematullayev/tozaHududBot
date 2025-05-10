@@ -1,6 +1,10 @@
 const { Schema, default: mongoose } = require("mongoose");
 
 const schema = new Schema({
+  residentId: {
+    required: true,
+    type: Number,
+  },
   licshet: {
     required: true,
     type: String,
@@ -22,6 +26,11 @@ const schema = new Schema({
     default: "",
   },
   abonent_deleted: { type: Boolean, default: false },
+  mahallaId: Number,
+  companyId: {
+    type: Number,
+    required: true,
+  },
 });
 
 module.exports.HybridMail = mongoose.model("hybrid_mail", schema);

@@ -80,6 +80,17 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         return;
       }
 
+      const existRequest = await NewAbonent.findOne({
+        "citizen.pnfl": ctx.message.text,
+      });
+      if (existRequest) {
+        ctx.reply(
+          "Ushbu fuqaroga kod ochish uchun allaqachon so'rov yuborilgan"
+        );
+        ctx.scene.leave();
+        return;
+      }
+
       const mahallalarButtons = admin
         ? await keyboards.nazoratchigaBiriktirilganMahallalar(
             inspektor.companyId || admin.companyId

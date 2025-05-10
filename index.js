@@ -16,6 +16,9 @@ const express = require("express");
 const cors = require("cors");
 const isAuth = require("./middlewares/isAuth");
 const { app, server } = require("./config/socketConfig");
+const {
+  updateAbonentsFromTozamakon,
+} = require("./intervals/updateAbonentsFromTozamakon");
 
 // App middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -46,9 +49,9 @@ mongoose
       isAuth,
       require("./routers/notificationRouter")
     );
-    // app.use("/api/court-service", isAuth, require("./routers/sudRouter"));
-    // app.use("/api/targets", isAuth, require("./routers/targetsRouter"));
-    // app.use("/api/bildirgilar", isAuth, require("./routers/bildirgilarRouter"));
+    app.use("/api/court-service", isAuth, require("./routers/sudRouter"));
+    app.use("/api/targets", isAuth, require("./routers/targetsRouter"));
+    app.use("/api/bildirgilar", isAuth, require("./routers/bildirgilarRouter"));
     app.use(
       "/api/fetchTelegram",
       isAuth,
@@ -83,9 +86,10 @@ mongoose
       require("./core/bot");
       require("./middlewares");
       require("./actions");
-      require("./intervals");
+      // require("./intervals");
     }
     useTelegramBot();
+    updateAbonentsFromTozamakon(1144);
   })
   .catch((err) => {
     console.error("MongoDB ulanishda xatolik:", err.message);

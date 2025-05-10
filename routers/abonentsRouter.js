@@ -2,6 +2,7 @@ const router = require("express").Router();
 const { Abonent } = require("../models/Abonent");
 
 router.get("/", (req, res) => res.json({ ok: true }));
+
 router.get("/get-one-abonent-by-licshet/:licshet", async (req, res) => {
   try {
     const abonents = await Abonent.find({
@@ -34,5 +35,7 @@ router.get("/get-one-abonent-by-licshet/:licshet", async (req, res) => {
       .status(500);
   }
 });
+
+router.post("update-abonents-by-tozamakon", updateAbonentsByTozamakon);
 
 module.exports = router;

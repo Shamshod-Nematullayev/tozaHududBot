@@ -1,3 +1,5 @@
+const { createTozaMakonApi } = require("../../api/tozaMakon");
+const { HybridMail } = require("../../models/HybridMail");
 const { SudAkt } = require("../../models/SudAkt");
 const { Counter } = require("../../requires");
 
@@ -294,5 +296,77 @@ module.exports.uploadSudArizaFile = async (req, res) => {
   } catch (err) {
     res.json({ ok: false, message: "Internal server error 500" });
     console.error(err);
+  }
+};
+
+module.exports.getDebitorAbonents = async (req, res) => {
+  try {
+    const { companyId } = req.user;
+    const { balanceFrom, balanceTo, mahallaId, page, size } = req.query;
+
+    const tozaMakonApi = createTozaMakonApi(companyId);
+
+    const { data } = await tozaMakonApi.get("/user-service/residents", {
+      params: {
+        balanceFrom: balanceFrom ?? 10000,
+        balanceTo,
+        mahallaId,
+        companyId,
+        page,
+        size,
+      },
+    });
+
+    const filtersSudAkt = { companyId };
+    const filtersHybridMail = { companyId };
+
+    if (mahallaId) {
+      filtersSudAkt.mfy_id = mahallaId;
+      filtersHybridMail.mahallaId = mahallaId;
+    }
+
+    const [sudAkts, hybridMails] = await Promise.all([
+      SudAkt.find(filtersSudAkt).select([
+        "sud_case_number",
+        "claimAmount",
+        "created_at",
+        "licshet",
+      ]),
+      HybridMail.find(filtersHybridMail).select([
+        "hybridMailId",
+        "isSent",
+        "createdOn",
+        "warning_amount",
+        "licshet",
+      ]),
+    ]);
+
+    // Eng oxirgi elementni olish uchun Map
+    const sudAktMap = new Map();
+    sudAkts.forEach((akt) => {
+      sudAktMap.set(akt.licshet, akt); // oxirgisi ustiga yoziladi
+    });
+
+    const hybridMailMap = new Map();
+    hybridMails.forEach((mail) => {
+      hybridMailMap.set(mail.licshet, mail); // oxirgisi ustiga yoziladi
+    });
+
+    const abonentFromTozaMakon = data.content.map((abonent) => {
+      return {
+        ...abonent,
+        sudAkt: sudAktMap.get(abonent.accountNumber) || null,
+        hybridMail: hybridMailMap.get(abonent.accountNumber) || null,
+      };
+    });
+
+    res.json({
+      ok: true,
+      rows: abonentFromTozaMakon,
+      total: data.totalElements,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, message: "Internal server error 500" });
   }
 };
