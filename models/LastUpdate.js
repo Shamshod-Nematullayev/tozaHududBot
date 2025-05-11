@@ -5,7 +5,9 @@ const LastUpdate = mongoose.model(
   "LastUpdate",
   new Schema({
     key: String,
-    value: Date,
+    rows: Array,
+    last_update: Date,
+    page: Number,
   })
 );
 

@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "3": "^2.1.0",
     "agenda": "^5.0.0",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.1",

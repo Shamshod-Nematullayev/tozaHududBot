@@ -46,3 +46,7 @@ module.exports.caotoNames = [
     companyId: 1263,
   },
 ];
+
+module.exports.queueNames = {
+  updateAbonents: "updateAbonents",
+};

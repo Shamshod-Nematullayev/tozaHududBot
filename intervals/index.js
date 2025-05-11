@@ -1,3 +1,4 @@
+const { agenda } = require("../config/agenda");
 const { Company } = require("../requires");
 const { createAktPack } = require("./createAktPack");
 const { sendKunlikEtkReports } = require("./kunlikEtkReports");
@@ -9,12 +10,6 @@ const { sendIdentifietMfyReport } = require("./sendIdentifietMfyReport");
 const { sendMFYIncomeReport } = require("./sendMFYIncomeReport");
 const { sendPinflMfyReport } = require("./sendPinflMfyReport");
 const { addUpdateArizaAktTask } = require("./updateArizaAkt");
-
-const Agenda = require("agenda");
-
-const agenda = new Agenda({
-  db: { address: process.env.MONGO, collection: "agendaJobs" },
-});
 
 // Define tasks with Agenda
 agenda.define("createAktPackTask", async () => {
@@ -65,22 +60,4 @@ agenda.define("nazoratchilarKunlikTushumTask", async () => {
       nazoratchilarKunlikTushum(company.id);
     }
   });
-});
-
-// Schedule jobs
-
-agenda.on("ready", () => {
-  console.log("Agenda is ready to use!");
-  agenda.start();
-  // agenda.every("0 9 * * *", "createAktPackTask"); // 09:00 every day
-  agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask"); // 09:00 to 17:00 every day
-  agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod"); // 09:00 to 17:00 every day
-  agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask"); // 09:05 to 22:05 every day
-  agenda.every("5 9-22 * * *", "sendKunlikEtkReportsTask"); // 09:05 to 22:05 every day
-  agenda.every("0 9-22 * * *", "sendPinflMfyReportTask"); // 09:00 to 22:00 every day
-  agenda.every("0 9-22 * * *", "sendEtkMfyReportTask"); // 09:00 to 22:00 every day
-  agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask"); // 09:00 to 22:00 every day
-});
-agenda.on("error", (error) => {
-  console.error("Agenda error:", error);
 });

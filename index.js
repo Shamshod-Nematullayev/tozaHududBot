@@ -19,6 +19,8 @@ const { app, server } = require("./config/socketConfig");
 const {
   updateAbonentsFromTozamakon,
 } = require("./intervals/updateAbonentsFromTozamakon");
+const { agenda } = require("./config/agenda");
+const { queueNames } = require("./constants");
 
 // App middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -32,10 +34,8 @@ app.use(
 );
 mongoose
   .connect(process.env.MONGO, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000, // serverga ulanish uchun kutish vaqti
-    socketTimeoutMS: 45000, // so'rov uchun vaqt
+    connectTimeoutMS: 30000,
+    socketTimeoutMS: 30000,
   })
   .then(async () => {
     console.log(`Ma'lumotlar bazasiga ulandi`);
@@ -86,10 +86,8 @@ mongoose
       require("./core/bot");
       require("./middlewares");
       require("./actions");
-      // require("./intervals");
     }
     useTelegramBot();
-    updateAbonentsFromTozamakon(1144);
   })
   .catch((err) => {
     console.error("MongoDB ulanishda xatolik:", err.message);
@@ -97,6 +95,25 @@ mongoose
   });
 process.on("warning", (warning) => {
   console.warn(warning.stack);
+});
+
+// Schedule jobs
+
+agenda.on("ready", () => {
+  console.log("Agenda is ready to use!");
+  require("./intervals");
+  agenda.start();
+  agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask"); // 09:00  to 17:00 every day
+  agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod"); // 09:00 to 17:00 every day
+  agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask"); // 09:05 to 22:05 every day
+  agenda.every("5 9-22 * * *", "sendKunlikEtkReportsTask"); // 09:05 to 22:05 every day
+  agenda.every("0 9-22 * * *", "sendPinflMfyReportTask"); // 09:00 to 22:00 every day
+  agenda.every("0 9-22 * * *", "sendEtkMfyReportTask"); // 09:00 to 22:00 every day
+  agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask"); // 09:00 to 22:00 every day
+  agenda.every("0 3 * * *", queueNames.updateAbonents, { companyId: 1144 });
+});
+agenda.on("error", (error) => {
+  console.error("Agenda error:", error);
 });
 
 const PORT = process.env.PORT || 3000;

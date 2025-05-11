@@ -36,6 +36,6 @@ router.get("/get-one-abonent-by-licshet/:licshet", async (req, res) => {
   }
 });
 
-router.post("update-abonents-by-tozamakon", updateAbonentsByTozamakon);
+//router.post("update-abonents-by-tozamakon", updateAbonentsByTozamakon);
 
 module.exports = router;
