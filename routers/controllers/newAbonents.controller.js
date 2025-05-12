@@ -262,12 +262,14 @@ module.exports.castlingWithNewAbonent = async (req, res) => {
       streetId: newAbonent.streetId,
     });
 
-    await tozaMakonApi.patch(
-      "/billing-service/residents/" + freeAbonent.id + "/inhabitant",
-      {
-        inhabitantCount: String(newAbonent.inhabitant_cnt),
-      }
-    );
+    if (newAbonent.inhabitant_cnt > 0) {
+      await tozaMakonApi.patch(
+        "/billing-service/residents/" + freeAbonent.id + "/inhabitant",
+        {
+          inhabitantCount: String(newAbonent.inhabitant_cnt),
+        }
+      );
+    }
 
     res.json({
       ok: true,
@@ -315,6 +317,7 @@ module.exports.castlingWithNewAbonent = async (req, res) => {
       companyId: newAbonent.companyId,
     });
   } catch (error) {
+    console.error(error);
     res
       .status(500)
       .json({ ok: false, message: "Server error " + error.message });

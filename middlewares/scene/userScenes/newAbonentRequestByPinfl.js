@@ -222,6 +222,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       ).data;
       if (streets.length == 1) {
         ctx.wizard.state.street_id = streets[0].id;
+        ctx.wizard.state.streetName = streets[0].name;
         ctx.reply(
           "Yashovchi sonini tanlang yoki kiriting",
           Markup.keyboard([

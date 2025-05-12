@@ -8,7 +8,6 @@ const BATCH_SIZE = 1000;
 
 module.exports = (agenda) => {
   agenda.define(queueNames.updateAbonents, async (job, done) => {
-    console.log("Job ishga tushdi");
     const data = job.attrs.data || {}; // fallback bo‘sh obyekt
     const { companyId, page = 0 } = data;
 
@@ -49,8 +48,9 @@ module.exports = (agenda) => {
       const state = await LastUpdate.findOne({
         key: `abonents-temp-${companyId}`,
       });
-      if (!state || !Array.isArray(state.rows))
+      if (!state || !Array.isArray(state.rows)) {
         throw new Error("Temporary data not found");
+      }
 
       const rows = state.rows;
       const chunk = rows.slice(page * BATCH_SIZE, (page + 1) * BATCH_SIZE);
@@ -89,19 +89,22 @@ module.exports = (agenda) => {
 
       await LastUpdate.findOneAndUpdate(
         { key: `abonents-last-page-${companyId}` },
-        { $set: { page } },
+        { $set: { page: page + 1 } },
         { upsert: true }
       );
 
       // queue next batch
-      await agenda.now("update abonents", { companyId, page: page + 1 });
+      await agenda.now(queueNames.updateAbonents, {
+        companyId,
+        page: page + 1,
+      });
 
       done();
     } catch (err) {
       console.error("❌ Job failed", err);
 
       // qayta urinib ko'rish uchun
-      await agenda.schedule("in 1 minute", "update abonents", {
+      await agenda.schedule("in 1 minute", queueNames.updateAbonents, {
         companyId,
         page,
       });

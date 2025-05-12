@@ -20,6 +20,20 @@ const isConfirmSchema = new Schema({
   inspector: inspectorSchema,
   updated_at: Date,
 });
+const courtProcessSchema = new Schema(
+  {
+    id: {
+      type: String,
+      required: true,
+    },
+    createdDate: {
+      type: Date,
+      required: true,
+    },
+  },
+  { _id: false }
+);
+
 const schema = new Schema(
   {
     id: {
@@ -68,7 +82,12 @@ const schema = new Schema(
     ekt_kod_tasdiqlandi: isConfirmSchema,
     street_tasdiqlandi: isConfirmSchema,
     phone_tasdiqlandi: isConfirmSchema,
-    bumadi: Boolean,
+    sudAkt: {
+      type: courtProcessSchema,
+    },
+    warningLetter: {
+      type: courtProcessSchema,
+    },
     companyId: {
       type: Number,
       required: true,
