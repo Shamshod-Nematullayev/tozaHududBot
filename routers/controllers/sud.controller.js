@@ -302,12 +302,40 @@ module.exports.uploadSudArizaFile = async (req, res) => {
 module.exports.getDebitorAbonents = async (req, res) => {
   try {
     const { companyId } = req.user;
-    const { balanceFrom, balanceTo, mahallaId, page, size } = req.query;
+    const {
+      balanceFrom,
+      balanceTo,
+      mahallaId,
+      hadSudAkt,
+      hadWarningLetter,
+      page,
+      size,
+    } = req.query;
 
     const filters = { companyId };
     if (balanceFrom) filters.ksaldo = { $gte: balanceFrom };
     if (balanceTo) filters.ksaldo = { ...filters.ksaldo, $lte: balanceTo };
     if (mahallaId) filters.mahallas_id = mahallaId;
+    if (hadSudAkt) {
+      if (hadSudAkt === "true") filters["sudAkt.id"] = { $exist: true };
+      else if (hadSudAkt === "false") filters["sudAkt.id"] = { $exist: false };
+      else
+        return res.status(400).json({
+          ok: false,
+          message: "hadSudAkt's value wrong",
+        });
+    }
+    if (hadWarningLetter) {
+      if (hadWarningLetter === "true")
+        filters["warningLetter.id"] = { $exist: true };
+      else if (hadWarningLetter === "false")
+        filters["warningLetter.id"] = { $exist: false };
+      else
+        return res.status(400).json({
+          ok: false,
+          message: "hadWarningLetter's value wrong",
+        });
+    }
 
     const abonents = await Abonent.find(filters)
       .skip(size * (page - 1))
