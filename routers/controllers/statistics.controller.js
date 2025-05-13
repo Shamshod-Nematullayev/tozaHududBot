@@ -1,4 +1,5 @@
 const { Abonent } = require("../../models/Abonent");
+const { LastUpdate } = require("../../models/LastUpdate");
 
 module.exports.getIdentityStat = async (req, res) => {
   try {
@@ -40,6 +41,20 @@ module.exports.getETKConfirmStat = async (req, res) => {
       confirmed: allAbonentsCount - confirmed,
     });
     console.log(allAbonentsCount, confirmed, "etk");
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+    console.error(error);
+  }
+};
+
+module.exports.getLastUpdateDateAbonentsSaldo = async (req, res) => {
+  try {
+    const lastUpdateDate = (
+      await LastUpdate.findOne({ key: `abonents-update-${req.user.companyId}` })
+    ).last_update;
+    res.json({ lastUpdateDate });
   } catch (error) {
     res.status(500).json({
       message: "Internal Server Error",
