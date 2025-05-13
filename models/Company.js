@@ -57,6 +57,8 @@ const schema = new Schema(
     hybridToken: String,
     hybridLogin: String,
     hybridPassword: String,
+    hybridRegion: Number,
+    hybridArea: Number,
     ekopayLogin: String,
     ekopayPassword: String,
     ekopaySessionId: String,

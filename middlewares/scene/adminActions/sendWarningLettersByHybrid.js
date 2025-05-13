@@ -2,7 +2,7 @@ const { Scenes } = require("telegraf");
 const { INPUT_ABONENTS_LICSHET } = require("../../../constants");
 const { createInlineKeyboard } = require("../../../lib/keyboards");
 const { HybridMail } = require("../../../models/HybridMail");
-const { keyboards, Abonent } = require("../../../requires");
+const { keyboards, Abonent, Admin, Company } = require("../../../requires");
 const {
   handleTelegramExcel,
 } = require("../../smallFunctions/handleTelegramExcel");
@@ -15,6 +15,7 @@ const PDFMerger = require("pdf-merger-js");
 const { tozaMakonApi } = require("../../../api/tozaMakon");
 const { hybridPochtaApi } = require("../../../api/hybridPochta");
 const FormData = require("form-data");
+const { default: puppeteer } = require("puppeteer");
 
 // required small functions
 
@@ -46,7 +47,7 @@ async function createWarningLetterPDF(abonentData) {
     )
   ).data;
 
-  const createHtmlString = new Promise((resolve, reject) => {
+  const html = await new Promise((resolve, reject) => {
     ejs.renderFile(
       path.join(__dirname, "../../../", "views", "gibrid.ogohlantirish.ejs"),
       { warningDataPrint },
@@ -57,14 +58,23 @@ async function createWarningLetterPDF(abonentData) {
       }
     );
   });
-  const html = await createHtmlString;
-  const convertPDF = new Promise((resolve, reject) => {
-    // htmlPDF
-    //   .create(html, { format: "letter", orientation: "portrait" })
-    //   .toBuffer((err, str) => {
-    //     if (err) return reject(err);
-    //     resolve({ base64: str.toString("base64"), courtWarning });
-    //   });
+  const convertPDF = new Promise(async (resolve, reject) => {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0" });
+    const buffer = await page.pdf({
+      format: "letter",
+      printBackground: true,
+    });
+    await page.close();
+    resolve({
+      base64: buffer.toString("base64"),
+      courtWarning,
+    });
   });
   return await convertPDF;
 }
@@ -73,6 +83,9 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
   "Ogohlantish xati yuborish",
   async (ctx) => {
     try {
+      const admin = await Admin.findOne({ user_id: ctx.from.id });
+      if (!admin) return ctx.reply("Sizning adminlik huquqingiz yoq");
+      ctx.wizard.state.admin = admin;
       const jsonData = await handleTelegramExcel(ctx);
       const arrayMails = [];
       // validations
@@ -86,16 +99,23 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           const licshet = row[Object.keys(row)[1]];
           console.log(licshet);
           if (licshet === undefined) {
-            ctx.reply(`${qator}-qatorda licshet topilmadi`);
+            ctx.reply(`${qator}-qatorda hisob raqami topilmadi`);
             return false;
           }
-          const abonent = await Abonent.findOne({ licshet });
+          const abonent = await Abonent.findOne({
+            licshet,
+            companyId: admin.companyId,
+          }).lean();
           if (!abonent) {
-            ctx.reply(`${licshet} licshet abonent topilmadi`);
+            ctx.reply(`${licshet} hisob raqamli abonent topilmadi`);
             return false;
           }
           const now = new Date();
-          const oltiOyAvval = new Date(now.getFullYear(), now.getMonth(), 1);
+          const oltiOyAvval = new Date(
+            now.getFullYear(),
+            now.getMonth() - 6,
+            1
+          );
           const mail = await HybridMail.findOne({
             licshet,
             warning_date_billing: {
@@ -104,18 +124,46 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
             },
           });
           if (mail) {
-            ctx.reply(
-              `${mail.licshet} hisob raqamiga allaqachon xabar yuborilgan`
+            await ctx.reply(
+              `${mail.licshet} hisob raqamiga oxirgi 6 oy ichida allaqachon ogohlantirish xati yuborilgan`
             );
             return false;
           }
+          ctx.wizard.state.abonents.push({ id: abonent.id, licshet });
         }
         return true;
       }
+      ctx.wizard.state.abonents = [];
       if (!(await validate())) {
-        console.log("Validatsiyadan o'tmadi");
+        await ctx.reply("Validatsiyadan o'tmadi");
         return;
       }
+      if (ctx.wizard.state.abonents.length == 0)
+        return ctx.reply("Abonentlar topilmadi");
+      const company = await Company.findOne({ id: admin.companyId });
+      for (const abonent of ctx.wizard.state.abonents) {
+        try {
+          const abonentData = (
+            await tozaMakonApi.get("/user-service/residents/" + abonent.id)
+          ).data;
+          const { base64, courtWarning } = await createWarningLetterPDF(
+            abonentData
+          );
+          const newMail = (
+            await hybridPochtaApi.post("/PdfMail", {
+              Address: `${abonentData.mahallaName} ${abonentData.streetName}`,
+              Receiver: abonentData.fullName,
+              Document64: base64,
+              Region: company.hybridRegion, //viloyat
+              Area: company.hybridArea, // tuman
+            })
+          ).data;
+        } catch (error) {
+          ctx.reply(error.message);
+          console.error(error);
+        }
+      }
+
       let i = 0;
       const loop = async () => {
         console.log(i);
@@ -131,8 +179,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           }
           const row = jsonData[i];
           const licshet = row[Object.keys(row)[1]];
-          const abonent = await Abonent.findOne({ licshet });
-
+          const abonent = await Abonent.findOne({});
           const abonentData = (
             await tozaMakonApi.get("/user-service/residents/" + abonent.id)
           ).data;
