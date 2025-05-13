@@ -16,6 +16,7 @@ const {
   createManySudAriza,
   uploadSudArizaFile,
   getDebitorAbonents,
+  getDebitorAbonentsExcel,
 } = require("./controllers/sud.controller");
 
 router.get("/", getSudAkts);
@@ -258,5 +259,7 @@ router.put("/hybrid-mails/update-mail-status/:mail_id", async (req, res) => {
 });
 
 router.get("/debitor-abonents", getDebitorAbonents);
+
+router.get("/debitor-abonents/excel", getDebitorAbonentsExcel);
 
 module.exports = router;

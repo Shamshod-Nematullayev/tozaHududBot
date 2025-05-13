@@ -10,140 +10,48 @@ const isCancel = require("../../smallFunctions/isCancel");
 const ejs = require("ejs");
 const path = require("path");
 
-// const htmlPDF = require("html-pdf");
 const PDFMerger = require("pdf-merger-js");
 const { createTozaMakonApi } = require("../../../api/tozaMakon");
-const { hybridPochtaApi } = require("../../../api/hybridPochta");
+const { createHybridPochtaApi } = require("../../../api/hybridPochta");
 const FormData = require("form-data");
 const { default: puppeteer } = require("puppeteer");
-
-// required small functions
-
-async function createWarningLetterPDF(abonentData, companyId) {
-  const company = await Company.findOne({ id: companyId });
-  const now = new Date();
-  const tozaMakonApi = createTozaMakonApi(companyId);
-  await tozaMakonApi.post("/user-service/court-warnings/batch", {
-    oneWarningInOnePage: true,
-    residentIds: [abonentData.id],
-    warningBasis: `${abonentData.balance.kSaldo.toLocaleString()} soʻm qarzdor`,
-    warningDate: `${now.getFullYear()}-${
-      now.getMonth() < 9 ? "0" + (now.getMonth() + 1) : now.getMonth() + 1
-    }-${now.getDate()}`,
-  });
-  const courtWarning = (
-    await tozaMakonApi.get("/user-service/court-warnings", {
-      params: {
-        litigationStatus: "NEW",
-        status: "NEW",
-        districtId: company.districtId,
-        page: 0,
-        size: 1,
-        accountNumber: abonentData.accountNumber,
-      },
-    })
-  ).data.content[0];
-  const warningDataPrint = (
-    await tozaMakonApi.get(
-      "/user-service/court-warnings/" + courtWarning.id + "/print"
-    )
-  ).data;
-
-  const html = await new Promise((resolve, reject) => {
-    ejs.renderFile(
-      path.join(__dirname, "../../../", "views", "gibrid.ogohlantirish.ejs"),
-      { warningDataPrint },
-      {},
-      (err, str) => {
-        if (err) return reject(err);
-        resolve(str);
-      }
-    );
-  });
-  const convertPDF = new Promise(async (resolve, reject) => {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
-    const buffer = await page.pdf({
-      format: "letter",
-      printBackground: true,
-    });
-    await page.close();
-    resolve({
-      base64: buffer.toString("base64"),
-      courtWarning,
-    });
-  });
-  return await convertPDF;
-}
 
 const sendWarningLettersByHybrid = new Scenes.WizardScene(
   "Ogohlantish xati yuborish",
   async (ctx) => {
+    const admin = await Admin.findOne({ user_id: ctx.from.id });
+    if (!admin) return ctx.reply("Sizning adminlik huquqingiz yoq");
+    ctx.wizard.state.admin = admin;
+    ctx.wizard.state.abonents = [];
+    ctx.wizard.state.mails = [];
+    await ctx.replyWithDocument(INPUT_ABONENTS_LICSHET, {
+      caption:
+        "Excel faylni kiriting. Xat yuborilishi kerak bo'lgan abonentlar shaxsiy hisob raqamlarini A ustuniga joylashtiring.",
+      reply_markup: keyboards.cancelBtn.reply_markup,
+    });
+    ctx.wizard.next();
+  },
+  async (ctx) => {
     try {
-      const admin = await Admin.findOne({ user_id: ctx.from.id });
-      if (!admin) return ctx.reply("Sizning adminlik huquqingiz yoq");
-      ctx.wizard.state.admin = admin;
+      const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.admin.companyId);
+      const hybridPochtaApi = createHybridPochtaApi(
+        ctx.wizard.state.admin.companyId
+      );
       const jsonData = await handleTelegramExcel(ctx);
-      const arrayMails = [];
       // validations
       if (!jsonData.length) {
         return ctx.replyWithHTML(`Xatolik! Faylda hisob raqamlar topilmadi`);
       }
-      async function validate() {
-        let qator = 1;
-        for (const row of jsonData) {
-          qator++;
-          const licshet = row[Object.keys(row)[1]];
-          console.log(licshet);
-          if (licshet === undefined) {
-            ctx.reply(`${qator}-qatorda hisob raqami topilmadi`);
-            return false;
-          }
-          const abonent = await Abonent.findOne({
-            licshet,
-            companyId: admin.companyId,
-          }).lean();
-          if (!abonent) {
-            ctx.reply(`${licshet} hisob raqamli abonent topilmadi`);
-            return false;
-          }
-          const now = new Date();
-          const oltiOyAvval = new Date(
-            now.getFullYear(),
-            now.getMonth() - 6,
-            1
-          );
-          const mail = await HybridMail.findOne({
-            licshet,
-            warning_date_billing: {
-              $gte: oltiOyAvval,
-              $lt: now,
-            },
-          });
-          if (mail) {
-            await ctx.reply(
-              `${mail.licshet} hisob raqamiga oxirgi 6 oy ichida allaqachon ogohlantirish xati yuborilgan`
-            );
-            return false;
-          }
-          ctx.wizard.state.abonents.push({ id: abonent.id, licshet });
-        }
-        return true;
-      }
-      ctx.wizard.state.abonents = [];
-      if (!(await validate())) {
+
+      if (!(await validate(ctx, jsonData))) {
         await ctx.reply("Validatsiyadan o'tmadi");
         return;
       }
       if (ctx.wizard.state.abonents.length == 0)
         return ctx.reply("Abonentlar topilmadi");
-      const company = await Company.findOne({ id: admin.companyId });
-      const tozaMakonApi = createTozaMakonApi(admin.companyId);
+      const company = await Company.findOne({
+        id: ctx.wizard.state.admin.companyId,
+      });
       for (const abonent of ctx.wizard.state.abonents) {
         try {
           const abonentData = (
@@ -161,93 +69,46 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
               Area: company.hybridArea, // tuman
             })
           ).data;
-        } catch (error) {
-          ctx.reply(error.message);
-          console.error(error);
-        }
-      }
-
-      let i = 0;
-      const loop = async () => {
-        console.log(i);
-        try {
-          if (i == jsonData.length) {
-            ctx.replyWithHTML(
-              `Xatlar gibrit pochta bazasiga jo'natildi. <a href="https://hybrid.pochta.uz/#/main/mails/listing/draft?sortBy=createdOn&sortDesc=true&page=1&itemsPerPage=50">Saytga</a> kirib ularni tasdiqlashingiz kerak`,
-              createInlineKeyboard([[["Tekshirish 🔄", "refresh"]]])
-            );
-            ctx.wizard.state.arrayMails = arrayMails;
-            ctx.wizard.next();
-            return;
-          }
-          const row = jsonData[i];
-          const licshet = row[Object.keys(row)[1]];
-          const abonent = await Abonent.findOne({});
-          const abonentData = (
-            await tozaMakonApi.get("/user-service/residents/" + abonent.id)
-          ).data;
-          const { base64, courtWarning } = await createWarningLetterPDF(
-            abonentData
-          );
-          const newMail = (
-            await hybridPochtaApi.post("/PdfMail", {
-              Address: `${abonentData.mahallaName} ${abonentData.streetName}`,
-              Receiver: abonentData.fullName,
-              Document64: base64,
-              Region: 3, //Samarqand viloyati
-              Area: 41, // Kattaqo'rg'on tumani
-            })
-          ).data;
           const newMailOnDB = await HybridMail.create({
-            licshet: licshet,
+            licshet: abonent.licshet,
             type: "ogohlantirish_by_tg_bot",
             hybridMailId: newMail.Id,
             createdOn: new Date(),
             receiver: abonentData.fullName,
             warning_date_billing: new Date(),
-            warning_amount: abonentData.balance.kSaldo,
-            sud_process_id_billing: courtWarning.id,
           });
-          arrayMails.push({
-            hybridMailId: newMail.Id,
-            _id: newMailOnDB._id,
-            licshet: licshet,
-            courtWarning_id: courtWarning.id,
-          });
-          i++;
-          console.log(i);
-          loop();
+          ctx.wizard.state.mails.push(newMailOnDB);
         } catch (error) {
           ctx.reply(error.message);
           console.error(error);
         }
-      };
-      loop();
+      }
+      ctx.replyWithHTML(
+        `Xatlar gibrit pochta bazasiga jo'natildi. <a href="https://hybrid.pochta.uz/#/main/mails/listing/draft?sortBy=createdOn&sortDesc=true&page=1&itemsPerPage=50">Saytga</a> kirib ularni tasdiqlashingiz kerak`,
+        createInlineKeyboard([[["Tekshirish 🔄", "refresh"]]])
+      );
+      ctx.wizard.next();
     } catch (e) {
       console.error(e);
     }
   },
   async (ctx) => {
-    if (ctx.update.callback_query?.data !== "refresh") {
+    if (ctx.update.callback_query?.data !== "refresh")
       return await ctx.replyWithHTML(
         `Xatlar gibrit pochta bazasiga jo'natildi. <a href="https://hybrid.pochta.uz/#/main/mails/listing/draft?sortBy=createdOn&sortDesc=true&page=1&itemsPerPage=50">Saytga</a> kirib ularni tasdiqlashingiz kerak`,
         createInlineKeyboard([[["Tekshirish 🔄", "refresh"]]])
       );
-    }
+
     let counter = 0;
     const results = [];
-    async function loop() {
-      if (counter == ctx.wizard.state.arrayMails.length) {
-        ctx.replyWithHTML(
-          `Tasdiqlangan xatlar: ${results.length} / ${ctx.wizard.state.arrayMails.length}`
-        );
-        return;
-      }
-      const row = ctx.wizard.state.arrayMails[counter];
-      const mail = (
+    const hybridPochtaApi = createHybridPochtaApi(
+      ctx.wizard.state.admin.companyId
+    );
+    for (const mail of ctx.wizard.state.mails) {
+      const mailData = (
         await hybridPochtaApi.get("/mail", {
           params: {
-            id: row.hybridMailId,
+            id: mail.hybridMailId,
           },
         })
       ).data;
@@ -257,11 +118,11 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           $set: { isSent: true, sentOn: response.SentOn },
         });
       }
-      counter++;
-      console.log(counter);
-      await loop();
     }
-    await loop();
+    await ctx.replyWithHTML(
+      `Tasdiqlangan xatlar: ${results.length} / ${ctx.wizard.state.arrayMails.length}`
+    );
+
     let jonatilmagan;
     const hammasiJonatildi = results.every((result) => {
       jonatilmagan = result;
@@ -288,6 +149,10 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
     ctx.reply("Tekshirish");
     let counter = 0;
     const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.admin.companyId);
+    const hybridPochtaApi = createHybridPochtaApi(
+      ctx.wizard.state.admin.companyId
+    );
+
     async function loop() {
       if (counter == ctx.wizard.state.arrayMails.length) {
         await ctx.reply("Billingga yuklab bo'ldim.");
@@ -371,6 +236,10 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
               sud_process_id_billing: row.courtWarning_id,
             },
           });
+          await Abonent.findOneAndUpdate({
+            licshet: row.licshet,
+            companyId: ctx.wizard.state.admin.companyId,
+          });
           counter++;
         }
       );
@@ -379,13 +248,6 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
   }
 );
 
-sendWarningLettersByHybrid.enter((ctx) => {
-  ctx.replyWithDocument(INPUT_ABONENTS_LICSHET, {
-    caption:
-      "Excel faylni kiriting. Xat yuborilishi kerak bo'lgan abonentlar shaxsiy hisob raqamlarini A ustuniga joylashtiring.",
-    reply_markup: keyboards.cancelBtn.reply_markup,
-  });
-});
 sendWarningLettersByHybrid.on("text", (ctx, next) => {
   if (isCancel(ctx.message.text)) {
     ctx.reply("Bekor qilindi", keyboards.adminKeyboard.resize());
@@ -399,3 +261,105 @@ sendWarningLettersByHybrid.leave((ctx) => {
 });
 
 module.exports = { sendWarningLettersByHybrid };
+
+// required small functions
+
+async function createWarningLetterPDF(abonentData, companyId) {
+  const company = await Company.findOne({ id: companyId });
+  const now = new Date();
+  const tozaMakonApi = createTozaMakonApi(companyId);
+  await tozaMakonApi.post("/user-service/court-warnings/batch", {
+    oneWarningInOnePage: true,
+    residentIds: [abonentData.id],
+    warningBasis: `${abonentData.balance.kSaldo.toLocaleString()} soʻm qarzdor`,
+    warningDate: `${now.getFullYear()}-${
+      now.getMonth() < 9 ? "0" + (now.getMonth() + 1) : now.getMonth() + 1
+    }-${now.getDate()}`,
+  });
+  const courtWarning = (
+    await tozaMakonApi.get("/user-service/court-warnings", {
+      params: {
+        litigationStatus: "NEW",
+        status: "NEW",
+        districtId: company.districtId,
+        page: 0,
+        size: 1,
+        accountNumber: abonentData.accountNumber,
+      },
+    })
+  ).data.content[0];
+  const warningDataPrint = (
+    await tozaMakonApi.get(
+      "/user-service/court-warnings/" + courtWarning.id + "/print"
+    )
+  ).data;
+
+  const html = await new Promise((resolve, reject) => {
+    ejs.renderFile(
+      path.join(__dirname, "../../../", "views", "gibrid.ogohlantirish.ejs"),
+      { warningDataPrint },
+      {},
+      (err, str) => {
+        if (err) return reject(err);
+        resolve(str);
+      }
+    );
+  });
+  const convertPDF = new Promise(async (resolve, reject) => {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0" });
+    const buffer = await page.pdf({
+      format: "letter",
+      printBackground: true,
+    });
+    await page.close();
+    resolve({
+      base64: buffer.toString("base64"),
+      courtWarning,
+    });
+  });
+  return await convertPDF;
+}
+
+async function validate(ctx, jsonData) {
+  let qator = 1;
+  for (const row of jsonData) {
+    qator++;
+    const licshet = row[Object.keys(row)[1]];
+    console.log(licshet);
+    if (licshet === undefined) {
+      ctx.reply(`${qator}-qatorda hisob raqami topilmadi`);
+      return false;
+    }
+    const abonent = await Abonent.findOne({
+      licshet,
+      companyId: ctx.wizard.state.admin.companyId,
+    }).lean();
+    if (!abonent) {
+      ctx.reply(`${licshet} hisob raqamli abonent topilmadi`);
+      return false;
+    }
+    const now = new Date();
+    const oltiOyAvval = new Date(now.getFullYear(), now.getMonth() - 6, 1);
+    const mail = await HybridMail.findOne({
+      licshet,
+      warning_date_billing: {
+        $gte: oltiOyAvval,
+        $lt: now,
+      },
+    });
+    if (mail) {
+      await ctx.reply(
+        `${mail.licshet} hisob raqamiga oxirgi 6 oy ichida allaqachon ogohlantirish xati yuborilgan`
+      );
+      return false;
+    }
+    ctx.wizard.state.abonents.push({ id: abonent.id, licshet });
+  }
+  return true;
+}

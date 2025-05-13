@@ -1,7 +1,6 @@
-const { createTozaMakonApi } = require("../../api/tozaMakon");
-const { HybridMail } = require("../../models/HybridMail");
 const { SudAkt } = require("../../models/SudAkt");
 const { Counter, Abonent } = require("../../requires");
+const Excel = require("exceljs");
 
 module.exports.getSudAkts = async (req, res) => {
   try {
@@ -328,7 +327,6 @@ module.exports.getDebitorAbonents = async (req, res) => {
           message: "warning's value wrong",
         });
     }
-    console.log(filters);
     const abonents = await Abonent.find(filters)
       .skip(size * page)
       .limit(size);
@@ -339,6 +337,82 @@ module.exports.getDebitorAbonents = async (req, res) => {
       rows: abonents,
       total: countAbonents,
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, message: "Internal server error 500" });
+  }
+};
+
+module.exports.getDebitorAbonentsExcel = async (req, res) => {
+  try {
+    const { companyId } = req.user;
+    const { balanceFrom, balanceTo, mahallaId, sudAkt, warning } = req.query;
+
+    const filters = { companyId };
+    if (balanceFrom) filters.ksaldo = { $gte: parseFloat(balanceFrom) };
+    if (balanceTo)
+      filters.ksaldo = { ...filters.ksaldo, $lte: parseFloat(balanceTo) };
+    if (mahallaId) filters.mahallas_id = mahallaId;
+    if (sudAkt) {
+      if (sudAkt === "true") filters["sudAkt.id"] = { $exists: 1 };
+      else if (sudAkt === "false") filters["sudAkt.id"] = { $exists: 0 };
+      else
+        return res.status(400).json({
+          ok: false,
+          message: "sudAkt's value wrong",
+        });
+    }
+    if (warning) {
+      if (warning === "true") filters["warningLetter.id"] = { $exists: 1 };
+      else if (warning === "false")
+        filters["warningLetter.id"] = { $exists: 0 };
+      else
+        return res.status(400).json({
+          ok: false,
+          message: "warning's value wrong",
+        });
+    }
+
+    const abonents = await Abonent.find(filters);
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet("Abonents");
+    worksheet.columns = [
+      { header: "ID", key: "id", width: 15 },
+      { header: "Hisob raqami", key: "licshet", width: 15 },
+      { header: "F.I.O.", key: "fullName", width: 30 },
+      { header: "Qarzdorlik", key: "ksaldo", width: 15 },
+      { header: "Sud Akt id", key: "sudAktId", width: 15 },
+      { header: "Sud Akt sana", key: "sudAktDate", width: 15 },
+      { header: "Ogohlantirish id", key: "warningLetterId", width: 15 },
+      { header: "Ogohlantirish sana", key: "warningLetterDate", width: 15 },
+    ];
+    abonents.forEach((abonent) => {
+      worksheet.addRow({
+        id: abonent.id,
+        licshet: abonent.licshet,
+        fullName: abonent.fio,
+        ksaldo: abonent.ksaldo,
+        sudAktId: abonent.sudAkt?.id,
+        sudAktDate: abonent.sudAkt?.createdDate,
+        warningLetterId: abonent.warningLetter?.id,
+        warningLetterDate: abonent.warningLetter?.createdDate,
+      });
+    });
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF0070C0" },
+      };
+    });
+    // Export qilish
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader("Content-Disposition", "attachment; filename=abonents.xlsx");
+    await workbook.xlsx.write(res);
   } catch (error) {
     console.error(error);
     res.status(500).json({ ok: false, message: "Internal server error 500" });

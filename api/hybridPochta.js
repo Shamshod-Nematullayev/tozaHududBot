@@ -1,56 +1,57 @@
 const { default: axios } = require("axios");
 const { Company } = require("../requires");
 
-const hybridPochtaApi = axios.create({
-  baseURL: "https://hybrid.pochta.uz/api",
-  headers: {
-    Accept: "application/json, text/plain, */*",
-  },
-});
-
-hybridPochtaApi.interceptors.request.use(
-  async (config) => {
-    const session = await Company.findOne({ login: "dxsh24107" });
-    if (session.hybridToken) {
-      config.headers["Authorization"] = `Bearer ${session.hybridToken}`;
+const createHybridPochtaApi = (companyId) => {
+  const instance = axios.create({
+    baseURL: "https://hybrid.pochta.uz/api",
+    headers: {
+      Accept: "application/json, text/plain, */*",
+    },
+  });
+  instance.interceptors.request.use(
+    async (config) => {
+      const session = await Company.findOne({ id: companyid });
+      if (session.hybridToken) {
+        config.headers["Authorization"] = `Bearer ${session.hybridToken}`;
+      }
+      return config;
+    },
+    (err) => {
+      return Promise.reject(err);
     }
-    return config;
-  },
-  (err) => {
-    return Promise.reject(err);
-  }
-);
+  );
 
-hybridPochtaApi.interceptors.response.use(
-  (response) => response,
-  async (err) => {
-    const session = await Company.findOne({ login: "dxsh24107" });
+  hybridPochtaApi.interceptors.response.use(
+    (response) => response,
+    async (err) => {
+      const session = await Company.findOne({ id: companyId });
 
-    if (err.response && err.response.status === 401) {
-      const { data } = await axios.post(
-        "https://hybrid.pochta.uz/token",
-        {
-          username: session.hybridLogin,
-          password: session.hybridPassword,
-          grant_type: "password",
-        },
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            Accept: "application/json, text/plain, */*",
+      if (err.response && err.response.status === 401) {
+        const { data } = await axios.post(
+          "https://hybrid.pochta.uz/token",
+          {
+            username: session.hybridLogin,
+            password: session.hybridPassword,
+            grant_type: "password",
           },
-        }
-      );
-      await session.updateOne({
-        $set: {
-          hybridToken: data.access_token,
-        },
-      });
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Accept: "application/json, text/plain, */*",
+            },
+          }
+        );
+        await session.updateOne({
+          $set: {
+            hybridToken: data.access_token,
+          },
+        });
 
-      err.config.headers["Authorization"] = `Bearer ${data.access_token}`;
-      return hybridPochtaApi.request(err.config);
+        err.config.headers["Authorization"] = `Bearer ${data.access_token}`;
+        return hybridPochtaApi.request(err.config);
+      }
     }
-  }
-);
+  );
+};
 
-module.exports = { hybridPochtaApi };
+module.exports = { createHybridPochtaApi };

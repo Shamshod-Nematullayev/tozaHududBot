@@ -100,31 +100,31 @@ process.on("warning", (warning) => {
 
 // Schedule jobs
 
-agenda.on("ready", async () => {
-  console.log("Agenda is ready to use!");
-  require("./intervals");
-  agenda.start();
-  agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask"); // 09:00  to 17:00 every day
-  agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod"); // 09:00 to 17:00 every day
-  agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask"); // 09:05 to 22:05 every day
-  agenda.every("5 9-22 * * *", "sendKunlikEtkReportsTask"); // 09:05 to 22:05 every day
-  agenda.every("0 9-22 * * *", "sendPinflMfyReportTask"); // 09:00 to 22:00 every day
-  agenda.every("0 9-22 * * *", "sendEtkMfyReportTask"); // 09:00 to 22:00 every day
-  agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask"); // 09:00 to 22:00 every day
-  agenda.every("0 3 * * *", queueNames.updateAbonents, { companyId: 1144 });
+// agenda.on("ready", async () => {
+//   console.log("Agenda is ready to use!");
+//   require("./intervals");
+//   agenda.start();
+//   agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask"); // 09:00  to 17:00 every day
+//   agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod"); // 09:00 to 17:00 every day
+//   agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask"); // 09:05 to 22:05 every day
+//   agenda.every("5 9-22 * * *", "sendKunlikEtkReportsTask"); // 09:05 to 22:05 every day
+//   agenda.every("0 9-22 * * *", "sendPinflMfyReportTask"); // 09:00 to 22:00 every day
+//   agenda.every("0 9-22 * * *", "sendEtkMfyReportTask"); // 09:00 to 22:00 every day
+//   agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask"); // 09:00 to 22:00 every day
+//   agenda.every("0 3 * * *", queueNames.updateAbonents, { companyId: 1144 });
 
-  // const lastPage = await LastUpdate.findOne({ key: "abonents-last-page-1144" });
-  // if (lastPage)
-  //   agenda.now(queueNames.updateAbonents, {
-  //     companyId: 1144,
-  //     page: lastPage.page,
-  //   });
-});
+//   // const lastPage = await LastUpdate.findOne({ key: "abonents-last-page-1144" });
+//   // if (lastPage)
+//   //   agenda.now(queueNames.updateAbonents, {
+//   //     companyId: 1144,
+//   //     page: lastPage.page,
+//   //   });
+// });
 agenda.on("error", (error) => {
   console.error("Agenda error:", error);
 });
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
