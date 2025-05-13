@@ -302,43 +302,35 @@ module.exports.uploadSudArizaFile = async (req, res) => {
 module.exports.getDebitorAbonents = async (req, res) => {
   try {
     const { companyId } = req.user;
-    const {
-      balanceFrom,
-      balanceTo,
-      mahallaId,
-      hadSudAkt,
-      hadWarningLetter,
-      page,
-      size,
-    } = req.query;
+    const { balanceFrom, balanceTo, mahallaId, sudAkt, warning, page, size } =
+      req.query;
 
     const filters = { companyId };
     if (balanceFrom) filters.ksaldo = { $gte: balanceFrom };
     if (balanceTo) filters.ksaldo = { ...filters.ksaldo, $lte: balanceTo };
     if (mahallaId) filters.mahallas_id = mahallaId;
-    if (hadSudAkt) {
-      if (hadSudAkt === "true") filters["sudAkt.id"] = { $exist: true };
-      else if (hadSudAkt === "false") filters["sudAkt.id"] = { $exist: false };
+    if (sudAkt) {
+      if (sudAkt === "true") filters["sudAkt.id"] = { $exists: 1 };
+      else if (sudAkt === "false") filters["sudAkt.id"] = { $exists: 0 };
       else
         return res.status(400).json({
           ok: false,
-          message: "hadSudAkt's value wrong",
+          message: "sudAkt's value wrong",
         });
     }
-    if (hadWarningLetter) {
-      if (hadWarningLetter === "true")
-        filters["warningLetter.id"] = { $exist: true };
-      else if (hadWarningLetter === "false")
-        filters["warningLetter.id"] = { $exist: false };
+    if (warning) {
+      if (warning === "true") filters["warningLetter.id"] = { $exists: 1 };
+      else if (warning === "false")
+        filters["warningLetter.id"] = { $exists: 0 };
       else
         return res.status(400).json({
           ok: false,
-          message: "hadWarningLetter's value wrong",
+          message: "warning's value wrong",
         });
     }
-
+    console.log(filters);
     const abonents = await Abonent.find(filters)
-      .skip(size * (page - 1))
+      .skip(size * page)
       .limit(size);
     const countAbonents = await Abonent.countDocuments(filters);
 

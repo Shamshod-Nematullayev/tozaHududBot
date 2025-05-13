@@ -12,15 +12,17 @@ const path = require("path");
 
 // const htmlPDF = require("html-pdf");
 const PDFMerger = require("pdf-merger-js");
-const { tozaMakonApi } = require("../../../api/tozaMakon");
+const { createTozaMakonApi } = require("../../../api/tozaMakon");
 const { hybridPochtaApi } = require("../../../api/hybridPochta");
 const FormData = require("form-data");
 const { default: puppeteer } = require("puppeteer");
 
 // required small functions
 
-async function createWarningLetterPDF(abonentData) {
+async function createWarningLetterPDF(abonentData, companyId) {
+  const company = await Company.findOne({ id: companyId });
   const now = new Date();
+  const tozaMakonApi = createTozaMakonApi(companyId);
   await tozaMakonApi.post("/user-service/court-warnings/batch", {
     oneWarningInOnePage: true,
     residentIds: [abonentData.id],
@@ -34,7 +36,7 @@ async function createWarningLetterPDF(abonentData) {
       params: {
         litigationStatus: "NEW",
         status: "NEW",
-        districtId: 47,
+        districtId: company.districtId,
         page: 0,
         size: 1,
         accountNumber: abonentData.accountNumber,
@@ -141,6 +143,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
       if (ctx.wizard.state.abonents.length == 0)
         return ctx.reply("Abonentlar topilmadi");
       const company = await Company.findOne({ id: admin.companyId });
+      const tozaMakonApi = createTozaMakonApi(admin.companyId);
       for (const abonent of ctx.wizard.state.abonents) {
         try {
           const abonentData = (
@@ -284,6 +287,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
       );
     ctx.reply("Tekshirish");
     let counter = 0;
+    const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.admin.companyId);
     async function loop() {
       if (counter == ctx.wizard.state.arrayMails.length) {
         await ctx.reply("Billingga yuklab bo'ldim.");
@@ -307,64 +311,69 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
           },
         })
       ).data;
-      ejs.renderFile("./views/hybridPochtaCash.ejs", { mail }, (err, str) => {
-        if (err) return console.error(err);
+      ejs.renderFile(
+        "./views/hybridPochtaCash.ejs",
+        { mail },
+        async (err, str) => {
+          if (err) return console.error(err);
 
-        // htmlPDF
-        //   .create(str, { format: "A4", orientation: "portrait" })
-        //   .toBuffer(async (err, bufferCash) => {
-        //     if (err) return console.error(err);
+          const browser = await puppeteer.launch({
+            headless: true,
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          });
 
-        //     let merger = new PDFMerger();
-        //     await merger.add(buffer);
-        //     await merger.add(bufferCash);
-        //     // Set metadata
-        //     await merger.setMetadata({
-        //       producer: "oliy ong",
-        //       author: "Shamshod Nematullayev",
-        //       creator: "Toza Hudud bot",
-        //       title: "Ogohlantirish xati",
-        //     });
-        //     const bufferWarningWithCash = await merger.saveAsBuffer();
-        //     const formData = new FormData();
-        //     formData.append(
-        //       "file",
-        //       bufferWarningWithCash,
-        //       row.hybridMailId + `.pdf`
-        //     );
-        //     const fileUploadBilling = (
-        //       await tozaMakonApi.post(
-        //         "/file-service/buckets/upload",
-        //         formData,
-        //         {
-        //           params: {
-        //             folderType: "SUD_PROCESS",
-        //           },
-        //           headers: { "Content-Type": "multipart/form-data" },
-        //         }
-        //       )
-        //     ).data;
-        //     await tozaMakonApi.post(
-        //       "/user-service/court-processes/" +
-        //         row.courtWarning_id +
-        //         "/add-file",
-        //       {
-        //         description: `warning letter by hybrid`,
-        //         fileName: `${fileUploadBilling.fileName}*${fileUploadBilling.fileId}`,
-        //         fileType: "WARNING_FILE",
-        //       }
-        //     );
+          const page = await browser.newPage();
+          await page.setContent(str, { waitUntil: "networkidle0" });
+          const bufferCash = await page.pdf({
+            format: "A4",
+            printBackground: true,
+          });
+          await page.close();
 
-        //     await HybridMail.findByIdAndUpdate(row._id, {
-        //       $set: {
-        //         isSavedBilling: true,
-        //         sud_process_id_billing: row.courtWarning_id,
-        //       },
-        //     });
-        //     counter++;
-        //     loop();
-        //   });
-      });
+          const merger = new PDFMerger();
+          await merger.add(buffer);
+          await merger.add(bufferCash);
+          await merger.setMetadata({
+            producer: "oliy ong",
+            author: "Shamshod Nematullayev",
+            creator: "Toza Hudud bot",
+            title: "Ogohlantirish xati",
+          });
+          const bufferWarningWithCash = await merger.saveAsBuffer();
+          const formData = new FormData();
+          formData.append(
+            "file",
+            bufferWarningWithCash,
+            row.hybridMailId + `.pdf`
+          );
+          const fileUploadBilling = (
+            await tozaMakonApi.post("/file-service/buckets/upload", formData, {
+              params: {
+                folderType: "SUD_PROCESS",
+              },
+              headers: { "Content-Type": "multipart/form-data" },
+            })
+          ).data;
+          await tozaMakonApi.post(
+            "/user-service/court-processes/" +
+              row.courtWarning_id +
+              "/add-file",
+            {
+              description: `warning letter by hybrid`,
+              fileName: `${fileUploadBilling.fileName}*${fileUploadBilling.fileId}`,
+              fileType: "WARNING_FILE",
+            }
+          );
+
+          await HybridMail.findByIdAndUpdate(row._id, {
+            $set: {
+              isSavedBilling: true,
+              sud_process_id_billing: row.courtWarning_id,
+            },
+          });
+          counter++;
+        }
+      );
     }
     await loop();
   }
