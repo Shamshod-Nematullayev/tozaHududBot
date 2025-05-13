@@ -12,7 +12,7 @@ module.exports.getArizalar = async (req, res) => {
       page = 1,
       limit = 10,
       sortField = "sana",
-      sortDirection = "asc",
+      sortDirection = "desc",
       document_type,
       document_number,
       account_number,
@@ -194,7 +194,7 @@ module.exports.createAriza = async (req, res) => {
     const counter = await Counter.findOne({
       name: "ariza_tartib_raqami",
       companyId: req.user.companyId,
-      arizaDocumentType: document_type
+      arizaDocumentType: document_type,
     });
     const newAriza = await Ariza.create({
       licshet: licshet,
