@@ -380,22 +380,26 @@ module.exports.getDebitorAbonentsExcel = async (req, res) => {
       { header: "ID", key: "id", width: 15 },
       { header: "Hisob raqami", key: "licshet", width: 15 },
       { header: "F.I.O.", key: "fullName", width: 30 },
+      { header: "Mahalla", key: "mahalla", width: 15 },
       { header: "Qarzdorlik", key: "ksaldo", width: 15 },
       { header: "Sud Akt id", key: "sudAktId", width: 15 },
       { header: "Sud Akt sana", key: "sudAktDate", width: 15 },
       { header: "Ogohlantirish id", key: "warningLetterId", width: 15 },
       { header: "Ogohlantirish sana", key: "warningLetterDate", width: 15 },
+      { header: "Shaxsi tasdiqlangan", key: "shaxsi_tasdiqlandi", width: 15 },
     ];
     abonents.forEach((abonent) => {
       worksheet.addRow({
         id: abonent.id,
         licshet: abonent.licshet,
         fullName: abonent.fio,
+        mahalla: abonent.mahalla_name,
         ksaldo: abonent.ksaldo,
         sudAktId: abonent.sudAkt?.id,
         sudAktDate: abonent.sudAkt?.createdDate,
         warningLetterId: abonent.warningLetter?.id,
         warningLetterDate: abonent.warningLetter?.createdDate,
+        shaxsi_tasdiqlandi: abonent.shaxsi_tasdiqlandi?.confirm ? "✅" : "❌",
       });
     });
     worksheet.getRow(1).eachCell((cell) => {

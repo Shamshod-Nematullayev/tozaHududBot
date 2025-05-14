@@ -10,7 +10,7 @@ const createHybridPochtaApi = (companyId) => {
   });
   instance.interceptors.request.use(
     async (config) => {
-      const session = await Company.findOne({ id: companyid });
+      const session = await Company.findOne({ id: companyId });
       if (session.hybridToken) {
         config.headers["Authorization"] = `Bearer ${session.hybridToken}`;
       }
@@ -21,7 +21,7 @@ const createHybridPochtaApi = (companyId) => {
     }
   );
 
-  hybridPochtaApi.interceptors.response.use(
+  instance.interceptors.response.use(
     (response) => response,
     async (err) => {
       const session = await Company.findOne({ id: companyId });
@@ -48,10 +48,13 @@ const createHybridPochtaApi = (companyId) => {
         });
 
         err.config.headers["Authorization"] = `Bearer ${data.access_token}`;
-        return hybridPochtaApi.request(err.config);
+        return instance.request(err.config);
       }
+
+      return Promise.reject(err);
     }
   );
+  return instance;
 };
 
 module.exports = { createHybridPochtaApi };

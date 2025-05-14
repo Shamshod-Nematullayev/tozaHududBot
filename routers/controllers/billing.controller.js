@@ -629,7 +629,10 @@ module.exports.getAbonentsByMfyId = async (req, res) => {
 
 module.exports.getActiveMfy = async (req, res) => {
   try {
-    const data = await Mahalla.find({ reja: { $gt: 0 } });
+    const data = await Mahalla.find({
+      reja: { $gt: 0 },
+      companyId: req.user.companyId,
+    });
     const mahallalar = data.map((mfy) => {
       return { id: mfy.id, name: mfy.name, printed: mfy.abarotka_berildi };
     });

@@ -50,7 +50,6 @@ const getAbonentCard = new WizardScene(
           `/user-service/residents/${abonent.id}/print-card?lang=UZ`
         )
       ).data;
-      console.error(data);
       const html = await new Promise((resolve, reject) => {
         ejs.renderFile(
           "./views/abonentKarta.ejs",

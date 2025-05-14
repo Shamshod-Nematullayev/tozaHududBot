@@ -25,6 +25,14 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         );
         return ctx.scene.leave();
       }
+      const company = await Company.findOne({ id: inspektor.companyId });
+      const now = new Date();
+      if (!company.active || company.activeExpiresDate < now) {
+        await ctx.reply(
+          "Dastur faoliyati vaqtincha cheklangan. \nIltimos, xizmatlardan foydalanishni davom ettirish uchun to‘lovni amalga oshiring."
+        );
+        return ctx.scene.leave();
+      }
       ctx.wizard.state.inspector_id = inspektor._id;
       ctx.wizard.state.inspector_name = inspektor.name;
       ctx.wizard.state.companyId = inspektor.companyId;

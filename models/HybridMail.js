@@ -20,6 +20,7 @@ const schema = new Schema({
   isSavedBilling: { type: Boolean, default: false },
   warning_amount: Number,
   sud_process_id_billing: String,
+  warningIdTozamakon: Number,
   warning_date_billing: Date,
   sud_akt_id: {
     type: String,
