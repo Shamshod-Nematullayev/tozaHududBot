@@ -15,6 +15,7 @@ const {
 const { EtkAbonent } = require("../../../models/EtkAbonent");
 const { default: axios } = require("axios");
 const { caotoNames } = require("../../../constants");
+const { io } = require("../../../config/socketConfig");
 
 const enterFunc = (ctx) => {
   ctx.reply("Xonadon egasining PINFL raqamini kiriting!", keyboards.cancelBtn);
@@ -472,6 +473,35 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           `Yangi abonent yaratish uchun ariza yuborildi. Abonent: ${ctx.wizard.state.citizen.lastName} ${ctx.wizard.state.citizen.firstName} ${ctx.wizard.state.citizen.patronymic}`,
           keyboards.mainKeyboard
         );
+        const users = await Admin.find({
+          companyId: ctx.wizard.state.companyId,
+          roles: "billing",
+        });
+        users.forEach(async (user) => {
+          await Notification.create({
+            message: "Yangi abonent ochish bo'yicha ariza qabul qilindi",
+            type: "info",
+            sender: {
+              id: "system",
+            },
+            receiver: {
+              id: user._id,
+            },
+          });
+          if (usersMapSocket[user.id]) {
+            io.to(usersMapSocket[user.id]).emit("notification", {
+              message: "Yangi abonent ochish bo'yicha ariza qabul qilindi",
+              type: "info",
+              sender: {
+                id: "system",
+              },
+              receiver: {
+                id: user._id,
+              },
+            });
+          }
+        });
+
         ctx.scene.leave();
         await ctx.deleteMessage();
       } else if (ctx.callbackQuery.data === "no") {
@@ -502,3 +532,4 @@ new_abonent_request_by_pinfl_scene.leave((ctx) =>
 new_abonent_request_by_pinfl_scene.enter(enterFunc);
 
 module.exports = { new_abonent_request_by_pinfl_scene };
+system;

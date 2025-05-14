@@ -19,8 +19,7 @@ io.on("connection", (socket) => {
       socket.handshake.query.accessToken || "",
       process.env.SECRET_JWT_KEY
     );
-    usersMapSocket[decoded.id] = socket.id;
-
+    usersMapSocket[decoded.id] = socket.id; // User._id = socket.id
     socket.on("disconnect", () => {
       delete usersMapSocket[decoded.id];
     });
