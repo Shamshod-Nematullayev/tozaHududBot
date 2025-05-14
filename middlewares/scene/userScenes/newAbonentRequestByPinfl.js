@@ -532,4 +532,3 @@ new_abonent_request_by_pinfl_scene.leave((ctx) =>
 new_abonent_request_by_pinfl_scene.enter(enterFunc);
 
 module.exports = { new_abonent_request_by_pinfl_scene };
-system;
