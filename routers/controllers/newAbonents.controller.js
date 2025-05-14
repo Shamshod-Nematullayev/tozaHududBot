@@ -21,7 +21,8 @@ module.exports.getPendingNewAbonents = async (req, res) => {
       companyId: companyId,
     })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .sort({ createdAt: -1 });
     res.json({ ok: true, count, pendingNewAbonents });
   } catch (error) {
     console.error(error);

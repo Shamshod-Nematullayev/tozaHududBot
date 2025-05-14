@@ -22,46 +22,51 @@ const citizenSchema = new Schema({
   passportExpireDate: String,
 });
 
-const schema = new Schema({
-  citizen: citizenSchema,
-  nazoratchi_id: String,
-  mahallaId: {
-    type: String,
-    required: true,
+const schema = new Schema(
+  {
+    citizen: citizenSchema,
+    nazoratchi_id: String,
+    mahallaId: {
+      type: String,
+      required: true,
+    },
+    mahallaName: {
+      type: String,
+      required: true,
+    },
+    streetName: {
+      type: String,
+      required: true,
+    },
+    streetId: {
+      type: String,
+      required: true,
+    },
+    abonent_name: String,
+    accountNumber: String,
+    residentId: Number,
+    cadastr: String,
+    inhabitant_cnt: {
+      type: Number,
+      required: true,
+    },
+    etkCustomerCode: String,
+    etkCaoto: String,
+    senderId: Number,
+    companyId: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
   },
-  mahallaName: {
-    type: String,
-    required: true,
-  },
-  streetName: {
-    type: String,
-    required: true,
-  },
-  streetId: {
-    type: String,
-    required: true,
-  },
-  abonent_name: String,
-  accountNumber: String,
-  residentId: Number,
-  cadastr: String,
-  inhabitant_cnt: {
-    type: Number,
-    required: true,
-  },
-  etkCustomerCode: String,
-  etkCaoto: String,
-  senderId: Number,
-  companyId: {
-    type: Number,
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: ["pending", "approved", "rejected"],
-    default: "pending",
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 module.exports.StatusNewAbonent = {
   PENDING: "pending",
