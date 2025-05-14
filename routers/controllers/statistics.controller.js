@@ -1,5 +1,6 @@
 const { Abonent } = require("../../models/Abonent");
 const { LastUpdate } = require("../../models/LastUpdate");
+const { NewAbonent } = require("../../models/NewAbonents");
 
 module.exports.getIdentityStat = async (req, res) => {
   try {
@@ -55,6 +56,20 @@ module.exports.getLastUpdateDateAbonentsSaldo = async (req, res) => {
       await LastUpdate.findOne({ key: `abonents-update-${req.user.companyId}` })
     ).last_update;
     res.json({ lastUpdateDate });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+    console.error(error);
+  }
+};
+
+module.exports.getNewAbonentRequstsCount = async (req, res) => {
+  try {
+    const count = await NewAbonent.countDocuments({
+      companyId: req.user.companyId,
+    });
+    res.json({ count });
   } catch (error) {
     res.status(500).json({
       message: "Internal Server Error",
