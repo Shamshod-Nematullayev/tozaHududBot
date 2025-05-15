@@ -74,6 +74,7 @@ mongoose
       isAuth,
       require("./routers/yashovchiSoniXatlov")
     );
+    app.use("/api/reports", isAuth, require("./routers/reportsRouter"));
 
     app.use((req, res, next) => {
       res.status(404).json({

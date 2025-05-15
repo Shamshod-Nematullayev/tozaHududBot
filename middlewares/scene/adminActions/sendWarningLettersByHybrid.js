@@ -21,9 +21,16 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
   async (ctx) => {
     const admin = await Admin.findOne({ user_id: ctx.from.id });
     if (!admin) return ctx.reply("Sizning adminlik huquqingiz yoq");
+    const company = await Company.findOne({
+      id: admin.companyId,
+    }).select(["id", "hybridLogin", "hybridRegion", "hybridArea"]);
+    if (!company.hybridLogin)
+      return await ctx.reply("Hybrid pochta logini yo'q");
+    ctx.wizard.state.company = company;
     ctx.wizard.state.admin = admin;
     ctx.wizard.state.abonents = [];
     ctx.wizard.state.mails = [];
+
     await ctx.replyWithDocument(INPUT_ABONENTS_LICSHET, {
       caption:
         "Excel faylni kiriting. Xat yuborilishi kerak bo'lgan abonentlar shaxsiy hisob raqamlarini B ustuniga joylashtiring.",
@@ -49,9 +56,7 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
       }
       if (ctx.wizard.state.abonents.length == 0)
         return ctx.reply("Abonentlar topilmadi");
-      const company = await Company.findOne({
-        id: ctx.wizard.state.admin.companyId,
-      });
+
       const message = await ctx.reply(
         `Ogohlantirish xatlari yaratilmoqda 0 / ${ctx.wizard.state.abonents.length}`
       );
@@ -71,8 +76,8 @@ const sendWarningLettersByHybrid = new Scenes.WizardScene(
               Address: `${abonentData.mahallaName}, ${abonentData.streetName}`,
               Receiver: abonentData.fullName,
               Document64: base64,
-              Region: company.hybridRegion, //viloyat
-              Area: company.hybridArea, // tuman
+              Region: ctx.wizard.state.company.hybridRegion, //viloyat
+              Area: ctx.wizard.state.company.hybridArea, // tuman
             })
           ).data;
           const newMailOnDB = await HybridMail.create({
