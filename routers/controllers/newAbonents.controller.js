@@ -150,6 +150,17 @@ module.exports.acceptPendingNewAbonent = async (req, res) => {
         },
         inspector_id: nazoratchi.id,
         inspector_name: nazoratchi.name,
+        updated_at: new Date(),
+      },
+      ekt_kod_tasdiqlandi: {
+        confirm: true,
+        inspector: {
+          _id: nazoratchi._id,
+          name: nazoratchi.name,
+        },
+        inspector_id: nazoratchi.id,
+        inspector_name: nazoratchi.name,
+        updated_at: new Date(),
       },
       companyId: pendingAbonent.companyId,
     });
@@ -314,6 +325,17 @@ module.exports.castlingWithNewAbonent = async (req, res) => {
         },
         inspector_id: nazoratchi.id,
         inspector_name: nazoratchi.name,
+        updated_at: new Date(),
+      },
+      ekt_kod_tasdiqlandi: {
+        confirm: true,
+        inspector: {
+          _id: nazoratchi._id,
+          name: nazoratchi.name,
+        },
+        inspector_id: nazoratchi.id,
+        inspector_name: nazoratchi.name,
+        updated_at: new Date(),
       },
       companyId: newAbonent.companyId,
     });

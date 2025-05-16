@@ -13,9 +13,10 @@ const {
   extractBirthDateString,
 } = require("../../../helpers/extractBirthDateFromPinfl");
 const { EtkAbonent } = require("../../../models/EtkAbonent");
+const { Notification } = require("../../../models/Notification");
 const { default: axios } = require("axios");
 const { caotoNames } = require("../../../constants");
-const { io } = require("../../../config/socketConfig");
+const { io, usersMapSocket } = require("../../../config/socketConfig");
 
 const enterFunc = (ctx) => {
   ctx.reply("Xonadon egasining PINFL raqamini kiriting!", keyboards.cancelBtn);
@@ -301,6 +302,21 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
 
       ctx.wizard.state.inhabitant_cnt = parseInt(ctx.message.text);
       await ctx.reply("Abonent elektr kodini kiriting", keyboards.cancelBtn);
+      if (ctx.wizard.state.inspektor.id == 21886) {
+        await ctx.replyWithHTML(
+          `
+          Abonent: <code>${ctx.wizard.state.citizen.lastName} ${ctx.wizard.state.citizen.firstName} ${ctx.wizard.state.citizen.patronymic}</code> \n
+          Kadastr: <code>${ctx.wizard.state.cadastr}</code> \n
+          Mahalla: <code>${ctx.wizard.state.mahallaName}</code> \n
+          Ko'cha: <code>${ctx.wizard.state.streetName}</code> \n
+          Yashovchilar soni: <code>${ctx.wizard.state.inhabitant_cnt}</code> \n
+          Barcha ma'lumotlar to'g'rimi?
+          `,
+          keyboards.yesOrNo
+        );
+        ctx.wizard.selectStep(8);
+        return;
+      }
       return ctx.wizard.next();
     } catch (error) {
       ctx.reply(
@@ -466,7 +482,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           cadastr: ctx.wizard.state.cadastr,
           inhabitant_cnt: Number(ctx.wizard.state.inhabitant_cnt),
           etkCustomerCode: ctx.wizard.state.etkCustomerCode,
-          etkCaoto: etk_abonent.caotoNumber,
+          etkCaoto: etk_abonent?.caotoNumber,
           companyId: ctx.wizard.state.companyId,
         });
         await ctx.reply(
