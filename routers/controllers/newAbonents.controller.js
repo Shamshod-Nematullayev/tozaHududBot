@@ -283,10 +283,6 @@ module.exports.castlingWithNewAbonent = async (req, res) => {
       );
     }
 
-    res.json({
-      ok: true,
-      message: "Bo'sh abonent muvaffaqqiyatli almashtirildi",
-    });
     await freeAbonent.deleteOne();
     await newAbonent.updateOne({
       $set: {
@@ -338,6 +334,10 @@ module.exports.castlingWithNewAbonent = async (req, res) => {
         updated_at: new Date(),
       },
       companyId: newAbonent.companyId,
+    });
+    res.json({
+      ok: true,
+      message: "Bo'sh abonent muvaffaqqiyatli almashtirildi",
     });
   } catch (error) {
     console.error(error);
