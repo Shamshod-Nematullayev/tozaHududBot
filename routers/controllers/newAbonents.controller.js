@@ -190,6 +190,7 @@ module.exports.getFreeAbonentIdForNewAbonent = async (req, res) => {
     const freeAbonent = await FreeAbonent.findOne({
       companyId,
       inHabitantCount: 0,
+      inProcess: { $ne: true },
     });
     if (!freeAbonent) {
       return res
@@ -208,18 +209,29 @@ module.exports.getFreeAbonentIdForNewAbonent = async (req, res) => {
 module.exports.castlingWithNewAbonent = async (req, res) => {
   try {
     const { companyId } = req.user;
-    const { id, newAbonentId, accountNumber } = req.body;
-    if (!id || !accountNumber || !newAbonentId) {
+    const { newAbonentId, accountNumber } = req.body;
+    if (!accountNumber || !newAbonentId) {
       return res.status(400).json({
         ok: false,
         message: "id, accountNumber, newAbonentId required",
       });
     }
 
-    const freeAbonent = await FreeAbonent.findOne({
-      companyId,
-      id,
-    });
+    const freeAbonent = await FreeAbonent.findOneAndUpdate(
+      {
+        companyId,
+        inHabitantCount: 0,
+        inProcess: { $ne: true },
+      },
+      {
+        $set: {
+          inProcess: true,
+        },
+      },
+      {
+        new: true,
+      }
+    );
     if (!freeAbonent) {
       return res
         .status(404)
