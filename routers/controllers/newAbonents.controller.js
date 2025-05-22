@@ -213,7 +213,7 @@ module.exports.castlingWithNewAbonent = async (req, res) => {
     if (!accountNumber || !newAbonentId) {
       return res.status(400).json({
         ok: false,
-        message: "id, accountNumber, newAbonentId required",
+        message: "accountNumber, newAbonentId required",
       });
     }
 

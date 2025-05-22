@@ -57,7 +57,7 @@ router.post("/login", async (req, res, next) => {
     const ctx = await bot.telegram.getChat(admin.user_id);
     let photo = { data: null };
     if (ctx.photo) {
-      const file = await bot.telegram.getFile(ctx.photo.big_file_id);
+      const file = await bot.telegram.getFile(ctx.photo.small_file_id);
       photo = await axios.get(
         `https://api.telegram.org/file/bot${process.env.TOKEN}/${file.file_path}`,
         { responseType: "arraybuffer" }
@@ -156,6 +156,18 @@ router.put("/change-password", isAuth, async (req, res) => {
       ok: false,
       message: "Internal server error",
     });
+  }
+});
+
+router.get("/get-photo", isAuth, async (req, res) => {
+  try {
+    const ctx = await bot.telegram.getChat(req.user.user_id);
+    const photo = await axios.get(
+      `https://api.telegram.org/file/bot${process.env.TOKEN}/${ctx.photo.small_file_id}`
+    );
+    res.status(200).json({ ok: true, photo: photo.data });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Internal server error" });
   }
 });
 
