@@ -16,6 +16,7 @@ const {
   sendAbonentsListToTelegram,
   getMfyById,
   getAbonentDataByLicshet,
+  getActPacks,
 } = require("./controllers/billing.controller");
 
 const router = require("express").Router();
@@ -136,5 +137,7 @@ router.post(
 router.get("/get-mfy-by-id/:mfy_id", getMfyById);
 
 router.get("/get-abonent-acts/:abonentId", getAbonentActs);
+
+router.get("/act-packs", getActPacks);
 
 module.exports = router;

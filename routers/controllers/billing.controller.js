@@ -11,6 +11,8 @@ const { PDFDocument } = require("pdf-lib");
 const { kirillga } = require("../../middlewares/smallFunctions/lotinKiril");
 const { Mahalla } = require("../../models/Mahalla");
 const { packNames, packTypes } = require("../../intervals/createAktPack");
+const { Act } = require("../../models/Act");
+const { User } = require("../../models/User");
 // small functions
 function formatDate(date) {
   const year = date.getFullYear();
@@ -884,5 +886,15 @@ module.exports.getAbonentDataByLicshet = async (req, res) => {
       message: "Internal server error 500 " + error.message,
     });
     console.error(error);
+  }
+};
+
+module.exports.getActPacks = async (req, res) => {
+  try {
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+    const { data } = await tozaMakonApi.get("/billing-service/act-packs");
+    res.json(data.content);
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
   }
 };
