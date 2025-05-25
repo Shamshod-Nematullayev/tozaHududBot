@@ -177,8 +177,11 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       );
       ctx.wizard.next();
     } catch (error) {
-      ctx.reply("Kutilmagan xatolik yuz berdi", keyboards.cancelBtn.resize());
-      console.error(error.message);
+      ctx.reply(
+        "Kutilmagan xatolik yuz berdi" + error.response?.data?.message,
+        keyboards.cancelBtn.resize()
+      );
+      console.error(error.response);
     }
   },
   async (ctx) => {

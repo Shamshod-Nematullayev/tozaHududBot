@@ -5,6 +5,7 @@ const { bot, Company } = require("../requires");
 const { default: axios } = require("axios");
 const isAuth = require("../middlewares/isAuth");
 const { message } = require("telegraf/filters");
+const { User } = require("../models/User");
 
 const router = require("express").Router();
 
@@ -168,13 +169,20 @@ router.put("/change-password", isAuth, async (req, res) => {
 
 router.get("/get-photo", isAuth, async (req, res) => {
   try {
-    const ctx = await bot.telegram.getChat(req.user.user_id);
-    const photo = await axios.get(
-      `https://api.telegram.org/file/bot${process.env.TOKEN}/${ctx.photo.small_file_id}`
-    );
+    const user = await Admin.findById(req.user.id);
+    const ctx = await bot.telegram.getChat(user.user_id);
+    let photo = { dta: null };
+    if (ctx.photo) {
+      const file = await bot.telegram.getFile(ctx.photo.small_file_id);
+      photo = await axios.get(
+        `https://api.telegram.org/file/bot${process.env.TOKEN}/${file.file_path}`,
+        { responseType: "arraybuffer" }
+      );
+    }
     res.status(200).json({ ok: true, photo: photo.data });
   } catch (error) {
     res.status(500).json({ ok: false, message: "Internal server error" });
+    console.error(error);
   }
 });
 

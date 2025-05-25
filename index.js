@@ -126,7 +126,7 @@ process.on("warning", (warning) => {
 //   console.error("Agenda error:", error);
 // });
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
