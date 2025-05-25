@@ -11,7 +11,12 @@ const schema = new mongoose.Schema({
   fullName: String,
   profilePhotoId: String,
   companyId: Number,
-  roles: Array,
+  roles: {
+    type: [String],
+    enum: ["billing", "yurist", "admin", "stm"],
+    default: [],
+  },
   pnfl: String,
 });
 module.exports.Admin = mongoose.model("admin", schema, "admin");
+

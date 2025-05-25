@@ -33,7 +33,7 @@ router.post("/login", async (req, res, next) => {
         id: admin.id,
         login: admin.login,
         companyId: admin.companyId,
-        // role: admin.role, // hali rollar berilmagan
+        role: admin.roles, // hali rollar berilmagan
       },
       process.env.SECRET_JWT_KEY,
       { expiresIn: "1h" }
@@ -43,6 +43,7 @@ router.post("/login", async (req, res, next) => {
         id: admin.id,
         login: admin.login,
         companyId: admin.companyId,
+        role: admin.roles,
       },
       process.env.REFRESH_JWT_KEY,
       { expiresIn: "12h" }
@@ -107,8 +108,14 @@ router.post("/refresh-token", async (req, res) => {
     if (err) return res.status(403).json({ message: "Invalid refresh token" });
 
     const accessToken = jwt.sign(
-      { id: decoded.id, login: decoded.login, companyId: admin.companyId },
+      {
+        id: decoded.id,
+        login: decoded.login,
+        companyId: admin.companyId,
+        roles: admin.roles,
+      },
       process.env.SECRET_JWT_KEY,
+
       { expiresIn: "1h" }
     );
 

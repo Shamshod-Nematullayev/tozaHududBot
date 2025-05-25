@@ -20,6 +20,25 @@ module.exports.getAllNotifications = async (req, res) => {
   }
 };
 
+module.exports.markAllNotificationsAsRead = async (req, res) => {
+  try {
+    const notifications = await Notification.updateMany(
+      { "receiver.id": req.user.id },
+      { $set: { status: "read", updated_at: new Date() } }
+    );
+    res.status(200).json({
+      ok: true,
+      notifications,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 module.exports.markNotificationAsRead = async (req, res) => {
   try {
     const notification = await Notification.findByIdAndUpdate(
