@@ -7,6 +7,7 @@ const {
   getActPacks,
   getPdfByFileId,
   addLogToAct,
+  calculateAmount,
 } = require("./controllers/acts.controller");
 
 const router = require("express").Router();
@@ -17,9 +18,11 @@ router.get("/packs", getActPacks);
 
 router.get("/stats", getActStats);
 
-router.get("/:id", getActById);
+router.get("/pdf", getPdfByFileId);
 
-router.get("/:fileId/pdf", getPdfByFileId);
+router.get("/calculate-amount", calculateAmount);
+
+router.get("/:id", getActById);
 
 router.patch("/:id/check", isSTMRole, checkActById);
 

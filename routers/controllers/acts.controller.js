@@ -214,11 +214,14 @@ exports.checkActById = async (req, res) => {
 
 module.exports.getPdfByFileId = async (req, res) => {
   try {
-    const fileId = req.params.fileId;
+    const fileId = req.query.fileId;
 
     const tozaMakonApi = createTozaMakonApi(req.user.companyId);
-    const { data } = await tozaMakonApi.get(`/file-service/pdf/${fileId}`, {
+    const { data } = await tozaMakonApi.get(`/file-service/buckets/download`, {
       responseType: "arraybuffer",
+      params: {
+        file: fileId,
+      },
     });
     res.set("Content-Type", "application/pdf");
     res.send(data);
@@ -248,6 +251,39 @@ module.exports.addLogToAct = async (req, res) => {
     act.logs.push(logEntry);
     await act.save();
     res.json({ message: "Log muvaffaqiyatli qo'shildi", act });
+  } catch (error) {
+    console.error("Xatolik: ", error);
+    res.status(500).json({ error: "Ichki server xatoligi" });
+  }
+};
+
+module.exports.calculateAmount = async (req, res) => {
+  try {
+    const {
+      residentId,
+      actPackId,
+      startPeriod,
+      endPeriod,
+      kSaldo = 0,
+      inhabitantCount,
+    } = req.query;
+
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+
+    const { data } = await tozaMakonApi.get(
+      `/billing-service/acts/calculate-amount`,
+      {
+        params: {
+          residentId,
+          actPackId,
+          startPeriod,
+          endPeriod,
+          kSaldo,
+          inhabitantCount,
+        },
+      }
+    );
+    res.json(data);
   } catch (error) {
     console.error("Xatolik: ", error);
     res.status(500).json({ error: "Ichki server xatoligi" });
