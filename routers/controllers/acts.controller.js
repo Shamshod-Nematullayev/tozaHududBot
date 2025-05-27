@@ -286,6 +286,11 @@ module.exports.calculateAmount = async (req, res) => {
     res.json(data);
   } catch (error) {
     console.error("Xatolik: ", error);
-    res.status(500).json({ error: "Ichki server xatoligi" });
+    res
+      .status(500)
+      .json({
+        error: "Ichki server xatoligi",
+        message: error.response?.data?.message,
+      });
   }
 };
