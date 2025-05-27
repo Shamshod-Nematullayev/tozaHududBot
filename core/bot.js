@@ -24,10 +24,10 @@ bot.catch((error, ctx) => {
 module.exports = { bot };
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
-// bot
-//   .launch(() => {
-//     console.log("Bot has been started.");
-//   })
-//   .catch((err) => {
-//     console.log(err);
-//   });
+bot
+  .launch(() => {
+    console.log("Bot has been started.");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
