@@ -23,6 +23,10 @@ const schema = new Schema({
     type: Number,
     required: true,
   },
+  period: {
+    type: String,
+    required: true,
+  },
   checkedAt: {
     type: Date,
     default: false,
@@ -44,6 +48,10 @@ const schema = new Schema({
   logs: {
     type: Array(logSchema),
     default: [],
+  },
+  companyId: {
+    type: Number,
+    required: true,
   },
 });
 

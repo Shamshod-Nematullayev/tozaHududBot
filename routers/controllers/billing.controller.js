@@ -552,9 +552,9 @@ module.exports.getAbonentsByMfyId = async (req, res) => {
     const filters = {};
     if (identified) {
       if (identified === "true") {
-        filters.shaxsi_tasdiqlandi = { confirm: true };
+        filters["shaxsi_tasdiqlandi.confirm"] = true;
       } else if (identified === "false") {
-        filters.shaxsi_tasdiqlandi = { confirm: { $ne: true } };
+        filters["shaxsi_tasdiqlandi.confirm"] = { $ne: true };
       } else {
         return res.status(400).json({
           ok: false,
@@ -564,9 +564,9 @@ module.exports.getAbonentsByMfyId = async (req, res) => {
     }
     if (etkStatus) {
       if (etkStatus === "true") {
-        filters.ekt_kod_tasdiqlandi = { confirm: true };
+        filters["ekt_kod_tasdiqlandi.confirm"] = true;
       } else if (etkStatus === "false") {
-        filters.ekt_kod_tasdiqlandi = { confirm: { $ne: true } };
+        filters["ekt_kod_tasdiqlandi.confirm"] = { $ne: true };
       } else {
         return res.status(400).json({
           ok: false,
@@ -599,14 +599,17 @@ module.exports.getAbonentsByMfyId = async (req, res) => {
         (a) => a.licshet == abonent.accountNumber
       );
 
+      if (!abonentMongo) return false;
+
       // Filtrlash uchun shartlarni qo'llash
       const isAboveMinSaldo = minSaldo ? abonentSaldo > Number(minSaldo) : true;
       const isBelowMaxSaldo = maxSaldo ? abonentSaldo < Number(maxSaldo) : true;
 
-      if (!abonentMongo?.ekt_kod_tasdiqlandi?.confirm)
-        abonent.isElektrKodConfirm = false;
+      if (abonentMongo.ekt_kod_tasdiqlandi) {
+        abonent.isElektrKodConfirm = abonentMongo.ekt_kod_tasdiqlandi.confirm;
+      }
       abonent.fullName = kirillga(abonentMongo?.fio || abonent.fullName);
-      return isAboveMinSaldo && isBelowMaxSaldo && abonentMongo;
+      return isAboveMinSaldo && isBelowMaxSaldo;
     });
     filteredData.sort((a, b) => a.fullName.localeCompare(b.fullName));
     res.json({ ok: true, data: filteredData });
@@ -756,9 +759,7 @@ module.exports.createDublicateAct = async (req, res) => {
 
 module.exports.sendAbonentsListToTelegram = async (req, res) => {
   try {
-    let { minSaldo, maxSaldo, onlyNotIdentited, mahalla_name, electricCode } =
-      req.query;
-    onlyNotIdentited = onlyNotIdentited === "true";
+    let { minSaldo, maxSaldo, identified, etkStatus, mahalla_name } = req.query;
     const files = req.files;
     const company = await Company.findOne({ id: req.user.companyId });
 
@@ -784,8 +785,8 @@ module.exports.sendAbonentsListToTelegram = async (req, res) => {
       generateMessage({
         minSaldo,
         maxSaldo,
-        onlyNotIdentified: onlyNotIdentited,
-        electricCode,
+        identified,
+        etkStatus,
         mahalla_name,
       })
     );
@@ -803,8 +804,8 @@ module.exports.sendAbonentsListToTelegram = async (req, res) => {
 function generateMessage({
   minSaldo,
   maxSaldo,
-  onlyNotIdentified,
-  electricCode,
+  identified,
+  etkStatus,
   mahalla_name,
 }) {
   let parts = [];
@@ -820,14 +821,16 @@ function generateMessage({
   }
 
   // 2. Shaxsi tasdiqlanmagan
-  if (onlyNotIdentified) {
-    parts.push("shaxsi tasdiqlanmagan");
+  if (identified === "true") {
+    parts.push("shaxsi tasdiqlangan");
+  } else if (identified === "false") {
+    parts.push("shaxsi tasdiqmalangan");
   }
 
   // 3. Elektr kodi holati
-  if (electricCode === "tasdiqlangan") {
+  if (etkStatus === "true") {
     parts.push("elektr kodi kiritilgan");
-  } else if (electricCode === "tasdiqlanmagan") {
+  } else if (etkStatus === "false") {
     parts.push("elektr kodi kiritilmagan");
   }
   // 4. Yakuniy matn
