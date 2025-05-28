@@ -220,7 +220,7 @@ exports.checkActById = async (req, res) => {
     };
     // Yangilaymiz
     act.checkedAt = new Date();
-    act.checkedBy = user.fullName;
+    act.checkedBy = req.user.fullName;
     act.fixedSum = fixedSum ?? act.fixedSum;
     act.status = status;
     act.warningMessage = warningMessage ?? act.warningMessage;
