@@ -11,10 +11,6 @@ const logSchema = new Schema(
 );
 
 const schema = new Schema({
-  accountNumber: {
-    type: String,
-    required: true,
-  },
   actPackId: {
     type: Number,
     required: true,

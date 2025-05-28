@@ -34,6 +34,7 @@ router.post("/login", async (req, res, next) => {
         id: admin.id,
         login: admin.login,
         companyId: admin.companyId,
+        fullName: admin.fullName,
         role: admin.roles, // hali rollar berilmagan
       },
       process.env.SECRET_JWT_KEY,
@@ -44,6 +45,7 @@ router.post("/login", async (req, res, next) => {
         id: admin.id,
         login: admin.login,
         companyId: admin.companyId,
+        fullName: admin.fullName,
         role: admin.roles,
       },
       process.env.REFRESH_JWT_KEY,
@@ -81,6 +83,7 @@ router.post("/login", async (req, res, next) => {
         fullName: admin.fullName,
         pnfl: admin.pnfl,
         companyId: admin.companyId,
+        fullName: admin.fullName,
         roles: admin.roles,
       },
       company: {
@@ -113,6 +116,7 @@ router.post("/refresh-token", async (req, res) => {
         id: decoded.id,
         login: decoded.login,
         companyId: admin.companyId,
+        fullName: admin.fullName,
         roles: admin.roles,
       },
       process.env.SECRET_JWT_KEY,

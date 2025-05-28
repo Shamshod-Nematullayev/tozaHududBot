@@ -157,16 +157,15 @@ module.exports.getActById = async (req, res) => {
 exports.checkActById = async (req, res) => {
   try {
     const actId = req.params.id;
-    const { fixedSum, status, warningMessage, comment, period } = req.body;
-
-    const user = await Admin.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    if (!user.roles.includes("stm")) {
-      return res.status(403).json({ error: "Access denied" });
-    }
+    const {
+      fixedSum,
+      status,
+      warningMessage,
+      comment,
+      actPackId,
+      companyId,
+      period,
+    } = req.body;
 
     // status faqat quyidagilardan bo'lishi kerak
     const allowedStatuses = [
@@ -176,22 +175,36 @@ exports.checkActById = async (req, res) => {
       "tekshirildi",
     ];
     if (!allowedStatuses.includes(status)) {
-      return res.status(400).json({ error: "Noto‘g‘ri status qiymati." });
+      return res.status(400).json({
+        error: "Noto‘g‘ri status qiymati.",
+        message:
+          "Status faqat quyidagilardan bo'lishi kerak: ogohlantirildi, tuzatildi, bekor_qilindi, tekshirildi.",
+      });
     }
+
+    //01.2025
+    if (/[0-9]{2}.[0-9]{4}/.test(period))
+      if (!actPackId || isNaN(actPackId)) {
+        return res.status(400).json({
+          error: "Noto‘g‘ri actPackId formati. Raqam bo'lishi kerak.",
+        });
+      }
 
     const act = await Act.findOne({ actId });
 
+    console.log(req.user);
     if (!act) {
       const newAct = new Act({
         actId,
-        checkedBy: user.fullName,
+        checkedBy: req.user.fullName,
         fixedSum,
         status,
         warningMessage,
         comment,
         checkedAt: new Date(),
+        actPackId,
         period,
-        actPackId: req.body.actPackId,
+        companyId,
       });
 
       await newAct.save();
@@ -201,11 +214,10 @@ exports.checkActById = async (req, res) => {
     // Logga yozamiz
     const logEntry = {
       actions: `Status: ${act.status || "yangi"} ➝ ${status}`,
-      user: user.fullName,
+      user: req.user.fullName,
       date: new Date(),
       comment: comment || "",
     };
-
     // Yangilaymiz
     act.checkedAt = new Date();
     act.checkedBy = user.fullName;
@@ -219,7 +231,7 @@ exports.checkActById = async (req, res) => {
     res.json({ message: "Akt muvaffaqiyatli yangilandi", act });
   } catch (error) {
     console.error("Xatolik:", error);
-    res.status(500).json({ error: "Ichki server xatoligi" });
+    res.status(500).json({ message: "Ichki server xatoligi" });
   }
 };
 
@@ -235,12 +247,11 @@ module.exports.getPdfByFileId = async (req, res) => {
         file: fileId,
       },
     });
-    console.log(data);
     res.set("Content-Type", "application/pdf");
     res.send(data);
   } catch (error) {
     console.error("Xatolik: ", error);
-    res.status(500).json({ error: "Ichki server xatoligi" });
+    res.status(500).json({ message: "Ichki server xatoligi" });
   }
 };
 
@@ -266,7 +277,7 @@ module.exports.addLogToAct = async (req, res) => {
     res.json({ message: "Log muvaffaqiyatli qo'shildi", act });
   } catch (error) {
     console.error("Xatolik: ", error);
-    res.status(500).json({ error: "Ichki server xatoligi" });
+    res.status(500).json({ message: "Ichki server xatoligi" });
   }
 };
 
@@ -300,7 +311,7 @@ module.exports.calculateAmount = async (req, res) => {
   } catch (error) {
     console.error("Xatolik: ", error);
     res.status(500).json({
-      error: "Ichki server xatoligi",
+      message: "Ichki server xatoligi",
       message: error.response?.data?.message,
     });
   }

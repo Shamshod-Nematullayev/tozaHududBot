@@ -12,7 +12,7 @@ module.exports = function (req, res, next) {
     // Verify the token
     const decoded = jwt.verify(token, process.env.SECRET_JWT_KEY);
     req.user = decoded; // Add user data to request
-    if (req.user.roles.includes("stm")) {
+    if (req.user.roles.includes("stm") && req.query.companyId) {
       req.user.companyId = req.query.companyId;
     }
     next();
