@@ -214,12 +214,14 @@ exports.checkActById = async (req, res) => {
 
 module.exports.getPdfByFileId = async (req, res) => {
   try {
-    const fileId = req.params.fileId;
+    const fileId = req.query.fileId;
 
     const tozaMakonApi = createTozaMakonApi(req.user.companyId);
-    const { data } = await tozaMakonApi.get(`/file-service/pdf/${fileId}`, {
+    const { data } = await tozaMakonApi.get(`/file-service/buckets/download`, {
+      params: { file: fileId },
       responseType: "arraybuffer",
     });
+    console.log(data);
     res.set("Content-Type", "application/pdf");
     res.send(data);
   } catch (error) {

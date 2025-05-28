@@ -17,9 +17,9 @@ router.get("/packs", getActPacks);
 
 router.get("/stats", getActStats);
 
-router.get("/:id", getActById);
+router.get("/pdf", getPdfByFileId);
 
-router.get("/:fileId/pdf", getPdfByFileId);
+router.get("/:id", getActById);
 
 router.patch("/:id/check", isSTMRole, checkActById);
 
