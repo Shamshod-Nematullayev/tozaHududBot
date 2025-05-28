@@ -220,6 +220,9 @@ module.exports.getPdfByFileId = async (req, res) => {
     const { data } = await tozaMakonApi.get(`/file-service/buckets/download`, {
       params: { file: fileId },
       responseType: "arraybuffer",
+      params: {
+        file: fileId,
+      },
     });
     console.log(data);
     res.set("Content-Type", "application/pdf");
@@ -253,5 +256,41 @@ module.exports.addLogToAct = async (req, res) => {
   } catch (error) {
     console.error("Xatolik: ", error);
     res.status(500).json({ error: "Ichki server xatoligi" });
+  }
+};
+
+module.exports.calculateAmount = async (req, res) => {
+  try {
+    const {
+      residentId,
+      actPackId,
+      startPeriod,
+      endPeriod,
+      kSaldo = 0,
+      inhabitantCount,
+    } = req.query;
+
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+
+    const { data } = await tozaMakonApi.get(
+      `/billing-service/acts/calculate-amount`,
+      {
+        params: {
+          residentId,
+          actPackId,
+          startPeriod,
+          endPeriod,
+          kSaldo,
+          inhabitantCount,
+        },
+      }
+    );
+    res.json(data);
+  } catch (error) {
+    console.error("Xatolik: ", error);
+    res.status(500).json({
+      error: "Ichki server xatoligi",
+      message: error.response?.data?.message,
+    });
   }
 };
