@@ -40,9 +40,11 @@ module.exports.getConfirmedAbonentCountsReportByInspectors = async (
         };
       }
       if (toDate) {
+        const endOfDay = new Date(toDate);
+        endOfDay.setHours(23, 59, 59, 999);
         filters["shaxsi_tasdiqlandi.updated_at"] = {
           ...filters["shaxsi_tasdiqlandi.updated_at"],
-          $lte: new Date(toDate),
+          $lte: endOfDay,
         };
       }
       inspector.pnflConfirmedByDate = await Abonent.countDocuments(filters);
@@ -56,9 +58,11 @@ module.exports.getConfirmedAbonentCountsReportByInspectors = async (
         };
       }
       if (toDate) {
+        const endOfDay = new Date(toDate);
+        endOfDay.setHours(23, 59, 59, 999);
         filters["shaxsi_tasdiqlandi.updated_at"] = {
           ...filters["shaxsi_tasdiqlandi.updated_at"],
-          $lte: new Date(toDate),
+          $lte: new Date(endOfDay),
         };
       }
       inspector.etkConfirmedByDate = await Abonent.countDocuments(filters);
