@@ -131,15 +131,26 @@ module.exports.getActById = async (req, res) => {
   try {
     const { id } = req.params;
     let companyId = req.user.companyId;
-    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
-    const { data } = await tozaMakonApi.get(`/billing-service/acts/${id}`);
+    const tozaMakonApi = createTozaMakonApi(companyId);
+    const data = (
+      await tozaMakonApi.get(`/billing-service/acts`, {
+        params: {
+          id,
+        },
+      })
+    ).data.content[0];
     const act = await Act.findOne({ actId: data.id });
     if (act) {
       data.onDb = act;
     }
     res.json(data);
   } catch (error) {
-    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error.message);
+    res.status(500).json({
+      ok: false,
+      error: "Internal server error 500",
+      message: error.response?.data?.message,
+    });
   }
 };
 
