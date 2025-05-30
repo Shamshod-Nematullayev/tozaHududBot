@@ -151,7 +151,7 @@ composer.command("help", (ctx) => {
 });
 composer.command("tushum", async (ctx) => {
   // nazoratchilarKunlikTushum();
-  sendMFYIncomeReport();
+  sendMFYIncomeReport(1144);
 });
 
 composer.hears(/mvd_\w+/g, (ctx) => {
