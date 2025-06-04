@@ -62,6 +62,10 @@ const schema = new Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
+    kadastr_baza_not_worked: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

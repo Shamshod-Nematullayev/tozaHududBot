@@ -60,7 +60,7 @@ tozaMakonApi.interceptors.response.use(
   }
 );
 
-function createTozaMakonApi(companyId) {
+function createTozaMakonApi(companyId, type = "billing") {
   const instance = axios.create({
     baseURL: "https://api.tozamakon.eco",
     headers: {
@@ -74,9 +74,13 @@ function createTozaMakonApi(companyId) {
     async (config) => {
       const session = await Company.findOne({ id: companyId });
       if (session?.tozamakonAccessToken) {
-        config.headers[
-          "Authorization"
-        ] = `Bearer ${session.tozamakonAccessToken}`;
+        config.headers["Authorization"] = `Bearer ${
+          type === "billing"
+            ? session.tozamakonAccessToken
+            : type === "gps"
+            ? session.tozamakonGpsAccessToken
+            : ""
+        }`;
       }
       return config;
     },
@@ -99,22 +103,45 @@ function createTozaMakonApi(companyId) {
 
       if (status === 401) {
         try {
-          const { data } = await axios.post(
-            "https://api.tozamakon.eco/user-service/users/login",
-            {
-              username: session.login,
-              password: session.password,
-            }
-          );
+          if (type === "billing") {
+            const { data } = await axios.post(
+              "https://api.tozamakon.eco/user-service/users/login",
+              {
+                username: session.login,
+                password: session.password,
+              }
+            );
 
-          await Company.findByIdAndUpdate(session._id, {
-            $set: {
-              tozamakonAccessToken: data.access_token,
-            },
-          });
+            await Company.findByIdAndUpdate(session._id, {
+              $set: {
+                tozamakonAccessToken: data.access_token,
+              },
+            });
 
-          error.config.headers["Authorization"] = `Bearer ${data.access_token}`;
-          return instance.request(error.config);
+            error.config.headers[
+              "Authorization"
+            ] = `Bearer ${data.access_token}`;
+            return instance.request(error.config);
+          } else if (type === "gps") {
+            const { data } = await axios.post(
+              "https://api.tozamakon.eco/user-service/users/login",
+              {
+                username: session.tozamakonGpsLogin,
+                password: session.tozamakonGpsPassword,
+              }
+            );
+
+            await Company.findByIdAndUpdate(session._id, {
+              $set: {
+                tozamakonGpsAccessToken: data.access_token,
+              },
+            });
+
+            error.config.headers[
+              "Authorization"
+            ] = `Bearer ${data.access_token}`;
+            return instance.request(error.config);
+          }
         } catch (loginError) {
           return Promise.reject(loginError); // login noto‘g‘ri bo‘lsa, to‘xtatish
         }

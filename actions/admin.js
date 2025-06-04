@@ -176,6 +176,11 @@ composer.hears(/k_\w+/g, (ctx) => {
   );
 });
 
+composer.command("geo", async (ctx) => {
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+  ctx.scene.enter("abonentlarniGeozonagaBiriktirish");
+});
+
 composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
   ctx.scene.enter("pochtaHarajatiniTekshirishScene")
 );
