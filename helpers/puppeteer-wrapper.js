@@ -1,4 +1,5 @@
 const nodeHtmlToImage = require("node-html-to-image");
+const puppeteer = require("puppeteer"); // <-- MUHIM!
 
 const defaultPuppeteerArgs = {
   args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -6,13 +7,14 @@ const defaultPuppeteerArgs = {
 };
 
 module.exports = (options) => {
-  const puppeteerOptions = {
+  const puppeteerArgs = {
     ...defaultPuppeteerArgs,
-    ...(options.puppeteer || {}),
+    ...(options.puppeteerArgs || {}),
   };
 
   return nodeHtmlToImage({
     ...options,
-    puppeteer: puppeteerOptions,
+    puppeteer, // <-- modulning o‘zi
+    puppeteerArgs, // <-- sozlamalar alohida
   });
 };
