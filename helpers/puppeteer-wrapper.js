@@ -6,13 +6,13 @@ const defaultPuppeteerArgs = {
 };
 
 module.exports = (options) => {
-  const puppeteerArgs = {
+  const puppeteerOptions = {
     ...defaultPuppeteerArgs,
-    ...options.puppeteerArgs,
+    ...(options.puppeteer || {}),
   };
 
   return nodeHtmlToImage({
     ...options,
-    puppeteerArgs,
+    puppeteer: puppeteerOptions,
   });
 };
