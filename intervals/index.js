@@ -18,7 +18,7 @@ agenda.define("createAktPackTask", async () => {
 
 agenda.define("sendKunlikPinflReportsTask", async () => {
   await sendKunlikPinflReports(1265);
-  await sendKunlikPinflReports(1143);
+  // await sendKunlikPinflReports(1143);
   await sendKunlikPinflReports(621);
   await sendKunlikPinflReports(337);
   await sendKunlikPinflReports(1263);
@@ -26,7 +26,7 @@ agenda.define("sendKunlikPinflReportsTask", async () => {
 
 agenda.define("sendKunlikEtkReportsTask", async () => {
   await sendKunlikEtkReports(1265);
-  await sendKunlikEtkReports(1143);
+  // await sendKunlikEtkReports(1143);
   await sendKunlikEtkReports(1266);
   await sendKunlikEtkReports(621);
   await sendKunlikEtkReports(337);
@@ -34,7 +34,7 @@ agenda.define("sendKunlikEtkReportsTask", async () => {
 
 agenda.define("sendMFYIncomeReportTask", async () => {
   await sendMFYIncomeReport(1265);
-  await sendMFYIncomeReport(1143);
+  // await sendMFYIncomeReport(1143);
   await sendMFYIncomeReport(1144);
 });
 agenda.define("sendMFYIncomeReportTaskNurobod", async () => {
@@ -43,13 +43,13 @@ agenda.define("sendMFYIncomeReportTaskNurobod", async () => {
 
 agenda.define("sendPinflMfyReportTask", async () => {
   sendPinflMfyReport(1144);
-  sendPinflMfyReport(1143);
+  // sendPinflMfyReport(1143);
   sendIdentifietMfyReport(1265);
 });
 
 agenda.define("sendEtkMfyReportTask", async () => {
   sendEtkMfyReport(1144);
-  sendEtkMfyReport(1143);
+  // sendEtkMfyReport(1143);
   sendIdentifietMfyReport(1265);
 });
 

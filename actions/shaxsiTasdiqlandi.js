@@ -216,14 +216,17 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       //   requestni o'chirib yuborish
       await req.deleteOne();
       //   telegram kanaldagi postni yangilash
-      await ctx.telegram.editMessageCaption(
+      ctx.telegram.editMessageCaption(
         company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
         ctx.update.callback_query.message.message_id,
         0,
         `KOD: ${req.licshet}\nFIO: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
         { parse_mode: "HTML" }
       );
-      await ctx.deleteMessage();
+      await ctx.telegram.deleteMessage(
+        company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+        ctx.update.callback_query.message.message_id
+      );
       //   tizimga kiritgan nazoratchiga javob yo'llash
       await ctx.telegram.sendMessage(
         req.user.id,
@@ -265,7 +268,6 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
     } catch (error) {
       console.error(error);
     }
-    console.error(error, ctx.message);
   }
 });
 

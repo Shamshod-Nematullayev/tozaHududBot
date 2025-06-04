@@ -113,8 +113,8 @@ agenda.on("ready", async () => {
   agenda.every("0 9-22 * * *", "sendPinflMfyReportTask"); // 09:00 to 22:00 every day
   agenda.every("0 9-22 * * *", "sendEtkMfyReportTask"); // 09:00 to 22:00 every day
   agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask"); // 09:00 to 22:00 every day
-  agenda.every("0 3 * * *", queueNames.updateAbonents, { companyId: 1144 });
 
+  // agenda.every("0 3 * * *", queueNames.updateAbonents, { companyId: 1144 });
   // const lastPage = await LastUpdate.findOne({ key: "abonents-last-page-1144" });
   // if (lastPage)
   //   agenda.now(queueNames.updateAbonents, {
