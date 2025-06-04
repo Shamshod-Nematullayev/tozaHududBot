@@ -26,7 +26,14 @@ const abonentlarniGeozonagaBiriktirish = new WizardScene(
       ctx.wizard.state.mahallalar = mahallalar;
       ctx.wizard.state.admin = admin;
 
-      await ctx.reply("Mahallani tanlang", keyboards.mahallalar);
+      await ctx.reply(
+        "Mahallani tanlang",
+        Markup.inlineKeyboard(
+          mahallalar.map((item) => {
+            return [Markup.button.callback(item.name, `mahalla_${item.id}`)];
+          })
+        )
+      );
       ctx.wizard.next();
     } catch (error) {
       console.error(

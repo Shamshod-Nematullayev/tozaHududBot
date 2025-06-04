@@ -165,16 +165,6 @@ composer.hears(/mvd_\w+/g, (ctx) => {
     })
     .catch((err) => console.log(err));
 });
-composer.hears(/k_\w+/g, (ctx) => {
-  find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
-    (res) => {
-      ctx.reply(
-        `<code>${res.details.PermanentRegistration.Cadastre}</code>\n<code>${res.details.PermanentRegistration.Address}</code>`,
-        { parse_mode: "HTML" }
-      );
-    }
-  );
-});
 
 composer.command("geo", async (ctx) => {
   if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);

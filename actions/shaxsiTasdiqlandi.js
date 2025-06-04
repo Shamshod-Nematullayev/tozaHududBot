@@ -258,7 +258,10 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         { parse_mode: "HTML" }
       );
 
-      await ctx.deleteMessage();
+      await ctx.telegram.deleteMessage(
+        company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+        ctx.update.callback_query.message.message_id
+      );
     }
   } catch (error) {
     try {
