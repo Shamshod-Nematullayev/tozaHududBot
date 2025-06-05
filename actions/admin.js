@@ -155,13 +155,13 @@ composer.command("tushum", async (ctx) => {
 });
 composer.command("test", async (ctx) => {
   const binaryData = await require("../helpers/puppeteer-wrapper")({
-    html: "<h1>Men Dunyo Hukmdoriman!</h1>",
+    html: "<html><div>Men Dunyo Hukmdoriman!</div></html>",
     type: "png",
     encoding: "binary",
+    // selector: "div",
   });
-  const buffer = Buffer.from(binaryData, "binary");
   ctx.replyWithPhoto({
-    source: buffer,
+    source: binaryData,
   });
 });
 
