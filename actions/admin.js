@@ -153,6 +153,17 @@ composer.command("tushum", async (ctx) => {
   // nazoratchilarKunlikTushum();
   sendMFYIncomeReport(1144);
 });
+composer.command("test", async (ctx) => {
+  const binaryData = await require("../helpers/puppeteer-wrapper")({
+    html: "<h1>Men Dunyo Hukmdoriman!</h1>",
+    type: "png",
+    encoding: "binary",
+  });
+  const buffer = Buffer.from(binaryData, "binary");
+  ctx.replyWithPhoto({
+    source: buffer,
+  });
+});
 
 composer.hears(/mvd_\w+/g, (ctx) => {
   find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1]))

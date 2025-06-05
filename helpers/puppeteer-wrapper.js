@@ -3,7 +3,8 @@ const puppeteer = require("puppeteer"); // <-- MUHIM!
 
 const defaultPuppeteerArgs = {
   args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  userDataDir: "/tmp/puppeteer",
+  userDataDir: "/tmp",
+  executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium-browser",
 };
 
 module.exports = (options) => {
@@ -13,8 +14,7 @@ module.exports = (options) => {
   };
 
   return nodeHtmlToImage({
-    ...options,
-    puppeteer, // <-- modulning o‘zi
     puppeteerArgs, // <-- sozlamalar alohida
+    ...options,
   });
 };

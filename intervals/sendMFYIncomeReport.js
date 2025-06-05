@@ -119,7 +119,7 @@ async function sendMFYIncomeReport(
       }
     );
   } catch (err) {
-    console.error(new Error(err));
+    console.error(err);
   }
 }
 module.exports = { sendMFYIncomeReport };
