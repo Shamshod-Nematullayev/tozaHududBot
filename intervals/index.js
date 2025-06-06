@@ -42,22 +42,18 @@ agenda.define("sendMFYIncomeReportTaskNurobod", async () => {
 });
 
 agenda.define("sendPinflMfyReportTask", async () => {
-  sendPinflMfyReport(1144);
+  await sendPinflMfyReport(1144);
   // sendPinflMfyReport(1143);
-  sendIdentifietMfyReport(1265);
+  await sendIdentifietMfyReport(1265);
 });
 
 agenda.define("sendEtkMfyReportTask", async () => {
-  sendEtkMfyReport(1144);
+  await sendEtkMfyReport(1144);
   // sendEtkMfyReport(1143);
-  sendIdentifietMfyReport(1265);
+  await sendIdentifietMfyReport(1265);
 });
 
 agenda.define("nazoratchilarKunlikTushumTask", async () => {
-  const companies = await Company.find();
-  companies.forEach((company) => {
-    if (company.ekopayLogin) {
-      nazoratchilarKunlikTushum(company.id);
-    }
-  });
+  await nazoratchilarKunlikTushum(1144);
+  await nazoratchilarKunlikTushum(1265);
 });
