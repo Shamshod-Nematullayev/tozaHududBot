@@ -159,17 +159,22 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       //   requestni o'chirib yuborish
       await req.deleteOne();
       //   telegram kanaldagi postni yangilash
-      ctx.telegram.editMessageCaption(
-        company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
-        ctx.update.callback_query.message.message_id,
-        0,
-        `KOD: ${req.licshet}\nFIO: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
-        { parse_mode: "HTML" }
-      );
-      await ctx.telegram.deleteMessage(
-        company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
-        ctx.update.callback_query.message.message_id
-      );
+      ctx.telegram
+        .deleteMessage(
+          company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+          ctx.update.callback_query.message.message_id
+        )
+        .catch(() => {
+          ctx.deleteMessage().catch(() => {
+            ctx.telegram.editMessageCaption(
+              company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+              ctx.update.callback_query.message.message_id,
+              0,
+              `#delete KOD: ${req.licshet}\nFIO: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+              { parse_mode: "HTML" }
+            );
+          });
+        });
       //   tizimga kiritgan nazoratchiga javob yo'llash
       await ctx.telegram.sendMessage(
         req.user.id,
@@ -195,16 +200,22 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         `Siz yuborgan pasport ma'lumot bekor qilindi. <b>${req.licshet}</b> \nPasport: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}`,
         { parse_mode: "HTML" }
       );
-      // telegram kanaldagi xabarni o'zgartirish
-      await ctx.editMessageCaption(
-        `KOD: ${req.licshet}\nFIO: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nBekor qilindi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
-        { parse_mode: "HTML" }
-      );
 
-      await ctx.telegram.deleteMessage(
-        company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
-        ctx.update.callback_query.message.message_id
-      );
+      // o'chirish, o'chirish ishlamasa
+      ctx.telegram
+        .deleteMessage(
+          company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+          ctx.update.callback_query.message.message_id
+        )
+        .catch(() => {
+          ctx.deleteMessage().catch(() => {
+            // telegram kanaldagi xabarni o'zgartirish
+            ctx.editMessageCaption(
+              `KOD: ${req.licshet}\nFIO: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nBekor qilindi: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`,
+              { parse_mode: "HTML" }
+            );
+          });
+        });
     }
   } catch (error) {
     try {
