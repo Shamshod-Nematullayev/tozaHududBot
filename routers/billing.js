@@ -17,6 +17,7 @@ const {
   getMfyById,
   getAbonentDataByLicshet,
   getActPacks,
+  getTariffs,
 } = require("./controllers/billing.controller");
 
 const router = require("express").Router();
@@ -139,5 +140,7 @@ router.get("/get-mfy-by-id/:mfy_id", getMfyById);
 router.get("/get-abonent-acts/:abonentId", getAbonentActs);
 
 router.get("/act-packs", getActPacks);
+
+router.get("/get-tariffs", getTariffs);
 
 module.exports = router;

@@ -901,3 +901,24 @@ module.exports.getActPacks = async (req, res) => {
     res.json({ ok: false, message: "Internal server error 500" });
   }
 };
+
+module.exports.getTariffs = async (req, res) => {
+  try {
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+    const company = await Company.findOne({ id: req.user.companyId });
+    const { data } = await tozaMakonApi.get(
+      "/billing-service/tariffs/population-tariffs",
+      {
+        params: {
+          page: 0,
+          size: 100,
+          regionId: company.regionId,
+          companyId: company.id,
+        },
+      }
+    );
+    res.json({ tariffs: data.content });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+  }
+};
