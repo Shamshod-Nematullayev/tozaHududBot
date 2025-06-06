@@ -64,6 +64,7 @@ const getAbonentCard = new WizardScene(
       const browser = await puppeter.launch({
         headless: true,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        userDataDir: "/tmp/puppeteer",
       });
       const page = await browser.newPage();
       await page.setContent(html, { waitUntil: "networkidle0" });

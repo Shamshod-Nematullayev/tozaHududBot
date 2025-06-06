@@ -172,9 +172,7 @@ actions.forEach((action) => {
       }
       ctx.scene.enter(action);
       await ctx.deleteMessage();
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (error) {}
   });
 });
 

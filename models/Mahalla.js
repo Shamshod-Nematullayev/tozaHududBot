@@ -46,6 +46,10 @@ const schema = new mongoose.Schema({
     default: false,
   },
   publicOfferFileId: String,
+  geoZoneBiriktirilganKochalar: {
+    type: Array,
+    default: [],
+  },
 });
 
 module.exports.Mahalla = mongoose.model("mahalla", schema);

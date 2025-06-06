@@ -77,7 +77,7 @@ router.post("/login", async (req, res, next) => {
       telegram_id: admin.user_id,
       fullName: admin.fullName,
       photo: photo.data,
-      abonentsPrefix: company.abonentsPrefix,
+      abonentsPrefix: company?.abonentsPrefix,
       user: {
         login: admin.login,
         fullName: admin.fullName,
@@ -87,13 +87,13 @@ router.post("/login", async (req, res, next) => {
         roles: admin.roles,
       },
       company: {
-        id: company.id,
-        name: company.name,
-        locationName: company.locationName,
-        phone: company.phone,
-        managerName: company.manager?.fullName,
-        billingAdminName: company.billingAdmin?.fullName,
-        gpsOperatorName: company.gpsOperator?.fullName,
+        id: company?.id,
+        name: company?.name,
+        locationName: company?.locationName,
+        phone: company?.phone,
+        managerName: company?.manager?.fullName,
+        billingAdminName: company?.billingAdmin?.fullName,
+        gpsOperatorName: company?.gpsOperator?.fullName,
       },
     });
   } catch (ex) {

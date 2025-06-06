@@ -64,6 +64,9 @@ const schema = new Schema(
     ekopaySessionId: String,
     ekopayParentId: String,
     ekopayToken: String,
+    tozamakonGpsLogin: String,
+    tozamakonGpsPassword: String,
+    tozamakonGpsAccessToken: String,
     type: {
       type: String,
       enum: ["dxsh", "ekopay"],

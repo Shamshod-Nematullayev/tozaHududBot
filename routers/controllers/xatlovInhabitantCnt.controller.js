@@ -85,7 +85,7 @@ module.exports.getMultiplyRequests = async (req, res) => {
     sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
     const data = await MultiplyRequest.find({
       ...filters,
-      document_id: { $exists: false },
+      $or: [{ document_id: { $exists: false } }, { document_id: { $eq: "" } }],
       confirm: false,
       companyId,
     }) // Filtrlash
@@ -95,7 +95,7 @@ module.exports.getMultiplyRequests = async (req, res) => {
       .lean(); // Faqatgina "plain" obyekt qaytarish uchun (performance uchun yaxshi)
     const totalCount = await MultiplyRequest.countDocuments({
       ...filters,
-      document_id: { $exists: false },
+      $or: [{ document_id: { $exists: false } }, { document_id: { $eq: "" } }],
       confirm: false,
       companyId,
     }); // Toplam sonliqni o'qish

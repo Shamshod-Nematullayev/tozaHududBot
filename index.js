@@ -22,6 +22,7 @@ const {
 const { agenda } = require("./config/agenda");
 const { queueNames } = require("./constants");
 const { LastUpdate } = require("./models/LastUpdate");
+const { connectDb } = require("./config/connectDB");
 
 // App middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -33,99 +34,79 @@ app.use(
     credentials: true,
   })
 );
-mongoose
-  .connect(process.env.MONGO, {
-    connectTimeoutMS: 30000,
-    socketTimeoutMS: 50000,
-  })
-  .then(async () => {
-    console.log(`Ma'lumotlar bazasiga ulandi`);
-    // require("./test");
+connectDb();
 
-    // use routers
-    app.use("/api/auth", require("./routers/auth"));
-    app.use("/api/statistics", isAuth, require("./routers/statisticsRouter"));
-    app.use(
-      "/api/notification",
-      isAuth,
-      require("./routers/notificationRouter")
-    );
-    app.use("/api/court-service", isAuth, require("./routers/sudRouter"));
-    app.use("/api/targets", isAuth, require("./routers/targetsRouter"));
-    app.use("/api/bildirgilar", isAuth, require("./routers/bildirgilarRouter"));
-    app.use(
-      "/api/fetchTelegram",
-      isAuth,
-      require("./routers/fetchTelegramRouter")
-    );
-    app.use("/api/pachkalar", isAuth, require("./routers/aktPachka"));
-    app.use("/api/documents", isAuth, require("./routers/kiruvchiXujjatlar"));
-    app.use("/api/inspectors", isAuth, require("./routers/inspectorsRouter"));
-    app.use("/api/abonents", isAuth, require("./routers/abonentsRouter"));
-    app.use("/api/billing", isAuth, require("./routers/billing"));
-    app.use("/api/arizalar", isAuth, require("./routers/arizalarRouter"));
-    app.use(
-      "/api/pendingNewAbonents",
-      isAuth,
-      require("./routers/newAbonentsRouter")
-    );
-    app.use(
-      "/api/yashovchi-soni-xatlov",
-      isAuth,
-      require("./routers/yashovchiSoniXatlov")
-    );
-    app.use("/api/reports", isAuth, require("./routers/reportsRouter"));
-    app.use("/api/acts", isAuth, require("./routers/actsRouter"));
+// use routers
+app.use("/api/auth", require("./routers/auth"));
+app.use("/api/statistics", isAuth, require("./routers/statisticsRouter"));
+app.use("/api/notification", isAuth, require("./routers/notificationRouter"));
+app.use("/api/court-service", isAuth, require("./routers/sudRouter"));
+app.use("/api/targets", isAuth, require("./routers/targetsRouter"));
+app.use("/api/bildirgilar", isAuth, require("./routers/bildirgilarRouter"));
+app.use("/api/fetchTelegram", isAuth, require("./routers/fetchTelegramRouter"));
+app.use("/api/pachkalar", isAuth, require("./routers/aktPachka"));
+app.use("/api/documents", isAuth, require("./routers/kiruvchiXujjatlar"));
+app.use("/api/inspectors", isAuth, require("./routers/inspectorsRouter"));
+app.use("/api/abonents", isAuth, require("./routers/abonentsRouter"));
+app.use("/api/billing", isAuth, require("./routers/billing"));
+app.use("/api/arizalar", isAuth, require("./routers/arizalarRouter"));
+app.use(
+  "/api/pendingNewAbonents",
+  isAuth,
+  require("./routers/newAbonentsRouter")
+);
+app.use(
+  "/api/yashovchi-soni-xatlov",
+  isAuth,
+  require("./routers/yashovchiSoniXatlov")
+);
+app.use("/api/reports", isAuth, require("./routers/reportsRouter"));
+app.use("/api/acts", isAuth, require("./routers/actsRouter"));
 
-    app.use((req, res, next) => {
-      res.status(404).json({
-        ok: false,
-        message: `Cannot ${req.method} ${req.originalUrl}`,
-      });
-    });
-
-    // telegram bot
-    function useTelegramBot() {
-      require("./core/bot");
-      require("./middlewares");
-      require("./actions");
-      require("./test");
-    }
-    useTelegramBot();
-  })
-  .catch((err) => {
-    console.error("MongoDB ulanishda xatolik:", err.message);
-    process.exit(1);
+app.use((req, res, next) => {
+  res.status(404).json({
+    ok: false,
+    message: `Cannot ${req.method} ${req.originalUrl}`,
   });
+});
+
+// telegram bot
+function useTelegramBot() {
+  require("./core/bot");
+  require("./middlewares");
+  require("./actions");
+}
+useTelegramBot();
+
 process.on("warning", (warning) => {
   console.warn(warning.stack);
 });
 
 // Schedule jobs
 
-// agenda.on("ready", async () => {
-//   console.log("Agenda is ready to use!");
-//   require("./intervals");
-//   agenda.start();
-//   agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask"); // 09:00  to 17:00 every day
-//   agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod"); // 09:00 to 17:00 every day
-//   agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask"); // 09:05 to 22:05 every day
-//   agenda.every("5 9-22 * * *", "sendKunlikEtkReportsTask"); // 09:05 to 22:05 every day
-//   agenda.every("0 9-22 * * *", "sendPinflMfyReportTask"); // 09:00 to 22:00 every day
-//   agenda.every("0 9-22 * * *", "sendEtkMfyReportTask"); // 09:00 to 22:00 every day
-//   agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask"); // 09:00 to 22:00 every day
-//   agenda.every("0 3 * * *", queueNames.updateAbonents, { companyId: 1144 });
+agenda.on("ready", async () => {
+  console.log("Agenda is ready to use!");
+  require("./intervals");
+  agenda.start();
+  agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask"); // 09:00  to 17:00 every day
+  agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod"); // 09:00 to 17:00 every day
+  agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask"); // 09:05 to 22:05 every day
+  agenda.every("5 9-22 * * *", "sendKunlikEtkReportsTask"); // 09:05 to 22:05 every day
+  agenda.every("0 9-22 * * *", "sendPinflMfyReportTask"); // 09:00 to 22:00 every day
+  agenda.every("0 9-22 * * *", "sendEtkMfyReportTask"); // 09:00 to 22:00 every day
+  agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask"); // 09:00 to 22:00 every day
 
-//   // const lastPage = await LastUpdate.findOne({ key: "abonents-last-page-1144" });
-//   // if (lastPage)
-//   //   agenda.now(queueNames.updateAbonents, {
-//   //     companyId: 1144,
-//   //     page: lastPage.page,
-//   //   });
-// });
-// agenda.on("error", (error) => {
-//   console.error("Agenda error:", error);
-// });
+  // agenda.every("0 3 * * *", queueNames.updateAbonents, { companyId: 1144 });
+  // const lastPage = await LastUpdate.findOne({ key: "abonents-last-page-1144" });
+  // if (lastPage)
+  //   agenda.now(queueNames.updateAbonents, {
+  //     companyId: 1144,
+  //     page: lastPage.page,
+  //   });
+});
+agenda.on("error", (error) => {
+  console.error("Agenda error:", error);
+});
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

@@ -64,7 +64,6 @@ module.exports.getActStats = async (req, res) => {
     res.json({ ok: false, message: "Internal server error 500" });
   }
 };
-async function getAndMergeActs(page, size) {}
 module.exports.getActs = async (req, res) => {
   try {
     let companyId = req.user.companyId;
@@ -80,7 +79,7 @@ module.exports.getActs = async (req, res) => {
           actPackId: packId,
           page,
           size,
-          status,
+          actStatus: status,
         },
       })
     ).data;
@@ -93,25 +92,30 @@ module.exports.getActs = async (req, res) => {
           actPackId: packId,
           page,
           size: 500,
-          status,
+          actStatus: status,
         },
       });
       const ids = data.content.map((act) => act.id);
       const acts = await Act.find({ actId: { $in: ids } });
+      console.log(acts.length, ids.length, ids);
       const actMap = new Map(acts.map((act) => [act.actId, act]));
-
-      content.push(
-        ...content.map((item) => ({
-          ...item,
-          onDb: actMap.get(item.id) || {}, // actId mos kelganini qo‘shamiz
-        }))
-      );
+      data.content.forEach((item) => {
+        const onDb = actMap.get(item.id);
+        if (onDb && onDb.status == checkStatus) {
+          content.push({ ...item, onDb });
+        }
+        if (checkStatus == "yangi" && !onDb) {
+          content.push({ ...item });
+        }
+      });
+    } else {
+      content = data.content;
     }
 
     const acts = await Act.find(filters);
     const actMap = new Map(acts.map((act) => [act.actId, act]));
 
-    const merged = data.content.map((item) => ({
+    const merged = content.map((item) => ({
       ...item,
       onDb: actMap.get(item.id) || {}, // actId mos kelganini qo‘shamiz
     }));

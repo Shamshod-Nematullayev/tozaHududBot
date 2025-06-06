@@ -1,4 +1,5 @@
 // BOT o'zgaruvchisi
+const launchBot = true;
 const { Telegraf } = require("telegraf");
 const TOKEN = process.env.TOKEN;
 
@@ -15,19 +16,15 @@ bot.catch((error, ctx) => {
   }
 });
 
-// bot.telegram.setMyCommands([
-//   { command: "start", description: "Start the bot" },
-//   { command: "help", description: "Get help information" },
-//   { command: "settings", description: "Configure your settings" },
-// ]);
-
 module.exports = { bot };
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
-bot;
-// .launch(() => {
-//   console.log("Bot has been started.");
-// })
-// .catch((err) => {
-//   console.log(err);
-// });
+
+if (launchBot)
+  bot
+    .launch(() => {
+      console.log("Bot has been started.");
+    })
+    .catch((err) => {
+      console.log(err);
+    });

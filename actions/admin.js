@@ -151,7 +151,18 @@ composer.command("help", (ctx) => {
 });
 composer.command("tushum", async (ctx) => {
   // nazoratchilarKunlikTushum();
-  sendMFYIncomeReport();
+  sendMFYIncomeReport(1144);
+});
+composer.command("test", async (ctx) => {
+  const binaryData = await require("../helpers/puppeteer-wrapper")({
+    html: "<html><div>Men Dunyo Hukmdoriman!</div></html>",
+    type: "png",
+    encoding: "binary",
+    // selector: "div",
+  });
+  ctx.replyWithPhoto({
+    source: binaryData,
+  });
 });
 
 composer.hears(/mvd_\w+/g, (ctx) => {
@@ -165,15 +176,10 @@ composer.hears(/mvd_\w+/g, (ctx) => {
     })
     .catch((err) => console.log(err));
 });
-composer.hears(/k_\w+/g, (ctx) => {
-  find_address_by_pinfil_from_mvd(Number(ctx.message.text.split("_")[1])).then(
-    (res) => {
-      ctx.reply(
-        `<code>${res.details.PermanentRegistration.Cadastre}</code>\n<code>${res.details.PermanentRegistration.Address}</code>`,
-        { parse_mode: "HTML" }
-      );
-    }
-  );
+
+composer.command("geo", async (ctx) => {
+  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+  ctx.scene.enter("abonentlarniGeozonagaBiriktirish");
 });
 
 composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>

@@ -17,6 +17,7 @@ const { Notification } = require("../../../models/Notification");
 const { default: axios } = require("axios");
 const { caotoNames } = require("../../../constants");
 const { io, usersMapSocket } = require("../../../config/socketConfig");
+const { LeaderType } = require("docx");
 
 const enterFunc = (ctx) => {
   ctx.reply("Xonadon egasining PINFL raqamini kiriting!", keyboards.cancelBtn);
@@ -130,17 +131,29 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       const tozaMakonApi = createTozaMakonApi(
         inspektor.companyId || admin.companyId
       );
-      const houses = (
-        await tozaMakonApi.get("/user-service/houses/pinfl/" + ctx.message.text)
-      ).data;
+      let houses = {};
+      try {
+        houses = (
+          await tozaMakonApi.get(
+            "/user-service/houses/pinfl/" + ctx.message.text
+          )
+        ).data;
+      } catch (error) {
+        await ctx.reply(
+          houses.data?.message ||
+            "Kadastr tizimidan ma'lumotlarni olishda xatolik yuz berdi. Iltimos keyinroq urinib ko'ring"
+        );
+        ctx.wizard.state.kadastr_baza_not_worked = true;
+      }
       await ctx.reply(
         `${citizen.lastName} ${citizen.firstName} ${citizen.patronymic}`
       );
       if (!houses.cadastr_list) {
         await ctx.reply(
-          houses.data.message ||
+          houses.data?.message ||
             "Kadastr tizimidan ma'lumotlarni olishda xatolik yuz berdi. Iltimos keyinroq urinib ko'ring"
         );
+        ctx.wizard.state.kadastr_baza_not_worked = true;
         ctx.reply(
           "Mahallani tanlang",
           Markup.inlineKeyboard(mahallalarButtons)
@@ -178,10 +191,10 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       ctx.wizard.next();
     } catch (error) {
       ctx.reply(
-        "Kutilmagan xatolik yuz berdi" + error.response?.data?.message,
+        "Kutilmagan xatolik yuz berdi " + error.response?.data?.message,
         keyboards.cancelBtn.resize()
       );
-      console.error(error.response);
+      console.error(error);
     }
   },
   async (ctx) => {
@@ -487,6 +500,7 @@ const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
           etkCustomerCode: ctx.wizard.state.etkCustomerCode,
           etkCaoto: etk_abonent?.caotoNumber,
           companyId: ctx.wizard.state.companyId,
+          kadastr_baza_not_worked: ctx.wizard.state.kadastr_baza_not_worked,
         });
         await ctx.reply(
           `Yangi abonent yaratish uchun ariza yuborildi. Abonent: ${ctx.wizard.state.citizen.lastName} ${ctx.wizard.state.citizen.firstName} ${ctx.wizard.state.citizen.patronymic}`,

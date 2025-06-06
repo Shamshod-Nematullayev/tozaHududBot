@@ -125,9 +125,8 @@ const createTargetScene = new WizardScene(
         }
       }
     } catch (error) {
-      ctx.reply("xatolik createTarget.js");
+      ctx.reply("xatolik createTarget.js " + error.message);
       ctx.scene.leave();
-      console.error(error);
     }
   }
 );

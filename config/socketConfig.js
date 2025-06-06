@@ -24,7 +24,7 @@ io.on("connection", (socket) => {
       delete usersMapSocket[decoded.id];
     });
   } catch (error) {
-    console.error(error.message);
+    // console.error(error.message);
   }
 });
 
