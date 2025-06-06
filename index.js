@@ -89,6 +89,7 @@ mongoose
       require("./core/bot");
       require("./middlewares");
       require("./actions");
+      require("./test");
     }
     useTelegramBot();
   })

@@ -28,9 +28,9 @@ module.exports.getActPacks = async (req, res) => {
 module.exports.getActStats = async (req, res) => {
   try {
     let companyId = req.user.companyId;
-    const {
-      period = `${new Date().getMonth() + 1}.${new Date().getFullYear()}`,
-    } = req.query;
+    const date = new Date();
+    const { period = `${date.getMonth() + 1}.${date.getFullYear()}` } =
+      req.query;
     const tozaMakonApi = createTozaMakonApi(companyId);
     const { data } = await tozaMakonApi.get("/billing-service/act-packs", {
       params: { period },
@@ -182,8 +182,8 @@ exports.checkActById = async (req, res) => {
       });
     }
 
-    //01.2025
-    if (/[0-9]{2}.[0-9]{4}/.test(period))
+    // period formati: 1.2025
+    if (/^\d+\.\d{4}$/.test(period))
       if (!actPackId || isNaN(actPackId)) {
         return res.status(400).json({
           error: "Noto‘g‘ri actPackId formati. Raqam bo'lishi kerak.",

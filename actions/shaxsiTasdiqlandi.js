@@ -81,99 +81,42 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       }
       //   billingga yangilov so'rovini yuborish
       const tozaMakonApi = createTozaMakonApi(req.companyId);
-      let pasportData;
-      try {
-        pasportData = await tozaMakonApi.get("/user-service/citizens", {
+
+      const pasportData = (
+        await tozaMakonApi.get("/user-service/citizens", {
           params: {
             passport: req.data.passport_serial + req.data.passport_number,
             pinfl: req.data.pinfl,
           },
-        });
-        if (!pasportData.data.photo) {
-          const formData = new FormData();
-          const customDates = await find_one_by_pinfil_from_mvd(req.data.pinfl);
-          if (!customDates.success) {
-            return await ctx.answerCbQuery(customDates.message);
-          }
-          // MIME turini ajratamiz
-          const mimeMatch = customDates.photo.match(/^data:(.+);base64,(.*)$/);
-          const mimeType = mimeMatch[1];
-          const base64Data = mimeMatch[2];
-          // Blobga o‘girib, FormData ichiga qo‘shamiz
-          const blob = base64ToBlob(base64Data, mimeType);
+        })
+      ).data;
 
-          formData.append("file", blob, "image.jpg");
-          const bucket = (
-            await tozaMakonApi.post("/file-service/buckets/upload", formData, {
-              params: {
-                folderType: "RESIDENT_IMAGE",
-              },
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            })
-          ).data;
-          pasportData = {
-            birthDate: req.data.birth_date,
-            email: null,
-            firstName: req.data.first_name,
-            foreignCitizen: false,
-            id: abonent.id,
-            inn: null,
-            lastName: req.data.last_name,
-            passport: req.data.passport_serial + req.data.passport_number,
-            passportExpireDate: req.data.details.doc_end_date,
-            passportGivenDate: subtractTenYears(req.data.details.doc_end_date),
-            passportIssuer: req.data.details.division,
-            patronymic: req.data.middle_name,
-            photo: bucket.fileId,
-            pnfl: req.data.pinfl,
-          };
-          return console.log(pasportData);
-        }
-      } catch (error) {
-        await ctx.answerCbQuery(error.response.data.message);
-      }
-      const abonentDatasResponse = await tozaMakonApi.get(
-        `/user-service/residents/${abonent.id}?include=translates`
-      );
-      if (!abonentDatasResponse || abonentDatasResponse.status !== 200) {
-        return await ctx.answerCbQuery(
-          "Abonent dastlabki ma'lumotlarini oliishda xatolik"
-        );
-      }
-      const data = abonentDatasResponse.data;
-      const updateResponse = await tozaMakonApi.put(
-        "/user-service/residents/" + abonent.id,
-        {
-          id: abonent.id,
-          accountNumber: abonent.licshet,
-          residentType: "INDIVIDUAL",
-          electricityAccountNumber: data.electricityAccountNumber,
-          electricityCoato: data.electricityCoato,
-          companyId: data.companyId,
-          streetId: data.streetId,
-          mahallaId: data.mahallaId,
-          contractNumber: data.contractNumber,
-          contractDate: data.contractDate,
-          homePhone: null,
-          active: data.active,
-          description: `${inspector.id} ${inspector.name} ma'lumotiga asosan shaxsi tasdiqlandi o'zgartirildi.`,
-          citizen: {
-            ...pasportData.data,
-            phone: data.citizen.phone,
-          },
-          house: {
-            ...data.house,
-            cadastralNumber: data.house.cadastralNumber
-              ? data.house.cadastralNumber
-              : "00:00:00:00:00:0000:0000",
-          },
-        }
-      );
-      if (!updateResponse || updateResponse.status !== 200) {
-        return await ctx.answerCbQuery("Ma'lumotlarni yangilashda xatolik");
-      }
+      const data = (
+        await tozaMakonApi.get(
+          `/user-service/residents/${abonent.id}?include=translates`
+        )
+      ).data;
+
+      // ma'lumotlarni yangilash
+      await tozaMakonApi.put("/user-service/residents/" + abonent.id, {
+        ...data,
+        id: abonent.id,
+        accountNumber: abonent.licshet,
+        residentType: "INDIVIDUAL",
+        homePhone: null,
+        description: `${inspector.id} ${inspector.name} ma'lumotiga asosan shaxsi tasdiqlandi o'zgartirildi.`,
+        citizen: {
+          ...data.citizen,
+          ...pasportData,
+        },
+        house: {
+          ...data.house,
+          cadastralNumber: data.house.cadastralNumber
+            ? data.house.cadastralNumber
+            : "00:00:00:00:00:0000:0000",
+        },
+      });
+      // identifikatsiyadan o'tkazish
       await tozaMakonApi.patch("/user-service/residents/identified", {
         identified: true,
         residentIds: [abonent.id],
@@ -263,9 +206,8 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
         error?.response?.data?.message || "Xatolik kuzatildi"
       );
     } catch (error) {
-      console.error(error);
+      console.error(new Error(error.message));
     }
-    console.error(error, ctx.message);
   }
 });
 

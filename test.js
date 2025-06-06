@@ -255,3 +255,27 @@ async function aktPachkasiniChange() {
   console.log("Yakullandi");
 }
 // aktPachkasiniChange();
+
+async function getAllFrozenAbonents() {
+  const tozaMakonApi = createTozaMakonApi(1144);
+  let page = 0;
+  const result = [];
+  for (let i = 0; i < 100; i++) {
+    const rows = (
+      await tozaMakonApi.get("/user-service/residents", {
+        params: {
+          page: page,
+          size: 300,
+        },
+      })
+    ).data.content;
+    for (let row of rows) {
+      if (row.isFrozen) result.push(row.accountNumber);
+    }
+    page++;
+    console.log(page);
+  }
+  console.log(result, result.length);
+}
+
+getAllFrozenAbonents();
