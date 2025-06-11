@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose");
 
 async function connectDb() {
   try {
-    mongoose.connect(process.env.MONGO, {
+    await mongoose.connect(process.env.MONGO, {
       connectTimeoutMS: 30000,
       socketTimeoutMS: 50000,
     });
