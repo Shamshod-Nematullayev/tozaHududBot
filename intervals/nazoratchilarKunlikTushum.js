@@ -18,7 +18,8 @@ async function nazoratchilarKunlikTushum(companyId = 1144) {
         },
       }
     );
-    const inspectors = await Nazoratchi.find({ activ: true, companyId });
+    let inspectors = await Nazoratchi.find({ activ: true, companyId });
+    inspectors = inspectors.filter((i) => !i.dontShowOnReport);
     const now = new Date();
     const dateString = `${now.getFullYear()}.${
       now.getMonth() + 1

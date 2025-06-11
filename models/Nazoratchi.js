@@ -20,6 +20,10 @@ const schema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  dontShowOnReport: {
+    type: Boolean,
+    default: false,
+  },
   shaxs_tasdiqlash_ball: { type: Number, default: 0 },
   companyId: {
     type: Number,

@@ -356,7 +356,7 @@ module.exports.changeArizaAct = async (req, res) => {
 
     // Fayl yuklash
     let fileId = file
-      ? await uploadFile(file, ariza.document_number, companyId)
+      ? await uploadFile(file, ariza.document_number, req.user.companyId)
       : ariza.aktInfo.fileId;
 
     // K-Saldo hisoblash
