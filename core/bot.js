@@ -1,5 +1,4 @@
 // BOT o'zgaruvchisi
-const launchBot = true;
 const { Telegraf } = require("telegraf");
 const TOKEN = process.env.TOKEN;
 
@@ -19,12 +18,3 @@ bot.catch((error, ctx) => {
 module.exports = { bot };
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
-
-if (launchBot)
-  bot
-    .launch(() => {
-      console.log("Bot has been started.");
-    })
-    .catch((err) => {
-      console.log(err);
-    });

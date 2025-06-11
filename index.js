@@ -1,4 +1,5 @@
 // Bismillah
+const launchBot = true;
 require("dotenv").config();
 if (!process.env.SECRET_JWT_KEY || !process.env.REFRESH_JWT_KEY) {
   console.error(
@@ -22,6 +23,7 @@ const { agenda } = require("./config/agenda");
 const { queueNames } = require("./constants");
 const { LastUpdate } = require("./models/LastUpdate");
 const { connectDb } = require("./config/connectDB");
+const { bot } = require("./requires");
 
 // App middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -33,6 +35,22 @@ app.use(
     credentials: true,
   })
 );
+if (launchBot)
+  if (process.env.NODE_ENV === "development") {
+    bot
+      .launch(() => {
+        console.log("Bot has been started. Polling is enabled.");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    const WEBHOOK_PATH = "/secret-path";
+    const WEBHOOK_URL = "https://greenzone.uz" + WEBHOOK_PATH;
+    app.use(bot.webhookCallback(WEBHOOK_PATH));
+    bot.telegram.setWebhook(WEBHOOK_URL);
+    console.log("Bot has been started. Webhook is enabled.");
+  }
 connectDb();
 
 // use routers
