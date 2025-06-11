@@ -46,7 +46,7 @@ if (launchBot)
       });
   } else {
     const WEBHOOK_PATH = "/bot" + process.env.TOKEN;
-    const WEBHOOK_URL = "https://greenzone.uz" + WEBHOOK_PATH;
+    const WEBHOOK_URL = "https://api.greenzone.uz" + WEBHOOK_PATH;
     app.use(bot.webhookCallback(WEBHOOK_PATH));
     bot.telegram.setWebhook(WEBHOOK_URL);
     console.log("Bot has been started. Webhook is enabled.");
