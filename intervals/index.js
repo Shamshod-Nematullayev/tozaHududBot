@@ -17,19 +17,19 @@ agenda.define("createAktPackTask", async () => {
 });
 
 agenda.define("sendKunlikPinflReportsTask", async () => {
-  await sendKunlikPinflReports(1265);
+  // await sendKunlikPinflReports(1265);
   // await sendKunlikPinflReports(1143);
   await sendKunlikPinflReports(621);
   await sendKunlikPinflReports(337);
-  await sendKunlikPinflReports(1263);
+  // await sendKunlikPinflReports(1263);
 });
 
 agenda.define("sendKunlikEtkReportsTask", async () => {
   await sendKunlikEtkReports(1265);
   // await sendKunlikEtkReports(1143);
-  await sendKunlikEtkReports(1266);
-  await sendKunlikEtkReports(621);
-  await sendKunlikEtkReports(337);
+  // await sendKunlikEtkReports(1266);
+  // await sendKunlikEtkReports(621);
+  // await sendKunlikEtkReports(337);
 });
 
 agenda.define("sendMFYIncomeReportTask", async () => {
