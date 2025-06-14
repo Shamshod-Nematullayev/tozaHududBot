@@ -18,6 +18,7 @@ const {
   getAbonentDataByLicshet,
   getActPacks,
   getTariffs,
+  getAbonentsByMfyIdExcel,
 } = require("./controllers/billing.controller");
 
 const router = require("express").Router();
@@ -66,6 +67,8 @@ router.get(`/get-abonent-dxj-by-licshet/:licshet`, async (req, res) => {
 router.get("/get-abonent-data-by-licshet/:licshet", getAbonentDataByLicshet);
 
 router.get("/get-abonents-by-mfy-id/:mfy_id", getAbonentsByMfyId);
+
+router.get("/get-abonents-by-mfy-id/:mfy_id/excel", getAbonentsByMfyIdExcel);
 
 router.get("/get-all-active-mfy", getActiveMfy);
 
