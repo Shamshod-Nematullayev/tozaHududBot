@@ -1,4 +1,6 @@
 const { WizardScene } = require("telegraf/scenes");
+const os = require("os");
+const path = require("path");
 const {
   Abonent,
   keyboards,
@@ -61,10 +63,23 @@ const getAbonentCard = new WizardScene(
           }
         );
       });
+      let optionsByOs = {};
+      if (os.platform() === "win32") {
+        optionsByOs = {
+          args: [],
+          executablePath:
+            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        };
+      } else {
+        optionsByOs = {
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          userDataDir: path.join(os.tmpdir(), "puppeteer"),
+          executablePath: "/usr/bin/chromium-browser",
+        };
+      }
       const browser = await puppeter.launch({
         headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        userDataDir: "/tmp/puppeteer",
+        ...optionsByOs,
       });
       const page = await browser.newPage();
       await page.setContent(html, { waitUntil: "networkidle0" });

@@ -45,6 +45,18 @@ module.exports.caotoNames = [
     region: 18,
     companyId: 1263,
   },
+  {
+    title: "Payariq TETK",
+    caoto: 18224,
+    region: 18,
+    companyId: 1266,
+  },
+  {
+    title: "Chelak TETK",
+    caoto: 18226,
+    region: 18,
+    companyId: 1266,
+  },
 ];
 
 module.exports.queueNames = {
