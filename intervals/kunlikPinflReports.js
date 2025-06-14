@@ -88,7 +88,7 @@ async function sendKunlikPinflReports(companyId = 1144) {
         });
         const buffer = Buffer.from(binaryData, "binary");
 
-        bot.telegram.sendPhoto(
+        return bot.telegram.sendPhoto(
           company.GROUP_ID_NAZORATCHILAR,
           { source: buffer },
           {

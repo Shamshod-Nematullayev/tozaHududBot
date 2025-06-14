@@ -108,7 +108,7 @@ agenda.on("ready", async () => {
   agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask"); // 09:00  to 17:00 every day
   agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod"); // 09:00 to 17:00 every day
   agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask"); // 09:05 to 22:05 every day
-  agenda.every("5 9-22 * * *", "sendKunlikEtkReportsTask"); // 09:05 to 22:05 every day
+  agenda.every("8 9-22 * * *", "sendKunlikEtkReportsTask"); // 09:05 to 22:05 every day
   agenda.every("0 9-22 * * *", "sendPinflMfyReportTask"); // 09:00 to 22:00 every day
   agenda.every("0 9-22 * * *", "sendEtkMfyReportTask"); // 09:00 to 22:00 every day
   agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask"); // 09:00 to 22:00 every day
