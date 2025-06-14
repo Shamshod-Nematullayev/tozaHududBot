@@ -4,11 +4,14 @@ const isCancel = require("../../smallFunctions/isCancel");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 const { Abonent } = require("../../../models/Abonent");
 const { Company } = require("../../../models/Company");
-const { changeAbonentDates } = require("../../../requires");
-const cc = "https://cleancity.uz/";
+const { createTozaMakonApi } = require("../../../api/tozaMakon");
 
 const changeAbonentStreet = new Scenes.WizardScene(
   "changeAbonentStreet",
+  (ctx) => {
+    ctx.reply("Abonent shaxsiy hisob raqamini kiriting", keyboards.cancelBtn);
+    return ctx.wizard.next();
+  },
   async (ctx) => {
     try {
       if (!ctx.message)
@@ -23,7 +26,10 @@ const changeAbonentStreet = new Scenes.WizardScene(
           keyboards.cancelBtn.resize()
         );
       }
-      const inspektor = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
+      const inspektor = await Nazoratchi.findOne({
+        telegram_id: ctx.from.id,
+        activ: true,
+      });
       if (!inspektor) {
         ctx.reply(
           "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!"
@@ -32,7 +38,10 @@ const changeAbonentStreet = new Scenes.WizardScene(
       }
       ctx.wizard.state.inspector_id = inspektor.id;
       ctx.wizard.state.inspector_name = inspektor.name;
-      const abonent = await Abonent.findOne({ licshet: ctx.message.text });
+      const abonent = await Abonent.findOne({
+        licshet: ctx.message.text,
+        companyId: inspektor.companyId,
+      });
       ctx.wizard.state.abonent = abonent;
       if (!abonent) {
         ctx.reply(
@@ -47,24 +56,30 @@ const changeAbonentStreet = new Scenes.WizardScene(
           keyboards.cancelBtn.resize()
         );
       }
-      const session = await Company.findOne({ type: "dxsh" });
-      let streets = await fetch(cc + "ds?DAO=StreetsDAO&ACTION=GETLISTALL", {
-        method: "POST",
-        headers: {
-          accept: "application/json, text/javascript, */*; q=0.01",
-          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,uz;q=0.7",
-          "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-          Cookie: session.cookie,
-        },
-        body: `mahallas_id=${abonent.mahallas_id}`,
-      });
-      streets = await streets.json();
-      //   if(streets.msg === "Session has expired") return
-      streets = streets.rows;
+
+      const company = await Company.findOne({ id: inspektor.companyId });
+      const now = new Date();
+      if (!company.active || company.activeExpiresDate < now) {
+        await ctx.reply(
+          "Dastur faoliyati vaqtincha cheklangan. \nIltimos, xizmatlardan foydalanishni davom ettirish uchun to‘lovni amalga oshiring."
+        );
+        return ctx.scene.leave();
+      }
+      ctx.wizard.state.companyId = inspektor.companyId;
+      const tozaMakonApi = createTozaMakonApi(inspektor.companyId);
+      let streets = (
+        await tozaMakonApi.get("/user-service/mahallas/streets", {
+          params: {
+            size: 100,
+            mahallaId: abonent.mahallas_id,
+            districtId: company.districtId,
+          },
+        })
+      ).data;
+
       let keyboardsArray = [];
       ctx.wizard.state.streets = streets;
-      for (let i = 0; i < streets.length; i++) {
-        const street = streets[i];
+      for (let street of streets) {
         keyboardsArray.push([Markup.button.callback(street.name, street.id)]);
       }
       await ctx.reply(
@@ -79,29 +94,29 @@ const changeAbonentStreet = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      if (!ctx.callbackQuery) return ctx.scene.leave();
+      if (!ctx.callbackQuery) throw new Error("Ko'cha tanlanishi kutilgan edi");
       const street = ctx.wizard.state.streets.find(
         (street) => street.id == ctx.callbackQuery.data
       );
       if (!street) {
         ctx.reply(
-          "Xatolik kuzatildi " + error.message,
+          "Xatolik kuzatildi " + new Error("Ko'cha topilmadi"),
           keyboards.cancelBtn.resize()
         );
         return ctx.scene.leave();
       }
       const abonent = ctx.wizard.state.abonent;
-      const res = await changeAbonentDates({
-        abonent_id: abonent.id,
-        abo_data: {
-          description: `${ctx.wizard.state.inspector_id} ${ctx.wizard.state.inspector_name} ma'lumotiga asosan ko'cha/qishloq ma'lumoti o'zgartirildi.`,
-          streets_id: street.id,
-        },
+      const tozaMakonApi = createTozaMakonApi(abonent.companyId);
+      const prevData = (
+        await tozaMakonApi.get(
+          "/user-service/residents/" + abonent.id + "?include=translates"
+        )
+      ).data;
+      await tozaMakonApi.put("/user-service/residents/" + abonent.id, {
+        ...prevData,
+        description: `${ctx.wizard.state.inspector_name} ma'lumotiga asosan ko'cha/qishloq ma'lumoti o'zgartirildi.`,
+        streetId: street.id,
       });
-      if (!res.success) {
-        console.error(res);
-        return ctx.answerCbQuery(res.msg);
-      }
 
       await Abonent.findByIdAndUpdate(abonent._id, {
         $set: {
@@ -122,7 +137,9 @@ const changeAbonentStreet = new Scenes.WizardScene(
       ctx.scene.leave();
     } catch (error) {
       ctx.reply(
-        "Xatolik kuzatildi " + error.message,
+        "Xatolik kuzatildi " + error.response?.data?.message ||
+          error.message ||
+          error,
         keyboards.cancelBtn.resize()
       );
       console.error(error);
@@ -136,10 +153,6 @@ changeAbonentStreet.on("text", (ctx, next) => {
     return ctx.scene.leave();
   }
   next();
-});
-
-changeAbonentStreet.enter((ctx) => {
-  ctx.reply("Abonent litsavoy hisob raqamini kiriting", keyboards.cancelBtn);
 });
 
 module.exports = { changeAbonentStreet };
