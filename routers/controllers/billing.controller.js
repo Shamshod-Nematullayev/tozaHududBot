@@ -22,6 +22,45 @@ function formatDate(date) {
   return `${year}-${month}-${day}`;
 }
 
+async function getActPackIds(document_type, tozaMakonApi, companyId) {
+  const date = new Date();
+  const packIds =
+    (await Company.findOne({ id: companyId })).akt_pachka_ids || {};
+  let actPackId = packIds[document_type]?.id;
+  if (
+    !actPackId ||
+    packIds[document_type].month != date.getMonth() + 1 ||
+    packIds[document_type].year != date.getFullYear()
+  ) {
+    // akt pachkasi yo'q bo'lsa
+    const packId = (
+      await tozaMakonApi.post("/billing-service/act-packs", {
+        companyId,
+        createdDate: formatDate(new Date()),
+        description: `added by th-dashboard`,
+        isActive: true,
+        isSpecialPack: false,
+        name: packIds[document_type]?.name || packNames[document_type],
+        packType: packIds[document_type]?.type || packTypes[document_type],
+      })
+    ).data;
+    await Company.findOneAndUpdate(
+      { id: companyId },
+      {
+        $set: {
+          [`akt_pachka_ids.${document_type}.id`]: packId,
+          [`akt_pachka_ids.${document_type}.month`]: new Date().getMonth() + 1,
+          [`akt_pachka_ids.${document_type}.year`]: new Date().getFullYear(),
+          [`akt_pachka_ids.${document_type}.type`]:
+            packIds[document_type]?.type || packTypes[document_type],
+        },
+      }
+    );
+    actPackId = packId;
+  }
+  return actPackId;
+}
+
 module.exports.downloadFileFromBilling = async (req, res) => {
   try {
     const { file_id } = req.query;
@@ -1039,5 +1078,103 @@ module.exports.getAbonentsByMfyIdExcel = async (req, res) => {
     res.json({ ok: true, data: filteredData });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
+  }
+};
+
+module.exports.monayTransferAct = async (req, res) => {
+  // first index of array is debitor act other elemens are creditors acts
+  const acts = [];
+  const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+
+  let { debitorAct, creditorActs } = req.body;
+  debitorAct = JSON.parse(debitorAct);
+  creditorActs = JSON.parse(creditorActs);
+  try {
+    console.log(req.body);
+    const formData = new FormData();
+    formData.append("file", req.file.buffer, req.file.originalname);
+    const fileUploadResponse = (
+      await tozaMakonApi.post(
+        "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+    ).data;
+    const fileId =
+      fileUploadResponse.fileName + "*" + fileUploadResponse.fileId;
+
+    const actPackId = await getActPackIds(
+      "pul_kuchirish",
+      tozaMakonApi,
+      req.user.companyId
+    );
+    const date = new Date();
+    const debitorActData = (
+      await tozaMakonApi.post("/billing-service/acts", {
+        actType: "DEBIT",
+        amount: debitorAct.amount,
+        amountWithQQS: debitorAct.amount,
+        amountWithoutQQS: 0,
+        kSaldo: (
+          await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+            params: {
+              amount: debitorAct.amount,
+              residentId: debitorAct.residentId,
+              actPackId: actPackId,
+              actType: "DEBIT",
+            },
+          })
+        ).data,
+        description: `pul ko'chirish ${creditorActs
+          .map((act) => act.accountNumber)
+          .join(", ")} larga ${debitorAct.amount} so'm`,
+        fileId,
+        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        residentId: debitorAct.residentId,
+        actPackId: actPackId,
+      })
+    ).data;
+    acts.push(debitorActData);
+
+    for (let creditorAct of creditorActs) {
+      const creditorActData = (
+        await tozaMakonApi.post("/billing-service/acts", {
+          actType: "CREDIT",
+          amount: creditorAct.amount,
+          amountWithQQS: creditorAct.amount,
+          amountWithoutQQS: 0,
+          kSaldo: (
+            await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
+              params: {
+                amount: creditorAct.amount,
+                residentId: creditorAct.residentId,
+                actPackId: actPackId,
+                actType: "CREDIT",
+              },
+            })
+          ).data,
+          description: `pul ko'chirish ${debitorAct.accountNumber} dan ${creditorAct.amount} so'm`,
+          fileId,
+          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+          residentId: creditorAct.residentId,
+          actPackId: actPackId,
+        })
+      ).data;
+      acts.push(creditorActData);
+    }
+
+    res.json({ ok: true, data: acts });
+  } catch (error) {
+    for (let act of acts) {
+      await tozaMakonApi.delete("/billing-service/acts/" + act.id);
+    }
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
   }
 };

@@ -19,6 +19,7 @@ const {
   getActPacks,
   getTariffs,
   getAbonentsByMfyIdExcel,
+  monayTransferAct,
 } = require("./controllers/billing.controller");
 
 const router = require("express").Router();
@@ -145,5 +146,11 @@ router.get("/get-abonent-acts/:abonentId", getAbonentActs);
 router.get("/act-packs", getActPacks);
 
 router.get("/get-tariffs", getTariffs);
+
+router.post(
+  "/monay-transfer-act",
+  uploadAsBlob.single("file"),
+  monayTransferAct
+);
 
 module.exports = router;

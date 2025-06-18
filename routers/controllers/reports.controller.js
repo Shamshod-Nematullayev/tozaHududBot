@@ -1,80 +1,90 @@
 const { Abonent, Nazoratchi } = require("../../requires");
 const Excel = require("exceljs");
+async function countConfirmed(inspectorId, companyId, field, fromDate, toDate) {
+  const baseFilter = {
+    [`${field}.confirm`]: true,
+    [`${field}.inspector._id`]: inspectorId,
+    companyId,
+  };
+
+  const byDateFilter = {
+    ...baseFilter,
+  };
+
+  if (fromDate) {
+    byDateFilter[`${field}.updated_at`] = { $gte: new Date(fromDate) };
+  }
+
+  if (toDate) {
+    const end = new Date(toDate);
+    end.setHours(23, 59, 59, 999);
+    byDateFilter[`${field}.updated_at`] = {
+      ...byDateFilter[`${field}.updated_at`],
+      $lte: end,
+    };
+  }
+
+  const total = await Abonent.countDocuments(baseFilter);
+  const byDate = await Abonent.countDocuments(byDateFilter);
+
+  return { total, byDate };
+}
+
+async function getReportData(req) {
+  const { fromDate, toDate, page = 1, limit = 10 } = req.query;
+  const inspectors = await Nazoratchi.find({
+    companyId: req.user.companyId,
+  })
+    .select(["name", "_id", "id"])
+    .skip(req.query.page ? (page - 1) * limit : 0)
+    .limit(req.query.page ? limit : 1000)
+    .lean();
+
+  const result = await Promise.all(
+    inspectors.map(async (inspector) => {
+      const { total: pnflConfirmed, byDate: pnflConfirmedByDate } =
+        await countConfirmed(
+          inspector._id,
+          req.user.companyId,
+          "shaxsi_tasdiqlandi",
+          fromDate,
+          toDate
+        );
+      const { total: etkConfirmed, byDate: etkConfirmedByDate } =
+        await countConfirmed(
+          inspector._id,
+          req.user.companyId,
+          "ekt_kod_tasdiqlandi",
+          fromDate,
+          toDate
+        );
+      return {
+        ...inspector,
+        pnflConfirmed,
+        pnflConfirmedByDate,
+        etkConfirmed,
+        etkConfirmedByDate,
+      };
+    })
+  );
+
+  const count = await Nazoratchi.countDocuments({
+    companyId: req.user.companyId,
+  });
+
+  return { result, count };
+}
 
 module.exports.getConfirmedAbonentCountsReportByInspectors = async (
   req,
   res
 ) => {
   try {
-    const { fromDate, toDate, page = 1, limit = 10 } = req.query;
-    const inspectors = await Nazoratchi.find({
-      companyId: req.user.companyId,
-    })
-      .select(["name", "_id", "id"])
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean();
-    const allRowsCount = await Nazoratchi.countDocuments({
-      companyId: req.user.companyId,
-    });
-    const result = [];
-    const promises = inspectors.map(async (inspector) => {
-      inspector.pnflConfirmed = await Abonent.countDocuments({
-        "shaxsi_tasdiqlandi.confirm": true,
-        "shaxsi_tasdiqlandi.inspector._id": inspector._id,
-        companyId: req.user.companyId,
-      });
-      inspector.etkConfirmed = await Abonent.countDocuments({
-        "ekt_kod_tasdiqlandi.confirm": true,
-        "ekt_kod_tasdiqlandi.inspector._id": inspector._id,
-
-        companyId: req.user.companyId,
-      });
-      let filters = {
-        companyId: req.user.companyId,
-        "shaxsi_tasdiqlandi.inspector._id": inspector._id,
-      };
-      if (fromDate) {
-        filters["shaxsi_tasdiqlandi.updated_at"] = {
-          $gte: new Date(fromDate),
-        };
-      }
-      if (toDate) {
-        const endOfDay = new Date(toDate);
-        endOfDay.setHours(23, 59, 59, 999);
-        filters["shaxsi_tasdiqlandi.updated_at"] = {
-          ...filters["shaxsi_tasdiqlandi.updated_at"],
-          $lte: endOfDay,
-        };
-      }
-      inspector.pnflConfirmedByDate = await Abonent.countDocuments(filters);
-      filters = {
-        companyId: req.user.companyId,
-        "ekt_kod_tasdiqlandi.inspector._id": inspector._id,
-      };
-      if (fromDate) {
-        filters["ekt_kod_tasdiqlandi.updated_at"] = {
-          $gte: new Date(fromDate),
-        };
-      }
-      if (toDate) {
-        const endOfDay = new Date(toDate);
-        endOfDay.setHours(23, 59, 59, 999);
-        filters["shaxsi_tasdiqlandi.updated_at"] = {
-          ...filters["shaxsi_tasdiqlandi.updated_at"],
-          $lte: new Date(endOfDay),
-        };
-      }
-      inspector.etkConfirmedByDate = await Abonent.countDocuments(filters);
-      result.push(inspector);
-    });
-    await Promise.all(promises);
-    res.json({ rows: result, count: allRowsCount });
+    const { result, count } = await getReportData(req);
+    res.json({ rows: result, count });
   } catch (error) {
-    res.status(500).json({
-      message: "Internal Server Error",
-    });
     console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -83,60 +93,8 @@ module.exports.getConfirmedAbonentCountsReportByInspectorsExcel = async (
   res
 ) => {
   try {
-    const { fromDate, toDate } = req.query;
-    const inspectors = await Nazoratchi.find({
-      companyId: req.user.companyId,
-    })
-      .select(["name", "_id", "id"])
-      .lean();
-    const result = [];
-    const promises = inspectors.map(async (inspector) => {
-      inspector.pnflConfirmed = await Abonent.countDocuments({
-        "shaxsi_tasdiqlandi.confirm": true,
-        "shaxsi_tasdiqlandi.inspector._id": inspector._id,
-        companyId: req.user.companyId,
-      });
-      inspector.etkConfirmed = await Abonent.countDocuments({
-        "ekt_kod_tasdiqlandi.confirm": true,
-        "ekt_kod_tasdiqlandi.inspector._id": inspector._id,
-
-        companyId: req.user.companyId,
-      });
-      let filters = {
-        companyId: req.user.companyId,
-        "shaxsi_tasdiqlandi.inspector._id": inspector._id,
-      };
-      if (fromDate) {
-        filters["shaxsi_tasdiqlandi.updated_at"] = {
-          $gte: new Date(fromDate),
-        };
-      }
-      if (toDate) {
-        filters["shaxsi_tasdiqlandi.updated_at"] = {
-          ...filters["shaxsi_tasdiqlandi.updated_at"],
-          $lte: new Date(toDate),
-        };
-      }
-      inspector.pnflConfirmedByDate = await Abonent.countDocuments(filters);
-      filters = {
-        companyId: req.user.companyId,
-        "ekt_kod_tasdiqlandi.inspector._id": inspector._id,
-      };
-      if (fromDate) {
-        filters["ekt_kod_tasdiqlandi.updated_at"] = {
-          $gte: new Date(fromDate),
-        };
-      }
-      if (toDate) {
-        filters["shaxsi_tasdiqlandi.updated_at"] = {
-          ...filters["shaxsi_tasdiqlandi.updated_at"],
-          $lte: new Date(toDate),
-        };
-      }
-      inspector.etkConfirmedByDate = await Abonent.countDocuments(filters);
-      result.push(inspector);
-    });
-    await Promise.all(promises);
+    const { result, count } = await getReportData(req);
+    res.json({ rows: result, count });
     const workbook = new Excel.Workbook();
     const worksheet = workbook.addWorksheet("Reports");
     worksheet.columns = [
