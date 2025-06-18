@@ -9,6 +9,10 @@ const isPinfl = require("../../smallFunctions/isPinfl");
 const { CustomDataRequest } = require("../../../models/CustomDataRequest");
 const { Nazoratchi } = require("../../../models/Nazoratchi");
 const fs = require("fs");
+const { createTozaMakonApi } = require("../../../api/tozaMakon");
+const {
+  extractBirthDateString,
+} = require("../../../helpers/extractBirthDateFromPinfl");
 
 const updateAbonentDatesByPinfl = new Scenes.WizardScene(
   "update_abonent_date_by_pinfil",
@@ -110,7 +114,39 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       // shaxsiy ma'lumotlarni olish
       const customDates = await find_one_by_pinfil_from_mvd(ctx.message.text);
       if (!customDates.success) {
-        return ctx.reply(customDates.message, keyboards.cancelBtn.resize());
+        if (
+          customDates.message ==
+          "Hozirda baza ishlamayapti, keyinroq boshqatdan urinib ko'ring"
+        ) {
+          const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId);
+          const birthdate = extractBirthDateString(ctx.message.text);
+          const citizen = (
+            await tozaMakonApi.get("/user-service/citizens", {
+              params: {
+                pinfl: ctx.message.text,
+                birthdate,
+              },
+            })
+          ).data;
+          if (citizen) {
+            customDates.success = true;
+            customDates.last_name = citizen.lastName;
+            customDates.first_name = citizen.firstName;
+            customDates.middle_name = citizen.patronymic;
+            customDates.birth_date = citizen.birthDate;
+            customDates.isFromTozaMakon = true;
+            customDates.photo = (
+              await tozaMakonApi.get("/file-service/buckets/download", {
+                params: {
+                  file: citizen.photo,
+                },
+                responseType: "arraybuffer",
+              })
+            ).data;
+          }
+        } else {
+          return ctx.reply(customDates.message, keyboards.cancelBtn.resize());
+        }
       }
       if (customDates.first_name == "" || customDates.success === false) {
         return ctx.reply(
@@ -121,7 +157,9 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       ctx.wizard.state.pinfl = ctx.message.text;
       ctx.wizard.state.customDates = customDates;
       // nazoratchiga tasdiqlash uchun yuborish
-      const buffer = Buffer.from(customDates.photo, "base64");
+      const buffer = customDates.isFromTozaMakon
+        ? customDates.photo
+        : Buffer.from(customDates.photo, "base64");
       await ctx.replyWithPhoto(
         { source: buffer },
         {
@@ -138,6 +176,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       ctx.wizard.next();
     } catch (error) {
       ctx.reply("Xatolik kuzatildi, " + error.message, keyboards.cancelBtn);
+      console.error(error);
     }
   },
   async (ctx) => {
@@ -169,7 +208,9 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
             reUpdating: ctx.wizard.state.reUpdating,
             companyId: ctx.wizard.state.companyId,
           });
-          const buffer = Buffer.from(customDates.photo, "base64");
+          const buffer = customDates.isFromTozaMakon
+            ? customDates.photo
+            : Buffer.from(customDates.photo, "base64");
           let text = `KOD: ${ctx.wizard.state.abonent.licshet}\nPasport: ${customDates.last_name} ${customDates.first_name} ${customDates.middle_name} ${customDates.birth_date}\nBilling: ${ctx.wizard.state.abonent.fio}\nInspector: <a href="https://t.me/${ctx.from.username}">${ctx.from.first_name}</a>`;
           if (ctx.wizard.state.reUpdating)
             text =
