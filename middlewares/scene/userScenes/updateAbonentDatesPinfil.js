@@ -135,6 +135,8 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
             customDates.middle_name = citizen.patronymic;
             customDates.birth_date = citizen.birthDate;
             customDates.isFromTozaMakon = true;
+            customDates.passport_serial = citizen.passport.slice(0, 2);
+            customDates.passport_number = citizen.passport.slice(2);
             customDates.photo = (
               await tozaMakonApi.get("/file-service/buckets/download", {
                 params: {

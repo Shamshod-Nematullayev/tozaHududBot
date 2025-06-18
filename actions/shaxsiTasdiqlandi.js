@@ -130,11 +130,6 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
           description: `${inspector.id} ${inspector.name} ma'lumotiga asosan o'zgartirildi.`,
           photo: req.data.photo,
           passport_number: `${req.data.passport_serial}${req.data.passport_number}`,
-          passport_expire_date: req.data.details.doc_end_date
-            ? `${req.data.details.doc_end_date.split("-")[2]}.${
-                req.data.details.doc_end_date.split("-")[1]
-              }.${req.data.details.doc_end_date.split("-")[0]}`
-            : undefined,
           pinfl: req.data.pinfl,
           shaxsi_tasdiqlandi: {
             confirm: true,
