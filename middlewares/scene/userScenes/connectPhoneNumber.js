@@ -55,7 +55,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
       if (abonent.phone_tasdiqlandi?.confirm) {
         ctx.wizard.selectStep(2);
         return ctx.reply(
-          `🛑 Ushbu hisob raqamiga ${abonent.phone_tasdiqlandi.inspector_name} tomonidan allaqachon telefon raqami biriktirilgan. Baribir o'zgartirmoqchimisiz?`,
+          `🛑 Ushbu hisob raqamiga ${abonent.phone_tasdiqlandi.inspector_name} tomonidan allaqachon telefon raqami biriktirilgan <b>${abonent.phone}</b>. Baribir o'zgartirmoqchimisiz?`,
           keyboards.yesOrNo
         );
       }
@@ -126,7 +126,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
         await ctx.deleteMessage();
         ctx.wizard.selectStep(1);
         return await ctx.replyWithHTML(
-          `<b>${ctx.wizard.state.fio}</b> ${ctx.wizard.state.mahalla_name} MFY\n` +
+          `<b>${ctx.wizard.state.fio}</b> ${ctx.wizard.state.mahalla_name}\n` +
             `Telefon raqamini kiriting misol: 992852536`,
           keyboards.cancelBtn.resize()
         );

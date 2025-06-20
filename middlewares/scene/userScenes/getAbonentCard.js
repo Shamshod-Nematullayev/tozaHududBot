@@ -88,6 +88,7 @@ const getAbonentCard = new WizardScene(
         printBackground: true,
       });
       await page.close();
+      await browser.close();
 
       await ctx.replyWithDocument({
         source: Buffer.from(buffer),
