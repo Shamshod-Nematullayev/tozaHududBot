@@ -176,10 +176,13 @@ module.exports.acceptPendingNewAbonent = async (req, res) => {
       { parse_mode: "HTML" }
     );
   } catch (error) {
-    console.error(error);
     res
       .status(500)
-      .json({ ok: false, message: "Server error " + error.message });
+      .json({
+        ok: false,
+        message:
+          error.response?.data?.message || "Server error " + error.message,
+      });
   }
 };
 
