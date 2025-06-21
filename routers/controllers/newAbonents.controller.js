@@ -165,7 +165,7 @@ module.exports.acceptPendingNewAbonent = async (req, res) => {
       companyId: pendingAbonent.companyId,
     });
     await pendingAbonent.updateOne({
-      status: StatusNewAbonent.ACCEPTED,
+      status: StatusNewAbonent.APPROVED,
       accountNumber: generatedAccountNumber,
     });
 
