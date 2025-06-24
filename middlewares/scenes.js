@@ -63,6 +63,7 @@ const {
 const {
   abonentlarniGeozonagaBiriktirish,
 } = require("./scene/adminActions/abonentlarniGeozonagaBiriktirish");
+const { getWarningLetter } = require("./scene/userScenes/getWarningLetter");
 
 const stage = new Scenes.Stage([
   newAdminScene,
@@ -94,6 +95,7 @@ const stage = new Scenes.Stage([
   getAbonentCard,
   uploadWarningTozamakonScene,
   abonentlarniGeozonagaBiriktirish,
+  getWarningLetter,
 ]);
 
 bot.use(new LocalSession({ database: "./session.json" }).middleware());

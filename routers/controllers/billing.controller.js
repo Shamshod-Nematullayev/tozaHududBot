@@ -582,83 +582,6 @@ module.exports.createDublicateActByAriza = async (req, res) => {
   }
 };
 
-module.exports.getAbonentsByMfyId = async (req, res) => {
-  try {
-    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
-    const { minSaldo, maxSaldo, identified, etkStatus } = req.query;
-    let page = 0;
-    let totalPages = 1;
-    const rows = [];
-    const filters = {};
-    if (identified) {
-      if (identified === "true") {
-        filters["shaxsi_tasdiqlandi.confirm"] = true;
-      } else if (identified === "false") {
-        filters["shaxsi_tasdiqlandi.confirm"] = { $ne: true };
-      } else {
-        return res.status(400).json({
-          ok: false,
-          message: "Invalid value identified must be true/false",
-        });
-      }
-    }
-    if (etkStatus) {
-      if (etkStatus === "true") {
-        filters["ekt_kod_tasdiqlandi.confirm"] = true;
-      } else if (etkStatus === "false") {
-        filters["ekt_kod_tasdiqlandi.confirm"] = { $ne: true };
-      } else {
-        return res.status(400).json({
-          ok: false,
-          message: "Invalid value identified must be true/false",
-        });
-      }
-    }
-    const abonents = await Abonent.find({
-      mahallas_id: req.params.mfy_id,
-      companyId: req.user.companyId,
-      ...filters,
-    }).lean();
-    const { data } = await tozaMakonApi.get(
-      `/user-service/residents?districtId=47&sort=id,DESC&page=${page}&size=300&companyId=1144&mahallaId=${req.params.mfy_id}`
-    );
-    rows.push(...data.content);
-    totalPages = data.totalPages;
-    if (totalPages > 1) {
-      for (let i = 1; i < totalPages; i++) {
-        const { data } = await tozaMakonApi.get(
-          `/user-service/residents?districtId=47&sort=id,DESC&page=${i}&size=300&companyId=1144&mahallaId=${req.params.mfy_id}`
-        );
-        rows.push(...data.content);
-      }
-    }
-    let filteredData = rows.filter((abonent) => {
-      const abonentSaldo = Number(abonent.ksaldo);
-
-      const abonentMongo = abonents.find(
-        (a) => a.licshet == abonent.accountNumber
-      );
-
-      if (!abonentMongo) return false;
-
-      // Filtrlash uchun shartlarni qo'llash
-      const isAboveMinSaldo = minSaldo ? abonentSaldo > Number(minSaldo) : true;
-      const isBelowMaxSaldo = maxSaldo ? abonentSaldo < Number(maxSaldo) : true;
-
-      if (abonentMongo.ekt_kod_tasdiqlandi) {
-        abonent.isElektrKodConfirm = abonentMongo.ekt_kod_tasdiqlandi.confirm;
-      }
-      abonent.fullName = kirillga(abonentMongo?.fio || abonent.fullName);
-      return isAboveMinSaldo && isBelowMaxSaldo;
-    });
-    filteredData.sort((a, b) => a.fullName.localeCompare(b.fullName));
-    res.json({ ok: true, data: filteredData });
-  } catch (error) {
-    res.json({ ok: false, message: "Internal server error 500" });
-    console.error(error);
-  }
-};
-
 module.exports.getActiveMfy = async (req, res) => {
   try {
     const data = await Mahalla.find({
@@ -963,83 +886,103 @@ module.exports.getTariffs = async (req, res) => {
   }
 };
 
+async function getAbonentsByMfyId(req, res) {
+  const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+  const { minSaldo, maxSaldo, identified, etkStatus } = req.query;
+  let page = 0;
+  let totalPages = 1;
+  const rows = [];
+  const filters = {};
+  if (identified) {
+    if (identified === "true") {
+      filters["shaxsi_tasdiqlandi.confirm"] = true;
+    } else if (identified === "false") {
+      filters["shaxsi_tasdiqlandi.confirm"] = { $ne: true };
+    } else {
+      return res.status(400).json({
+        ok: false,
+        message: "Invalid value identified must be true/false",
+      });
+    }
+  }
+  if (etkStatus) {
+    if (etkStatus === "true") {
+      filters["ekt_kod_tasdiqlandi.confirm"] = true;
+    } else if (etkStatus === "false") {
+      filters["ekt_kod_tasdiqlandi.confirm"] = { $ne: true };
+    } else {
+      return res.status(400).json({
+        ok: false,
+        message: "Invalid value identified must be true/false",
+      });
+    }
+  }
+  const abonents = await Abonent.find({
+    mahallas_id: req.params.mfy_id,
+    companyId: req.user.companyId,
+    ...filters,
+  }).lean();
+  const { data } = await tozaMakonApi.get(
+    `/user-service/residents?districtId=47&sort=id,DESC&page=${page}&size=300&companyId=1144&mahallaId=${req.params.mfy_id}`
+  );
+  rows.push(...data.content);
+  totalPages = data.totalPages;
+  if (totalPages > 1) {
+    for (let i = 1; i < totalPages; i++) {
+      const { data } = await tozaMakonApi.get(
+        `/user-service/residents?districtId=47&sort=id,DESC&page=${i}&size=300&companyId=1144&mahallaId=${req.params.mfy_id}`
+      );
+      rows.push(...data.content);
+    }
+  }
+  let filteredData = rows.filter((abonent) => {
+    const abonentSaldo = Number(abonent.ksaldo);
+
+    const abonentMongo = abonents.find(
+      (a) => a.licshet == abonent.accountNumber
+    );
+
+    if (!abonentMongo) return false;
+
+    // Filtrlash uchun shartlarni qo'llash
+    const isAboveMinSaldo = minSaldo ? abonentSaldo > Number(minSaldo) : true;
+    const isBelowMaxSaldo = maxSaldo ? abonentSaldo < Number(maxSaldo) : true;
+
+    if (abonentMongo.ekt_kod_tasdiqlandi) {
+      abonent.isElektrKodConfirmForExcel = abonentMongo.ekt_kod_tasdiqlandi
+        .confirm
+        ? "✅"
+        : "❌";
+    }
+    if (abonentMongo.shaxsi_tasdiqlandi) {
+      abonent.isIdentified = abonentMongo.shaxsi_tasdiqlandi.confirm
+        ? "✅"
+        : "❌";
+    }
+
+    if (abonentMongo.ekt_kod_tasdiqlandi) {
+      abonent.isElektrKodConfirm = abonentMongo.ekt_kod_tasdiqlandi.confirm;
+    }
+    abonent.fullName = kirillga(abonentMongo?.fio || abonent.fullName);
+    return isAboveMinSaldo && isBelowMaxSaldo;
+  });
+  filteredData.sort((a, b) => a.fullName.localeCompare(b.fullName));
+  return filteredData;
+}
+
+module.exports.getAbonentsByMfyId = async (req, res) => {
+  try {
+    const data = await getAbonentsByMfyId(req, res);
+    res.json({ ok: true, data });
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+    console.error(error);
+  }
+};
+
 module.exports.getAbonentsByMfyIdExcel = async (req, res) => {
   try {
-    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
-    const { minSaldo, maxSaldo, identified, etkStatus } = req.query;
-    let page = 0;
-    let totalPages = 1;
-    const rows = [];
-    const filters = {};
-    if (identified) {
-      if (identified === "true") {
-        filters["shaxsi_tasdiqlandi.confirm"] = true;
-      } else if (identified === "false") {
-        filters["shaxsi_tasdiqlandi.confirm"] = { $ne: true };
-      } else {
-        return res.status(400).json({
-          ok: false,
-          message: "Invalid value identified must be true/false",
-        });
-      }
-    }
-    if (etkStatus) {
-      if (etkStatus === "true") {
-        filters["ekt_kod_tasdiqlandi.confirm"] = true;
-      } else if (etkStatus === "false") {
-        filters["ekt_kod_tasdiqlandi.confirm"] = { $ne: true };
-      } else {
-        return res.status(400).json({
-          ok: false,
-          message: "Invalid value identified must be true/false",
-        });
-      }
-    }
-    const abonents = await Abonent.find({
-      mahallas_id: req.params.mfy_id,
-      companyId: req.user.companyId,
-      ...filters,
-    }).lean();
-    const { data } = await tozaMakonApi.get(
-      `/user-service/residents?districtId=47&sort=id,DESC&page=${page}&size=300&companyId=1144&mahallaId=${req.params.mfy_id}`
-    );
-    rows.push(...data.content);
-    totalPages = data.totalPages;
-    if (totalPages > 1) {
-      for (let i = 1; i < totalPages; i++) {
-        const { data } = await tozaMakonApi.get(
-          `/user-service/residents?districtId=47&sort=id,DESC&page=${i}&size=300&companyId=1144&mahallaId=${req.params.mfy_id}`
-        );
-        rows.push(...data.content);
-      }
-    }
-    let filteredData = rows.filter((abonent) => {
-      const abonentSaldo = Number(abonent.ksaldo);
-
-      const abonentMongo = abonents.find(
-        (a) => a.licshet == abonent.accountNumber
-      );
-
-      if (!abonentMongo) return false;
-
-      // Filtrlash uchun shartlarni qo'llash
-      const isAboveMinSaldo = minSaldo ? abonentSaldo > Number(minSaldo) : true;
-      const isBelowMaxSaldo = maxSaldo ? abonentSaldo < Number(maxSaldo) : true;
-
-      if (abonentMongo.ekt_kod_tasdiqlandi) {
-        abonent.isElektrKodConfirm = abonentMongo.ekt_kod_tasdiqlandi.confirm
-          ? "✅"
-          : "❌";
-      }
-      if (abonentMongo.shaxsi_tasdiqlandi) {
-        abonent.isIdentified = abonentMongo.shaxsi_tasdiqlandi.confirm
-          ? "✅"
-          : "❌";
-      }
-      abonent.fullName = kirillga(abonentMongo?.fio || abonent.fullName);
-      return isAboveMinSaldo && isBelowMaxSaldo;
-    });
-    filteredData.sort((a, b) => a.fullName.localeCompare(b.fullName));
+    const filteredData = await getAbonentsByMfyId(req, res);
     const workbook = new Excel.Workbook();
     const worksheet = workbook.addWorksheet("Abonents");
     worksheet.columns = [
@@ -1054,7 +997,7 @@ module.exports.getAbonentsByMfyIdExcel = async (req, res) => {
       { header: "Shaxsi tasdiqlangan", key: "isIdentified", width: 15 },
       {
         header: "Elektr Kod tasdiqlangan",
-        key: "isElektrKodConfirm",
+        key: "isElektrKodConfirmForExcel",
         width: 15,
       },
     ];

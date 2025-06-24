@@ -34,6 +34,12 @@ composer.hears(["📅Abonent karta", kirillga("📅Abonent karta")], (ctx) => {
   ctx.scene.enter("getAbonentCard");
 });
 composer.hears(
+  ["✉️Ogohlantrish xati", kirillga("✉️Ogohlantrish xati")],
+  (ctx) => {
+    ctx.scene.enter("getWarningLetter");
+  }
+);
+composer.hears(
   ["🔌 ELEKTR KODI🔌", kirillga("🔌 ELEKTR KODI🔌")],
   async (ctx) => {
     ctx.scene.enter("updateElektrKod");
