@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      table {
+        overflow: hidden;
+        border-collapse: collapse;
+        padding: 10px;
+      }
+      div {
+        display: inline-block;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 5px 15px;
+        margin: 0;
+        border-collapse: collapse;
+      }
+      p {
+        text-decoration: underline;
+      }
+      th {
+        background-color: rgb(127, 172, 255);
+      }
+      td:nth-child(3) {
+        text-align: right;
+        font-weight: bold;
+      }
+      td:last-child {
+        text-align: right;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <p><%= sana %></p>
+      <h2>Xatlovchilar qilgan ishlar yuzasidan tezkor ma'lumot</h2>
+      <table cellscasing="0">
+        <tr>
+          <th>№</th>
+          <th>Xatlovchi</th>
+          <th>Elektr kodi</th>
+          <th>JSHSHIR</th>
+          <th>Yangi abonent</th>
+          <th>Telefon raqami</th>
+          <th>Ball</th>
+        </tr>
+        <% inspectors.map((ins, index) => { %>
+        <tr>
+          <td><%= index + 1 %></td>
+          <td><%= ins.name %></td>
+          <td><%= ins.etkKod %></td>
+          <td><%= ins.pinfl %></td>
+          <td><%= ins.newAbonent %></td>
+          <td><%= ins.phone %></td>
+          <td><%= ins.ball %></td>
+        </tr>
+        <% }) %>
+        <tr>
+          <td></td>
+          <td>Жами</td>
+          <td><%= inspectors.reduce((a, b) => a + b.etkKod, 0) %></td>
+          <td><%= inspectors.reduce((a, b) => a + b.pinfl, 0) %></td>
+          <td><%= inspectors.reduce((a, b) => a + b.newAbonent, 0) %></td>
+          <td><%= inspectors.reduce((a, b) => a + b.phone, 0) %></td>
+          <td><%= inspectors.reduce((a, b) => a + b.ball, 0) %></td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

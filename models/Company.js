@@ -89,6 +89,7 @@ const schema = new Schema(
     activeExpiresDate: Date,
     CHANNEL_ID_SHAXSI_TASDIQLANDI: String,
     GROUP_ID_NAZORATCHILAR: String,
+    GROUP_ID_XATLOVCHILAR: String,
     manager: {
       type: employeerSchema,
       required: true,

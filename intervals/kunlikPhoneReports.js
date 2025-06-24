@@ -12,18 +12,18 @@ function bugungiSana() {
 
 //   main function
 
-async function sendKunlikEtkReports(companyId = 1144, isXatlovchi = false) {
+async function sendKunlikPhoneReports(companyId = 1144, isXatlovchi = false) {
   try {
     const company = await Company.findOne({ id: companyId });
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const abonents = await Abonent.find({
-      "ekt_kod_tasdiqlandi.confirm": true,
-      "ekt_kod_tasdiqlandi.updated_at": { $gt: today },
+      "phone_tasdiqlandi.confirm": true,
+      "phone_tasdiqlandi.updated_at": { $gt: today },
     });
     const soatlik = abonents.filter(
-      (abonent) => new Date(abonent.ekt_kod_tasdiqlandi.updated_at) > oneHourAgo
+      (abonent) => new Date(abonent.phone_tasdiqlandi.updated_at) > oneHourAgo
     );
     let filters = { activ: true, companyId };
     if (isXatlovchi) filters = { ...filters, isXatlovchi: true };
@@ -31,8 +31,7 @@ async function sendKunlikEtkReports(companyId = 1144, isXatlovchi = false) {
 
     abonents.forEach((abonent) => {
       const nazoratchi = inspectors.find(
-        (nazoratchi) =>
-          nazoratchi.id == abonent.ekt_kod_tasdiqlandi.inspector_id
+        (nazoratchi) => nazoratchi.id == abonent.phone_tasdiqlandi.inspector_id
       );
       if (nazoratchi) {
         if (!nazoratchi.counterOfConfirm) {
@@ -78,7 +77,7 @@ async function sendKunlikEtkReports(companyId = 1144, isXatlovchi = false) {
         allConfirmedHourly,
         inspectors,
         sana: bugungiSana(),
-        report_name: "ETK Код киритиш",
+        report_name: "Телефон рақам киритиш",
       },
       async (err, res) => {
         if (err) throw err;
@@ -90,15 +89,9 @@ async function sendKunlikEtkReports(companyId = 1144, isXatlovchi = false) {
           selector: "div",
         });
         const buffer = Buffer.from(binaryData, "binary");
-        console.log(
-          isXatlovchi
-            ? company.GROUP_ID_XATLOVCHILAR
-            : company.GROUP_ID_NAZORATCHILAR
-        );
+
         bot.telegram.sendPhoto(
-          isXatlovchi
-            ? company.GROUP_ID_XATLOVCHILAR
-            : company.GROUP_ID_NAZORATCHILAR,
+          company.GROUP_ID_NAZORATCHILAR,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
@@ -111,4 +104,4 @@ async function sendKunlikEtkReports(companyId = 1144, isXatlovchi = false) {
     console.error(error);
   }
 }
-module.exports = { sendKunlikEtkReports };
+module.exports = { sendKunlikPhoneReports };

@@ -2,6 +2,7 @@ const { agenda } = require("../config/agenda");
 const { Company } = require("../requires");
 const { createAktPack } = require("./createAktPack");
 const { sendKunlikEtkReports } = require("./kunlikEtkReports");
+const { sendKunlikPhoneReports } = require("./kunlikPhoneReports");
 const { sendKunlikPinflReports } = require("./kunlikPinflReports");
 const { lastPayReportInspectors } = require("./lastPayReportInspectors");
 const { nazoratchilarKunlikTushum } = require("./nazoratchilarKunlikTushum");
@@ -10,6 +11,7 @@ const { sendIdentifietMfyReport } = require("./sendIdentifietMfyReport");
 const { sendMFYIncomeReport } = require("./sendMFYIncomeReport");
 const { sendPinflMfyReport } = require("./sendPinflMfyReport");
 const { addUpdateArizaAktTask } = require("./updateArizaAkt");
+const xatlovchilarIshiHisobot = require("./xatlovchilarIshiHisobot");
 
 // Define tasks with Agenda
 agenda.define("createAktPackTask", async () => {
@@ -22,6 +24,7 @@ agenda.define("sendKunlikPinflReportsTask", async () => {
   await sendKunlikPinflReports(621);
   await sendKunlikPinflReports(337);
   // await sendKunlikPinflReports(1263);
+  await sendKunlikPhoneReports(1144);
 });
 
 agenda.define("sendKunlikEtkReportsTask", async () => {

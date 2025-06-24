@@ -29,6 +29,7 @@ const schema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  isXatlovchi: Boolean,
 });
 
 // id: ekopay tizimida nazoratchi nomiga yaratilgan id
