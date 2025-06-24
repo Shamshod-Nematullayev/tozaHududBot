@@ -25,6 +25,7 @@ agenda.define("sendKunlikPinflReportsTask", async () => {
   await sendKunlikPinflReports(337);
   // await sendKunlikPinflReports(1263);
   await sendKunlikPhoneReports(1144);
+  await xatlovchilarIshiHisobot(1144);
 });
 
 agenda.define("sendKunlikEtkReportsTask", async () => {

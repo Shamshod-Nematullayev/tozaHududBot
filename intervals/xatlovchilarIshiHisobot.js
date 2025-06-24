@@ -56,10 +56,14 @@ async function xatlovchilarIshiHisobot(companyId = 1144) {
         if (inspector) inspector.etkKod += 1;
       }
       if (abonent.shaxsi_tasdiqlandi?.confirm) {
-        const inspector = inspectorMap.get(
-          String(abonent.shaxsi_tasdiqlandi.inspector_id)
+        const ins = inspectors.find(
+          (i) => i._id == abonent.shaxsi_tasdiqlandi.inspector._id
         );
-        if (inspector) inspector.pinfl += 1;
+
+        if (ins) {
+          const inspector = inspectorMap.get(String(ins.id));
+          if (inspector) inspector.pinfl += 1;
+        }
       }
       if (abonent.phone_tasdiqlandi?.confirm) {
         const inspector = inspectorMap.get(
@@ -99,6 +103,7 @@ async function xatlovchilarIshiHisobot(companyId = 1144) {
     console.log(process.env.ME);
     bot.telegram.sendPhoto(
       company.GROUP_ID_XATLOVCHILAR,
+      // process.env.ME,
       { source: buffer },
       {
         caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
