@@ -1,4 +1,5 @@
 const { NOTIFICATIONS_CHANNEL_ID } = require("../constants");
+const { sendKunlikPhoneReports } = require("../intervals/kunlikPhoneReports");
 const {
   nazoratchilarKunlikTushum,
 } = require("../intervals/nazoratchilarKunlikTushum");
@@ -180,6 +181,10 @@ composer.hears(/mvd_\w+/g, (ctx) => {
 composer.command("geo", async (ctx) => {
   if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
   ctx.scene.enter("abonentlarniGeozonagaBiriktirish");
+});
+
+composer.hears("phone_report", () => {
+  sendKunlikPhoneReports(1144);
 });
 
 composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>

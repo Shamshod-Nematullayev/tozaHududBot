@@ -1,6 +1,5 @@
 const { Scenes } = require("telegraf");
 const { keyboards, Nazoratchi, Abonent } = require("../../../requires");
-const getAbonentCard = require("./getAbonentCard");
 const { createTozaMakonApi } = require("../../../api/tozaMakon");
 const isCancel = require("../../smallFunctions/isCancel");
 
