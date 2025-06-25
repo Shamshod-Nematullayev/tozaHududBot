@@ -77,7 +77,7 @@ const getWarningLetter = new Scenes.WizardScene(
   }
 );
 
-getAbonentCard.on("text", async (ctx, next) => {
+getWarningLetter.on("text", async (ctx, next) => {
   if (isCancel(ctx?.message?.text)) {
     ctx.reply("Amaliyot bekor qilindi", keyboards.mainKeyboard);
     return ctx.scene.leave();
