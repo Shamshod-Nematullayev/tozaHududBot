@@ -1121,3 +1121,59 @@ module.exports.monayTransferAct = async (req, res) => {
     console.error(error);
   }
 };
+
+module.exports.getHouses = async (req, res) => {
+  try {
+    const { cadNum } = req.query;
+    if (!cadNum)
+      return res.json({ ok: false, message: "cadNum not found on query" });
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+    const { data } = await tozaMakonApi.get("/billing-service/houses", {
+      params: {
+        cadNum,
+      },
+    });
+    res.json(data);
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+  }
+};
+
+module.exports.getResidents = async (req, res) => {
+  try {
+    const { cadastralNumber, pnfl } = req.query;
+    if (!cadastralNumber && !pnfl)
+      return res.json({
+        ok: false,
+        message: "cadastralNumber or pnfl not found on query",
+      });
+
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+    const result = {};
+    const resultByCadastralNum = (
+      await tozaMakonApi.get("/billing-service/residents", {
+        params: {
+          cadastralNumber,
+          page: 0,
+          size: 10,
+        },
+      })
+    ).data.content;
+
+    const resultByPnfl = (
+      await tozaMakonApi.get("/billing-service/residents", {
+        params: {
+          pnfl,
+          page: 0,
+          size: 10,
+        },
+      })
+    ).data.content;
+    result.cadastralNumber = resultByCadastralNum;
+    result.pnfl = resultByPnfl;
+
+    res.json(result);
+  } catch (error) {
+    res.json({ ok: false, message: "Internal server error 500" });
+  }
+};
