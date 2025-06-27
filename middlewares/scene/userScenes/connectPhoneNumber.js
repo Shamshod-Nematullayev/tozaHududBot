@@ -94,6 +94,12 @@ const connectPhoneNumber = new Scenes.WizardScene(
             ...abonentDatas.citizen,
             phone: ctx.message.text,
           },
+          house: {
+            ...abonentDatas.house,
+            cadastralNumber: data.house.cadastralNumber
+              ? data.house.cadastralNumber
+              : "00:00:00:00:00:0000:0000",
+          },
         }
       );
       await Abonent.updateOne(
