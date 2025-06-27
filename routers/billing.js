@@ -20,6 +20,8 @@ const {
   getTariffs,
   getAbonentsByMfyIdExcel,
   monayTransferAct,
+  getHouses,
+  getResidents,
 } = require("./controllers/billing.controller");
 
 const router = require("express").Router();
@@ -146,6 +148,10 @@ router.get("/get-abonent-acts/:abonentId", getAbonentActs);
 router.get("/act-packs", getActPacks);
 
 router.get("/get-tariffs", getTariffs);
+
+router.get("/get-houses", getHouses);
+
+router.get("/residents", getResidents);
 
 router.post(
   "/monay-transfer-act",
