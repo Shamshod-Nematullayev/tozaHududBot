@@ -1,5 +1,6 @@
 const { NOTIFICATIONS_CHANNEL_ID } = require("../constants");
 const { sendKunlikPhoneReports } = require("../intervals/kunlikPhoneReports");
+const { sendKunlikPinflReports } = require("../intervals/kunlikPinflReports");
 const {
   nazoratchilarKunlikTushum,
 } = require("../intervals/nazoratchilarKunlikTushum");
@@ -153,6 +154,10 @@ composer.command("help", (ctx) => {
 composer.command("tushum", async (ctx) => {
   // nazoratchilarKunlikTushum();
   sendMFYIncomeReport(1144);
+});
+composer.hears(/pnflreport_\w/g, async (ctx) => {
+  const companyId = Number(ctx.message.text.split("_")[1]);
+  sendKunlikPinflReports(companyId);
 });
 composer.command("test", async (ctx) => {
   const binaryData = await require("../helpers/puppeteer-wrapper")({
