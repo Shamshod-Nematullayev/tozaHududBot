@@ -96,8 +96,8 @@ const connectPhoneNumber = new Scenes.WizardScene(
           },
           house: {
             ...abonentDatas.house,
-            cadastralNumber: data.house.cadastralNumber
-              ? data.house.cadastralNumber
+            cadastralNumber: abonentDatas.house.cadastralNumber
+              ? abonentDatas.house.cadastralNumber
               : "00:00:00:00:00:0000:0000",
           },
         }
