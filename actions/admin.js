@@ -5,6 +5,7 @@ const {
   nazoratchilarKunlikTushum,
 } = require("../intervals/nazoratchilarKunlikTushum");
 const { sendMFYIncomeReport } = require("../intervals/sendMFYIncomeReport");
+const xatlovchilarIshiHisobot = require("../intervals/xatlovchilarIshiHisobot");
 const { kirillga } = require("../middlewares/smallFunctions/lotinKiril");
 const { Notification } = require("../models/Notification");
 const {
@@ -186,6 +187,10 @@ composer.hears(/mvd_\w+/g, (ctx) => {
 composer.command("geo", async (ctx) => {
   if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
   ctx.scene.enter("abonentlarniGeozonagaBiriktirish");
+});
+
+composer.hears("xatlovchilar_report", async (ctx) => {
+  xatlovchilarIshiHisobot(1144);
 });
 
 composer.hears("phone_report", () => {
