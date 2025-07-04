@@ -94,6 +94,7 @@ const connectPhoneNumber = new Scenes.WizardScene(
             ...abonentDatas.citizen,
             phone: ctx.message.text,
           },
+          phone: ctx.message.text,
           house: {
             ...abonentDatas.house,
             cadastralNumber: abonentDatas.house.cadastralNumber
