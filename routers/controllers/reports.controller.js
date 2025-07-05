@@ -93,8 +93,7 @@ module.exports.getConfirmedAbonentCountsReportByInspectorsExcel = async (
   res
 ) => {
   try {
-    const { result, count } = await getReportData(req);
-    res.json({ rows: result, count });
+    const { result } = await getReportData(req);
     const workbook = new Excel.Workbook();
     const worksheet = workbook.addWorksheet("Reports");
     worksheet.columns = [
