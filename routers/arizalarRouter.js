@@ -11,6 +11,7 @@ const {
   createAriza,
   moveToInboxAriza,
   updateArizaById,
+  createMonayTransferAriza,
 } = require("./controllers/arizalar.controller");
 const { uploadAsBlob } = require("../middlewares/multer");
 
@@ -36,5 +37,7 @@ router.put(
 );
 
 router.put("/add-image/:ariza_id", addImageToAriza);
+
+router.post("/create-monay-transfer-ariza", createMonayTransferAriza);
 
 module.exports = router;

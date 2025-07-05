@@ -5,6 +5,7 @@ const { Abonent, bot, Company, Counter } = require("../../requires");
 const { PDFDocument } = require("pdf-lib");
 const PDFMerger = require("pdf-merger-js");
 const FormData = require("form-data");
+const { getActPackIds } = require("./billing.controller");
 
 module.exports.getArizalar = async (req, res) => {
   try {
@@ -554,6 +555,86 @@ module.exports.addImageToAriza = async (req, res) => {
       { new: true }
     );
     res.json({ ok: true, message: "Biriktirildi", ariza: updatedAriza });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, message: "Internal server error" });
+  }
+};
+
+module.exports.createMonayTransferAriza = async (req, res) => {
+  try {
+    let { debitorAct, creditorActs } = req.body;
+    if (
+      debitorAct.amount !==
+      creditorActs.reduce((total, act) => total + act.amount, 0)
+    ) {
+      return res.status(400).json({
+        ok: false,
+        message: "creditor actlar to'plami debitor actga teng bo'lishi kerak",
+      });
+    }
+    if (
+      creditorActs.find((a) => a.accountNumber === debitorAct.accountNumber)
+    ) {
+      return res.status(400).json({
+        ok: false,
+        message: "creditor actlar ichida debitor abonent bo'lmasligi kerak",
+      });
+    }
+    const counter = await Counter.findOne({
+      companyId: req.user.companyId,
+      arizaDocumentType: "pul_kuchirish",
+      name: "ariza_tartib_raqami",
+    });
+    const ariza = await Ariza.create({
+      licshet: debitorAct.accountNumber,
+      document_type: "pul_kuchirish",
+      companyId: req.user.companyId,
+      document_number: counter.value + 1,
+      needMonayTransferActs: creditorActs,
+    });
+    await counter.updateOne({ $set: { value: counter.value + 1 } });
+    res.json({ ok: true, ariza });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, message: "Internal server error" });
+  }
+};
+
+module.exports.createMonayTransferActByAriza = async (req, res) => {
+  try {
+    const ariza = await Ariza.findOne({
+      _id: req.params._id,
+      companyId: req.user.companyId,
+    });
+    if (!ariza) {
+      return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
+    }
+    const acts = [];
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+    const formData = new FormData();
+    formData.append("file", req.file.buffer, req.file.originalname);
+    const fileUploadResponse = (
+      await tozaMakonApi.post(
+        "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+    ).data;
+    const fileId =
+      fileUploadResponse.fileName + "*" + fileUploadResponse.fileId;
+    const actPackId = await getActPackIds(
+      "pul_kuchirish",
+      tozaMakonApi,
+      req.user.companyId
+    );
+    const date = new Date();
+    const act = await createMonayTransferAct(ariza, req.user.companyId, req);
+    res.json({ ok: true, act });
   } catch (error) {
     console.error(error);
     res.status(500).json({ ok: false, message: "Internal server error" });

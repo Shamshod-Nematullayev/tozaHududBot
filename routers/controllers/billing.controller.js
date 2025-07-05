@@ -22,7 +22,11 @@ function formatDate(date) {
   return `${year}-${month}-${day}`;
 }
 
-async function getActPackIds(document_type, tozaMakonApi, companyId) {
+module.exports.getActPackIds = async function getActPackIds(
+  document_type,
+  tozaMakonApi,
+  companyId
+) {
   const date = new Date();
   const packIds =
     (await Company.findOne({ id: companyId })).akt_pachka_ids || {};
@@ -59,7 +63,7 @@ async function getActPackIds(document_type, tozaMakonApi, companyId) {
     actPackId = packId;
   }
   return actPackId;
-}
+};
 
 module.exports.downloadFileFromBilling = async (req, res) => {
   try {
@@ -1033,7 +1037,6 @@ module.exports.monayTransferAct = async (req, res) => {
   debitorAct = JSON.parse(debitorAct);
   creditorActs = JSON.parse(creditorActs);
   try {
-    console.log(req.body);
     const formData = new FormData();
     formData.append("file", req.file.buffer, req.file.originalname);
     const fileUploadResponse = (
@@ -1050,7 +1053,7 @@ module.exports.monayTransferAct = async (req, res) => {
     const fileId =
       fileUploadResponse.fileName + "*" + fileUploadResponse.fileId;
 
-    const actPackId = await getActPackIds(
+    const actPackId = await this.getActPackIds(
       "pul_kuchirish",
       tozaMakonApi,
       req.user.companyId

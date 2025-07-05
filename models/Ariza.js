@@ -6,11 +6,15 @@ module.exports.arizaDocumentTypes = [
   "viza",
   "death",
   "gps",
+  "pul_kuchirish",
 ];
 
 const schema = new mongoose.Schema({
   asosiy_licshet: String,
   ikkilamchi_licshet: String,
+  needMonayTransferActs: {
+    type: Array,
+  },
   sana: {
     type: Date,
     required: true,
