@@ -57,6 +57,48 @@ module.exports.caotoNames = [
     region: 18,
     companyId: 1266,
   },
+  {
+    title: "Temiryo'l ETK",
+    caoto: 18405,
+    region: 18,
+    companyId: 621,
+  },
+  {
+    title: "Siyob TETK",
+    caoto: 18407,
+    region: 18,
+    companyId: 621,
+  },
+  {
+    title: "Bog'ishamol TETK",
+    caoto: 18408,
+    region: 18,
+    companyId: 621,
+  },
+  {
+    title: "Zarafshon TETK",
+    caoto: 18234,
+    region: 18,
+    companyId: 621,
+  },
+  {
+    title: "Do'stlik ETK",
+    caoto: 18233,
+    region: 18,
+    companyId: 621,
+  },
+  {
+    title: "Zarafshon TETK",
+    caoto: 18234,
+    region: 18,
+    companyId: 337,
+  },
+  {
+    title: "Do'stlik ETK",
+    caoto: 18233,
+    region: 18,
+    companyId: 337,
+  },
 ];
 
 module.exports.queueNames = {
