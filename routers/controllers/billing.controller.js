@@ -12,81 +12,37 @@ const { kirillga } = require("../../middlewares/smallFunctions/lotinKiril");
 const { Mahalla } = require("../../models/Mahalla");
 const { packNames, packTypes } = require("../../intervals/createAktPack");
 const Excel = require("exceljs");
-const { Act } = require("../../models/Act");
-const { User } = require("../../models/User");
-// small functions
-function formatDate(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-module.exports.getActPackIds = async function getActPackIds(
-  document_type,
-  tozaMakonApi,
-  companyId
-) {
-  const date = new Date();
-  const packIds =
-    (await Company.findOne({ id: companyId })).akt_pachka_ids || {};
-  let actPackId = packIds[document_type]?.id;
-  if (
-    !actPackId ||
-    packIds[document_type].month != date.getMonth() + 1 ||
-    packIds[document_type].year != date.getFullYear()
-  ) {
-    // akt pachkasi yo'q bo'lsa
-    const packId = (
-      await tozaMakonApi.post("/billing-service/act-packs", {
-        companyId,
-        createdDate: formatDate(new Date()),
-        description: `added by th-dashboard`,
-        isActive: true,
-        isSpecialPack: false,
-        name: packIds[document_type]?.name || packNames[document_type],
-        packType: packIds[document_type]?.type || packTypes[document_type],
-      })
-    ).data;
-    await Company.findOneAndUpdate(
-      { id: companyId },
-      {
-        $set: {
-          [`akt_pachka_ids.${document_type}.id`]: packId,
-          [`akt_pachka_ids.${document_type}.month`]: new Date().getMonth() + 1,
-          [`akt_pachka_ids.${document_type}.year`]: new Date().getFullYear(),
-          [`akt_pachka_ids.${document_type}.type`]:
-            packIds[document_type]?.type || packTypes[document_type],
-        },
-      }
-    );
-    actPackId = packId;
-  }
-  return actPackId;
-};
+const {
+  uploadFileToTozaMakon,
+  getOrCreateActPackId,
+  calculateKSaldo,
+  createAct,
+  deleteActById,
+  getFileAsBuffer,
+} = require("../../services/billing.service");
 
 module.exports.downloadFileFromBilling = async (req, res) => {
   try {
+    // 1. inputlarni olish
     const { file_id } = req.query;
     if (!file_id) {
       return res
         .status(400)
         .json({ ok: false, message: "Fayl ID talab qilinadi." });
     }
+    const cleanFileId = file_id.split("*").pop(); // "filaname*fileId" => "fileId"
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
 
-    const cleanFileId = file_id.split("*").pop(); // Oxirgi qismni olish
+    // 2. faylni yuklab olish
+    const response = await getFileAsBuffer(tozaMakonApi, cleanFileId);
 
-    const response = await tozaMakonApi.get("/file-service/buckets/download", {
-      params: { file: cleanFileId },
-      responseType: "arraybuffer",
-    });
-    // Faylni Base64 ga o'tkazish
+    // 3. Faylni Base64 ga o'tkazish
     const base64Data = Buffer.from(response.data).toString("base64");
-    const contentType = "application/pdf";
 
+    // 4. javob qaytarish
     res.json({
       ok: true,
-      file: `data:${contentType};base64,${base64Data}`,
+      file: `data:application/pdf;base64,${base64Data}`,
     });
   } catch (error) {
     console.error("Error downloading file:", error);
@@ -143,9 +99,8 @@ module.exports.getAbonentActs = async (req, res) => {
   }
 };
 
-module.exports.createFullAct = async (req, res) => {
+module.exports.createResidentAct = async (req, res) => {
   try {
-    // initial values
     const {
       next_inhabitant_count,
       akt_sum,
@@ -156,10 +111,11 @@ module.exports.createFullAct = async (req, res) => {
       ariza_id,
       photos,
     } = req.body;
+
     const companyId = req.user.companyId;
     const date = new Date();
 
-    // validate
+    // Validate
     if (
       [next_inhabitant_count, akt_sum, amountWithoutQQS].some(isNaN) &&
       document_type !== "viza"
@@ -169,36 +125,26 @@ module.exports.createFullAct = async (req, res) => {
         message:
           "[next_inhabitant_count, akt_sum, amountWithoutQQS] fields are not valid",
       });
-    } else if (
-      document_type == "viza" &&
-      [akt_sum, amountWithoutQQS].some(isNaN)
-    ) {
-      return res.status(400).json({
-        ok: false,
-        message: "[akt_sum, amountWithoutQQS] fields are not valid",
-      });
     }
+
     const abonent = await Abonent.findOne({ licshet, companyId });
-    if (!abonent)
+    if (!abonent) {
       return res.status(404).json({
         ok: false,
-        message: "Abonent mavjud emas",
+        message: "Abonent topilmadi",
       });
+    }
 
+    // 🖼️ 1. Agar rasm bo‘lsa — PDFga qo‘shamiz
     if (photos?.length > 0) {
-      // endi pdf va rasmlarni birlashtirish kodi kerak
-      const photosBuffer = [];
+      const pdfDoc = await PDFDocument.create();
       for (let file_id of photos) {
         const file = await bot.telegram.getFile(file_id);
-        const photoBuffer = await bot.telegram.getFileLink(file.file_id);
-        const response = await axios.get(photoBuffer, {
+        const photoUrl = await bot.telegram.getFileLink(file.file_id);
+        const response = await axios.get(photoUrl, {
           responseType: "arraybuffer",
         });
-        photosBuffer.push(response.data);
-      }
-      const pdfDoc = await PDFDocument.create();
-      for (let photoBuffer of photosBuffer) {
-        const image = await pdfDoc.embedPng(photoBuffer);
+        const image = await pdfDoc.embedPng(response.data);
         const page = pdfDoc.addPage([image.width, image.height]);
         page.drawImage(image, {
           x: 0,
@@ -207,16 +153,16 @@ module.exports.createFullAct = async (req, res) => {
           height: image.height,
         });
       }
-      let pdfBuffer = await pdfDoc.save();
+
+      // PDFni merge qilamiz
       const merger = new PDFMerger();
-      await merger.add(req.file.buffer);
-      pdfBuffer = Buffer.from(pdfBuffer);
-      await merger.add(pdfBuffer);
-      const bufferAktFile = await merger.saveAsBuffer();
-      req.file.buffer = bufferAktFile;
+      await merger.add(req.file.buffer); // original akt
+      await merger.add(Buffer.from(await pdfDoc.save())); // rasmli PDF
+      req.file.buffer = await merger.saveAsBuffer();
     }
-    // akt faylini telegram bazaga saqlash
-    const documentOnTelegram = await bot.telegram.sendDocument(
+
+    // 📎 2. Faylni Telegramga yuklaymiz
+    const telegramDoc = await bot.telegram.sendDocument(
       process.env.TEST_BASE_CHANNEL_ID,
       {
         source: req.file.buffer,
@@ -224,6 +170,7 @@ module.exports.createFullAct = async (req, res) => {
       }
     );
 
+    // 📄 3. Incoming Document yaratish
     let counter = await Counter.findOne({
       name: "incoming_document_number",
       companyId,
@@ -231,7 +178,7 @@ module.exports.createFullAct = async (req, res) => {
     await IncomingDocument.create({
       abonent: licshet,
       doc_type: document_type,
-      file_id: documentOnTelegram.document.file_id,
+      file_id: telegramDoc.document.file_id,
       file_name: req.file.originalname,
       comment: description,
       date: Date.now(),
@@ -245,343 +192,167 @@ module.exports.createFullAct = async (req, res) => {
       },
     });
 
-    // akt faylini tozaMakon ga saqlash
-    const tozaMakonApi = createTozaMakonApi(companyId);
-    const formData = new FormData();
-    formData.append("file", req.file.buffer, req.file.originalname);
-
-    const fileUploadResponse = await tozaMakonApi.post(
-      "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+    // 📤 4. Faylni TozaMakon APIga yuklash
+    const tozaMakonApi =
+      require("../api/tozaMakon").createTozaMakonApi(companyId);
+    const fileId = await uploadFileToTozaMakon(
+      tozaMakonApi,
+      req.file.buffer,
+      req.file.originalname
     );
-    const packIds =
-      (await Company.findOne({ id: companyId })).akt_pachka_ids || {};
-    let actPackId = packIds[document_type]?.id;
-    if (
-      !actPackId ||
-      packIds[document_type].month != date.getMonth() + 1 ||
-      packIds[document_type].year != date.getFullYear()
-    ) {
-      // akt pachkasi yo'q bo'lsa
-      const packId = (
-        await tozaMakonApi.post("/billing-service/act-packs", {
-          companyId,
-          createdDate: formatDate(new Date()),
-          description: `added by th-dashboard`,
-          isActive: true,
-          isSpecialPack: false,
-          name: packIds[document_type]?.name || packNames[document_type],
-          packType: packIds[document_type]?.type || packTypes[document_type],
-        })
-      ).data;
-      await Company.findOneAndUpdate(
-        { id: companyId },
-        {
-          $set: {
-            [`akt_pachka_ids.${document_type}.id`]: packId,
-            [`akt_pachka_ids.${document_type}.month`]:
-              new Date().getMonth() + 1,
-            [`akt_pachka_ids.${document_type}.year`]: new Date().getFullYear(),
-            [`akt_pachka_ids.${document_type}.type`]:
-              packIds[document_type]?.type || packTypes[document_type],
-          },
-        }
-      );
-      actPackId = packId;
-    }
-    if (!isNaN(akt_sum)) {
-      const calculateKSaldo = (
-        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
-          params: {
-            amount: Math.abs(akt_sum),
-            residentId: abonent.id,
-            actPackId: actPackId,
-            actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
-          },
-        })
-      ).data;
 
-      const inhabitantCounts =
-        next_inhabitant_count && "undefined" != next_inhabitant_count
-          ? { inhabitantCount: next_inhabitant_count }
-          : {};
-      const aktResponse = await tozaMakonApi.post("/billing-service/acts", {
-        actPackId: actPackId,
-        actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
-        amount: Number(akt_sum),
-        amountWithQQS: Number(akt_sum) - (Number(amountWithoutQQS) || 0),
-        amountWithoutQQS: Number(amountWithoutQQS) || 0,
-        description,
-        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        fileId:
-          fileUploadResponse.data.fileName +
-          "*" +
-          fileUploadResponse.data.fileId,
-        kSaldo: calculateKSaldo,
-        residentId: abonent.id,
-        ...inhabitantCounts,
-      });
+    // 📦 5. Akt Pachkasini olish
+    const actPackId = await getOrCreateActPackId(
+      document_type,
+      tozaMakonApi,
+      companyId
+    );
 
-      if (aktResponse.status !== 201) {
-        console.error(
-          "Billing tizimiga akt kiritib bo'lmadi",
-          aktResponse.data
-        );
-        return res.status(500).json({
-          ok: false,
-          message: "Billing tizimiga akt kiritib bo'lmadi",
-        });
-      }
-      if (ariza_id) {
-        const ariza = await Ariza.findByIdAndUpdate(ariza_id, {
-          $set: {
-            status: "akt_kiritilgan",
-            akt_pachka_id: aktResponse.data.actPackId,
-            akt_id: aktResponse.data.id,
-            aktInfo: {
-              ...aktResponse.data,
-            },
-            akt_date: aktResponse.data.createdAt,
-          },
-        });
-      }
-      return res.json({
-        ok: true,
-        message: "Akt muvaffaqqiyatli qo'shildi",
+    // 📊 6. kSaldo hisoblash
+    const kSaldo = await calculateKSaldo(tozaMakonApi, {
+      amount: Math.abs(akt_sum),
+      residentId: abonent.id,
+      actPackId,
+      actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
+    });
+
+    const inhabitantCounts =
+      next_inhabitant_count && "undefined" !== next_inhabitant_count
+        ? { inhabitantCount: next_inhabitant_count }
+        : {};
+
+    // 📌 7. Aktni yaratish
+    const aktPayload = {
+      actPackId,
+      actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
+      amount: Number(akt_sum),
+      amountWithQQS: Number(akt_sum) - (Number(amountWithoutQQS) || 0),
+      amountWithoutQQS: Number(amountWithoutQQS) || 0,
+      description,
+      endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+      startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+      fileId,
+      kSaldo,
+      residentId: abonent.id,
+      ...inhabitantCounts,
+    };
+
+    const aktResponse = await createAct(tozaMakonApi, aktPayload);
+
+    // Agar ariza bo'lsa akt ma'lumotlari yozib qolinadi
+    if (ariza_id) {
+      const { Ariza } = require("../models/Ariza");
+      await Ariza.findByIdAndUpdate(ariza_id, {
+        $set: {
+          status: "akt_kiritilgan",
+          akt_pachka_id: aktResponse.actPackId,
+          akt_id: aktResponse.id,
+          aktInfo: aktResponse,
+          akt_date: aktResponse.createdAt,
+        },
       });
     }
+
+    return res.json({ ok: true, message: "Akt muvaffaqqiyatli qo‘shildi" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ ok: false, message: "Internal server error 500" });
+    return res.status(500).json({ ok: false, message: err.message });
   }
 };
 
-module.exports.createDublicateActByAriza = async (req, res) => {
+module.exports.duplicateActFromRequest = async (req, res) => {
   try {
     const { ariza_id, akt_sum } = req.body;
+    const { Ariza } = require("../models/Ariza");
     const ariza = await Ariza.findById(ariza_id);
-    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
-    const fake_account = await Abonent.findOne({
-      licshet: ariza.ikkilamchi_licshet,
+
+    if (!ariza) {
+      return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
+    }
+
+    const { Abonent } = require("../models/Abonent");
+    const companyId = req.user.companyId;
+
+    const abonentReal = await Abonent.findOne({
+      licshet: ariza.licshet,
+      companyId,
     });
-    const date = new Date();
-    // upload file to billing service
-    const formData = new FormData();
-    formData.append("file", req.file.buffer, req.file.originalname);
-    const fileUploadResponse = await tozaMakonApi.post(
-      "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+    const abonentFake = await Abonent.findOne({
+      licshet: ariza.ikkilamchi_licshet,
+      companyId,
+    });
+
+    const tozaMakonApi =
+      require("../api/tozaMakon").createTozaMakonApi(companyId);
+
+    // 1. Faylni TozaMakon APIga yuklash
+    const fileId = await uploadFileToTozaMakon(
+      tozaMakonApi,
+      req.file.buffer,
+      req.file.originalname
     );
 
-    const document_type = ariza.document_type;
-    let packIds =
-      (await Company.findOne({ id: req.user.companyId })).akt_pachka_ids || {};
-    let actPackId = packIds[document_type]?.id;
-    if (
-      !actPackId ||
-      packIds[document_type].month != date.getMonth() + 1 ||
-      packIds[document_type].year != date.getFullYear()
-    ) {
-      // akt pachkasi yo'q bo'lsa
-      const packId = (
-        await tozaMakonApi.post("/billing-service/act-packs", {
-          companyId: req.user.companyId,
-          createdDate: formatDate(new Date()),
-          description: `added by th-dashboard`,
-          isActive: true,
-          isSpecialPack: false,
-          name: packIds[document_type]?.name || packNames[document_type],
-          packType: packIds[document_type]?.type || packTypes[document_type],
-        })
-      ).data;
-      await Company.findOneAndUpdate(
-        { id: req.user.companyId },
-        {
-          $set: {
-            [`akt_pachka_ids.${document_type}.id`]: packId,
-            [`akt_pachka_ids.${document_type}.month`]:
-              new Date().getMonth() + 1,
-            [`akt_pachka_ids.${document_type}.year`]: new Date().getFullYear(),
-            [`akt_pachka_ids.${document_type}.type`]:
-              packIds[document_type]?.type || packTypes[document_type],
-          },
-        }
-      );
-      packIds[document_type] = {
-        id: packId,
-        month: new Date().getMonth() + 1,
-        year: new Date().getFullYear(),
-        type: packIds[document_type]?.type || packTypes[document_type],
-        name: packIds[document_type]?.name || packNames[document_type],
-      };
-      actPackId = packId;
-    }
-    if (akt_sum > 0) {
-      let actPackId = packIds.pul_kuchirish?.id;
-      if (
-        !actPackId ||
-        packIds.pul_kuchirish.month != date.getMonth() + 1 ||
-        packIds.pul_kuchirish.year != date.getFullYear()
-      ) {
-        // akt pachkasi yo'q bo'lsa
-        const packId = (
-          await tozaMakonApi.post("/billing-service/act-packs", {
-            companyId: req.user.companyId,
-            createdDate: formatDate(new Date()),
-            description: `added by th-dashboard`,
-            isActive: true,
-            isSpecialPack: false,
-            name: packIds.pul_kuchirish?.name || packNames.pul_kuchirish,
-            packType: packIds.pul_kuchirish?.type || packTypes.pul_kuchirish,
-          })
-        ).data;
-        await Company.findOneAndUpdate(
-          { id: req.user.companyId },
-          {
-            $set: {
-              [`akt_pachka_ids.pul_kuchirish.id`]: packId,
-              [`akt_pachka_ids.pul_kuchirish.month`]: new Date().getMonth() + 1,
-              [`akt_pachka_ids.pul_kuchirish.year`]: new Date().getFullYear(),
-              [`akt_pachka_ids.pul_kuchirish.type`]:
-                packIds.pul_kuchirish?.type || packTypes.pul_kuchirish,
-            },
-          }
-        );
-        packIds.pul_kuchirish = {
-          id: packId,
-          month: new Date().getMonth() + 1,
-          year: new Date().getFullYear(),
-          type: packIds.pul_kuchirish?.type || packTypes.pul_kuchirish,
-          name: packIds.pul_kuchirish?.name || packNames.pul_kuchirish,
-        };
-        actPackId = packId;
-      }
-      // monay transfer to real account
-      const calculateKSaldo = (
-        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
-          params: {
-            amount: Math.abs(akt_sum),
-            residentId: abonent.id,
-            actPackId: packIds.pul_kuchirish.id,
-            actType: "CREDIT",
-          },
-        })
-      ).data;
-      (
-        await tozaMakonApi.post("/billing-service/acts", {
-          actPackId: packIds.pul_kuchirish.id,
-          actType: "CREDIT",
-          amount: Math.abs(akt_sum),
-          amountWithQQS: 0,
-          amountWithoutQQS: Math.abs(akt_sum),
-          description: `${ariza.ikkilamchi_licshet} ikkilamchi hisob raqamidan pul ko'chirish`,
-          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          fileId:
-            fileUploadResponse.data.fileName +
-            "*" +
-            fileUploadResponse.data.fileId,
-          kSaldo: calculateKSaldo,
-          residentId: abonent.id,
-        })
-      ).data;
-      // monay transfer from fake account
-      const calculateKSaldo2 = (
-        await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
-          params: {
-            amount: Math.abs(akt_sum),
-            residentId: abonent.id,
-            actPackId: packIds.pul_kuchirish.id,
-            actType: "DEBIT",
-          },
-        })
-      ).data;
-      (
-        await tozaMakonApi.post("/billing-service/acts", {
-          actPackId: packIds.pul_kuchirish.id,
-          actType: "DEBIT",
-          amount: akt_sum,
-          amountWithQQS: 0,
-          amountWithoutQQS: akt_sum,
-          description: `${fake_account.licshet} haqiqiy hisob raqamiga pul ko'chirish`,
-          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          fileId:
-            fileUploadResponse.data.fileName +
-            "*" +
-            fileUploadResponse.data.fileId,
-          kSaldo: calculateKSaldo2,
-          residentId: fake_account.id,
-        })
-      ).data;
-    }
+    // 2. Akt pachkalarini olish
+    const pulKuchirishPackId = await getOrCreateActPackId(
+      "pul_kuchirish",
+      tozaMakonApi,
+      companyId
+    );
+    const dvaynikPackId = await getOrCreateActPackId(
+      "dvaynik",
+      tozaMakonApi,
+      companyId
+    );
 
-    // ikkilamchi hisob raqamini o'chirish kodlari
-    const calculateAmount = (
-      await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
-        params: {
-          actPackId: packIds.dvaynik.id,
-          residentId: fake_account.id,
-          inhabitantCount: 0,
-          kSaldo: 0,
-          // endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          // startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        },
-      })
-    ).data;
-    const dvaynikAkt = (
-      await tozaMakonApi.post("/billing-service/acts", {
-        actPackId: packIds.dvaynik.id,
-        actType: "CREDIT",
-        amount: Number(calculateAmount.amount) + Number(akt_sum),
-        amountWithQQS: 0,
-        amountWithoutQQS: Number(calculateAmount.amount) + Number(akt_sum),
-        description: `ikkilamchi hisob raqamini o'chirish`,
-        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        fileId:
-          fileUploadResponse.data.fileName +
-          "*" +
-          fileUploadResponse.data.fileId,
-        kSaldo: 0,
-        residentId: fake_account.id,
-        inhabitantCount: 0,
-      })
-    ).data;
-    if (dvaynikAkt.code) {
-      return res.status(500).json({
-        ok: false,
-        message:
-          "Ikkilamchi hisob raqamini o'chirishda xatolik yuz berdi " +
-          dvaynikAkt.message,
+    // 3. Pul ko‘chirish aktlarini yaratish
+    if (Number(akt_sum))
+      await transferAmountBetweenAccounts({
+        tozaMakonApi,
+        amount: Number(akt_sum),
+        residentFrom: abonentFake.id,
+        residentTo: abonentReal.id,
+        actPackId: pulKuchirishPackId,
+        fileId,
+        descriptionPrefix: `${abonentFake.licshet} → ${abonentReal.licshet}`,
       });
-    }
+
+    // 4. Dvaynikni yopish
+    const amountObj = await calculateAmount(tozaMakonApi, {
+      actPackId: dvaynikPackId,
+      residentId: abonentFake.id,
+      inhabitantCount: 0,
+      kSaldo: 0,
+    });
+
+    const dvaynikAct = await createAct(tozaMakonApi, {
+      actPackId: dvaynikPackId,
+      actType: "CREDIT",
+      amount: Number(amountObj.amount) + Number(akt_sum),
+      amountWithQQS: 0,
+      amountWithoutQQS: Number(amountObj.amount) + Number(akt_sum),
+      description: "ikkilamchi hisob raqamini o'chirish",
+      endPeriod: `${new Date().getMonth() + 1}.${new Date().getFullYear()}`,
+      startPeriod: `${new Date().getMonth() + 1}.${new Date().getFullYear()}`,
+      fileId,
+      kSaldo: 0,
+      residentId: abonentFake.id,
+      inhabitantCount: 0,
+    });
+
+    // 5. Arizani yangilash
     await ariza.updateOne({
       $set: {
         status: "akt_kiritilgan",
-        akt_pachka_id: packIds.dvaynik.id,
-        akt_id: dvaynikAkt.id,
-        aktInfo: dvaynikAkt,
+        akt_pachka_id: dvaynikPackId,
+        akt_id: dvaynikAct.id,
+        aktInfo: dvaynikAct,
         akt_date: new Date(),
       },
     });
-    return res.json({
-      ok: true,
-      message: "muvaffaqqiyatli akt qilindi",
-    });
+
+    res.json({ ok: true, message: "Aktlar muvaffaqiyatli yaratildi" });
   } catch (err) {
-    console.error(err);
+    console.error("Xato:", err.message);
     res.status(500).json({ ok: false, message: err.message });
   }
 };
@@ -1028,100 +799,47 @@ module.exports.getAbonentsByMfyIdExcel = async (req, res) => {
   }
 };
 
-module.exports.monayTransferAct = async (req, res) => {
-  // first index of array is debitor act other elemens are creditors acts
-  const acts = [];
+module.exports.transferMoneyBetweenResidents = async (req, res) => {
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+  const createdActs = [];
 
-  let { debitorAct, creditorActs } = req.body;
-  debitorAct = JSON.parse(debitorAct);
-  creditorActs = JSON.parse(creditorActs);
   try {
-    const formData = new FormData();
-    formData.append("file", req.file.buffer, req.file.originalname);
-    const fileUploadResponse = (
-      await tozaMakonApi.post(
-        "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
-    ).data;
-    const fileId =
-      fileUploadResponse.fileName + "*" + fileUploadResponse.fileId;
+    // 1. Kiruvchi ma’lumotlarni ajratib olamiz
+    let { debitorAct, creditorActs } = req.body;
+    debitorAct = JSON.parse(debitorAct);
+    creditorActs = JSON.parse(creditorActs);
 
-    const actPackId = await this.getActPackIds(
+    // 2. Faylni yuklab, fileId ni olamiz
+    const fileId = await getCommonActFileId(
+      tozaMakonApi,
+      req.file.buffer,
+      req.file.originalname
+    );
+
+    // 3. Akt pachkasini tayyorlaymiz
+    const actPackId = await getOrCreateActPackId(
       "pul_kuchirish",
       tozaMakonApi,
       req.user.companyId
     );
-    const date = new Date();
-    const debitorActData = (
-      await tozaMakonApi.post("/billing-service/acts", {
-        actType: "DEBIT",
-        amount: debitorAct.amount,
-        amountWithQQS: debitorAct.amount,
-        amountWithoutQQS: 0,
-        kSaldo: (
-          await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
-            params: {
-              amount: debitorAct.amount,
-              residentId: debitorAct.residentId,
-              actPackId: actPackId,
-              actType: "DEBIT",
-            },
-          })
-        ).data,
-        description: `pul ko'chirish ${creditorActs
-          .map((act) => act.accountNumber)
-          .join(", ")} larga ${debitorAct.amount} so'm`,
-        fileId,
-        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        residentId: debitorAct.residentId,
-        actPackId: actPackId,
-      })
-    ).data;
-    acts.push(debitorActData);
 
-    for (let creditorAct of creditorActs) {
-      const creditorActData = (
-        await tozaMakonApi.post("/billing-service/acts", {
-          actType: "CREDIT",
-          amount: creditorAct.amount,
-          amountWithQQS: creditorAct.amount,
-          amountWithoutQQS: 0,
-          kSaldo: (
-            await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
-              params: {
-                amount: creditorAct.amount,
-                residentId: creditorAct.residentId,
-                actPackId: actPackId,
-                actType: "CREDIT",
-              },
-            })
-          ).data,
-          description: `pul ko'chirish ${debitorAct.accountNumber} dan ${creditorAct.amount} so'm`,
-          fileId,
-          endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-          residentId: creditorAct.residentId,
-          actPackId: actPackId,
-        })
-      ).data;
-      acts.push(creditorActData);
-    }
+    // 4. Barcha aktlarni yaratamiz
+    const acts = await createMoneyTransferActs({
+      tozaMakonApi,
+      fileId,
+      actPackId,
+      debitor: debitorAct,
+      creditors: creditorActs,
+    });
+    createdActs.push(...acts);
 
     res.json({ ok: true, data: acts });
   } catch (error) {
-    for (let act of acts) {
-      await tozaMakonApi.delete("/billing-service/acts/" + act.id);
+    for (let act of createdActs) {
+      await deleteActById(tozaMakonApi, act.id);
     }
-    res.json({ ok: false, message: "Internal server error 500" });
-    console.error(error);
+    console.error("Xatolik:", error.message);
+    res.status(500).json({ ok: false, message: error.message });
   }
 };
 

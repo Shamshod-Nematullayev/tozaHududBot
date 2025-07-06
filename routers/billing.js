@@ -8,8 +8,7 @@ const {
   downloadFileFromBilling,
   getAbonentDHJByAbonentId,
   getAbonentActs,
-  createFullAct,
-  createDublicateActByAriza,
+  duplicateActFromRequest,
   getAbonentsByMfyId,
   createDublicateAct,
   getActiveMfy,
@@ -19,9 +18,10 @@ const {
   getActPacks,
   getTariffs,
   getAbonentsByMfyIdExcel,
-  monayTransferAct,
+  transferMoneyBetweenResidents,
   getHouses,
   getResidents,
+  createResidentAct,
 } = require("./controllers/billing.controller");
 
 const router = require("express").Router();
@@ -35,12 +35,12 @@ router.get("/next-incoming-document-number", async (req, res) => {
 
 router.get("/get-file/", downloadFileFromBilling);
 
-router.post("/create-full-akt", uploadAsBlob.single("file"), createFullAct);
+router.post("/create-full-akt", uploadAsBlob.single("file"), createResidentAct);
 
 router.post(
   "/create-dvaynik-akt-by-ariza",
   uploadAsBlob.single("file"),
-  createDublicateActByAriza
+  duplicateActFromRequest
 );
 
 router.post(
@@ -156,7 +156,7 @@ router.get("/residents", getResidents);
 router.post(
   "/monay-transfer-act",
   uploadAsBlob.single("file"),
-  monayTransferAct
+  transferMoneyBetweenResidents
 );
 
 module.exports = router;
