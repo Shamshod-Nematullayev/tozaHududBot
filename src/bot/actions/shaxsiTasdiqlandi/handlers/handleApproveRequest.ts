@@ -9,6 +9,9 @@ import {
   updateAbonentDetails,
 } from "@services/billing";
 import { Context } from "telegraf";
+import { tryDeleteOrEditMessage } from "./tryDeleteOrEditMessage";
+import { AxiosError } from "axios";
+import { parseDublicateError } from "./dublicateParseResult";
 
 export default async function handleApproveRequest(
   ctx: Context,
@@ -47,7 +50,23 @@ export default async function handleApproveRequest(
   });
 
   // identifikatsiyadan o'tkazish
-  await identificationAbonent(tozaMakonApi, abonent.id, true);
+  try {
+    await identificationAbonent(tozaMakonApi, abonent.id, true);
+  } catch (err) {
+    interface ErrorResponseData {
+      message: string;
+      code: string;
+      time: string;
+      traceId: string;
+    }
+    const error = err as AxiosError<ErrorResponseData>;
+
+    const resultErr = parseDublicateError(
+      error.response?.data.message || "",
+      abonent.accountNumber
+    );
+    // errorga qarab moslashuvchan kod yozishim kerak
+  }
 
   //   mongodb ma'lumotlar bazada yangilanish
   await abonent.updateOne({
@@ -77,25 +96,18 @@ export default async function handleApproveRequest(
       shaxs_tasdiqlash_ball: Number(inspector.shaxs_tasdiqlash_ball) + 1,
     },
   });
-  //   requestni o'chirib yuborish
-  await req.deleteOne();
-  //   telegram kanaldagi postni yangilash
-  if (ctx.callbackQuery?.message) {
-    const msgId = ctx.callbackQuery.message.message_id;
-    ctx.telegram
-      .deleteMessage(company.CHANNEL_ID_SHAXSI_TASDIQLANDI, msgId)
-      .catch(() => {
-        ctx.deleteMessage().catch(() => {
-          ctx.telegram.editMessageCaption(
-            company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
-            msgId,
-            "0",
-            `#delete KOD: ${req.licshet}\nFIO: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}\nInspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>\nTasdiqladi: <a href="https://t.me/${ctx.from?.username}">${ctx.from?.first_name}</a>`,
-            { parse_mode: "HTML" }
-          );
-        });
-      });
-  }
+
+  //  kanaldagi xabarni o'chirish
+  if (ctx.callbackQuery?.message)
+    await tryDeleteOrEditMessage(
+      ctx,
+      company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+      ctx.callbackQuery.message.message_id,
+      `#delete KOD: ${req.licshet}\nFIO: ${req.data.last_name} ${req.data.first_name} ${req.data.middle_name} ${req.data.birth_date}
+  Inspector: <a href="https://t.me/${req.user.username}">${inspector.name}</a>
+  ⚠️ Bu xabarni Telegram tomonidan avtomatik o‘chirish imkoni bo‘lmadi. Iltimos, admin sifatida qo‘lda o‘chiring.`
+    );
+
   //   tizimga kiritgan nazoratchiga javob yo'llash
   await ctx.telegram.sendMessage(
     req.user.id,
@@ -111,4 +123,5 @@ export default async function handleApproveRequest(
     { parse_mode: "HTML" }
   );
   //   adminga amaliyot tugagani haqida xabar yuborish status: 200
+  await ctx.answerCbQuery("✅ Ma'lumot qabul qilindi.");
 }
