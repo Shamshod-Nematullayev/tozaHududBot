@@ -2,10 +2,11 @@
   "name": "kodochishbot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "dev": "nodemon --no-deprecation index 2> errors.log"
+    "dev": "nodemon"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -42,7 +43,17 @@
     "socket.io": "^4.8.1",
     "telegraf": "^4.16.3",
     "telegraf-session-local": "^2.1.1",
+    "tsconfig-paths": "^4.2.0",
     "uuid": "^9.0.1",
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.0.10",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
   }
 }
