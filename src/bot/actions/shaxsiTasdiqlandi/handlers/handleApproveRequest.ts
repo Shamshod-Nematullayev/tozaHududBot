@@ -3,22 +3,20 @@ import { Abonent } from "@models/Abonent";
 import { Company } from "@models/Company";
 import { ICustomDataRequestDoc } from "@models/CustomDataRequest";
 import { Nazoratchi } from "@models/Nazoratchi";
+import {
+  getCitizen,
+  identificationAbonent,
+  updateAbonentDetails,
+} from "@services/billing";
 import { Context } from "telegraf";
 
 export default async function handleApproveRequest(
   ctx: Context,
   req: ICustomDataRequestDoc
 ) {
+  // validation and get varibles
   const abonent = await Abonent.findOne({ licshet: req.licshet });
   if (!abonent) return await ctx.answerCbQuery("Abonent topilmadi");
-  const inspector = await Nazoratchi.findById(req.inspector_id);
-  if (!inspector) return await ctx.answerCbQuery("Nazoratchi topilmadi");
-  const company = await Company.findOne({ id: req.companyId });
-  if (!company)
-    return await ctx.answerCbQuery(
-      "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!"
-    );
-  const [yil, oy, kun] = req.data.birth_date.split("-");
   if (
     abonent.shaxsi_tasdiqlandi &&
     abonent.shaxsi_tasdiqlandi.confirm &&
@@ -26,48 +24,30 @@ export default async function handleApproveRequest(
   ) {
     return await ctx.answerCbQuery("Bu abonent ma'lumoti kiritilib bo'lingan");
   }
-  //   billingga yangilov so'rovini yuborish
+  const inspector = await Nazoratchi.findById(req.inspector_id);
+  if (!inspector) return await ctx.answerCbQuery("Nazoratchi topilmadi");
+  const company = await Company.findOne({ id: req.companyId });
+  if (!company)
+    return await ctx.answerCbQuery(
+      "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!"
+    );
   const tozaMakonApi = createTozaMakonApi(req.companyId);
 
-  const pasportData = (
-    await tozaMakonApi.get("/user-service/citizens", {
-      params: {
-        passport: req.data.passport_serial + req.data.passport_number,
-        pinfl: req.data.pinfl,
-      },
-    })
-  ).data;
-
-  const data = (
-    await tozaMakonApi.get(
-      `/user-service/residents/${abonent.id}?include=translates`
-    )
-  ).data;
-
-  // ma'lumotlarni yangilash
-  await tozaMakonApi.put("/user-service/residents/" + abonent.id, {
-    ...data,
-    id: abonent.id,
-    accountNumber: abonent.licshet,
-    residentType: "INDIVIDUAL",
-    homePhone: null,
-    description: `${inspector.id} ${inspector.name} ma'lumotiga asosan shaxsi tasdiqlandi o'zgartirildi.`,
-    citizen: {
-      ...data.citizen,
-      ...pasportData,
-    },
-    house: {
-      ...data.house,
-      cadastralNumber: data.house.cadastralNumber
-        ? data.house.cadastralNumber
-        : "00:00:00:00:00:0000:0000",
-    },
+  //   ma'lumotlarni tayyorlash
+  const [yil, oy, kun] = req.data.birth_date.split("-");
+  const citizen = await getCitizen(tozaMakonApi, {
+    passport: req.data.passport_serial + req.data.passport_number,
+    birthDate: `${yil}-${oy}-${kun}`,
+    pinfl: req.data.pinfl,
   });
+
+  //   billingga yangilov so'rovini yuborish
+  await updateAbonentDetails(tozaMakonApi, abonent.id, {
+    citizen: citizen,
+  });
+
   // identifikatsiyadan o'tkazish
-  await tozaMakonApi.patch("/user-service/residents/identified", {
-    identified: true,
-    residentIds: [abonent.id],
-  });
+  await identificationAbonent(tozaMakonApi, abonent.id, true);
 
   //   mongodb ma'lumotlar bazada yangilanish
   await abonent.updateOne({

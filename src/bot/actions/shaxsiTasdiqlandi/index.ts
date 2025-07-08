@@ -1,10 +1,8 @@
-import { createTozaMakonApi } from "@api/tozaMakon.js";
 import { Composer } from "telegraf";
 import { bot } from "@bot/core/bot.js";
 import { CustomDataRequest } from "@models/CustomDataRequest.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Company } from "@models/Company.js";
-import { Abonent } from "@models/Abonent.js";
 import { Admin } from "@models/Admin.js";
 import handleApproveRequest from "./handlers/handleApproveRequest";
 import handleRejectRequest from "./handlers/handleRejectRequest";
@@ -44,13 +42,14 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
       );
     }
 
-    // Tasdiqlangan bo'lsa
     if (tasdiqlandi === "true") {
+      // Tasdiqlangan bo'lsa
       await handleApproveRequest(ctx, req);
     } else {
       await handleRejectRequest(ctx, req);
     }
   } catch (error: any) {
+    // Bekor qilingan bo'lsa
     try {
       await ctx.answerCbQuery(
         error?.response?.data?.message || "Xatolik kuzatildi"

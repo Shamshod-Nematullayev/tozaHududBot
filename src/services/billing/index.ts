@@ -5,3 +5,7 @@ export * from "./deleteActById";
 export * from "./getFileAsBufferFromTozamakon";
 export * from "./getOrCreateActPackId";
 export * from "./uploadFileToTozaMakon";
+export * from "./getAbonentDetails";
+export * from "./updateAbonentDetails";
+export * from "./identificationAbonent";
+export * from "./getCitizen";
