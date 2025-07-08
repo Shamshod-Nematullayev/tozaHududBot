@@ -22,7 +22,8 @@
       "@middlewares/*": ["middlewares/*"],
       "@lib/*": ["lib/*"],
       "@bot/*": ["bot/*"],
-      "@api/*": ["api/*"]
+      "@api/*": ["api/*"],
+      "@services/*": ["services/*"]
     },
     "sourceMap": true
   },

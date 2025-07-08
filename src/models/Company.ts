@@ -1,5 +1,57 @@
 import { model, Schema } from "mongoose";
 
+interface IAktPack {
+  id: number;
+  type: string;
+  month: number;
+  year: number;
+  name: string;
+}
+
+interface ICompany {
+  id: number;
+  name: string;
+  login: string;
+  password: string;
+  tozamakonGpsLogin: string;
+  tozamakonGpsPassword: string;
+  hybridLogin: string;
+  hybridPassword: string;
+  hybridToken?: string;
+  ekopayLogin: string;
+  ekopayPassword: number;
+  active: boolean;
+  type: "dxsh" | "stm";
+  ekopaySessionId?: string;
+  ekopayToken?: string;
+  akt_pachka_ids: {
+    viza: IAktPack;
+    odam_soni: IAktPack;
+    dvaynik: IAktPack;
+    pul_kuchirish: IAktPack;
+    death: IAktPack;
+    gps: IAktPack;
+  };
+  tozamakonAccessToken?: string;
+  CHANNEL_ID_SHAXSI_TASDIQLANDI: string;
+  GROUP_ID_NAZORATCHILAR: string;
+  GROUP_ID_XATLOVCHILAR: string;
+  ekopayParentId?: string;
+  phone: string;
+  activeExpiresDate: Date;
+  canInspectorsCreateAbonent: boolean;
+  manager: any;
+  billingAdmin: any;
+  gpsOperator: any;
+  locationName: string;
+  regionId: number;
+  abonentsPrefix: string;
+  districtId: 47;
+  hybridArea: 41;
+  hybridRegion: 3;
+  tozamakonGpsAccessToken?: string;
+}
+
 const aktPackSchema = new Schema({
   id: {
     type: String,
@@ -31,7 +83,7 @@ const employeerSchema = new Schema({
     required: true,
   },
 });
-const schema = new Schema(
+const schema = new Schema<ICompany>(
   {
     id: {
       type: Number,
@@ -50,10 +102,8 @@ const schema = new Schema(
       required: true,
     },
     tozamakonAccessToken: String,
-    user_id: Number,
     login: String,
     password: String,
-    authorization: String,
     hybridToken: String,
     hybridLogin: String,
     hybridPassword: String,
@@ -71,14 +121,6 @@ const schema = new Schema(
       type: String,
       enum: ["dxsh", "ekopay"],
       default: "dxsh",
-    },
-    path: {
-      type: Object,
-      default: {
-        getIncomes: "",
-        createNewAbonent: "",
-        searchAbonent: "",
-      },
     },
     akt_pachka_ids: aktPackTypesSchema,
     active: Boolean,

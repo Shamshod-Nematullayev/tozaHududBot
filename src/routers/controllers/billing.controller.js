@@ -23,14 +23,16 @@ import { Mahalla } from "@models/Mahalla";
 import { packNames, packTypes } from "../../intervals/createAktPack";
 
 import Excel from "exceljs";
+
 import {
   uploadFileToTozaMakon,
   getOrCreateActPackId,
+  calculateAmount,
   calculateKSaldo,
   createAct,
   deleteActById,
   getFileAsBuffer,
-} from "../../services/billing.service";
+} from "@services/billing";
 
 export const downloadFileFromBilling = async (req, res) => {
   try {
