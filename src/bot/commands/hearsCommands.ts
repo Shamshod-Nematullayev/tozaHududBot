@@ -1,4 +1,5 @@
 import { createTozaMakonApi } from "@api/tozaMakon";
+import { isValidAccountNumber } from "@bot/middlewares/scene/utils/validator";
 import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril";
 import { keyboards } from "@lib/keyboards";
 import { messages } from "@lib/messages";
@@ -6,6 +7,7 @@ import { Abonent } from "@models/Abonent";
 import { Admin } from "@models/Admin";
 import { Mahalla } from "@models/Mahalla";
 import { Nazoratchi } from "@models/Nazoratchi";
+import { searchAbonent } from "@services/billing";
 import { Composer, Markup } from "telegraf";
 import { MyContext } from "types/botContext";
 import { scenaNames } from "types/scenes";
@@ -102,29 +104,28 @@ hearsActions.forEach(({ buttons, listener }) => {
   composer.hears([...buttons, ...buttonsKirill], listener);
 });
 
+// Addintional commands (ShortCuts)
+
 composer.hears(/add-abonent_/, async (ctx) => {
   try {
     const admin = await Admin.findOne({ user_id: ctx.from.id });
     if (!admin) return ctx.reply("Sizda huquq yo'q");
     const licshet = ctx.message.text.split("_")[1];
+    if (!isValidAccountNumber(licshet))
+      return ctx.reply("Abonent hisob raqamini to'g'ri kiriting");
     const abonent = await Abonent.findOne({ licshet });
     if (abonent) return ctx.reply("Bu abonent tizimda allaqachon mavjud");
 
     const tozaMakonApi = createTozaMakonApi(admin.companyId);
 
-    let abonentData = (
-      await tozaMakonApi.get("/user-service/residents", {
-        params: {
-          districtId: 47,
-          sort: "id,DESC",
-          page: 0,
-          size: 5,
-          accountNumber: licshet,
-        },
-      })
-    ).data.content;
-    if (abonentData.length != 1) return ctx.reply("Billingda topilmadi");
-    abonentData = abonentData[0];
+    const searchResult = await searchAbonent(tozaMakonApi, {
+      accountNumber: licshet,
+      companyId: admin.companyId,
+    });
+
+    if (searchResult.length != 1) return ctx.reply("Billingda topilmadi");
+
+    const abonentData = searchResult[0];
     await Abonent.create({
       fio: abonentData.fullName,
       licshet: abonentData.accountNumber,
@@ -145,3 +146,5 @@ composer.hears(/add-abonent_/, async (ctx) => {
     ctx.reply("Error" + error.message);
   }
 });
+
+export default composer;

@@ -9,6 +9,7 @@ import { isValidAccountNumber } from "../utils/validator";
 import { getAbonentAndInspector } from "../utils/getAbonentAndInspector";
 import { getAbonentById } from "@services/billing";
 import { generateWarningLetter } from "@services/billing/generateWarningLetter";
+import { errorHandler } from "@bot/utils/errorHandler";
 
 export const getWarningLetter = new Scenes.WizardScene(
   "getWarningLetter",
@@ -17,58 +18,47 @@ export const getWarningLetter = new Scenes.WizardScene(
     ctx.wizard.next();
   },
   async (ctx) => {
-    try {
-      // 1. validation
-      if (
-        !ctx.message ||
-        !("text" in ctx.message) ||
-        !isValidAccountNumber(ctx.message.text) ||
-        !ctx.from
-      )
-        return ctx.reply(
-          "Abonent hisob raqamini to'g'ri kiriting",
-          keyboards.cancelBtn
-        );
-
-      // 2. get abonent and check access
-      const { abonent } = await getAbonentAndInspector(
-        ctx.from.id,
-        ctx.message.text
+    // 1. validation
+    if (
+      !ctx.message ||
+      !("text" in ctx.message) ||
+      !isValidAccountNumber(ctx.message.text) ||
+      !ctx.from
+    )
+      return ctx.reply(
+        "Abonent hisob raqamini to'g'ri kiriting",
+        keyboards.cancelBtn
       );
 
-      // 3. generate warning letter
-      const tozaMakonApi = createTozaMakonApi(abonent.companyId);
-      const abonentKSaldo = (await getAbonentById(tozaMakonApi, abonent.id))
-        .balance.kSaldo;
-      if (abonentKSaldo < 100000) {
-        ctx.scene.leave();
-        return ctx.reply(
-          "Abonentning qarzdorligi 100.000 so'mdan kichik bo'lganligi uchun bekor qilindi",
-          keyboards.mainKeyboard.resize()
-        );
-      }
-      const batch = await generateWarningLetter(
-        tozaMakonApi,
-        abonent.id,
-        abonentKSaldo
-      );
-      // 4. send response
-      await ctx.replyWithDocument({
-        source: batch,
-        filename: ctx.message.text + ".pdf",
-      });
+    // 2. get abonent and check access
+    const { abonent } = await getAbonentAndInspector(
+      ctx.from.id,
+      ctx.message.text
+    );
 
+    // 3. generate warning letter
+    const tozaMakonApi = createTozaMakonApi(abonent.companyId);
+    const abonentKSaldo = (await getAbonentById(tozaMakonApi, abonent.id))
+      .balance.kSaldo;
+    if (abonentKSaldo < 100000) {
       ctx.scene.leave();
-    } catch (err: any) {
-      if (err?.message === "NO_ACCESS") {
-        return ctx.reply("Sizda yetarli huquq yo‘q", keyboards.mainKeyboard);
-      }
-      if (err?.message === "NOT_FOUND") {
-        return ctx.reply("Abonent topilmadi");
-      }
-      console.error(err);
-      ctx.reply("Xatolik yuz berdi");
+      return ctx.reply(
+        "Abonentning qarzdorligi 100.000 so'mdan kichik bo'lganligi uchun bekor qilindi",
+        keyboards.mainKeyboard.resize()
+      );
     }
+    const batch = await generateWarningLetter(
+      tozaMakonApi,
+      abonent.id,
+      abonentKSaldo
+    );
+    // 4. send response
+    await ctx.replyWithDocument({
+      source: batch,
+      filename: ctx.message.text + ".pdf",
+    });
+
+    ctx.scene.leave();
   }
 );
 

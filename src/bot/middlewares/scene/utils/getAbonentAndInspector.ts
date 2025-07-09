@@ -7,10 +7,7 @@ export async function getAbonentAndInspector(
   userId: number,
   licshet: string
 ): Promise<{
-  inspector: Document<unknown, {}, INazoratchi> &
-    INazoratchi & {
-      _id: Types.ObjectId;
-    };
+  inspector: INazoratchi;
   abonent: IAbonentDoc;
 }> {
   const inspector = await Nazoratchi.findOne({ telegram_id: userId });
