@@ -8,7 +8,7 @@ import { kirillga } from "../middlewares/smallFunctions/lotinKiril";
 import { Notification } from "@models/Notification";
 import { find_address_by_pinfil_from_mvd } from "../../api/mvd-pinfil";
 import { Composer } from "telegraf";
-import { bot } from "./../core/bot";
+import { bot } from "../core/bot";
 import { keyboards } from "@lib/keyboards";
 import { messages } from "@lib/messages";
 import { Admin } from "@models/Admin";

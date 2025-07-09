@@ -1,5 +1,5 @@
 import { Composer } from "telegraf";
-import { bot } from "./../core/bot";
+import { bot } from "../core/bot";
 import { keyboards } from "@lib/keyboards";
 import { messages } from "@lib/messages";
 
@@ -14,7 +14,7 @@ composer.action("language", async (ctx) => {
   }
 });
 
-composer.action("lotin_tili_tanlash", async (ctx) => {
+composer.action("lotin_tili_tanlash", async (ctx: any) => {
   try {
     await ctx.deleteMessage();
     ctx.session.til = "lotin";
@@ -24,7 +24,7 @@ composer.action("lotin_tili_tanlash", async (ctx) => {
   }
 });
 
-composer.action("kiril_tili_tanlash", async (ctx) => {
+composer.action("kiril_tili_tanlash", async (ctx: any) => {
   try {
     await ctx.deleteMessage();
     ctx.session.til = "kiril";

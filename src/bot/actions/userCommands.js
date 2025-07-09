@@ -20,56 +20,7 @@ composer.command("user", (ctx) => {
     parse_mode: "HTML",
   });
 });
-composer.hears(
-  ["👤Yangi abonent ochish", kirillga("👤Yangi abonent ochish")],
-  (ctx) => {
-    ctx.scene.enter("new_abonent_request");
-  }
-);
-composer.hears(["🔎Izlash", kirillga("🔎Izlash")], (ctx) => {
-  ctx.scene.enter("SEARCH_BY_NAME");
-});
-composer.hears(["📅Abonent karta", kirillga("📅Abonent karta")], (ctx) => {
-  ctx.scene.enter("getAbonentCard");
-});
-composer.hears(
-  ["✉️Ogohlantrish xati", kirillga("✉️Ogohlantrish xati")],
-  (ctx) => {
-    ctx.scene.enter("getWarningLetter");
-  }
-);
-composer.hears(
-  ["🔌 ELEKTR KODI🔌", kirillga("🔌 ELEKTR KODI🔌")],
-  async (ctx) => {
-    ctx.scene.enter("updateElektrKod");
-  }
-);
 
-composer.hears(
-  ["👥Mening abonentlarim", kirillga("👥Mening abonentlarim")],
-  async (ctx) => {
-    try {
-      const nazoratchi = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
-      if (!nazoratchi) {
-        return ctx.reply(`Siz bunday huquqga ega emassiz`);
-      }
-
-      const mahallalar = await Mahalla.find({
-        "biriktirilganNazoratchi.inspactor_id": nazoratchi.id,
-      });
-      if (mahallalar.length == 0) {
-        return ctx.reply("Sizga biriktirilgan mahallalar yo'q!");
-      }
-      const keys = mahallalar.map((mfy) => {
-        return [Markup.button.callback(mfy.name, "newAbonentsList_" + mfy.id)];
-      });
-      ctx.reply("Sizga biriktirilgan mahallalar", Markup.inlineKeyboard(keys));
-    } catch (err) {
-      console.error(err);
-      ctx.reply("Xatolik");
-    }
-  }
-);
 composer.action(/newAbonentsList_/, async (ctx) => {
   try {
     await ctx.deleteMessage();
@@ -88,27 +39,6 @@ composer.action(/newAbonentsList_/, async (ctx) => {
     console.error(err);
     ctx.reply("Xatolik");
   }
-});
-
-composer.hears(["📓Qo`llanma", kirillga("📓Qo`llanma")], (ctx) => {
-  ctx.reply("Hozircha video qo'llanma mavjud emas. 🧠 Ishlatish kifoya");
-});
-composer.hears(
-  ["✏️Ma'lumotlarini o'zgartirish", kirillga("✏️Ma'lumotlarini o'zgartirish")],
-  (ctx) => {
-    ctx.reply(messages.chooseEditType, keyboards.editTypes.oneTime());
-  }
-);
-
-composer.hears(["⚙Sozlamalar", kirillga("⚙Sozlamalar")], (ctx) => {
-  ctx.reply(messages.chooseMenu, keyboards.settings);
-});
-
-composer.hears(["✒️Sudga xat✒️", kirillga("✒️Sudga xat✒️")], (ctx) => {
-  ctx.reply(
-    `To'lov qilishdan bosh tortgan abonentlarni majburiy undiruvga qaratish bo'limi`,
-    keyboards.targetMenuKeyboard
-  );
 });
 
 composer.action("getTargets", async (ctx) => {
@@ -179,50 +109,6 @@ actions.forEach((action) => {
       await ctx.deleteMessage();
     } catch (error) {}
   });
-});
-
-composer.hears(/add-abonent_/, async (ctx) => {
-  try {
-    const admin = await Admin.findOne({ user_id: ctx.from.id });
-    if (!admin) return ctx.reply("Sizda huquq yo'q");
-    const licshet = ctx.message.text.split("_")[1];
-    const abonent = await Abonent.findOne({ licshet });
-    if (abonent) return ctx.reply("Bu abonent tizimda allaqachon mavjud");
-
-    const tozaMakonApi = createTozaMakonApi(admin.companyId);
-
-    let abonentData = (
-      await tozaMakonApi.get("/user-service/residents", {
-        params: {
-          districtId: 47,
-          sort: "id,DESC",
-          page: 0,
-          size: 5,
-          accountNumber: licshet,
-        },
-      })
-    ).data.content;
-    if (abonentData.length != 1) return ctx.reply("Billingda topilmadi");
-    abonentData = abonentData[0];
-    await Abonent.create({
-      fio: abonentData.fullName,
-      licshet: abonentData.accountNumber,
-      energy_licshet: abonentData.electricityAccountNumber,
-      kadastr_number: abonentData.cadastralNumber,
-      mahalla_name: abonentData.mahallaName,
-      mahallas_id: abonentData.mahallaId,
-      streets_id: abonentData.streetId,
-      phone: abonentData.phone,
-      pinfl: abonentData.pinfl,
-      passport_number: abonentData.passport,
-      id: abonentData.id,
-      companyId: admin.companyId,
-    });
-    await ctx.reply("Abonent muvaffaqqiyatli yaratildi");
-  } catch (error) {
-    console.log(error.message);
-    ctx.reply("Error" + error.message);
-  }
 });
 
 bot.use(composer);
