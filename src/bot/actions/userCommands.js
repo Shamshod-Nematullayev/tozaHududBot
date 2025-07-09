@@ -9,6 +9,10 @@ import { Abonent } from "@models/Abonent";
 import { Target } from "@models/TargetAbonent";
 import { kirillga } from "../middlewares/smallFunctions/lotinKiril";
 import { createTozaMakonApi } from "../../api/tozaMakon";
+import { bot } from "@bot/core/bot";
+import { messages } from "@lib/messages";
+import { keyboards } from "@lib/keyboards";
+bot.telegram.deleteMyCommands();
 
 const composer = new Composer();
 composer.command("user", (ctx) => {

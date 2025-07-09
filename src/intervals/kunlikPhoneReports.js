@@ -78,7 +78,7 @@ export async function sendKunlikPhoneReports(
     });
 
     ejs.renderFile(
-      "./views/kunlikMalumotKiritishHisoboti.ejs",
+      "./src/views/kunlikMalumotKiritishHisoboti.ejs",
       {
         allConfirmed,
         allConfirmedHourly,

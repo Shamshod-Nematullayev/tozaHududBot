@@ -7,11 +7,14 @@ import {
   getCitizen,
   identificationAbonent,
   updateAbonentDetails,
+  searchAbonent,
+  getResidentHousesByPnfl,
 } from "@services/billing";
 import { Context } from "telegraf";
 import { tryDeleteOrEditMessage } from "./tryDeleteOrEditMessage";
-import { AxiosError } from "axios";
+import { Axios, AxiosError } from "axios";
 import { parseDublicateError } from "./dublicateParseResult";
+import { tryIdentifiedOrReject } from "./tryIdentifiedOrReject";
 
 export default async function handleApproveRequest(
   ctx: Context,
@@ -50,22 +53,13 @@ export default async function handleApproveRequest(
   });
 
   // identifikatsiyadan o'tkazish
-  try {
-    await identificationAbonent(tozaMakonApi, abonent.id, true);
-  } catch (err) {
-    interface ErrorResponseData {
-      message: string;
-      code: string;
-      time: string;
-      traceId: string;
-    }
-    const error = err as AxiosError<ErrorResponseData>;
+  const result = await tryIdentifiedOrReject(req, abonent, tozaMakonApi);
 
-    const resultErr = parseDublicateError(
-      error.response?.data.message || "",
-      abonent.accountNumber
+  if (!result.success) {
+    return await ctx.answerCbQuery(
+      "Ma'lumotlar yangilandi, ammo identifikatsiya qilib bo'lmadi. Xatolik: " +
+        result.errorMessage
     );
-    // errorga qarab moslashuvchan kod yozishim kerak
   }
 
   //   mongodb ma'lumotlar bazada yangilanish

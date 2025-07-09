@@ -93,10 +93,13 @@ async function xatlovchilarIshiHisobot(companyId = 1144) {
     });
 
     inspectors.sort((a, b) => b.ball - a.ball);
-    const res = await ejs.renderFile("./views/xatlovchilarIshiHisobot.ejs", {
-      sana: bugungiSana(),
-      inspectors,
-    });
+    const res = await ejs.renderFile(
+      "./src/views/xatlovchilarIshiHisobot.ejs",
+      {
+        sana: bugungiSana(),
+        inspectors,
+      }
+    );
     const binaryData = await nodeHtmlToImage({
       html: res,
       type: "png",
@@ -104,16 +107,19 @@ async function xatlovchilarIshiHisobot(companyId = 1144) {
       selector: "div",
     });
     const buffer = Buffer.from(binaryData, "binary");
-    console.log(process.env.ME);
-    bot.telegram.sendPhoto(
-      company.GROUP_ID_XATLOVCHILAR,
-      // process.env.ME,
-      { source: buffer },
-      {
-        caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
-        parse_mode: "HTML",
-      }
-    );
+    try {
+      await bot.telegram.sendPhoto(
+        company.GROUP_ID_NAZORATCHILAR,
+        // process.env.ME,
+        { source: buffer },
+        {
+          caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
+          parse_mode: "HTML",
+        }
+      );
+    } catch (error) {
+      console.error(company.GROUP_ID_NAZORATCHILAR, error.message);
+    }
   } catch (error) {
     console.error(error);
   }

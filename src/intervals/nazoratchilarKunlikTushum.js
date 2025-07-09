@@ -51,7 +51,7 @@ export async function nazoratchilarKunlikTushum(companyId = 1144) {
     rows.sort((a, b) => parseFloat(b.summasi) - parseFloat(a.summasi));
 
     ejs.renderFile(
-      "./views/nazoratchilarKunlikTushum.ejs",
+      "./src/views/nazoratchilarKunlikTushum.ejs",
       {
         sana: dateString,
         rows,

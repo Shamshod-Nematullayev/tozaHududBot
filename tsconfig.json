@@ -23,7 +23,8 @@
       "@lib/*": ["lib/*"],
       "@bot/*": ["bot/*"],
       "@api/*": ["api/*"],
-      "@services/*": ["services/*"]
+      "@services/*": ["services/*"],
+      "./src/views/*": ["views/*"]
     },
     "sourceMap": true
   },

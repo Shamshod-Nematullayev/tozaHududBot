@@ -95,7 +95,7 @@ export async function sendMFYIncomeReport(
         parseFloat(a.tushum / a.xisoblandi)
     );
     ejs.renderFile(
-      "./views/mfyIncome.ejs",
+      "./src/views/mfyIncome.ejs",
       {
         data: mahallas,
         jamiTushum: allTransactionAmount,

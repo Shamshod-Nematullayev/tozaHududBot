@@ -9,3 +9,6 @@ export * from "./getAbonentDetails";
 export * from "./updateAbonentDetails";
 export * from "./identificationAbonent";
 export * from "./getCitizen";
+export * from "./searchAbonent";
+export * from "./getResidentHousesByPnfl";
+export * from "./getAbonentById";

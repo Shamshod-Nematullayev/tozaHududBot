@@ -51,6 +51,7 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
   } catch (error: any) {
     // Bekor qilingan bo'lsa
     try {
+      console.log(error);
       await ctx.answerCbQuery(
         error?.response?.data?.message || "Xatolik kuzatildi"
       );

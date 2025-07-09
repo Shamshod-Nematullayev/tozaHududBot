@@ -48,7 +48,7 @@ export const sendEtkMfyReport = async (companyId = 1144) => {
       row.bajarilishi_foizda = Math.floor(row.procent) + " %";
     });
     ejs.renderFile(
-      "./views/pnfilKiritishHisobot.ejs",
+      "./src/views/pnfilKiritishHisobot.ejs",
       {
         data: rows,
         jamiKiritilgan,
@@ -68,14 +68,19 @@ export const sendEtkMfyReport = async (companyId = 1144) => {
         });
         const buffer = Buffer.from(binaryData, "binary");
 
-        bot.telegram.sendPhoto(
-          company.GROUP_ID_NAZORATCHILAR,
-          { source: buffer },
-          {
-            caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
-            parse_mode: "HTML",
-          }
-        );
+        try {
+          await bot.telegram.sendPhoto(
+            company.GROUP_ID_NAZORATCHILAR,
+            // process.env.ME,
+            { source: buffer },
+            {
+              caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
+              parse_mode: "HTML",
+            }
+          );
+        } catch (error) {
+          console.error(company.GROUP_ID_NAZORATCHILAR, error.message);
+        }
       }
     );
   } catch (error) {

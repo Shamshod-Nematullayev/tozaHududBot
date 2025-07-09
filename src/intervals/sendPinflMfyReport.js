@@ -64,7 +64,7 @@ export async function sendPinflMfyReport(companyId) {
     mahallalar.sort((a, b) => b.procent - a.procent);
 
     ejs.renderFile(
-      "./views/pnfilKiritishHisobot.ejs",
+      "./src/views/pnfilKiritishHisobot.ejs",
       {
         data: mahallalar,
         jamiKiritilgan,
@@ -84,15 +84,19 @@ export async function sendPinflMfyReport(companyId) {
         });
         const buffer = Buffer.from(binaryData, "binary");
 
-        await bot.telegram.sendPhoto(
-          company.GROUP_ID_NAZORATCHILAR,
-          // process.env.ME,
-          { source: buffer },
-          {
-            caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
-            parse_mode: "HTML",
-          }
-        );
+        try {
+          await bot.telegram.sendPhoto(
+            company.GROUP_ID_NAZORATCHILAR,
+            // process.env.ME,
+            { source: buffer },
+            {
+              caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
+              parse_mode: "HTML",
+            }
+          );
+        } catch (error) {
+          console.error(company.GROUP_ID_NAZORATCHILAR, error.message);
+        }
       }
     );
   } catch (error) {

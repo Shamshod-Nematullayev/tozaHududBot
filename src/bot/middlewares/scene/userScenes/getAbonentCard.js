@@ -53,7 +53,7 @@ export const getAbonentCard = new WizardScene(
       ).data;
       const html = await new Promise((resolve, reject) => {
         ejs.renderFile(
-          "./views/abonentKarta.ejs",
+          "./src/views/abonentKarta.ejs",
           { ...data },
           {},
           (err, str) => {

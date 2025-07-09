@@ -73,7 +73,7 @@ export async function sendKunlikPinflReports(companyId = 1144) {
     });
 
     ejs.renderFile(
-      "./views/kunlikMalumotKiritishHisoboti.ejs",
+      "./src/views/kunlikMalumotKiritishHisoboti.ejs",
       {
         allConfirmed,
         allConfirmedHourly,

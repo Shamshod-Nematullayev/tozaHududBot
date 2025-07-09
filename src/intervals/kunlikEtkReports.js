@@ -80,7 +80,7 @@ export async function sendKunlikEtkReports(
     });
 
     ejs.renderFile(
-      "./views/kunlikMalumotKiritishHisoboti.ejs",
+      "./src/views/kunlikMalumotKiritishHisoboti.ejs",
       {
         allConfirmed,
         allConfirmedHourly,

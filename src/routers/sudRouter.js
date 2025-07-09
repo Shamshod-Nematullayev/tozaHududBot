@@ -161,7 +161,7 @@ router.put(
         })
       ).data;
       ejs.renderFile(
-        "./views/hybridPochtaCash.ejs",
+        "./src/views/hybridPochtaCash.ejs",
         { mail },
         (err, result) => {
           if (err) throw err;

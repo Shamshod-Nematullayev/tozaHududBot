@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 
-interface IAbonent {
+export interface IAbonent {
   id: number;
   fio: string;
   last_name: string;
@@ -66,7 +66,9 @@ const courtProcessSchema = new Schema(
   { _id: false }
 );
 
-const schema = new Schema<IAbonent>(
+export interface IAbonentDoc extends IAbonent, Document {}
+
+const schema = new Schema<IAbonentDoc>(
   {
     id: {
       type: Number,
@@ -90,7 +92,7 @@ const schema = new Schema<IAbonent>(
       max: 12,
       min: 12,
     },
-    energy_licshet: Number,
+    energy_licshet: String,
     kadastr_number: String,
     mahalla_name: String,
     mahallas_id: {
@@ -130,5 +132,27 @@ const schema = new Schema<IAbonent>(
     timestamps: true,
   }
 );
+
+export interface AbonentDoc {
+  id: number;
+  fio: string;
+  last_name: string;
+  first_name: string;
+  middle_name: string;
+  licshet: string;
+  accountNumber: string;
+  caotoNumber: string;
+  companyId: number;
+  isConfirm: any;
+  createdAt: Date;
+  updatedAt: Date;
+  shaxsi_tasdiqlandi?: any;
+  shaxsi_tasdiqlandi_history?: any[];
+  ekt_kod_tasdiqlandi?: any;
+  street_tasdiqlandi?: any;
+  phone_tasdiqlandi?: any;
+  sudAkt?: any;
+  warningLetter?: any;
+}
 
 export const Abonent = model("billing_abonent", schema);

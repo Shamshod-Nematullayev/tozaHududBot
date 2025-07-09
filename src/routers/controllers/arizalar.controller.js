@@ -13,7 +13,7 @@ import { PDFDocument } from "pdf-lib";
 
 import PDFMerger from "pdf-merger-js";
 import FormData from "form-data";
-import { getOrCreateActPackId } from "../../services/billing.service";
+import { getOrCreateActPackId } from "@services/billing/getOrCreateActPackId";
 
 export const getArizalar = async (req, res) => {
   try {

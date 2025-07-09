@@ -198,7 +198,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene(
       ).data;
       const html = await new Promise(async (resolve, reject) => {
         ejs.renderFile(
-          "./views/hybridPochtaCash.ejs",
+          "./src/views/hybridPochtaCash.ejs",
           { mail },
           async (err, html) => {
             if (err) return reject(err);

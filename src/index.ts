@@ -107,7 +107,7 @@ app.use((req: MyRequest, res: Response, next: NextFunction) => {
 function useTelegramBot() {
   import("./bot/core/bot.js");
   import("./bot/middlewares/index.js");
-  // import("./bot/actions/index");
+  import("./bot/actions/index");
 }
 useTelegramBot();
 
