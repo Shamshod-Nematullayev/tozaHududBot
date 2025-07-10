@@ -7,14 +7,49 @@ export const arizaDocumentTypes = [
   "death",
   "gps",
   "pul_kuchirish",
-];
+] as const;
 
-const schema = new mongoose.Schema({
+interface IAriza {
+  fio: string;
+  abonentId: number;
+  asosiy_licshet: string;
+  ikkilamchi_licshet: string;
+  needMonayTransferActs: any[];
+  sana: Date;
+  document_type: (typeof arizaDocumentTypes)[number];
+  document_number: number;
+  licshet: string;
+  comment: string;
+  aktSummasi: number;
+  aktSummCounts: {
+    total: number;
+  };
+  current_prescribed_cnt: number;
+  next_prescribed_cnt: number;
+  status: string;
+  photos: string[];
+  recalculationPeriods: any[];
+  muzlatiladi: boolean;
+  is_canceled: boolean;
+  acceptedDate: Date;
+  akt_date: Date;
+  canceling_description: string;
+  akt_pachka_id: string;
+  akt_id: string;
+  actStatus: "NEW" | "CONFIRMED" | "WARNED" | "REJECTED";
+  aktInfo: any;
+  tempPhotos: string[];
+  actHistory: any[];
+  companyId: number;
+  version: number;
+}
+
+const schema = new mongoose.Schema<IAriza>({
+  fio: String,
+  abonentId: Number,
   asosiy_licshet: String,
   ikkilamchi_licshet: String,
-  needMonayTransferActs: {
-    type: Array,
-  },
+  needMonayTransferActs: Array,
   sana: {
     type: Date,
     required: true,
@@ -90,17 +125,17 @@ const schema = new mongoose.Schema({
   },
   aktInfo: Object,
   photos: {
-    type: Array,
+    type: [String],
     default: [],
   },
   tempPhotos: {
-    type: Array,
+    type: [String],
     default: [],
   },
   recalculationPeriods: Array,
   muzlatiladi: Boolean,
   actHistory: {
-    type: Array,
+    type: [Object],
     default: [],
   },
   companyId: {

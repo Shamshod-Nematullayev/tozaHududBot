@@ -14,14 +14,22 @@ import { PDFDocument } from "pdf-lib";
 import PDFMerger from "pdf-merger-js";
 import FormData from "form-data";
 import { getOrCreateActPackId } from "@services/billing/getOrCreateActPackId";
+import { Request, Response } from "express";
+import { CreateArizaDto } from "types/ariza.dto";
+import { getPagination } from "./utils/pagination";
+import { CustomRequest } from "types/express";
+import {
+  createArizaBodySchema,
+  getArizalarQuerySchema,
+} from "@schemas/ariza.schema";
+import { ZodError } from "zod";
 
-export const getArizalar = async (req, res) => {
+export const getArizalar = async (req: CustomRequest, res: Response) => {
   try {
+    const parsed = getArizalarQuerySchema.parse(req.query);
+    const { skip, limit, sort, meta } = getPagination(parsed);
+
     const {
-      page = 1,
-      limit = 10,
-      sortField = "sana",
-      sortDirection = "desc",
       document_type,
       document_number,
       account_number,
@@ -34,15 +42,10 @@ export const getArizalar = async (req, res) => {
       act_amount_to,
       ariza_status,
       act_status,
-    } = req.query;
-
-    const sortOptions = {};
-    sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
-
-    const skip = (parseInt(page) - 1) * limit; // Nechta elementni o'tkazib yuborish
+    } = parsed;
 
     // Filtrni dinamik shakllantirish
-    const filters = { companyId: req.user.companyId };
+    const filters: any = { companyId: req.user.companyId };
     if (document_type) filters.document_type = document_type;
     if (document_number) filters.document_number = document_number;
     if (account_number) filters.licshet = account_number;
@@ -57,43 +60,44 @@ export const getArizalar = async (req, res) => {
     if (act_from_date) filters.akt_date = { $gte: new Date(act_from_date) };
     if (act_to_date)
       filters.akt_date = { ...filters.akt_date, $lte: new Date(act_to_date) };
-    if (act_amount_from)
-      filters.aktSummasi = { $gte: parseFloat(act_amount_from) };
+    if (act_amount_from) filters.aktSummasi = { $gte: act_amount_from };
     if (act_amount_to)
       filters.aktSummasi = {
         ...filters.aktSummasi,
-        $lte: parseFloat(act_amount_to),
+        $lte: act_amount_to,
       };
     if (ariza_status) filters.status = ariza_status;
     if (act_status) filters.actStatus = act_status;
 
     // Ma'lumotlarni qidirish
-    const data = await Ariza.find(filters)
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(parseInt(limit))
-      .lean(); // Plain obyekt
+    const data = await Ariza.find(filters).sort(sort).skip(skip).limit(limit);
+    const total = await Ariza.countDocuments(filters);
 
-    const totalCount = await Ariza.countDocuments(filters);
-
-    res.status(200).json({
+    res.json({
       ok: true,
-      data: data,
+      data,
       meta: {
-        total: totalCount,
-        page: page,
-        limit: limit,
-        totalPages: Math.ceil(totalCount / limit),
+        ...meta,
+        total,
+        totalPages: Math.ceil(total / meta.limit),
       },
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        ok: false,
+        message: "Invalid query params",
+        issues: error.issues, // foydalanuvchi ko'rishi uchun
+      });
+    }
+
     res
       .status(500)
-      .json({ ok: false, message: `internal error: ${error.message}` });
+      .json({ ok: false, message: `internal error: ${error?.message}` });
   }
 };
 
-export const getArizaById = async (req, res) => {
+export const getArizaById = async (req: CustomRequest, res: Response) => {
   try {
     const ariza = await Ariza.findOne({
       _id: req.params._id,
@@ -105,19 +109,21 @@ export const getArizaById = async (req, res) => {
         message: "Ariza topilmadi",
       });
     const abonent = await Abonent.findOne({ licshet: ariza.licshet });
-    ariza.fio = abonent.fio;
-    ariza.abonentId = abonent.id;
+    ariza.fio = abonent?.fio;
+    ariza.abonentId = abonent?.id;
     res.json({
       ok: true,
       ariza,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    res.json({ ok: false, message: `internal error: ${error.message}` });
+    res
+      .status(500)
+      .json({ ok: false, message: `internal error: ${error.message}` });
   }
 };
 
-export const cancelArizaById = async (req, res) => {
+export const cancelArizaById = async (req: CustomRequest, res: Response) => {
   try {
     const { _id, canceling_description } = req.body;
     const ariza = await Ariza.findOneAndUpdate(
@@ -131,19 +137,23 @@ export const cancelArizaById = async (req, res) => {
       }
     );
     if (!ariza)
-      return res.json({
+      return res.status(404).json({
         ok: false,
         message: "Ariza topilmadi",
       });
     res.json({ ok: true, message: "Ariza bekor qilindi" });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.json({ ok: false, message: `internal error: ${error.message}` });
   }
 };
 
-export const createAriza = async (req, res) => {
+export const createAriza = async (
+  req: Request<{}, {}, CreateArizaDto>,
+  res: Response
+) => {
   try {
+    const parsedBody = createArizaBodySchema.parse(req.body);
     const {
       licshet,
       ikkilamchi_licshet,
@@ -155,17 +165,8 @@ export const createAriza = async (req, res) => {
       photos,
       recalculationPeriods,
       muzlatiladi,
-    } = req.body;
+    } = parsedBody;
     // validate the request
-    if (!licshet) return res.json({ ok: false, message: "Licshet not found" });
-    if (
-      document_type !== "dvaynik" &&
-      document_type !== "viza" &&
-      document_type !== "odam_soni" &&
-      document_type !== "death" &&
-      document_type !== "gps"
-    )
-      return res.json({ ok: false, message: "Noma'lum xujjat turi kiritildi" });
     if (
       (document_type === "viza" && !akt_summasi.total) ||
       (document_type === "viza" && akt_summasi.total === 0)
@@ -180,14 +181,6 @@ export const createAriza = async (req, res) => {
         ok: false,
         message: "Ikkilamchi aktlarda dvaynik kod kiritilishi majburiy!",
       });
-    if (document_type === "odam_soni") {
-      if (isNaN(current_prescribed_cnt) || isNaN(next_prescribed_cnt))
-        return res.json({
-          ok: false,
-          message:
-            "Odam soni hozirgi kundagi va keyin bo'lishi kerak bo'lgan odam soni kiritilishi majburiy!",
-        });
-    }
     if (
       document_type === "death" &&
       next_prescribed_cnt === current_prescribed_cnt &&

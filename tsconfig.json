@@ -24,6 +24,7 @@
       "@bot/*": ["bot/*"],
       "@api/*": ["api/*"],
       "@services/*": ["services/*"],
+      "@schemas/*": ["schemas/*"],
       "./src/views/*": ["views/*"]
     },
     "sourceMap": true

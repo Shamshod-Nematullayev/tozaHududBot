@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import { bot } from "../bot/core/bot.js";
 import axios from "axios";
 import isAuth from "../middlewares/isAuth.ts";
-import { User } from "@models/User.js";
 import { Company } from "@models/Company.ts";
 import { MyRequest } from "interfaces/express.interfaces.ts";
 import { NextFunction, Response, Router } from "express";

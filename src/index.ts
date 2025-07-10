@@ -60,7 +60,7 @@ if (launchBot) {
 connectDb();
 
 // use routers
-import authRouter from "./routers/auth.js";
+import authRouter from "./routers/auth.route";
 import statisticsRouter from "./routers/statisticsRouter.js";
 import notificationRouter from "./routers/notificationRouter.js";
 import sudRouter from "./routers/sudRouter.js";
@@ -72,7 +72,7 @@ import kiruvchiXujjatlarRouter from "./routers/kiruvchiXujjatlar.js";
 import inspectorsRouter from "./routers/inspectorsRouter.js";
 import abonentsRouter from "./routers/abonentsRouter.js";
 import billingRouter from "./routers/billing.js";
-import arizalarRouter from "./routers/arizalarRouter.js";
+import arizalarRouter from "./routers/arizalar.route.js";
 import newAbonentsRouter from "./routers/newAbonentsRouter.js";
 import yashovchiSoniXatlovRouter from "./routers/yashovchiSoniXatlov.js";
 import reportsRouter from "./routers/reportsRouter.js";

@@ -45,7 +45,8 @@
     "telegraf-session-local": "^2.1.1",
     "tsconfig-paths": "^4.2.0",
     "uuid": "^9.0.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^4.0.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
