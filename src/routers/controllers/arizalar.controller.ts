@@ -109,8 +109,10 @@ export const getArizaById = async (req: CustomRequest, res: Response) => {
         message: "Ariza topilmadi",
       });
     const abonent = await Abonent.findOne({ licshet: ariza.licshet });
-    ariza.fio = abonent?.fio;
-    ariza.abonentId = abonent?.id;
+    if (!abonent)
+      return res.status(404).json({ ok: false, message: "Abonent topilmadi" });
+    ariza.fio = abonent.fio;
+    ariza.abonentId = abonent.id;
     res.json({
       ok: true,
       ariza,
@@ -148,15 +150,12 @@ export const cancelArizaById = async (req: CustomRequest, res: Response) => {
   }
 };
 
-export const createAriza = async (
-  req: Request<{}, {}, CreateArizaDto>,
-  res: Response
-) => {
+export const createAriza = async (req: CustomRequest, res: Response) => {
   try {
     const parsedBody = createArizaBodySchema.parse(req.body);
     const {
-      licshet,
-      ikkilamchi_licshet,
+      account_number,
+      dublicat_account_number,
       document_type,
       akt_summasi,
       current_prescribed_cnt,
@@ -167,47 +166,27 @@ export const createAriza = async (
       muzlatiladi,
     } = parsedBody;
     // validate the request
-    if (
-      (document_type === "viza" && !akt_summasi.total) ||
-      (document_type === "viza" && akt_summasi.total === 0)
-    )
-      return res.json({
-        ok: false,
-        message: "Viza arizalariga akt summasi kiritish majburiy!",
-      });
-
-    if (document_type === "dvaynik" && !ikkilamchi_licshet)
-      return res.json({
-        ok: false,
-        message: "Ikkilamchi aktlarda dvaynik kod kiritilishi majburiy!",
-      });
-    if (
-      document_type === "death" &&
-      next_prescribed_cnt === current_prescribed_cnt &&
-      akt_summasi.total === 0
-    ) {
-      if (!current_prescribed_cnt || !next_prescribed_cnt)
-        return res.json({
-          ok: false,
-          message: "Majburiy qiymatlar kiritilmagan",
-        });
-    }
 
     const counter = await Counter.findOne({
       name: "ariza_tartib_raqami",
       companyId: req.user.companyId,
       arizaDocumentType: document_type,
     });
+    if (!counter)
+      return res.status(404).json({
+        ok: false,
+        message: "Ariza tartib raqami topilmadi",
+      });
     const newAriza = await Ariza.create({
-      licshet: licshet,
-      ikkilamchi_licshet: ikkilamchi_licshet,
-      asosiy_licshet: licshet,
+      licshet: account_number,
+      ikkilamchi_licshet: dublicat_account_number,
+      asosiy_licshet: account_number,
       document_number: counter.value + 1,
       document_type: document_type,
       comment: comment,
       current_prescribed_cnt: current_prescribed_cnt,
       next_prescribed_cnt: next_prescribed_cnt,
-      aktSummasi: parseInt(akt_summasi.total),
+      aktSummasi: akt_summasi.total,
       aktSummCounts: akt_summasi,
       sana: Date.now(),
       photos: photos,
@@ -217,9 +196,16 @@ export const createAriza = async (
     });
     await counter.updateOne({ $set: { value: counter.value + 1 } });
     res.json({ ok: true, ariza: newAriza });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        ok: false,
+        message: "Invalid request body",
+        issues: error.issues, // foydalanuvchi ko'rishi uchun
+      });
+    }
     console.error(error);
-    res.json({ ok: false, message: `internal error: ${error.message}` });
+    res.json({ ok: false, message: `internal error: Unknown error` });
   }
 };
 

@@ -2,7 +2,21 @@ import mongoose from "mongoose";
 import { arizaDocumentTypes } from "./Ariza";
 import { Company } from "./Company";
 
-const schema = new mongoose.Schema(
+interface ICounter {
+  value: number;
+  name: string;
+  last_update: Date;
+  arizaDocumentType:
+    | "dvaynik"
+    | "odam_soni"
+    | "viza"
+    | "death"
+    | "gps"
+    | "pul_kuchirish";
+  companyId: number;
+}
+
+const schema = new mongoose.Schema<ICounter>(
   {
     value: Number,
     name: String,

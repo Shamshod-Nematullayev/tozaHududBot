@@ -1,4 +1,5 @@
 import { arizaDocumentTypes } from "@models/Ariza";
+import mongoose from "mongoose";
 import z from "zod";
 
 export const getArizalarQuerySchema = z.object({
@@ -24,19 +25,30 @@ export const getArizalarQuerySchema = z.object({
   act_status: z.string().optional(),
 });
 
+const accountNumberRegex = [
+  /^\d{12}$/,
+  "uzunligi 12 ta raqamdan iborat matn bo'lishi kerak",
+] as const;
+
 export const createArizaBodySchema = z
   .object({
     document_type: z.enum(arizaDocumentTypes),
-    licshet: z.string().length(12),
+    account_number: z.string().regex(...accountNumberRegex),
     document_number: z.number(),
-    dublicat_account_number: z.string().optional(),
+    dublicat_account_number: z
+      .string()
+      .regex(...accountNumberRegex)
+      .optional(),
     total: z.number(),
     current_prescribed_cnt: z.number().optional(),
     next_prescribed_cnt: z.number().optional(),
     comment: z.string().optional(),
     photos: z.array(z.string()).optional(),
-    ikkilamchi_licshet: z.string().length(12),
-    akt_summasi: z.object({ total: z.number() }),
+    akt_summasi: z.object({
+      total: z.number(),
+      withQQSTotal: z.number(),
+      withoutQQSTotal: z.number(),
+    }),
     recalculationPeriods: z.array(
       z.object({
         startDate: z.coerce.date(),
@@ -57,7 +69,7 @@ export const createArizaBodySchema = z
       });
     }
 
-    if (data.document_type === "dvaynik" && !data.ikkilamchi_licshet) {
+    if (data.document_type === "dvaynik" && !data.dublicat_account_number) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["ikkilamchi_licshet"],
@@ -77,3 +89,10 @@ export const createArizaBodySchema = z
       });
     }
   });
+
+export const cancelArizaByIdSchema = z.object({
+  _id: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+    message: "Invalid ObjectId",
+  }),
+  canceling_description: z.string(),
+});
