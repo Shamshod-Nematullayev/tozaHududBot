@@ -21,7 +21,10 @@ const schema = new mongoose.Schema<ICounter>(
     value: Number,
     name: String,
     last_update: Date,
-    arizaDocumentType: String,
+    arizaDocumentType: {
+      type: String,
+      enum: arizaDocumentTypes,
+    },
     companyId: {
       type: Number,
       required: true,
@@ -50,8 +53,12 @@ export const Counter = mongoose.model("counter", schema, "counter");
       checkAndCreateCounter("ariza_tartib_raqami", company.id, documentType)
     );
   });
-  async function checkAndCreateCounter(name, companyId, documentType) {
-    const filters = { name, companyId };
+  async function checkAndCreateCounter(
+    name: string,
+    companyId: number,
+    documentType?: string
+  ) {
+    const filters: any = { name, companyId };
     if (documentType) filters.arizaDocumentType = documentType;
     const counter = await Counter.findOne(filters);
     if (!counter) {

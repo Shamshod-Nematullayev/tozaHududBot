@@ -106,3 +106,47 @@ export const changeArizaActBodySchema = z.object({
   photos: z.array(z.string()).optional(),
   actNumber: z.string(),
 });
+
+export const createMonayTransferArizaBodySchema = z
+  .object({
+    debitorAct: z.object({
+      accountNumber: z.string().regex(...accountNumberRegex),
+      amount: z.number().gt(0),
+    }),
+    creditorActs: z.array(
+      z.object({
+        accountNumber: z.string().regex(...accountNumberRegex),
+        amount: z.number().gt(0),
+      })
+    ),
+  })
+  .superRefine((data, ctx) => {
+    if (data.creditorActs.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["creditorActs"],
+        message: "Kreditor aktlar ro'yxati kiritilmadi!",
+      });
+    }
+    if (
+      data.creditorActs.reduce((total, act) => total + act.amount, 0) !==
+      data.debitorAct.amount
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["creditorActs"],
+        message: "Kreditor aktlar to'plami debitor actga teng bo'lishi kerak!",
+      });
+    }
+    if (
+      data.creditorActs.find(
+        (a) => a.accountNumber === data.debitorAct.accountNumber
+      )
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["creditorActs"],
+        message: "Kreditor aktlar ichida debitor abonent bo'lmasligi kerak!",
+      });
+    }
+  });

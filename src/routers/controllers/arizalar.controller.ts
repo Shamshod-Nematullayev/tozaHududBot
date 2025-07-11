@@ -20,9 +20,10 @@ import {
   cancelArizaByIdSchema,
   changeArizaActBodySchema,
   createArizaBodySchema,
+  createMonayTransferArizaBodySchema,
   getArizalarQuerySchema,
 } from "@schemas/ariza.schema";
-import { ZodError } from "zod";
+import z, { ZodError } from "zod";
 import {
   calculateKSaldo,
   createAct,
@@ -168,7 +169,6 @@ export const createAriza: Handler = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  const parsedBody = createArizaBodySchema.parse(req.body);
   const {
     account_number,
     dublicat_account_number,
@@ -180,7 +180,7 @@ export const createAriza: Handler = async (
     photos,
     recalculationPeriods,
     muzlatiladi,
-  } = parsedBody;
+  } = createArizaBodySchema.parse(req.body);
   // validate the request
 
   const counter = await Counter.findOne({
@@ -320,7 +320,7 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
     return res.status(404).json({ ok: false, message: "Abonent topilmadi" });
   }
 
-  // 🖼️ 1. Faylni olish
+  // 📁 1. Faylni olish
   let file = req.file?.buffer;
   if (!file)
     file = await getFileAsBuffer(
@@ -372,11 +372,13 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
       startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
     });
   } else {
+    // Yangi akt uchun pachkani olish
     ariza.akt_pachka_id = await getOrCreateActPackId(
       ariza.document_type,
       tozaMakonApi,
       req.user.companyId
     );
+    // Yangi akt yaratish
     ariza.akt_id = await createAct(tozaMakonApi, {
       kSaldo,
       amountWithQQS,
@@ -391,10 +393,10 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
       endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
       startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
     });
-    ariza.aktInfo = await getActInfo(tozaMakonApi, ariza.akt_id);
     ariza.actStatus = "NEW";
   }
 
+  ariza.aktInfo = await getActInfo(tozaMakonApi, ariza.akt_id);
   ariza.status = "qayta_akt_kiritilgan";
   ariza.akt_date = date;
   ariza.actHistory.push(ariza.aktInfo);
@@ -405,73 +407,50 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
   res.json({ ok: true, ariza });
 };
 
-export const addImageToAriza = async (req, res) => {
-  try {
-    const { ariza_id } = req.params;
-    const { file_id } = req.body;
-    const ariza = await Ariza.findOne({
-      _id: ariza_id,
-      companyId: req.user.companyId,
-    });
-    if (!file_id) {
-      return res.status(400).json({ ok: false, message: "Fayl ID topilmadi" });
-    }
-    if (!ariza) {
-      return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
-    }
-    const updatedAriza = await Ariza.findByIdAndUpdate(
-      ariza_id,
-      { $push: { tempPhotos: file_id } },
-      { new: true }
-    );
-    res.json({ ok: true, message: "Biriktirildi", ariza: updatedAriza });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ ok: false, message: "Internal server error" });
+export const addImageToAriza = async (req: Request, res: Response) => {
+  const { ariza_id } = z.parse(z.object({ ariza_id: z.string() }), req.params);
+  const { file_id } = z.parse(z.object({ file_id: z.string() }), req.body);
+  const ariza = await Ariza.findOne({
+    _id: ariza_id,
+    companyId: req.user.companyId,
+  });
+  if (!ariza) {
+    return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
   }
+  ariza.tempPhotos.push(file_id);
+  await ariza.save();
+  res.json({ ok: true, message: "Biriktirildi", ariza });
 };
 
-export const createMonayTransferAriza = async (req, res) => {
-  try {
-    let { debitorAct, creditorActs } = req.body;
-    if (
-      debitorAct.amount !==
-      creditorActs.reduce((total, act) => total + act.amount, 0)
-    ) {
-      return res.status(400).json({
-        ok: false,
-        message: "creditor actlar to'plami debitor actga teng bo'lishi kerak",
-      });
-    }
-    if (
-      creditorActs.find((a) => a.accountNumber === debitorAct.accountNumber)
-    ) {
-      return res.status(400).json({
-        ok: false,
-        message: "creditor actlar ichida debitor abonent bo'lmasligi kerak",
-      });
-    }
-    const counter = await Counter.findOne({
-      companyId: req.user.companyId,
-      arizaDocumentType: "pul_kuchirish",
-      name: "ariza_tartib_raqami",
-    });
-    const ariza = await Ariza.create({
-      licshet: debitorAct.accountNumber,
-      document_type: "pul_kuchirish",
-      companyId: req.user.companyId,
-      document_number: counter.value + 1,
-      needMonayTransferActs: creditorActs,
-    });
-    await counter.updateOne({ $set: { value: counter.value + 1 } });
-    res.json({ ok: true, ariza });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ ok: false, message: "Internal server error" });
-  }
+export const createMonayTransferAriza = async (req: Request, res: Response) => {
+  let { debitorAct, creditorActs } = createMonayTransferArizaBodySchema.parse(
+    req.body
+  );
+
+  const counter = await Counter.findOne({
+    companyId: req.user.companyId,
+    arizaDocumentType: "pul_kuchirish",
+    name: "ariza_tartib_raqami",
+  });
+  if (!counter)
+    return res
+      .status(404)
+      .json({ ok: false, message: "Ariza tartib raqami topilmadi" });
+  const ariza = await Ariza.create({
+    licshet: debitorAct.accountNumber,
+    document_type: "pul_kuchirish",
+    companyId: req.user.companyId,
+    document_number: counter.value + 1,
+    needMonayTransferActs: creditorActs,
+  });
+  await counter.updateOne({ $set: { value: counter.value + 1 } });
+  res.json({ ok: true, ariza });
 };
 
-export const createMonayTransferActByAriza = async (req, res) => {
+export const createMonayTransferActByAriza = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const ariza = await Ariza.findOne({
       _id: req.params._id,
@@ -480,30 +459,29 @@ export const createMonayTransferActByAriza = async (req, res) => {
     if (!ariza) {
       return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
     }
+    if (!req.file) {
+      return res.status(404).json({ ok: false, message: "Fayl topilmadi" });
+    }
     const acts = [];
     const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+
     const formData = new FormData();
     formData.append("file", req.file.buffer, req.file.originalname);
-    const fileUploadResponse = (
-      await tozaMakonApi.post(
-        "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
-    ).data;
-    const fileId =
-      fileUploadResponse.fileName + "*" + fileUploadResponse.fileId;
+    const fileId = await uploadFileToTozaMakon(
+      tozaMakonApi,
+      req.file.buffer,
+      req.file.originalname,
+      "SPECIFIC_ACT"
+    );
+
     const actPackId = await getOrCreateActPackId(
       "pul_kuchirish",
       tozaMakonApi,
       req.user.companyId
     );
     const date = new Date();
-    const act = await createMonayTransferAct(ariza, req.user.companyId, req);
+    // debitor abonentdan pul olish
+
     res.json({ ok: true, act });
   } catch (error) {
     console.error(error);

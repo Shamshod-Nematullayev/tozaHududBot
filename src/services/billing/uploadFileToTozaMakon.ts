@@ -4,20 +4,22 @@ import FormData from "form-data";
 /**
  * Faylni TozaMakon APIga yuklaydi va fileId qaytaradi
  */
-
 export async function uploadFileToTozaMakon(
   tozaMakonApi: Axios,
   buffer: Buffer,
-  filename: string
+  filename: string,
+  folderType: "SPECIFIC_ACT"
 ): Promise<string> {
   const formData = new FormData();
   formData.append("file", buffer, filename);
 
   const res = await tozaMakonApi.post(
-    "/file-service/buckets/upload?folderType=SPECIFIC_ACT",
+    "/file-service/buckets/upload?folderType=" + folderType,
     formData,
     {
-      headers: formData.getHeaders(),
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     }
   );
 
