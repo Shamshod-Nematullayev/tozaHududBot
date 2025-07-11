@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { IAct } from "types/billing";
 
 export const arizaDocumentTypes = [
   "dvaynik",
@@ -34,10 +35,10 @@ interface IAriza {
   acceptedDate: Date;
   akt_date: Date;
   canceling_description: string;
-  akt_pachka_id: string;
-  akt_id: string;
+  akt_pachka_id: number;
+  akt_id: number;
   actStatus: "NEW" | "CONFIRMED" | "WARNED" | "REJECTED";
-  aktInfo: any;
+  aktInfo: IAct;
   tempPhotos: string[];
   actHistory: any[];
   companyId: number;
@@ -108,8 +109,8 @@ const schema = new mongoose.Schema<IAriza>({
   acceptedDate: Date,
   canceling_description: String,
   akt_date: Date,
-  akt_pachka_id: String,
-  akt_id: String,
+  akt_pachka_id: Number,
+  akt_id: Number,
   actStatus: {
     type: String,
     enum: [

@@ -12,15 +12,16 @@ import {
   createMonayTransferAriza,
 } from "./controllers/arizalar.controller";
 import { uploadAsBlob } from "../middlewares/multer";
+import { catchAsync } from "./controllers/utils/catchAsync";
 
 const router = express.Router();
 
 // --- GET routes ---
-router.get("/", getArizalar); // GET all arizas
+router.get("/", catchAsync(getArizalar)); // GET all arizas
 router.get("/:id", getArizaById); // GET specific ariza
 
 // --- POST routes ---
-router.post("/", createAriza); // CREATE new ariza
+router.post("/", catchAsync(createAriza)); // CREATE new ariza
 router.post("/cancel", cancelArizaById); // Cancel ariza (non-idempotent)
 router.post("/money-transfer", createMonayTransferAriza); // Create transfer
 

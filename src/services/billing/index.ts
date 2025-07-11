@@ -12,3 +12,6 @@ export * from "./getCitizen";
 export * from "./searchAbonent";
 export * from "./getResidentHousesByPnfl";
 export * from "./getAbonentById";
+export * from "./getResidentActs";
+export * from "./updateAct";
+export * from "./getActInfo";

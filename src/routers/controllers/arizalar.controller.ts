@@ -14,17 +14,30 @@ import { PDFDocument } from "pdf-lib";
 import PDFMerger from "pdf-merger-js";
 import FormData from "form-data";
 import { getOrCreateActPackId } from "@services/billing/getOrCreateActPackId";
-import { Request, Response } from "express";
-import { CreateArizaDto } from "types/ariza.dto";
+import { Handler, Request, Response } from "express";
 import { getPagination } from "./utils/pagination";
-import { CustomRequest } from "types/express";
 import {
+  cancelArizaByIdSchema,
+  changeArizaActBodySchema,
   createArizaBodySchema,
   getArizalarQuerySchema,
 } from "@schemas/ariza.schema";
 import { ZodError } from "zod";
+import {
+  calculateKSaldo,
+  createAct,
+  getActInfo,
+  getFileAsBuffer,
+  getResidentActs,
+  updateAct,
+  uploadFileToTozaMakon,
+} from "@services/billing";
+import { mergePhotosWithPdf } from "./utils/mergePhotosWithPdf";
 
-export const getArizalar = async (req: CustomRequest, res: Response) => {
+export const getArizalar = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
   try {
     const parsed = getArizalarQuerySchema.parse(req.query);
     const { skip, limit, sort, meta } = getPagination(parsed);
@@ -97,7 +110,10 @@ export const getArizalar = async (req: CustomRequest, res: Response) => {
   }
 };
 
-export const getArizaById = async (req: CustomRequest, res: Response) => {
+export const getArizaById = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
   try {
     const ariza = await Ariza.findOne({
       _id: req.params._id,
@@ -125,402 +141,269 @@ export const getArizaById = async (req: CustomRequest, res: Response) => {
   }
 };
 
-export const cancelArizaById = async (req: CustomRequest, res: Response) => {
-  try {
-    const { _id, canceling_description } = req.body;
-    const ariza = await Ariza.findOneAndUpdate(
-      { _id, companyId: req.user.companyId },
-      {
-        $set: {
-          status: "bekor qilindi",
-          canceling_description,
-          is_canceled: true,
-        },
-      }
-    );
-    if (!ariza)
-      return res.status(404).json({
-        ok: false,
-        message: "Ariza topilmadi",
-      });
-    res.json({ ok: true, message: "Ariza bekor qilindi" });
-  } catch (error: any) {
-    console.error(error);
-    res.json({ ok: false, message: `internal error: ${error.message}` });
-  }
-};
-
-export const createAriza = async (req: CustomRequest, res: Response) => {
-  try {
-    const parsedBody = createArizaBodySchema.parse(req.body);
-    const {
-      account_number,
-      dublicat_account_number,
-      document_type,
-      akt_summasi,
-      current_prescribed_cnt,
-      next_prescribed_cnt,
-      comment,
-      photos,
-      recalculationPeriods,
-      muzlatiladi,
-    } = parsedBody;
-    // validate the request
-
-    const counter = await Counter.findOne({
-      name: "ariza_tartib_raqami",
-      companyId: req.user.companyId,
-      arizaDocumentType: document_type,
-    });
-    if (!counter)
-      return res.status(404).json({
-        ok: false,
-        message: "Ariza tartib raqami topilmadi",
-      });
-    const newAriza = await Ariza.create({
-      licshet: account_number,
-      ikkilamchi_licshet: dublicat_account_number,
-      asosiy_licshet: account_number,
-      document_number: counter.value + 1,
-      document_type: document_type,
-      comment: comment,
-      current_prescribed_cnt: current_prescribed_cnt,
-      next_prescribed_cnt: next_prescribed_cnt,
-      aktSummasi: akt_summasi.total,
-      aktSummCounts: akt_summasi,
-      sana: Date.now(),
-      photos: photos,
-      recalculationPeriods: recalculationPeriods,
-      muzlatiladi: muzlatiladi,
-      companyId: req.user.companyId,
-    });
-    await counter.updateOne({ $set: { value: counter.value + 1 } });
-    res.json({ ok: true, ariza: newAriza });
-  } catch (error: unknown) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({
-        ok: false,
-        message: "Invalid request body",
-        issues: error.issues, // foydalanuvchi ko'rishi uchun
-      });
+export const cancelArizaById = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const { _id, canceling_description } = cancelArizaByIdSchema.parse(req.body);
+  const ariza = await Ariza.findOneAndUpdate(
+    { _id, companyId: req.user.companyId },
+    {
+      $set: {
+        status: "bekor qilindi",
+        canceling_description,
+        is_canceled: true,
+      },
     }
-    console.error(error);
-    res.json({ ok: false, message: `internal error: Unknown error` });
-  }
-};
-
-export const moveToInboxAriza = async (req, res) => {
-  try {
-    await Ariza.findOneAndUpdate(
-      {
-        _id: req.params.ariza_id,
-        companyId: req.user.companyId,
-      },
-      {
-        $set: {
-          acceptedDate: new Date(),
-          status: "qabul qilindi",
-        },
-      }
-    );
-    res.status(200).json({
-      ok: true,
+  );
+  if (!ariza)
+    return res.status(404).json({
+      ok: false,
+      message: "Ariza topilmadi",
     });
-  } catch (error) {
-    console.error(error);
-    res.json({ ok: false, message: `internal error: ${error.message}` });
-  }
+  res.json({ ok: true, message: "Ariza bekor qilindi" });
 };
 
-export const updateArizaById = async (req, res) => {
-  try {
-    await Ariza.findOneAndUpdate(
-      {
-        _id: req.params.ariza_id,
-        companyId: req.user.companyId,
-      },
-      {
-        $set: {
-          ...req.body,
-        },
-      },
-      { new: true }
-    );
-    res.status(200).json({
-      ok: true,
+export const createAriza: Handler = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const parsedBody = createArizaBodySchema.parse(req.body);
+  const {
+    account_number,
+    dublicat_account_number,
+    document_type,
+    akt_summasi,
+    current_prescribed_cnt,
+    next_prescribed_cnt,
+    comment,
+    photos,
+    recalculationPeriods,
+    muzlatiladi,
+  } = parsedBody;
+  // validate the request
+
+  const counter = await Counter.findOne({
+    name: "ariza_tartib_raqami",
+    companyId: req.user.companyId,
+    arizaDocumentType: document_type,
+  });
+  if (!counter)
+    return res.status(404).json({
+      ok: false,
+      message: "Ariza tartib raqami topilmadi",
     });
-  } catch (error) {
-    console.error(error);
-    res.json({ ok: false, message: `internal error: ${error.message}` });
-  }
+  const newAriza = await Ariza.create({
+    licshet: account_number,
+    ikkilamchi_licshet: dublicat_account_number,
+    asosiy_licshet: account_number,
+    document_number: counter.value + 1,
+    document_type: document_type,
+    comment: comment,
+    current_prescribed_cnt: current_prescribed_cnt,
+    next_prescribed_cnt: next_prescribed_cnt,
+    aktSummasi: akt_summasi.total,
+    aktSummCounts: akt_summasi,
+    sana: Date.now(),
+    photos: photos,
+    recalculationPeriods: recalculationPeriods,
+    muzlatiladi: muzlatiladi,
+    companyId: req.user.companyId,
+  });
+  await counter.updateOne({ $set: { value: counter.value + 1 } });
+  res.json({ ok: true, ariza: newAriza });
 };
 
-export const updateArizaFromBillingById = async (req, res) => {
-  try {
-    const ariza = await Ariza.findOne({
+export const moveToInboxAriza: Handler = async (req, res) => {
+  await Ariza.findOneAndUpdate(
+    {
       _id: req.params.ariza_id,
       companyId: req.user.companyId,
-    });
-    if (!ariza)
-      return res.status(404).json({
-        ok: false,
-        message: "Ariza topilmadi",
-      });
-    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
-    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
-    const acts = (
-      await tozaMakonApi.get("/billing-service/acts", {
-        params: {
-          residentId: abonent.id,
-        },
-      })
-    ).data.content;
-    const act = acts.find((a) => a.id == ariza.akt_id);
-    const updates = {
-      actStatus: act.actStatus,
-      aktInfo: act,
-    };
-    if (act.actStatus === "CONFIRMED") updates.status = "tasdiqlangan";
-    const updatedAriza = await Ariza.findByIdAndUpdate(
-      ariza._id,
-      {
-        $set: updates,
+    },
+    {
+      $set: {
+        acceptedDate: new Date(),
+        status: "qabul qilindi",
       },
-      { new: true }
-    );
-    res.json({
-      ok: true,
-      ariza: updatedAriza,
-    });
-  } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ ok: false, message: `internal error: ${error.message}` });
-  }
+    }
+  );
+  res.status(200).json({
+    ok: true,
+  });
 };
 
-export const changeArizaAct = async (req, res) => {
-  try {
-    const { ariza_id } = req.params;
-    const {
-      allAmount,
-      inhabitantCount,
-      amountWithQQS,
-      amountWithoutQQS,
-      description,
-      photos,
-    } = req.body;
-
-    if (!allAmount || !amountWithQQS || !amountWithoutQQS || !description) {
-      return res
-        .status(400)
-        .json({ ok: false, message: "All fields are required" });
-    }
-
-    let file = req.file;
-    const ariza = await Ariza.findOne({
-      _id: ariza_id,
+export const updateArizaById: Handler = async (req, res) => {
+  await Ariza.findOneAndUpdate(
+    {
+      _id: req.params.ariza_id,
       companyId: req.user.companyId,
-    });
-    if (!ariza) {
-      return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
-    }
-
-    const abonent = await Abonent.findOne({ licshet: ariza.licshet });
-    if (!abonent) {
-      return res.status(404).json({ ok: false, message: "Abonent topilmadi" });
-    }
-
-    // PDF va rasmlarni birlashtirish
-    if (photos?.length > 0) {
-      file = await mergePhotosWithPdf(
-        photos,
-        req.file,
-        ariza.aktInfo.fileId.split("*")[1],
-        ariza.companyId
-      );
-    }
-
-    // Fayl yuklash
-    let fileId = file
-      ? await uploadFile(file, ariza.document_number, req.user.companyId)
-      : ariza.aktInfo.fileId;
-
-    // K-Saldo hisoblash
-    const actType = Number(allAmount) > 0 ? "CREDIT" : "DEBIT";
-    const kSaldo = await calculateKSaldo(allAmount, ariza, abonent.id, actType);
-
-    // Aktni yangilash yoki yaratish
-    const act = await updateOrCreateAct(
-      ariza,
-      allAmount,
-      amountWithQQS,
-      amountWithoutQQS,
-      description,
-      inhabitantCount,
-      fileId,
-      kSaldo,
-      actType,
-      abonent.id,
-      req
-    );
-
-    if (act.code) {
-      return res.status(500).json({ ok: false, message: act.message });
-    }
-
-    // Arizani yangilash
-    const date = new Date();
-    const updatedAriza = await Ariza.findByIdAndUpdate(
-      ariza._id,
-      {
-        $set: {
-          status: "qayta_akt_kiritilgan",
-          actStatus: "NEW",
-          akt_pachka_id: act.actPackId,
-          akt_id: act.id,
-          aktInfo: act,
-          akt_date: date,
-        },
-        $push: { actHistory: ariza.aktInfo },
+    },
+    {
+      $set: {
+        ...req.body,
       },
-      { new: true }
-    );
-
-    res.json({ ok: true, ariza: updatedAriza });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ ok: false, message: "Internal server error" });
-  }
+    },
+    { new: true }
+  );
+  res.status(200).json({
+    ok: true,
+  });
 };
 
-// PDF va rasm birlashtirish
-async function mergePhotosWithPdf(
-  photos,
-  uploadedFile,
-  existingFileId,
-  companyId
-) {
-  const tozaMakonApi = createTozaMakonApi(companyId);
-  let imgs = photos.split(",");
-  const photosBuffer = await Promise.all(
-    imgs.map(async (file_id) => {
-      const file = await bot.telegram.getFile(file_id);
-      const photoBuffer = await bot.telegram.getFileLink(file.file_id);
-      const response = await axios.get(photoBuffer, {
-        responseType: "arraybuffer",
-      });
-      return response.data;
-    })
+export const updateArizaFromBillingById: Handler = async (
+  req,
+  res
+): Promise<any> => {
+  // validate the request
+  const ariza = await Ariza.findOne({
+    _id: req.params.ariza_id,
+    companyId: req.user.companyId,
+  });
+  if (!ariza)
+    return res.status(404).json({
+      ok: false,
+      message: "Ariza topilmadi",
+    });
+  const abonent = await Abonent.findOne({ licshet: ariza.licshet });
+  if (!abonent)
+    return res.status(404).json({ ok: false, message: "Abonent topilmadi" });
+
+  // update the ariza
+  const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+  const acts = await getResidentActs(tozaMakonApi, abonent.id);
+  const act = acts.find((a) => a.id == ariza.akt_id);
+  if (!act)
+    return res.status(404).json({ ok: false, message: "Act topilmadi" });
+  const updates: any = {
+    actStatus: act.actStatus,
+    aktInfo: act,
+  };
+  if (act.actStatus === "CONFIRMED") updates.status = "tasdiqlangan";
+  const updatedAriza = await Ariza.findByIdAndUpdate(
+    ariza._id,
+    {
+      $set: updates,
+    },
+    { new: true }
   );
 
-  const pdfDoc = await PDFDocument.create();
-  for (let photoBuffer of photosBuffer) {
-    const image = await pdfDoc.embedPng(photoBuffer);
-    const page = pdfDoc.addPage([image.width, image.height]);
-    page.drawImage(image, {
-      x: 0,
-      y: 0,
-      width: image.width,
-      height: image.height,
-    });
-  }
+  res.json({
+    ok: true,
+    ariza: updatedAriza,
+  });
+};
 
-  let pdfBuffer = await pdfDoc.save();
-  const merger = new PDFMerger();
-  if (uploadedFile?.buffer) {
-    await merger.add(uploadedFile.buffer);
-  } else {
-    const response = await tozaMakonApi.get("/file-service/buckets/download", {
-      params: { file: existingFileId },
-      responseType: "arraybuffer",
-    });
-    await merger.add(response.data);
-  }
-
-  await merger.add(Buffer.from(pdfBuffer));
-  return { buffer: await merger.saveAsBuffer(), originalname: "merged.pdf" };
-}
-
-// Fayl yuklash
-async function uploadFile(file, documentNumber, companyId) {
-  const tozaMakonApi = createTozaMakonApi(companyId);
-  const formData = new FormData();
-  formData.append("file", file.buffer, file.originalname);
-  const fileData = (
-    await tozaMakonApi.post("/file-service/buckets/upload", formData, {
-      params: { folderType: "ACT" },
-    })
-  ).data;
-  return documentNumber + ".PDF*" + fileData.fileId;
-}
-
-// K-Saldo hisoblash
-async function calculateKSaldo(amount, ariza, residentId, actType) {
-  const tozaMakonApi = createTozaMakonApi(ariza.companyId);
-  return (
-    await tozaMakonApi.get("/billing-service/acts/calculate-k-saldo", {
-      params: {
-        amount,
-        residentId,
-        actPackId: ariza.aktInfo.actPackId,
-        actType,
-      },
-    })
-  ).data;
-}
-
-// Aktni yangilash yoki yaratish
-async function updateOrCreateAct(
-  ariza,
-  allAmount,
-  amountWithQQS,
-  amountWithoutQQS,
-  description,
-  inhabitantCount,
-  fileId,
-  kSaldo,
-  actType,
-  residentId,
-  req
-) {
-  const body = {
-    actType,
-    amount: allAmount,
+export const changeArizaAct: Handler = async (req, res): Promise<any> => {
+  // validate
+  const { ariza_id } = req.params;
+  const {
+    allAmount,
+    inhabitantCount,
     amountWithQQS,
     amountWithoutQQS,
     description,
-    fileId,
-    kSaldo,
-    residentId,
-  };
+    photos,
+    actNumber,
+  } = changeArizaActBodySchema.parse(req.body);
 
-  if (inhabitantCount) body.inhabitantCount = inhabitantCount;
-
-  const tozaMakonApi = createTozaMakonApi(ariza.companyId);
-
-  if (ariza.actStatus === "WARNED" || ariza.actStatus === "NEW") {
-    return (
-      await tozaMakonApi.put(`/billing-service/acts/${ariza.akt_id}`, {
-        id: ariza.akt_id,
-        ...body,
-      })
-    ).data;
-  } else {
-    const packId = (await Company.findOne({ id: req.user.companyId }))
-      .akt_pachka_ids;
-    const date = new Date();
-    return (
-      await tozaMakonApi.post("/billing-service/acts", {
-        ...body,
-        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        actPackId: packId[ariza.document_type].id,
-      })
-    ).data;
+  const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+  const ariza = await Ariza.findOne({
+    _id: ariza_id,
+    companyId: req.user.companyId,
+  });
+  if (!ariza) {
+    return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
   }
-}
+
+  const abonent = await Abonent.findOne({ licshet: ariza.licshet });
+  if (!abonent) {
+    return res.status(404).json({ ok: false, message: "Abonent topilmadi" });
+  }
+
+  // 🖼️ 1. Faylni olish
+  let file = req.file?.buffer;
+  if (!file)
+    file = await getFileAsBuffer(
+      tozaMakonApi,
+      ariza.aktInfo.fileId.split("*")[1]
+    );
+
+  // 🖼️ 2. Agar rasm bo‘lsa — PDFga qo‘shamiz
+  if (photos?.length) {
+    file = await mergePhotosWithPdf(photos, file);
+  }
+
+  // 📤 3. Faylni TozaMakonga yuklash
+  let newFileId = ariza.aktInfo.fileId;
+  if (req.file || photos?.length) {
+    newFileId = await uploadFileToTozaMakon(
+      tozaMakonApi,
+      file,
+      req.file?.originalname || "file.pdf"
+    );
+  }
+
+  // 4. K-Saldo hisoblash
+  const actType = Number(allAmount) > 0 ? "CREDIT" : "DEBIT";
+  const kSaldo = await calculateKSaldo(tozaMakonApi, {
+    amount: allAmount,
+    residentId: abonent.id,
+    actPackId: ariza.aktInfo.actPackId,
+    actType,
+  });
+
+  // 5. Aktni yangilash yoki yaratish
+  const date = new Date();
+  if (ariza.actStatus === "WARNED" || ariza.actStatus === "NEW") {
+    await updateAct(tozaMakonApi, ariza.aktInfo.id, {
+      kSaldo,
+      amountWithQQS,
+      amountWithoutQQS,
+      inhabitantCnt: inhabitantCount,
+      fileId: newFileId,
+      actType,
+      actNumber,
+      actPackId: ariza.aktInfo.actPackId,
+      amount: allAmount,
+      description,
+      id: ariza.aktInfo.id,
+      residentId: abonent.id,
+      endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+      startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+    });
+  } else {
+    ariza.akt_pachka_id = await getOrCreateActPackId(
+      ariza.document_type,
+      tozaMakonApi,
+      req.user.companyId
+    );
+    ariza.akt_id = await createAct(tozaMakonApi, {
+      kSaldo,
+      amountWithQQS,
+      amountWithoutQQS,
+      inhabitantCnt: inhabitantCount,
+      fileId: newFileId,
+      actType,
+      actPackId: ariza.akt_pachka_id,
+      amount: allAmount,
+      description,
+      residentId: abonent.id,
+      endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+      startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+    });
+    ariza.aktInfo = await getActInfo(tozaMakonApi, ariza.akt_id);
+    ariza.actStatus = "NEW";
+  }
+
+  ariza.status = "qayta_akt_kiritilgan";
+  ariza.akt_date = date;
+  ariza.actHistory.push(ariza.aktInfo);
+
+  // Arizani yangilash
+  await ariza.save();
+
+  res.json({ ok: true, ariza });
+};
 
 export const addImageToAriza = async (req, res) => {
   try {

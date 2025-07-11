@@ -96,3 +96,13 @@ export const cancelArizaByIdSchema = z.object({
   }),
   canceling_description: z.string(),
 });
+
+export const changeArizaActBodySchema = z.object({
+  allAmount: z.number(),
+  inhabitantCount: z.number().nullable(),
+  amountWithQQS: z.number(),
+  amountWithoutQQS: z.number(),
+  description: z.string(),
+  photos: z.array(z.string()).optional(),
+  actNumber: z.string(),
+});

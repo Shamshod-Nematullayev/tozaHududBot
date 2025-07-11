@@ -134,3 +134,50 @@ export interface IAbonent {
   nsaldo: number;
   ksaldo: number;
 }
+
+export interface IAct {
+  createdByFullName: string | null;
+  updatedByFullName: string | null;
+  warnedByFullName: string | null;
+  confirmedByFullName: string | null;
+  canceledByFullName: string | null;
+  residentFullName: string;
+  inhabitantCnt: number;
+  mahallaName: string;
+  streetName: string;
+  houseNumber: string;
+  flatNumber: number | null;
+  accountNumber: string;
+  id: number;
+  actNumber: string;
+  actPackId: number;
+  actPackName: string;
+  actStatus: "NEW" | "CONFIRMED" | "WARNED" | "REJECTED";
+  actType: "DEBIT" | "CREDIT";
+  amount: number;
+  amountWithQQS: number | null;
+  amountWithoutQQS: number | null;
+  canceledAt: string | null;
+  canceledBy: number | null;
+  cancellationConclusion: string | null;
+  companyId: number;
+  confirmedAt: string | null;
+  confirmedBy: number | null;
+  createdAt: string;
+  createdBy: number;
+  currentInhabitantCount: number | null;
+  description: string;
+  districtId: number;
+  endPeriod: string | null;
+  fileId: string;
+  oldInhabitantCount: number | null;
+  packType: string | null;
+  regionId: number;
+  residentId: number;
+  startPeriod: string | null;
+  updatedAt: string | null;
+  updatedBy: number;
+  warnedAt: string | null;
+  warnedBy: number | null;
+  warningConclusion: string | null;
+}

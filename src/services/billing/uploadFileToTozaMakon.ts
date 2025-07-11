@@ -9,7 +9,7 @@ export async function uploadFileToTozaMakon(
   tozaMakonApi: Axios,
   buffer: Buffer,
   filename: string
-) {
+): Promise<string> {
   const formData = new FormData();
   formData.append("file", buffer, filename);
 

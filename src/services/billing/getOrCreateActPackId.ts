@@ -1,3 +1,4 @@
+import { arizaDocumentTypes } from "@models/Ariza";
 import { Company } from "@models/Company";
 import { Axios } from "axios";
 import { packNames, packTypes } from "intervals/createAktPack";
@@ -8,7 +9,7 @@ import { formatDate } from "services/utils/formatDate";
  */
 
 export async function getOrCreateActPackId(
-  documentType: "viza" | "dvaynik" | "odam_soni" | "death" | "gps",
+  documentType: (typeof arizaDocumentTypes)[number],
   tozaMakonApi: Axios,
   companyId: number
 ) {

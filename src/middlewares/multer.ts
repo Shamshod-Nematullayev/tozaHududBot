@@ -1,5 +1,6 @@
 import multer from "multer";
 import fs from "fs";
+import { NextFunction, Request, Response } from "express";
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     //if that dir is not created then this will create that dir first
@@ -19,7 +20,12 @@ export const uploadAsBlob = multer({
   limits: { fileSize: 25 * 1024 * 1024 },
 });
 
-export const isLimitFileSize = (err, req, res, next) => {
+export const isLimitFileSize = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (err instanceof multer.MulterError) {
     if (err.code === "LIMIT_FILE_SIZE") {
       return res.json({

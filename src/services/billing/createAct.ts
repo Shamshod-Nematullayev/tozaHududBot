@@ -1,7 +1,7 @@
 import { Axios } from "axios";
 
 /**
- * Akt yaratish
+ * Akt yaratish yaratilgan akt ID si qaytariladi
  */
 export async function createAct(
   tozaMakonApi: Axios,
@@ -17,7 +17,8 @@ export async function createAct(
     fileId: string;
     kSaldo: number;
     residentId: number;
+    inhabitantCnt: number | null;
   }
-) {
+): Promise<number> {
   return (await tozaMakonApi.post("/billing-service/acts", payload)).data;
 }

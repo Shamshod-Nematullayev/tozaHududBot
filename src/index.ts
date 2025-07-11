@@ -1,8 +1,12 @@
 // Bismillah
 import "dotenv/config";
-import express, { NextFunction, Response } from "express";
+import express, {
+  NextFunction,
+  Request,
+  Response,
+  ErrorRequestHandler,
+} from "express";
 import cors from "cors";
-import { MyRequest } from "interfaces/express.interfaces";
 import isAuth from "./middlewares/isAuth.ts";
 import { app, server } from "./config/socketConfig.js";
 import { agenda } from "./config/agenda.js";
@@ -77,6 +81,7 @@ import newAbonentsRouter from "./routers/newAbonentsRouter.js";
 import yashovchiSoniXatlovRouter from "./routers/yashovchiSoniXatlov.js";
 import reportsRouter from "./routers/reportsRouter.js";
 import actsRouter from "./routers/actsRouter.js";
+import { ZodError } from "zod";
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);
@@ -96,12 +101,23 @@ app.use("/api/yashovchi-soni-xatlov", isAuth, yashovchiSoniXatlovRouter);
 app.use("/api/reports", isAuth, reportsRouter);
 app.use("/api/acts", isAuth, actsRouter);
 
-app.use((req: MyRequest, res: Response, next: NextFunction) => {
-  res.status(404).json({
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, next): any => {
+  if (err instanceof ZodError) {
+    return res.status(400).json({
+      ok: false,
+      message: "Invalid request data",
+      issues: err.issues,
+    });
+  }
+
+  console.error(err);
+  res.status(500).json({
     ok: false,
-    message: `Cannot ${req.method} ${req.url}`,
+    message: "Internal server error",
   });
-});
+};
+
+app.use(globalErrorHandler);
 
 // telegram bot
 function useTelegramBot() {
