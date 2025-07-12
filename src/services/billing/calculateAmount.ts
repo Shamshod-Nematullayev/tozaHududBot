@@ -9,6 +9,7 @@ export async function calculateAmount(
     residentId: number;
     inhabitantCount: number | null;
     kSaldo: number;
+    actPackId: number;
   }
 ): Promise<{
   actType: "CREDIT" | "DEBIT";

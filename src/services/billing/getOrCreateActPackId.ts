@@ -12,7 +12,7 @@ export async function getOrCreateActPackId(
   documentType: (typeof arizaDocumentTypes)[number],
   tozaMakonApi: Axios,
   companyId: number
-) {
+): Promise<number> {
   const date = new Date();
   const company = await Company.findOne({ id: companyId });
   if (!company) throw new Error("Company not found");
@@ -24,7 +24,7 @@ export async function getOrCreateActPackId(
     actPack.month === date.getMonth() + 1 &&
     actPack.year === date.getFullYear();
 
-  if (!actPack?.id || !isSameMonthYear) {
+  if (!isSameMonthYear) {
     const response = await tozaMakonApi.post("/billing-service/act-packs", {
       companyId,
       createdDate: formatDate(date),

@@ -9,7 +9,7 @@ export const getArizalarQuerySchema = z.object({
   sortDirection: z.enum(["asc", "desc"]).optional(),
 
   document_type: z.enum(arizaDocumentTypes).optional(),
-  document_number: z.number().optional(),
+  document_number: z.coerce.number().optional(),
   account_number: z.string().optional(),
   dublicat_account_number: z.string().optional(),
 
@@ -34,28 +34,28 @@ export const createArizaBodySchema = z
   .object({
     document_type: z.enum(arizaDocumentTypes),
     account_number: z.string().regex(...accountNumberRegex),
-    document_number: z.number(),
+    document_number: z.coerce.number(),
     dublicat_account_number: z
       .string()
       .regex(...accountNumberRegex)
       .optional(),
-    total: z.number(),
-    current_prescribed_cnt: z.number().optional(),
-    next_prescribed_cnt: z.number().optional(),
+    total: z.coerce.number(),
+    current_prescribed_cnt: z.coerce.number().optional(),
+    next_prescribed_cnt: z.coerce.number().optional(),
     comment: z.string().optional(),
     photos: z.array(z.string()).optional(),
     akt_summasi: z.object({
-      total: z.number(),
-      withQQSTotal: z.number(),
-      withoutQQSTotal: z.number(),
+      total: z.coerce.number(),
+      withQQSTotal: z.coerce.number(),
+      withoutQQSTotal: z.coerce.number(),
     }),
     recalculationPeriods: z.array(
       z.object({
         startDate: z.coerce.date(),
         endDate: z.coerce.date(),
-        withQQSTotal: z.number(),
-        withoutQQSTotal: z.number(),
-        total: z.number(),
+        withQQSTotal: z.coerce.number(),
+        withoutQQSTotal: z.coerce.number(),
+        total: z.coerce.number(),
       })
     ),
     muzlatiladi: z.boolean().optional(),
@@ -98,10 +98,10 @@ export const cancelArizaByIdSchema = z.object({
 });
 
 export const changeArizaActBodySchema = z.object({
-  allAmount: z.number(),
-  inhabitantCount: z.number().nullable(),
-  amountWithQQS: z.number(),
-  amountWithoutQQS: z.number(),
+  allAmount: z.coerce.number(),
+  inhabitantCount: z.coerce.number().nullable(),
+  amountWithQQS: z.coerce.number(),
+  amountWithoutQQS: z.coerce.number(),
   description: z.string(),
   photos: z.array(z.string()).optional(),
   actNumber: z.string(),
@@ -111,12 +111,12 @@ export const createMonayTransferArizaBodySchema = z
   .object({
     debitorAct: z.object({
       accountNumber: z.string().regex(...accountNumberRegex),
-      amount: z.number().gt(0),
+      amount: z.coerce.number().gt(0),
     }),
     creditorActs: z.array(
       z.object({
         accountNumber: z.string().regex(...accountNumberRegex),
-        amount: z.number().gt(0),
+        amount: z.coerce.number().gt(0),
       })
     ),
   })

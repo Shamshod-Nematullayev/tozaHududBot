@@ -2,8 +2,6 @@ import { WizardScene } from "telegraf/scenes";
 
 import { Abonent } from "@models/Abonent";
 
-import { tozaMakonApi } from "@api/tozaMakon";
-
 import { HybridMail } from "@models/HybridMail";
 
 import PDFMerger from "pdf-merger-js";
@@ -12,6 +10,7 @@ import path from "path";
 import axios from "axios";
 
 import FormData from "form-data";
+import { createTozaMakonApi } from "@api/tozaMakon";
 
 export const uploadWarningTozamakonScene = new WizardScene(
   "uploadWarningTozamakonScene",
@@ -66,6 +65,10 @@ export const uploadWarningTozamakonScene = new WizardScene(
           );
           continue;
         }
+
+        const tozaMakonApi = createTozaMakonApi(
+          ctx.wizard.state.admin.companyId
+        );
         const abonentData = (
           await tozaMakonApi.get("/user-service/residents/" + abonent.id)
         ).data;

@@ -26,10 +26,7 @@ const router = express.Router();
 
 // --- GET routes ---
 router.get("/get-file/", catchAsync(downloadPdfFileFromBillingAsBase64));
-router.get(
-  `/get-abonent-dxj-by-id/:abonent_id`,
-  catchAsync(getAbonentDHJByAbonentId)
-);
+router.get(`/get-abonent-dxj-by-id`, catchAsync(getAbonentDHJByAbonentId));
 router.get(
   "/get-abonent-data-by-licshet/:licshet",
   catchAsync(getAbonentDataByLicshet)

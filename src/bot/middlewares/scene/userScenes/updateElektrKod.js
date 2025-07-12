@@ -9,7 +9,7 @@ import { Nazoratchi } from "@models/Nazoratchi";
 import isCancel from "../../smallFunctions/isCancel";
 import { EtkKodRequest } from "@models/EtkKodRequest";
 
-import { tozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon";
 
 import { EtkAbonent } from "@models/EtkAbonent";
 
@@ -193,6 +193,7 @@ export const updateElektrKod = new Scenes.WizardScene(
             inspector_id: ctx.wizard.state.inspector_id,
             update_at: new Date(),
           });
+          const tozaMakonApi = createTozaMakonApi(abonent.companyId);
           await tozaMakonApi.patch("/user-service/residents/" + abonent.id, {
             electricityAccountNumber: ctx.wizard.state.ETK,
             electricityCoato: etkAbonent.caotoNumber,

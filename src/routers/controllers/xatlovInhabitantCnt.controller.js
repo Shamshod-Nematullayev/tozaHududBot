@@ -2,7 +2,7 @@ import { XatlovDocument } from "@models/XatlovDocument";
 import { MultiplyRequest } from "@models/MultiplyRequest";
 import { Mahalla } from "@models/Mahalla";
 import { Company } from "@models/Company";
-import { tozaMakonApi, createTozaMakonApi } from "../../api/tozaMakon";
+import { createTozaMakonApi } from "../../api/tozaMakon";
 import FormData from "form-data";
 
 export const cancelDalolatnoma = async (req, res) => {

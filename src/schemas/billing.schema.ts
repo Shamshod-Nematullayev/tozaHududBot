@@ -7,16 +7,16 @@ const accountNumberRegex = [
 ] as const;
 
 export const getAbonentDataRowIdQuerySchema = z.object({
-  residentId: z.number(),
-  page: z.number().optional(),
-  limit: z.number().optional(),
+  residentId: z.coerce.number(),
+  page: z.coerce.number().optional(),
+  limit: z.coerce.number().optional(),
 });
 
 export const createResidentActBodySchema = z.object({
-  next_inhabitant_count: z.number().nullable(),
-  akt_sum: z.number(),
+  next_inhabitant_count: z.coerce.number().nullable(),
+  akt_sum: z.coerce.number(),
   licshet: z.string().regex(...accountNumberRegex),
-  amountWithoutQQS: z.number().optional(),
+  amountWithoutQQS: z.coerce.number().optional(),
   document_type: z.enum(arizaDocumentTypes),
   description: z.string().max(255),
   ariza_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
@@ -29,13 +29,13 @@ export const duplicateActFromRequestBodySchema = z.object({
   ariza_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
     message: "Invalid ObjectId",
   }),
-  akt_sum: z.number(),
+  akt_sum: z.coerce.number(),
 });
 
 export const createDublicateActBodySchema = z.object({
   realAccountNumber: z.string().regex(...accountNumberRegex),
   fakeAccountNumber: z.string().regex(...accountNumberRegex),
-  fakeAccountIncomeAmount: z.number().gt(0),
+  fakeAccountIncomeAmount: z.coerce.number().gt(0),
 });
 
 export const sendAbonentsListToTelegramQuerySchema = z.object({
@@ -47,8 +47,8 @@ export const sendAbonentsListToTelegramQuerySchema = z.object({
 });
 
 export const getAbonentsByMfyIdQuerySchema = z.object({
-  minSaldo: z.number().optional(),
-  maxSaldo: z.number().optional(),
+  minSaldo: z.coerce.number().optional(),
+  maxSaldo: z.coerce.number().optional(),
   identified: z.enum(["true", "false"]).optional(),
   etkStatus: z.enum(["true", "false"]).optional(),
 });

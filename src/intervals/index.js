@@ -9,7 +9,7 @@ import { sendEtkMfyReport } from "./sendEtkMfyReport";
 import { sendIdentifietMfyReport } from "./sendIdentifietMfyReport";
 import { sendMFYIncomeReport } from "./sendMFYIncomeReport";
 import { sendPinflMfyReport } from "./sendPinflMfyReport";
-import { addUpdateArizaAktTask } from "./updateArizaAkt";
+// import { addUpdateArizaAktTask } from "./updateArizaAkt";
 import xatlovchilarIshiHisobot from "./xatlovchilarIshiHisobot";
 
 // Define tasks with Agenda

@@ -177,8 +177,7 @@ export const createResidentAct = async (
     inhabitantCount: next_inhabitant_count,
   };
 
-  const actId = await createAct(tozaMakonApi, aktPayload);
-  const actInfo = await getActInfo(tozaMakonApi, actId);
+  const actInfo = await createAct(tozaMakonApi, aktPayload);
 
   // Agar ariza bo'lsa akt ma'lumotlari yozib qolinadi
   if (ariza_id) {
@@ -186,7 +185,7 @@ export const createResidentAct = async (
       $set: {
         status: "akt_kiritilgan",
         akt_pachka_id: actPackId,
-        akt_id: actId,
+        akt_id: actInfo.id,
         aktInfo: actInfo,
         akt_date: actInfo.createdAt,
       },
@@ -271,9 +270,10 @@ export const duplicateActFromRequest = async (
     residentId: abonentFake.id,
     inhabitantCount: 0,
     kSaldo: 0,
+    actPackId: dvaynikPackId,
   });
 
-  const dvaynikActID = await createAct(tozaMakonApi, {
+  const dvaynikAct = await createAct(tozaMakonApi, {
     actPackId: dvaynikPackId,
     actType: "CREDIT",
     amount: Number(amountObj.amount) + Number(akt_sum),
@@ -287,14 +287,13 @@ export const duplicateActFromRequest = async (
     residentId: abonentFake.id,
     inhabitantCount: 0,
   });
-  const dvaynikAct = await getActInfo(tozaMakonApi, dvaynikActID);
 
   // 5. Arizani yangilash
   await ariza.updateOne({
     $set: {
       status: "akt_kiritilgan",
       akt_pachka_id: dvaynikPackId,
-      akt_id: dvaynikActID,
+      akt_id: dvaynikAct.id,
       aktInfo: dvaynikAct,
       akt_date: new Date(),
     },
@@ -376,6 +375,7 @@ export const createDublicateAct = async (
     residentId: abonentFake.id,
     inhabitantCount: 0,
     kSaldo: 0,
+    actPackId: dvaynikPackId,
   });
   await createAct(tozaMakonApi, {
     actPackId: dvaynikPackId,
@@ -653,7 +653,7 @@ export const transferMoneyBetweenResidents = async (
     res.json({ ok: true, data: acts });
   } catch (error) {
     for (let act of createdActs) {
-      await deleteActById(tozaMakonApi, act);
+      await deleteActById(tozaMakonApi, act.id);
     }
     res.json({ ok: false, message: "Internal server error 500" });
     console.error(error);

@@ -110,7 +110,7 @@ export const getArizaById = async (
 ): Promise<any> => {
   try {
     const ariza = await Ariza.findOne({
-      _id: req.params._id,
+      _id: req.params.id,
       companyId: req.user.companyId,
     }).lean();
     if (!ariza)
@@ -349,7 +349,7 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
   // 5. Aktni yangilash yoki yaratish
   const date = new Date();
   if (ariza.actStatus === "WARNED" || ariza.actStatus === "NEW") {
-    await updateAct(tozaMakonApi, ariza.aktInfo.id, {
+    const act = await updateAct(tozaMakonApi, ariza.aktInfo.id, {
       kSaldo,
       amountWithQQS,
       amountWithoutQQS,
@@ -365,6 +365,8 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
       endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
       startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
     });
+    ariza.akt_id = act.id;
+    ariza.aktInfo = act;
   } else {
     // Yangi akt uchun pachkani olish
     ariza.akt_pachka_id = await getOrCreateActPackId(
@@ -373,7 +375,7 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
       req.user.companyId
     );
     // Yangi akt yaratish
-    ariza.akt_id = await createAct(tozaMakonApi, {
+    const act = await createAct(tozaMakonApi, {
       kSaldo,
       amountWithQQS,
       amountWithoutQQS,
@@ -387,10 +389,11 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
       endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
       startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
     });
+    ariza.akt_id = act.id;
+    ariza.aktInfo = await getActInfo(tozaMakonApi, ariza.akt_id);
     ariza.actStatus = "NEW";
   }
 
-  ariza.aktInfo = await getActInfo(tozaMakonApi, ariza.akt_id);
   ariza.status = "qayta_akt_kiritilgan";
   ariza.akt_date = date;
   ariza.actHistory.push(ariza.aktInfo);
@@ -514,13 +517,15 @@ export const createMonayTransferActByAriza = async (
     for (let act of needMonayTransferActs) {
       const kSaldo = await calculateKSaldo(tozaMakonApi, act);
 
-      const actId = await createAct(tozaMakonApi, {
-        ...act,
-        kSaldo,
-        amountWithoutQQS: 0,
-        amountWithQQS: act.amount,
-        inhabitantCount: null,
-      });
+      const actId = (
+        await createAct(tozaMakonApi, {
+          ...act,
+          kSaldo,
+          amountWithoutQQS: 0,
+          amountWithQQS: act.amount,
+          inhabitantCount: null,
+        })
+      ).id;
       actIds.push(actId);
     }
   } catch (error) {

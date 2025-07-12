@@ -11,7 +11,7 @@ import { Mahalla } from "@models/Mahalla";
 
 import { Target } from "@models/TargetAbonent";
 
-import { tozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon";
 
 export const createTargetScene = new WizardScene(
   "createTarget",
@@ -51,6 +51,7 @@ export const createTargetScene = new WizardScene(
           keyboards.cancelBtn
         );
       }
+      const tozaMakonApi = createTozaMakonApi(inspector.companyId);
       const { balance } = (
         await tozaMakonApi.get("/user-service/residents/" + abonent.id)
       ).data;

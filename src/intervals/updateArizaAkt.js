@@ -1,7 +1,7 @@
 import Queue from "bull";
 import { Ariza } from "@models/Ariza";
 
-import { tozaMakonApi } from "../api/tozaMakon";
+import { createTozaMakonApi } from "../api/tozaMakon";
 
 const updateArizalarAkt = new Queue(
   "updateArizalarAkt",
@@ -29,6 +29,7 @@ updateArizalarAkt.process(async (job) => {
   fiveDaysAgo.setDate(today.getDate() - 5);
 
   try {
+    const tozaMakonApi = createTozaMakonApi(ariza.companyId);
     const act = (
       await tozaMakonApi.get("/billing-service/acts/" + ariza.akt_id)
     ).data;
