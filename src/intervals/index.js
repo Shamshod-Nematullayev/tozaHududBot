@@ -1,6 +1,5 @@
 import { agenda } from "../config/agenda";
 import { Company } from "@models/Company";
-import { createAktPack } from "./createAktPack";
 import { sendKunlikEtkReports } from "./kunlikEtkReports";
 import { sendKunlikPhoneReports } from "./kunlikPhoneReports";
 import { sendKunlikPinflReports } from "./kunlikPinflReports";
@@ -14,9 +13,6 @@ import { addUpdateArizaAktTask } from "./updateArizaAkt";
 import xatlovchilarIshiHisobot from "./xatlovchilarIshiHisobot";
 
 // Define tasks with Agenda
-agenda.define("createAktPackTask", async () => {
-  createAktPack();
-});
 
 agenda.define("sendKunlikPinflReportsTask", async () => {
   // await sendKunlikPinflReports(1265);

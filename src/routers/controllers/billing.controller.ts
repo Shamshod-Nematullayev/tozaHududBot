@@ -3,24 +3,12 @@ import { createTozaMakonApi } from "../../api/tozaMakon";
 
 import { Abonent } from "@models/Abonent";
 
-import { Counter } from "@models/Counter";
-
-import { IncomingDocument } from "@models/IncomingDocument";
-
 import { Ariza } from "@models/Ariza";
 
 import { bot } from "@bot/core/bot";
 import { Company } from "@models/Company";
 
-import FormData from "form-data";
-import axios from "axios";
-
-import { PDFDocument } from "pdf-lib";
-
-import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril";
 import { Mahalla } from "@models/Mahalla";
-
-import { packNames, packTypes } from "../../intervals/createAktPack";
 
 import Excel from "exceljs";
 

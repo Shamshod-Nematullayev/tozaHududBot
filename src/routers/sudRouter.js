@@ -7,7 +7,7 @@ import { uploadAsBlob, isLimitFileSize } from "../middlewares/multer";
 import { createHybridPochtaApi } from "../api/hybridPochta";
 
 import PDFMerger from "pdf-merger-js";
-import { tozaMakonApi } from "../api/tozaMakon";
+import { createTozaMakonApi } from "../api/tozaMakon";
 
 import FormData from "form-data";
 import {
@@ -186,6 +186,7 @@ router.put(
                 row.hybridMailId + `.pdf`
               );
               // billingdan sudAktini topish
+              const tozaMakonApi = createTozaMakonApi(req.user.companyId);
               const courtWarning = (
                 await tozaMakonApi.get(
                   `/user-service/court-warnings?accountNumber=${row.licshet}&status=NEW`

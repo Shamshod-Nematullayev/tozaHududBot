@@ -261,3 +261,20 @@ export interface IActPack {
   inventoryAmountSum: number;
   nameAndPackType: string;
 }
+
+export const packNames = {
+  viza: "PASSPORT VIZA",
+  odam_soni: "ODAM SONI",
+  dvaynik: "IKKILAMCHI KODLAR",
+  pul_kuchirish: "PUL KO'CHIRISH",
+  death: "O'LIM GUVOHNOMA",
+  gps: "GPS XULOSA",
+};
+export const packTypes = {
+  viza: "SERVICE_NOT_PROVIDED",
+  odam_soni: "INVENTORY",
+  dvaynik: "CANCEL_CONTRACT",
+  pul_kuchirish: "SIMPLE",
+  death: "INVENTORY",
+  gps: "INVENTORY",
+};

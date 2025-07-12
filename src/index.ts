@@ -1,11 +1,6 @@
 // Bismillah
 import "dotenv/config";
-import express, {
-  NextFunction,
-  Request,
-  Response,
-  ErrorRequestHandler,
-} from "express";
+import express from "express";
 import cors from "cors";
 import isAuth from "./middlewares/isAuth.ts";
 import { app, server } from "./config/socketConfig.js";
@@ -81,7 +76,7 @@ import newAbonentsRouter from "./routers/newAbonentsRouter.js";
 import yashovchiSoniXatlovRouter from "./routers/yashovchiSoniXatlov.js";
 import reportsRouter from "./routers/reportsRouter.js";
 import actsRouter from "./routers/actsRouter.js";
-import { ZodError } from "zod";
+import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.ts";
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);
@@ -100,23 +95,6 @@ app.use("/api/pendingNewAbonents", isAuth, newAbonentsRouter);
 app.use("/api/yashovchi-soni-xatlov", isAuth, yashovchiSoniXatlovRouter);
 app.use("/api/reports", isAuth, reportsRouter);
 app.use("/api/acts", isAuth, actsRouter);
-
-const globalErrorHandler: ErrorRequestHandler = (err, req, res, next): any => {
-  if (err instanceof ZodError) {
-    return res.status(400).json({
-      ok: false,
-      message: "Invalid request data",
-      issues: err.issues,
-    });
-  }
-
-  console.error(err);
-  res.status(500).json({
-    ok: false,
-    message: "Internal server error",
-  });
-};
-
 app.use(globalErrorHandler);
 
 // telegram bot
