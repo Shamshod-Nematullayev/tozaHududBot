@@ -75,7 +75,7 @@ import aktPachkaRouter from "./routers/aktPachka.js";
 import kiruvchiXujjatlarRouter from "./routers/kiruvchiXujjatlar.js";
 import inspectorsRouter from "./routers/inspectorsRouter.js";
 import abonentsRouter from "./routers/abonentsRouter.js";
-import billingRouter from "./routers/billing.js";
+import billingRouter from "./routers/billing.route.ts";
 import arizalarRouter from "./routers/arizalar.route.js";
 import newAbonentsRouter from "./routers/newAbonentsRouter.js";
 import yashovchiSoniXatlovRouter from "./routers/yashovchiSoniXatlov.js";

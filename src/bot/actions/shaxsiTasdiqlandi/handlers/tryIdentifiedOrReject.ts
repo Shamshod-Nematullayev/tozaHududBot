@@ -22,10 +22,12 @@ async function findFreeElectricityAccountNumber(
   let attempt = 0;
   while (attempt < 1000) {
     const accountNumber = getNextAccount();
-    const abonents = await searchAbonent(tozaMakonApi, {
-      electricityAccountNumber: accountNumber,
-      companyId,
-    });
+    const abonents = (
+      await searchAbonent(tozaMakonApi, {
+        electricityAccountNumber: accountNumber,
+        companyId,
+      })
+    ).content;
     if (abonents.length === 0) {
       return accountNumber;
     }

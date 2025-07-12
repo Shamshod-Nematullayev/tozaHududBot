@@ -9,7 +9,7 @@ export async function calculateKSaldo(
     amount: number;
     residentId: number;
     actPackId: number;
-    actType: string;
+    actType: "DEBIT" | "CREDIT";
   }
 ) {
   return (

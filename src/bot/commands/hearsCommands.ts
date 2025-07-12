@@ -118,10 +118,12 @@ composer.hears(/add-abonent_/, async (ctx) => {
 
     const tozaMakonApi = createTozaMakonApi(admin.companyId);
 
-    const searchResult = await searchAbonent(tozaMakonApi, {
-      accountNumber: licshet,
-      companyId: admin.companyId,
-    });
+    const searchResult = (
+      await searchAbonent(tozaMakonApi, {
+        accountNumber: licshet,
+        companyId: admin.companyId,
+      })
+    ).content;
 
     if (searchResult.length != 1) return ctx.reply("Billingda topilmadi");
 

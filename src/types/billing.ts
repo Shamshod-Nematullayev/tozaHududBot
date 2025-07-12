@@ -80,7 +80,27 @@ export interface AbonentSearchQuery {
   passport?: string;
   phone?: string;
   pnfl?: string;
-  size?: number;
+  size?:
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+    | 10
+    | 20
+    | 25
+    | 30
+    | 40
+    | 50
+    | 60
+    | 70
+    | 80
+    | 90
+    | 100
+    | 150
+    | 200
+    | 250
+    | 300;
   sort?: string;
   streetId?: number;
 }
@@ -180,4 +200,64 @@ export interface IAct {
   warnedAt: string | null;
   warnedBy: number | null;
   warningConclusion: string | null;
+}
+
+export interface DHJRow {
+  accountNumber: string;
+  accrual: number;
+  accrualType: "DEFAULT";
+  actAmount: number;
+  additionalAccrual: number;
+  cashAmount: number;
+  eMoneyAmount: number;
+  frozenActAmount: number;
+  frozenDebtSettlement: number;
+  frozenKSaldo: number;
+  frozenNSaldo: number;
+  frozenRevenue: number;
+  god: number;
+  id: number;
+  inhabitantCount: number;
+  kSaldo: number;
+  mes: number;
+  munisAmount: number;
+  nSaldo: number;
+  organizationId: null;
+  penaltyFee: number;
+  period: string;
+  q1031Amount: number;
+  residentId: number;
+  tariffId: number;
+  allPaymentsSum: number;
+  nSaldoDt: number;
+  nSaldoKt: number;
+  kSaldoDt: number;
+  kSaldoKt: number;
+}
+
+export interface IActPack {
+  companyName: string;
+  createdByName: string;
+  id: number;
+  companyId: number;
+  createdBy: number;
+  createdByNameMigration: null;
+  createdDate: string;
+  description: string;
+  districtId: number;
+  fileId: null;
+  isActive: boolean;
+  isSpecialPack: boolean;
+  name: string;
+  packType: string;
+  regionId: number;
+  actsCount: number;
+  actAmountSum: number;
+  actDebitCount: number;
+  actDebitAmountSum: number;
+  actCreditCount: number;
+  actCreditAmountSum: number;
+  inventoryCount: number;
+  inventoryAmountSum: number;
+  nameAndPackType: string;
 }

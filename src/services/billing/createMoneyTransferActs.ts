@@ -48,6 +48,7 @@ export async function createMoneyTransferActs({
     endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
     startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
     residentId: debitor.residentId,
+    inhabitantCount: null,
   });
 
   createdActs.push(debitAct);
@@ -72,6 +73,7 @@ export async function createMoneyTransferActs({
       endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
       startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
       residentId: creditor.residentId,
+      inhabitantCount: null,
     });
 
     createdActs.push(creditAct);

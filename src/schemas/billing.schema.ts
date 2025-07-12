@@ -1,0 +1,54 @@
+import { arizaDocumentTypes } from "@models/Ariza";
+import { Types } from "mongoose";
+import z from "zod";
+const accountNumberRegex = [
+  /^\d{12}$/,
+  "uzunligi 12 ta raqamdan iborat matn bo'lishi kerak",
+] as const;
+
+export const getAbonentDataRowIdQuerySchema = z.object({
+  residentId: z.number(),
+  page: z.number().optional(),
+  limit: z.number().optional(),
+});
+
+export const createResidentActBodySchema = z.object({
+  next_inhabitant_count: z.number().nullable(),
+  akt_sum: z.number(),
+  licshet: z.string().regex(...accountNumberRegex),
+  amountWithoutQQS: z.number().optional(),
+  document_type: z.enum(arizaDocumentTypes),
+  description: z.string().max(255),
+  ariza_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+    message: "Invalid ObjectId",
+  }),
+  photos: z.array(z.string()).optional(),
+});
+
+export const duplicateActFromRequestBodySchema = z.object({
+  ariza_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+    message: "Invalid ObjectId",
+  }),
+  akt_sum: z.number(),
+});
+
+export const createDublicateActBodySchema = z.object({
+  realAccountNumber: z.string().regex(...accountNumberRegex),
+  fakeAccountNumber: z.string().regex(...accountNumberRegex),
+  fakeAccountIncomeAmount: z.number().gt(0),
+});
+
+export const sendAbonentsListToTelegramQuerySchema = z.object({
+  minSaldo: z.string().optional(),
+  maxSaldo: z.string().optional(),
+  identified: z.enum(["true", "false"]).optional(),
+  etkStatus: z.enum(["true", "false"]).optional(),
+  mahalla_name: z.string(),
+});
+
+export const getAbonentsByMfyIdQuerySchema = z.object({
+  minSaldo: z.number().optional(),
+  maxSaldo: z.number().optional(),
+  identified: z.enum(["true", "false"]).optional(),
+  etkStatus: z.enum(["true", "false"]).optional(),
+});

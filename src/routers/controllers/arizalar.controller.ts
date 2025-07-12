@@ -1,17 +1,9 @@
-import axios from "axios";
-
 import { createTozaMakonApi } from "../../api/tozaMakon";
 
 import { Ariza } from "../../models/Ariza";
 
 import { Abonent } from "@models/Abonent";
-import { Company } from "@models/Company";
 import { Counter } from "@models/Counter";
-import { bot } from "@bot/core/bot";
-
-import { PDFDocument } from "pdf-lib";
-
-import PDFMerger from "pdf-merger-js";
 import FormData from "form-data";
 import { getOrCreateActPackId } from "@services/billing/getOrCreateActPackId";
 import { Handler, Request, Response } from "express";
@@ -27,6 +19,7 @@ import z, { ZodError } from "zod";
 import {
   calculateKSaldo,
   createAct,
+  deleteActById,
   getActInfo,
   getFileAsBuffer,
   getResidentActs,
@@ -339,7 +332,8 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
     newFileId = await uploadFileToTozaMakon(
       tozaMakonApi,
       file,
-      req.file?.originalname || "file.pdf"
+      req.file?.originalname || "file.pdf",
+      "SPECIFIC_ACT"
     );
   }
 
@@ -383,7 +377,7 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
       kSaldo,
       amountWithQQS,
       amountWithoutQQS,
-      inhabitantCnt: inhabitantCount,
+      inhabitantCount,
       fileId: newFileId,
       actType,
       actPackId: ariza.akt_pachka_id,
@@ -407,7 +401,10 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
   res.json({ ok: true, ariza });
 };
 
-export const addImageToAriza = async (req: Request, res: Response) => {
+export const addImageToAriza = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
   const { ariza_id } = z.parse(z.object({ ariza_id: z.string() }), req.params);
   const { file_id } = z.parse(z.object({ file_id: z.string() }), req.body);
   const ariza = await Ariza.findOne({
@@ -422,11 +419,15 @@ export const addImageToAriza = async (req: Request, res: Response) => {
   res.json({ ok: true, message: "Biriktirildi", ariza });
 };
 
-export const createMonayTransferAriza = async (req: Request, res: Response) => {
+export const createMonayTransferAriza = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
   let { debitorAct, creditorActs } = createMonayTransferArizaBodySchema.parse(
     req.body
   );
 
+  // 1. Ariza uchun tartiq raqami olish
   const counter = await Counter.findOne({
     companyId: req.user.companyId,
     arizaDocumentType: "pul_kuchirish",
@@ -436,12 +437,15 @@ export const createMonayTransferAriza = async (req: Request, res: Response) => {
     return res
       .status(404)
       .json({ ok: false, message: "Ariza tartib raqami topilmadi" });
+
+  // 2. Ariza yaratish
   const ariza = await Ariza.create({
     licshet: debitorAct.accountNumber,
     document_type: "pul_kuchirish",
     companyId: req.user.companyId,
     document_number: counter.value + 1,
     needMonayTransferActs: creditorActs,
+    aktSummasi: debitorAct.amount,
   });
   await counter.updateOne({ $set: { value: counter.value + 1 } });
   res.json({ ok: true, ariza });
@@ -451,6 +455,9 @@ export const createMonayTransferActByAriza = async (
   req: Request,
   res: Response
 ) => {
+  // rollback qilish
+  const actIds: number[] = [];
+  const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   try {
     const ariza = await Ariza.findOne({
       _id: req.params._id,
@@ -462,8 +469,6 @@ export const createMonayTransferActByAriza = async (
     if (!req.file) {
       return res.status(404).json({ ok: false, message: "Fayl topilmadi" });
     }
-    const acts = [];
-    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
 
     const formData = new FormData();
     formData.append("file", req.file.buffer, req.file.originalname);
@@ -481,9 +486,47 @@ export const createMonayTransferActByAriza = async (
     );
     const date = new Date();
     // debitor abonentdan pul olish
+    const needMonayTransferActs: any = [
+      {
+        amount: ariza.aktSummasi,
+        accountNumber: ariza.licshet,
+        residentId: ariza.abonentId,
+        actPackId,
+        fileId,
+        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        actType: "DEBIT",
+        description: "Pul kuchirish",
+      },
+      ...ariza.needMonayTransferActs.map((a) => ({
+        amount: a.amount,
+        accountNumber: a.accountNumber,
+        residentId: a.residentId,
+        actPackId,
+        fileId,
+        startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
+        actType: "CREDIT",
+        description: "Pul kuchirish " + ariza.licshet + "dan",
+      })),
+    ];
 
-    res.json({ ok: true, act });
+    for (let act of needMonayTransferActs) {
+      const kSaldo = await calculateKSaldo(tozaMakonApi, act);
+
+      const actId = await createAct(tozaMakonApi, {
+        ...act,
+        kSaldo,
+        amountWithoutQQS: 0,
+        amountWithQQS: act.amount,
+        inhabitantCount: null,
+      });
+      actIds.push(actId);
+    }
   } catch (error) {
+    for (let actId of actIds) {
+      await deleteActById(tozaMakonApi, actId);
+    }
     console.error(error);
     res.status(500).json({ ok: false, message: "Internal server error" });
   }

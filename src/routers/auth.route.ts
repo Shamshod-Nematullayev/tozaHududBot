@@ -5,15 +5,14 @@ import { bot } from "../bot/core/bot.js";
 import axios from "axios";
 import isAuth from "../middlewares/isAuth.ts";
 import { Company } from "@models/Company.ts";
-import { MyRequest } from "interfaces/express.interfaces.ts";
-import { NextFunction, Response, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 
 const router = Router();
 
 // POST login to admin account
 router.post(
   "/login",
-  async (req: MyRequest, res: Response, next: NextFunction): Promise<any> => {
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       const { login, password } = req.body;
       const admin: any = await Admin.findOne({
@@ -105,7 +104,7 @@ router.post(
 );
 router.post(
   "/refresh-token",
-  async (req: MyRequest, res: Response, next: NextFunction): Promise<any> => {
+  async (req: Request, res: Response): Promise<any> => {
     const { refreshToken } = req.body;
 
     if (!refreshToken) return res.status(401).json({ message: "Unauthorized" });
@@ -139,7 +138,7 @@ router.post(
   }
 );
 
-router.post("/logout", async (req: MyRequest, res: Response) => {
+router.post("/logout", async (req: Request, res: Response) => {
   const { refreshToken } = req.body;
 
   await Admin.updateOne({ refreshToken }, { refreshToken: null });
@@ -150,7 +149,7 @@ router.post("/logout", async (req: MyRequest, res: Response) => {
 router.put(
   "/change-password",
   isAuth,
-  async (req: MyRequest, res: Response): Promise<any> => {
+  async (req: Request, res: Response): Promise<any> => {
     try {
       if (!req.body.newPassword || !req.body.login || !req.body.password) {
         return res.status(400).json({
@@ -195,7 +194,7 @@ router.put(
 router.get(
   "/get-photo",
   isAuth,
-  async (req: MyRequest, res: Response): Promise<any> => {
+  async (req: Request, res: Response): Promise<any> => {
     try {
       const user = await Admin.findById(req.user?.id);
       if (!user)

@@ -42,6 +42,7 @@ export async function transferAmountBetweenAccounts(
     fileId,
     kSaldo: debitKSaldo,
     residentId: residentFrom,
+    inhabitantCount: null,
   });
 
   // CREDIT akt (asosiy hisobga pul kirim qilish)
@@ -64,5 +65,6 @@ export async function transferAmountBetweenAccounts(
     fileId,
     kSaldo: creditKSaldo,
     residentId: residentTo,
+    inhabitantCount: null,
   });
 }

@@ -3,11 +3,14 @@ import { AbonentSearchQuery, IAbonent } from "types/billing";
 
 export async function searchAbonent(
   tozaMakonApi: Axios,
-  query: AbonentSearchQuery
-): Promise<IAbonent[]> {
-  return (
+  query: AbonentSearchQuery,
+  withMetaData?: boolean
+): Promise<{ content: IAbonent[]; totalPages: number }> {
+  const data = (
     await tozaMakonApi.get("/user-service/residents", {
       params: query,
     })
-  ).data.content;
+  ).data;
+
+  return data;
 }

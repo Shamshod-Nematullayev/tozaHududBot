@@ -4,7 +4,7 @@ import { PDFDocument } from "pdf-lib";
 import PDFMerger from "pdf-merger-js";
 
 /**
- * // PDF va rasm birlashtirish
+ * PDF va rasm birlashtirish
  * photos telegramga yuklangan rasmning fileIdsi bo'lishi kerak
  */
 export async function mergePhotosWithPdf(

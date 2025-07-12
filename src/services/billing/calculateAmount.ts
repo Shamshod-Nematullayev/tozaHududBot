@@ -6,12 +6,20 @@ import { Axios } from "axios";
 export async function calculateAmount(
   tozaMakonApi: Axios,
   params: {
-    amount: number;
     residentId: number;
-    actPackId: number;
-    actType: string;
+    inhabitantCount: number | null;
+    kSaldo: number;
   }
-) {
+): Promise<{
+  actType: "CREDIT" | "DEBIT";
+  actPackId: number;
+  residentId: number;
+  amount: number;
+  inhabitantCount: number | null;
+  amountWithQQS: number;
+  amountWithoutQQS: number;
+  calcDtoList: null;
+}> {
   return (
     await tozaMakonApi.get("/billing-service/acts/calculate-amount", {
       params,

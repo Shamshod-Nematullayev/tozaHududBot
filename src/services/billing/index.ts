@@ -15,3 +15,5 @@ export * from "./getAbonentById";
 export * from "./getResidentActs";
 export * from "./updateAct";
 export * from "./getActInfo";
+export * from "./getResidentDHJByAbonentId";
+export * from "./getActPacks";
