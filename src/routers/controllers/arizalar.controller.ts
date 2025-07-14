@@ -77,12 +77,29 @@ export const getArizalar = async (
     if (act_status) filters.actStatus = act_status;
 
     // Ma'lumotlarni qidirish
-    const data = await Ariza.find(filters).sort(sort).skip(skip).limit(limit);
+    const data = await Ariza.find(filters)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    const accountNumbers = data.map((item) => item.licshet);
+    const abonents = await Abonent.find({
+      licshet: { $in: accountNumbers },
+    });
     const total = await Ariza.countDocuments(filters);
 
     res.json({
       ok: true,
-      data,
+      data: data.map((item) => {
+        let abonent = abonents.find(
+          (abonent) => abonent.licshet === item.licshet
+        );
+        return {
+          ...item,
+          abonentId: abonent?.id,
+          fullName: abonent?.fio,
+        };
+      }),
       meta: {
         ...meta,
         total,

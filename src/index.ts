@@ -58,6 +58,8 @@ if (launchBot) {
 
 connectDb();
 
+// idenAllAbonents(); vaqtincha foydalaniladigan funksiya
+
 // use routers
 import authRouter from "./routers/auth.route";
 import statisticsRouter from "./routers/statisticsRouter.js";
@@ -77,6 +79,7 @@ import yashovchiSoniXatlovRouter from "./routers/yashovchiSoniXatlov.js";
 import reportsRouter from "./routers/reportsRouter.js";
 import actsRouter from "./routers/actsRouter.js";
 import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.ts";
+import { idenAllAbonents } from "test/index.ts";
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);
@@ -111,18 +114,18 @@ process.on("warning", (warning) => {
 
 // Schedule jobs
 
-agenda.on("ready", async () => {
-  console.log("Agenda is ready to use!");
-  import("./intervals/index.js");
-  agenda.start();
-  agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask");
-  agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod");
-  agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask");
-  agenda.every("8 9-22 * * *", "sendKunlikEtkReportsTask");
-  agenda.every("0 9-22 * * *", "sendPinflMfyReportTask");
-  agenda.every("0 9-22 * * *", "sendEtkMfyReportTask");
-  agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask");
-});
+// agenda.on("ready", async () => {
+//   console.log("Agenda is ready to use!");
+//   import("./intervals/index.js");
+//   agenda.start();
+//   agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask");
+//   agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod");
+//   agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask");
+//   agenda.every("8 9-22 * * *", "sendKunlikEtkReportsTask");
+//   agenda.every("0 9-22 * * *", "sendPinflMfyReportTask");
+//   agenda.every("0 9-22 * * *", "sendEtkMfyReportTask");
+//   agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask");
+// });
 
 agenda.on("error", (error: Error) => {
   console.error("Agenda error:", error);
