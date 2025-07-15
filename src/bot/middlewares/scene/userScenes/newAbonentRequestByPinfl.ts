@@ -1,4 +1,4 @@
-import { Scenes, Markup } from "telegraf";
+import { Scenes, Markup, Context } from "telegraf";
 
 import isCancel from "../../smallFunctions/isCancel";
 import isRealPinflValidate from "../../smallFunctions/isPinfl";
@@ -8,7 +8,7 @@ import { keyboards, createInlineKeyboard } from "@lib/keyboards";
 
 import { Abonent } from "@models/Abonent";
 
-import { Nazoratchi } from "@models/Nazoratchi";
+import { INazoratchi, Nazoratchi } from "@models/Nazoratchi";
 
 import { Mahalla } from "@models/Mahalla";
 
@@ -21,17 +21,33 @@ import { EtkAbonent } from "@models/EtkAbonent";
 
 import { Notification } from "@models/Notification";
 import { Admin } from "@models/Admin";
-import { Company } from "@models/Company";
+import { Company, ICompany } from "@models/Company";
 
 import axios from "axios";
 
 import { caotoNames } from "../../../../constants";
 
 import { io, usersMapSocket } from "../../../../config/socketConfig";
+import { WizardWithState } from "@bot/helpers/WizardWithState";
+import { Message } from "telegraf/typings/core/types/typegram";
+import { Citizen } from "types/billing";
+import { getCitizen, getResidentHousesByPnfl } from "@services/billing";
+// import { MyContext } from "types/botContext";
+// 1. Lokal state tipi
+// 1. State tipi
+interface MySceneState {
+  inspector?: INazoratchi;
+  company?: ICompany;
+  companyId?: number;
+  mahallalarButtons?: any;
+  citizen?: Citizen;
+  kadastr_baza_not_worked?: boolean;
+  abonentCadastr?: string;
+}
 
-import { LeaderType } from "docx";
+type Ctx = WizardWithState<MySceneState>;
 
-const enterFunc = (ctx) => {
+const enterFunc = (ctx: Ctx) => {
   ctx.reply("Xonadon egasining PINFL raqamini kiriting!", keyboards.cancelBtn);
 };
 // 0 - jshshir
@@ -43,18 +59,23 @@ const enterFunc = (ctx) => {
 // 6 - elektr caoto
 // 7 - elektr kod to'g'rimi?
 // 8 - jami ma'lumotlar to'g'rimi?
-export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
+export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   "new_abonent_request",
   async (ctx) => {
     try {
-      const admin = await Admin.findOne({ user_id: ctx.from.id });
+      if (!ctx.message || !("text" in ctx.message)) {
+        await ctx.reply("Iltimos, faqat matnli PINFL raqamni yuboring.");
+        return;
+      }
+      const admin = await Admin.findOne({ user_id: ctx.from?.id });
       const inspektor = await Nazoratchi.findOne({
-        telegram_id: ctx.from.id,
+        telegram_id: ctx.from?.id,
         activ: true,
       });
       const company = await Company.findOne({
-        id: inspektor.companyId || admin.companyId,
+        id: inspektor?.companyId || admin?.companyId,
       });
+      if (!company) throw "Company not found";
       if (!company.canInspectorsCreateAbonent && !admin) {
         await ctx.reply(
           "Sizning tashkilotingiz nazoratchilar uchun yangi abonent yaratishga ruxsat bermagan"
@@ -68,9 +89,9 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         );
         return ctx.scene.leave();
       }
-      ctx.wizard.state.inspektor = inspektor;
-      ctx.wizard.state.companyId = inspektor.companyId || admin.companyId;
-
+      if (inspektor) ctx.wizard.state.inspector = inspektor;
+      ctx.wizard.state.companyId = inspektor?.companyId || admin?.companyId;
+      // as Message.TextMessage
       if (!isRealPinflValidate(ctx.message.text)) {
         ctx.replyWithPhoto(
           "https://scontent.fbhk1-4.fna.fbcdn.net/v/t39.30808-6/245114763_1689005674643325_574715679907072430_n.jpg?cstp=mx960x540&ctp=s960x540&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=UuAJ9wX9hRUQ7kNvgFH6cIS&_nc_ht=scontent.fbhk1-4.fna&oh=00_AYBErDlZHdtXHYwOa1n9AicX7rhWP63Hkf8COiCnTKAlUw&oe=669E7F35",
@@ -108,11 +129,11 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
 
       const mahallalarButtons = admin
         ? await keyboards.nazoratchigaBiriktirilganMahallalar(
-            inspektor.companyId || admin.companyId
+            inspektor?.companyId || admin.companyId
           )
         : await keyboards.nazoratchigaBiriktirilganMahallalar(
-            inspektor.companyId,
-            inspektor.id
+            inspektor?.companyId,
+            inspektor?.id
           );
 
       if (!mahallalarButtons) {
@@ -124,46 +145,33 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
       }
       ctx.wizard.state.mahallalarButtons = mahallalarButtons;
 
-      const birthdate = extractBirthDateString(ctx.message.text);
+      const birthDate = extractBirthDateString(ctx.message.text);
 
-      const citizen = (
-        await createTozaMakonApi(inspektor.companyId || admin.companyId).get(
-          "/user-service/citizens",
-          {
-            params: {
-              pinfl: ctx.message.text,
-              birthdate,
-            },
-          }
-        )
-      ).data;
+      const tozaMakonApi = createTozaMakonApi(
+        inspektor?.companyId || admin?.companyId
+      );
+      const citizen = await getCitizen(tozaMakonApi, {
+        pinfl: ctx.message.text,
+        birthDate,
+      });
 
       ctx.wizard.state.citizen = citizen;
 
-      const tozaMakonApi = createTozaMakonApi(
-        inspektor.companyId || admin.companyId
-      );
-      let houses = {};
+      let houses: string[] = [];
       try {
-        houses = (
-          await tozaMakonApi.get(
-            "/user-service/houses/pinfl/" + ctx.message.text
-          )
-        ).data;
+        houses = await getResidentHousesByPnfl(tozaMakonApi, citizen.pnfl);
       } catch (error) {
         await ctx.reply(
-          houses.data?.message ||
-            "Kadastr tizimidan ma'lumotlarni olishda xatolik yuz berdi. Iltimos keyinroq urinib ko'ring"
+          "Kadastr tizimidan ma'lumotlarni olishda xatolik yuz berdi. Iltimos keyinroq urinib ko'ring"
         );
         ctx.wizard.state.kadastr_baza_not_worked = true;
       }
       await ctx.reply(
-        `${citizen.lastName} ${citizen.firstName} ${citizen.patronymic}`
+        `${citizen.lastName} ${citizen.firstName} ${citizen.patronymic} ${citizen.birthDate}`
       );
-      if (!houses.cadastr_list) {
+      if (!houses) {
         await ctx.reply(
-          houses.data?.message ||
-            "Kadastr tizimidan ma'lumotlarni olishda xatolik yuz berdi. Iltimos keyinroq urinib ko'ring"
+          "Kadastr tizimidan ma'lumotlarni olishda xatolik yuz berdi. Iltimos keyinroq urinib ko'ring"
         );
         ctx.wizard.state.kadastr_baza_not_worked = true;
         ctx.reply(
@@ -173,7 +181,7 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         ctx.wizard.selectStep(2);
         return;
       }
-      if (houses.cadastr_list.length < 1) {
+      if (houses.length < 1) {
         await ctx.replyWithHTML(
           "Ushbu fuqaroga tegishli xonadon (kadastr) yo'q!\n <b>Diqqat xonadon egasi bo'lmagan shaxsga abonent ochish tavsiya etilmaydi</b>"
         );
@@ -184,16 +192,16 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         ctx.wizard.selectStep(2);
         return;
       }
-      if (houses.cadastr_list.length == 1) {
+      if (houses.length == 1) {
         ctx.reply(
           "Mahallani tanlang",
           Markup.inlineKeyboard(mahallalarButtons)
         );
-        ctx.wizard.state.cadastr = houses.cadastr_list[0];
+        ctx.wizard.state.abonentCadastr = houses[0];
         ctx.wizard.selectStep(2);
         return;
       }
-      const housesButtons = houses.cadastr_list.map((cadastr) => [
+      const housesButtons = houses.map((cadastr) => [
         Markup.button.callback(cadastr, "cadastr_" + cadastr),
       ]);
       ctx.reply(
@@ -201,9 +209,9 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene(
         Markup.inlineKeyboard(housesButtons)
       );
       ctx.wizard.next();
-    } catch (error) {
+    } catch (error: any) {
       ctx.reply(
-        "Kutilmagan xatolik yuz berdi " + error.response?.data?.message,
+        "Kutilmagan xatolik yuz berdi " + error?.response?.data?.message,
         keyboards.cancelBtn.resize()
       );
       console.error(error);

@@ -9,7 +9,6 @@ const TOKEN = process.env.TOKEN as string;
 export const bot = new Telegraf<MyContext>(TOKEN);
 
 bot.use(composer);
-
 bot.catch((error: any, ctx) => {
   errorHandler(error, ctx);
 });

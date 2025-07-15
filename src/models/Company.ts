@@ -8,7 +8,7 @@ interface IAktPack {
   name: string;
 }
 
-interface ICompany {
+export interface ICompany {
   id: number;
   name: string;
   login: string;
