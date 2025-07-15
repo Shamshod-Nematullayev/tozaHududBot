@@ -22,7 +22,7 @@ router.get("/", catchAsync(getArizalar)); // GET all arizas
 router.get("/:id", catchAsync(getArizaById)); // GET specific ariza
 
 // --- POST routes ---
-router.post("/", catchAsync(createAriza)); // CREATE new ariza
+router.post("/create", catchAsync(createAriza)); // CREATE new ariza
 router.post("/cancel", catchAsync(cancelArizaById)); // Cancel ariza (non-idempotent)
 router.post("/money-transfer", catchAsync(createMonayTransferAriza)); // Create transfer
 router.post("/money-transfer-act", catchAsync(createMonayTransferActByAriza));

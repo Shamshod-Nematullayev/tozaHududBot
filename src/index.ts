@@ -58,6 +58,8 @@ if (launchBot) {
 
 connectDb();
 
+// idenAllAbonents(); vaqtincha foydalaniladigan funksiya
+
 // use routers
 import authRouter from "./routers/auth.route";
 import statisticsRouter from "./routers/statisticsRouter.js";
@@ -77,6 +79,7 @@ import yashovchiSoniXatlovRouter from "./routers/yashovchiSoniXatlov.js";
 import reportsRouter from "./routers/reportsRouter.js";
 import actsRouter from "./routers/actsRouter.js";
 import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.ts";
+import { idenAllAbonents } from "test/index.ts";
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);

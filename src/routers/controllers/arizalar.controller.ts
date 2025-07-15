@@ -90,11 +90,16 @@ export const getArizalar = async (
 
     res.json({
       ok: true,
-      data: data.map((ariza) => ({
-        ...ariza,
-        fio: abonents.find((a) => a.licshet === ariza.licshet)?.fio,
-        abonentId: abonents.find((a) => a.licshet === ariza.licshet)?.id,
-      })),
+      data: data.map((item) => {
+        let abonent = abonents.find(
+          (abonent) => abonent.licshet === item.licshet
+        );
+        return {
+          ...item,
+          abonentId: abonent?.id,
+          fullName: abonent?.fio,
+        };
+      }),
       meta: {
         ...meta,
         total,
