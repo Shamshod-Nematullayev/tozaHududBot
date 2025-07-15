@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { IAct } from "types/billing";
 
 export const arizaDocumentTypes = [
@@ -45,9 +45,15 @@ interface IAriza {
   version: number;
 }
 
-const schema = new mongoose.Schema<IAriza>({
-  fio: String,
-  abonentId: Number,
+const schema = new Schema<IAriza>({
+  fio: {
+    type: String,
+    required: true,
+  },
+  abonentId: {
+    type: Number,
+    required: true,
+  },
   asosiy_licshet: String,
   ikkilamchi_licshet: String,
   needMonayTransferActs: Array,
