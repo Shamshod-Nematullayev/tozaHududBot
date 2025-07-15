@@ -81,6 +81,10 @@ export default async function handleApproveRequest(
         ...abonent.shaxsi_tasdiqlandi,
         fullName: abonent.fio,
         pinfl: abonent.pinfl,
+        inspector: {
+          _id: abonent.shaxsi_tasdiqlandi?.inspector?._id,
+          name: abonent.shaxsi_tasdiqlandi?.inspector?.name,
+        },
       },
     },
   });

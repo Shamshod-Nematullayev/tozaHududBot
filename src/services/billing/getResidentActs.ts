@@ -10,7 +10,7 @@ export async function getResidentActs(
   } = { page: 0, size: 100 }
 ): Promise<IAct[]> {
   return (
-    await tozaMakonApi.get(`/user-service/residents/${residentId}/acts`, {
+    await tozaMakonApi.get(`/billing-service/acts`, {
       params: {
         ...params,
         residentId,

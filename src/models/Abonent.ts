@@ -22,7 +22,16 @@ export interface IAbonent {
   phone?: string;
   pinfl?: number;
   passport_number?: string;
-  shaxsi_tasdiqlandi?: any;
+  shaxsi_tasdiqlandi?: {
+    confirm: boolean;
+    inspector_id: number;
+    inspector_name: string;
+    inspector: {
+      name: string;
+      _id: number;
+    };
+    updated_at: Date;
+  };
   shaxsi_tasdiqlandi_history?: any[];
   ekt_kod_tasdiqlandi?: any;
   street_tasdiqlandi?: any;

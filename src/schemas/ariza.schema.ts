@@ -70,7 +70,7 @@ export const createArizaBodySchema = z
     if (data.document_type === "dvaynik" && !data.dublicat_account_number) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["ikkilamchi_licshet"],
+        path: ["dublicat_account_number"],
         message: "Dvaynik arizalariga ikkilamchi licshet kiritish majburiy!",
       });
     }
@@ -101,7 +101,10 @@ export const changeArizaActBodySchema = z.object({
   amountWithQQS: z.coerce.number(),
   amountWithoutQQS: z.coerce.number(),
   description: z.string(),
-  photos: z.array(z.string()).optional(),
+  photos: z.preprocess(
+    (arg) => (typeof arg === "string" ? JSON.parse(arg) : arg),
+    z.array(z.string()).optional()
+  ),
   actNumber: z.string(),
 });
 

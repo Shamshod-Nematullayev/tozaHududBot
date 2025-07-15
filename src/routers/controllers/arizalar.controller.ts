@@ -266,7 +266,7 @@ export const updateArizaFromBillingById: Handler = async (
 ): Promise<any> => {
   // validate the request
   const ariza = await Ariza.findOne({
-    _id: req.params.ariza_id,
+    _id: req.params.id,
     companyId: req.user.companyId,
   });
   if (!ariza)
@@ -305,7 +305,7 @@ export const updateArizaFromBillingById: Handler = async (
 
 export const changeArizaAct: Handler = async (req, res): Promise<any> => {
   // validate
-  const { ariza_id } = req.params;
+  const { id } = req.params;
   const {
     allAmount,
     inhabitantCount,
@@ -318,7 +318,7 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
 
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const ariza = await Ariza.findOne({
-    _id: ariza_id,
+    _id: id,
     companyId: req.user.companyId,
   });
   if (!ariza) {
@@ -383,6 +383,7 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
       startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
     });
     ariza.akt_id = act.id;
+    ariza.actHistory.push(ariza.aktInfo);
     ariza.aktInfo = act;
   } else {
     // Yangi akt uchun pachkani olish
@@ -407,13 +408,13 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
       startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
     });
     ariza.akt_id = act.id;
+    ariza.actHistory.push(ariza.aktInfo);
     ariza.aktInfo = await getActInfo(tozaMakonApi, ariza.akt_id);
     ariza.actStatus = "NEW";
   }
 
   ariza.status = "qayta_akt_kiritilgan";
   ariza.akt_date = date;
-  ariza.actHistory.push(ariza.aktInfo);
 
   // Arizani yangilash
   await ariza.save();
