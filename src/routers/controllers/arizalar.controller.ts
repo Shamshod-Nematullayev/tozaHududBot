@@ -82,11 +82,11 @@ export const getArizalar = async (
       .skip(skip)
       .limit(limit)
       .lean();
-    const accountNumbers = data.map((item) => item.licshet);
+    const total = await Ariza.countDocuments(filters);
+    const accountNumbers = data.map((ariza) => ariza.licshet);
     const abonents = await Abonent.find({
       licshet: { $in: accountNumbers },
     });
-    const total = await Ariza.countDocuments(filters);
 
     res.json({
       ok: true,
@@ -180,6 +180,7 @@ export const createAriza: Handler = async (
   res: Response
 ): Promise<any> => {
   const {
+    abonentId,
     account_number,
     dublicat_account_number,
     document_type,
@@ -204,6 +205,7 @@ export const createAriza: Handler = async (
       message: "Ariza tartib raqami topilmadi",
     });
   const newAriza = await Ariza.create({
+    abonentId,
     licshet: account_number,
     ikkilamchi_licshet: dublicat_account_number,
     asosiy_licshet: account_number,
@@ -448,6 +450,11 @@ export const createMonayTransferAriza = async (
     req.body
   );
 
+  // 0. Find Abonent
+  const abonent = await Abonent.findOne({ licshet: debitorAct.accountNumber });
+  if (!abonent)
+    return res.status(404).json({ ok: false, message: "Abonent topilmadi" });
+
   // 1. Ariza uchun tartiq raqami olish
   const counter = await Counter.findOne({
     companyId: req.user.companyId,
@@ -467,6 +474,9 @@ export const createMonayTransferAriza = async (
     document_number: counter.value + 1,
     needMonayTransferActs: creditorActs,
     aktSummasi: debitorAct.amount,
+    fio: abonent.fio,
+    abonentId: abonent.id,
+    sana: new Date(),
   });
   await counter.updateOne({ $set: { value: counter.value + 1 } });
   res.json({ ok: true, ariza });
@@ -475,7 +485,7 @@ export const createMonayTransferAriza = async (
 export const createMonayTransferActByAriza = async (
   req: Request,
   res: Response
-) => {
+): Promise<any> => {
   // rollback qilish
   const actIds: number[] = [];
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);

@@ -33,6 +33,7 @@ const accountNumberRegex = [
 export const createArizaBodySchema = z
   .object({
     document_type: z.enum(arizaDocumentTypes),
+    abonentId: z.coerce.number(),
     account_number: z.string().regex(...accountNumberRegex),
     dublicat_account_number: z
       .string()

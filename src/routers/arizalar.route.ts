@@ -10,6 +10,7 @@ import {
   changeArizaAct,
   addImageToAriza,
   createMonayTransferAriza,
+  createMonayTransferActByAriza,
 } from "./controllers/arizalar.controller";
 import { uploadAsBlob } from "../middlewares/multer";
 import { catchAsync } from "./controllers/utils/catchAsync";
@@ -24,6 +25,7 @@ router.get("/:id", catchAsync(getArizaById)); // GET specific ariza
 router.post("/create", catchAsync(createAriza)); // CREATE new ariza
 router.post("/cancel", catchAsync(cancelArizaById)); // Cancel ariza (non-idempotent)
 router.post("/money-transfer", catchAsync(createMonayTransferAriza)); // Create transfer
+router.post("/money-transfer-act", catchAsync(createMonayTransferActByAriza));
 
 // --- PUT routes ---
 router.put("/:id", catchAsync(updateArizaById)); // Full update
