@@ -54,21 +54,18 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
           messages.enterOnlyNumber,
           keyboards.cancelBtn.resize()
         );
-      if (ctx.message.text.length != 12)
-        return ctx.reply(
-          messages.enterFullNamber,
-          keyboards.cancelBtn.resize()
-        );
-      const abonent = await Abonent.findOne({
-        licshet: ctx.message.text,
+      const abonents = await Abonent.find({
+        licshet: new RegExp(ctx.message.text),
         companyId: inspektor.companyId,
       });
-      if (!abonent) {
+      if (!abonents.length !== 1) {
         return ctx.reply(
           "Siz kiritgan hisob raqami bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
           keyboards.cancelBtn.resize()
         );
       }
+
+      const abonent = abonents[0];
       ctx.wizard.state.abonent = abonent;
       if (abonent.shaxsi_tasdiqlandi && abonent.shaxsi_tasdiqlandi.confirm) {
         ctx.reply(
