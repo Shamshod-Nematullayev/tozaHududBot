@@ -29,12 +29,27 @@ import { caotoNames } from "../../../../constants";
 
 import { io, usersMapSocket } from "../../../../config/socketConfig";
 import { WizardWithState } from "@bot/helpers/WizardWithState";
-import { Message } from "telegraf/typings/core/types/typegram";
+import {
+  InlineKeyboardButton,
+  Message,
+} from "telegraf/typings/core/types/typegram";
 import { Citizen } from "types/billing";
 import { getCitizen, getResidentHousesByPnfl } from "@services/billing";
+import { getStreetsByMahallaId } from "@services/billing/getStreetsByMahallaId";
+import { getElectricResidentDetails } from "@services/payme";
 // import { MyContext } from "types/botContext";
 // 1. Lokal state tipi
 // 1. State tipi
+interface BasicState {
+  id: number;
+  name: string;
+}
+interface IEtk_Abonent {
+  caotoNumber: string;
+  accountNumber: string;
+  companyId: number;
+  customerName: string;
+}
 interface MySceneState {
   inspector?: INazoratchi;
   company?: ICompany;
@@ -43,6 +58,12 @@ interface MySceneState {
   citizen?: Citizen;
   kadastr_baza_not_worked?: boolean;
   abonentCadastr?: string;
+  mahalla?: BasicState;
+  street?: BasicState;
+  streets?: BasicState[];
+  inhabitantCount?: number;
+  etk_abonent?: IEtk_Abonent;
+  findedETKAbonents?: IEtk_Abonent[];
 }
 
 type Ctx = WizardWithState<MySceneState>;
@@ -155,6 +176,15 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
         birthDate,
       });
 
+      if (!citizen.passport || !citizen.photo) {
+        await ctx.reply(
+          "Ushbu abonent pasport ma'lumotlari bilan muammo bor. Muddati o'tgan, vafot etgan va hokazo bo'lishi mumkin. Iltimos, xonadonda yashovchi boshqa muhim kishining nomiga ochishga urinib ko'ring",
+          keyboards.mainKeyboard
+        );
+        ctx.scene.leave();
+        return;
+      }
+
       ctx.wizard.state.citizen = citizen;
 
       let houses: string[] = [];
@@ -219,11 +249,12 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   },
   async (ctx) => {
     try {
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
       const data = ctx.callbackQuery.data.split("_");
       if (data[0] !== "cadastr") {
         throw "400 bad request. Cadastr raqami tanlanmadi";
       }
-      ctx.wizard.state.cadastr = data[1];
+      ctx.wizard.state.abonentCadastr = data[1];
       await ctx.reply(
         "Mahallani tanlang",
         Markup.inlineKeyboard(ctx.wizard.state.mahallalarButtons)
@@ -232,35 +263,28 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
       ctx.wizard.next();
     } catch (error) {
       ctx.reply("Kutilmagan xatolik yuz berdi", keyboards.cancelBtn.resize());
-
-      console.error(error.message);
+      console.error(error);
     }
   },
   async (ctx) => {
     try {
       // mahallani o'zgaruvchiga saqlash
-      const [key, mahallaId] = ctx.update.callback_query.data.split("_");
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
+      const [key, mahallaId] = ctx.callbackQuery.data.split("_");
       if (key !== "mahalla") {
         throw "status: 400 mahalla tanlanmadi";
       }
       const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId);
       await ctx.deleteMessage();
-      ctx.wizard.state.mahallaId = mahallaId;
-      ctx.wizard.state.mahallaName = (
-        await Mahalla.findOne({ id: mahallaId })
-      ).name;
+      const mahalla = await Mahalla.findOne({ id: mahallaId });
+      if (!mahalla) {
+        throw "status: 400 mahalla topilmadi";
+      }
+      ctx.wizard.state.mahalla = mahalla;
       // tanlangan mahallaga doir qishloqlarni olish
-      let streets = (
-        await tozaMakonApi.get("/user-service/mahallas/streets", {
-          params: {
-            size: 1000,
-            mahallaId,
-          },
-        })
-      ).data;
+      let streets = await getStreetsByMahallaId(tozaMakonApi, mahalla.id);
       if (streets.length == 1) {
-        ctx.wizard.state.street_id = streets[0].id;
-        ctx.wizard.state.streetName = streets[0].name;
+        ctx.wizard.state.street = streets[0];
         ctx.reply(
           "Yashovchi sonini tanlang yoki kiriting",
           Markup.keyboard([
@@ -290,15 +314,15 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   async (ctx) => {
     try {
       //ko'cha yoki qishloqni statega olish
-      const [key, streetId] = ctx.update.callback_query.data.split("_");
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
+      const [key, streetId] = ctx.callbackQuery.data.split("_");
       if (key !== "street") {
         throw "400 bad request";
       }
       await ctx.deleteMessage();
-      ctx.wizard.state.street_id = streetId;
-      ctx.wizard.state.streetName = ctx.wizard.state.streets.find(
-        (s) => s.id == streetId
-      ).name;
+      ctx.wizard.state.street = ctx.wizard.state.streets?.find(
+        (s) => s.id === parseInt(streetId)
+      );
       // yashovchi soni kiritish keyboardini jo'natish
       ctx.reply(
         "Yashovchi sonini tanlang yoki kiriting",
@@ -317,6 +341,7 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   async (ctx) => {
     try {
       // yashovchi sonini o'zgaruvchiga saqlash
+      if (!ctx.message || !("text" in ctx.message)) return;
       if (!ctx.message)
         return ctx.reply(
           "Yashovchi sonini tanlang yoki kiriting",
@@ -326,7 +351,7 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
             ["7", "8", "9"],
           ])
         );
-      if (isNaN(ctx.message.text))
+      if (isNaN(Number(ctx.message.text)))
         return ctx.reply(
           "Yashovchi sonini raqamda kiritish kerak",
           keyboards.cancelBtn.resize()
@@ -336,78 +361,55 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
           "Yashovchi soni 15 dan yuqori bo'lishi mumkin emas. Iltimos tekshib ko'ring"
         );
 
-      ctx.wizard.state.inhabitant_cnt = parseInt(ctx.message.text);
+      ctx.wizard.state.inhabitantCount = parseInt(ctx.message.text);
       await ctx.reply("Abonent elektr kodini kiriting", keyboards.cancelBtn);
-      if (ctx.wizard.state.inspektor.id == 21886) {
-        await ctx.replyWithHTML(
-          `
-          Abonent: <code>${ctx.wizard.state.citizen.lastName} ${ctx.wizard.state.citizen.firstName} ${ctx.wizard.state.citizen.patronymic}</code> \n
-          Kadastr: <code>${ctx.wizard.state.cadastr}</code> \n
-          Mahalla: <code>${ctx.wizard.state.mahallaName}</code> \n
-          Ko'cha: <code>${ctx.wizard.state.streetName}</code> \n
-          Yashovchilar soni: <code>${ctx.wizard.state.inhabitant_cnt}</code> \n
-          Barcha ma'lumotlar to'g'rimi?
-          `,
-          keyboards.yesOrNo
-        );
-        ctx.wizard.selectStep(8);
-        return;
-      }
       return ctx.wizard.next();
-    } catch (error) {
+    } catch (error: any) {
       ctx.reply(
         error.response?.data?.message || "Kutilmagan xatolik yuz berdi"
       );
-      console.error(error.message);
+      console.error(error);
     }
   },
   async (ctx) => {
     try {
-      if (isNaN(ctx.message.text)) {
+      if (!ctx.message || !("text" in ctx.message)) return;
+      if (isNaN(Number(ctx.message.text))) {
         ctx.reply(
           "Error: ETK kod to'g'ri kiritilmadi",
           keyboards.cancelBtn.resize()
         );
         return;
       }
-      const findedETKAbonents = await EtkAbonent.find({
+      const findedETKAbonents = (await EtkAbonent.find({
         accountNumber: ctx.message.text,
         companyId: ctx.wizard.state.companyId,
-      });
+      }).lean()) as {
+        caotoNumber: string;
+        accountNumber: string;
+        companyId: number;
+        customerName: string;
+      }[];
       if (!findedETKAbonents[0]) {
         for (let caoto of caotoNames.filter(
           (c) => c.companyId == ctx.wizard.state.companyId
         )) {
-          const { data } = await axios.post(
-            "https://api-e3abced5.payme.uz/api/cheque.create",
-            {
-              method: "cheque.create",
-              params: {
-                amount: 50000,
-                merchant_id: "5a5dffd8687ee421a5c4b0e6",
-                account: {
-                  account: ctx.message.text,
-                  region: caoto.region,
-                  subRegion: caoto.caoto,
-                },
-              },
-            }
-          );
+          const electrAbonentDetails = await getElectricResidentDetails({
+            accountNumber: ctx.message.text,
+            region: caoto.region,
+            caoto: caoto.caoto,
+          });
 
-          if (!data.error) {
-            findedETKAbonents.push({
-              caotoNumber: caoto.caoto,
-              accountNumber: ctx.message.text,
-              customerName: data.result.cheque.account.find(
-                (row) => row.name == "fio"
-              ).value,
-            });
-          }
+          findedETKAbonents.push({
+            caotoNumber: electrAbonentDetails.subRegion,
+            accountNumber: electrAbonentDetails.account,
+            companyId: caoto.companyId,
+            customerName: electrAbonentDetails.fio,
+          });
         }
       }
 
-      const etk_abonent = findedETKAbonents[0];
-      if (!etk_abonent) {
+      if (findedETKAbonents.length === 0) {
         await ctx.reply(
           "Siz kiritgan ETK kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
           keyboards.cancelBtn
@@ -415,6 +417,7 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
         return;
       }
 
+      const etk_abonent = findedETKAbonents[0];
       if (findedETKAbonents.length === 1) {
         await ctx.replyWithHTML(
           `Abonent: <code>${etk_abonent.customerName}</code> \nUshbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
@@ -425,30 +428,35 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
             ],
           ])
         );
-        ctx.wizard.state.etkCustomerCode = ctx.message.text;
         ctx.wizard.state.etk_abonent = etk_abonent;
         ctx.wizard.selectStep(7);
         return;
       }
 
-      const buttons = [];
+      const buttons: InlineKeyboardButton[] = [];
       findedETKAbonents.forEach((abonent) => {
-        const caoto = caotoNames.find((c) => c.caoto == abonent.caotoNumber);
-        buttons.push(Markup.button.callback(caoto.title, abonent.caotoNumber));
+        const caoto = caotoNames.find(
+          (c) => c.caoto == Number(abonent.caotoNumber)
+        );
+        if (caoto)
+          buttons.push(
+            Markup.button.callback(caoto.title, abonent.caotoNumber)
+          );
       });
       ctx.reply("Hududni tanlang", Markup.inlineKeyboard(buttons));
       ctx.wizard.state.findedETKAbonents = findedETKAbonents;
-      ctx.wizard.state.etkCustomerCode = ctx.message.text;
       ctx.wizard.next();
-    } catch (error) {
-      ctx.reply("Error: " + error.message);
+    } catch (error: any) {
+      ctx.reply("Error: " + error?.message);
       console.error(error);
     }
   },
   async (ctx) => {
     try {
+      // caotolar ichidan tanlash
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
       const caoto = ctx.callbackQuery.data;
-      const etk_abonent = ctx.wizard.state.findedETKAbonents.find(
+      const etk_abonent = ctx.wizard.state.findedETKAbonents?.find(
         (abonent) => abonent.caotoNumber == caoto
       );
       if (!etk_abonent) {
@@ -467,23 +475,24 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
         ])
       );
       ctx.wizard.next();
-    } catch (error) {
-      ctx.reply("Error: " + error.message);
+    } catch (error: any) {
+      ctx.reply("Error: " + error?.message);
       console.error(error);
     }
   },
   async (ctx) => {
     try {
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
       if (ctx.callbackQuery.data === "yes") {
         await ctx.replyWithHTML(
           `
-          Abonent: <code>${ctx.wizard.state.citizen.lastName} ${ctx.wizard.state.citizen.firstName} ${ctx.wizard.state.citizen.patronymic}</code> \n
-          Kadastr: <code>${ctx.wizard.state.cadastr}</code> \n
-          Mahalla: <code>${ctx.wizard.state.mahallaName}</code> \n
-          Ko'cha: <code>${ctx.wizard.state.streetName}</code> \n
-          Yashovchilar soni: <code>${ctx.wizard.state.inhabitant_cnt}</code> \n
-          ETK hisob raqami: <code>${ctx.wizard.state.etkCustomerCode}</code> \n
-          ETK abonent: <code>${ctx.wizard.state.etk_abonent.customerName}</code> \n
+          Abonent: <code>${ctx.wizard.state.citizen?.lastName} ${ctx.wizard.state.citizen?.firstName} ${ctx.wizard.state.citizen?.patronymic}</code> \n
+          Kadastr: <code>${ctx.wizard.state.abonentCadastr}</code> \n
+          Mahalla: <code>${ctx.wizard.state.mahalla?.name}</code> \n
+          Ko'cha: <code>${ctx.wizard.state.street?.name}</code> \n
+          Yashovchilar soni: <code>${ctx.wizard.state.inhabitantCount}</code> \n
+          ETK hisob raqami: <code>${ctx.wizard.state.etk_abonent?.accountNumber}</code> \n
+          ETK abonent: <code>${ctx.wizard.state.etk_abonent?.customerName}</code> \n
           Barcha ma'lumotlar to'g'rimi?
           `,
           keyboards.yesOrNo
@@ -497,33 +506,34 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
         ctx.wizard.selectStep(5);
       }
       await ctx.deleteMessage();
-    } catch (error) {
+    } catch (error: any) {
       ctx.reply("Error: " + error.message);
       console.error(error);
     }
   },
   async (ctx) => {
     try {
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
       if (ctx.callbackQuery.data === "yes") {
         const etk_abonent = ctx.wizard.state.etk_abonent;
         await NewAbonent.create({
-          abonent_name: `${ctx.wizard.state.citizen.lastName} ${ctx.wizard.state.citizen.firstName} ${ctx.wizard.state.citizen.patronymic}`,
-          nazoratchi_id: ctx.wizard.state.inspektor.id,
-          senderId: ctx.from.id,
-          mahallaId: ctx.wizard.state.mahallaId,
-          mahallaName: ctx.wizard.state.mahallaName,
-          streetId: ctx.wizard.state.street_id,
-          streetName: ctx.wizard.state.streetName,
+          abonent_name: `${ctx.wizard.state.citizen?.lastName} ${ctx.wizard.state.citizen?.firstName} ${ctx.wizard.state.citizen?.patronymic}`,
+          nazoratchi_id: ctx.wizard.state.inspector?.id,
+          senderId: ctx.from?.id,
+          mahallaId: ctx.wizard.state.mahalla?.id,
+          mahallaName: ctx.wizard.state.mahalla?.name,
+          streetId: ctx.wizard.state.street?.id,
+          streetName: ctx.wizard.state.street?.name,
           citizen: ctx.wizard.state.citizen,
-          cadastr: ctx.wizard.state.cadastr,
-          inhabitant_cnt: Number(ctx.wizard.state.inhabitant_cnt),
-          etkCustomerCode: ctx.wizard.state.etkCustomerCode,
+          cadastr: ctx.wizard.state.abonentCadastr,
+          inhabitant_cnt: Number(ctx.wizard.state.inhabitantCount),
+          etkCustomerCode: etk_abonent?.accountNumber,
           etkCaoto: etk_abonent?.caotoNumber,
           companyId: ctx.wizard.state.companyId,
           kadastr_baza_not_worked: ctx.wizard.state.kadastr_baza_not_worked,
         });
         await ctx.reply(
-          `Yangi abonent yaratish uchun ariza yuborildi. Abonent: ${ctx.wizard.state.citizen.lastName} ${ctx.wizard.state.citizen.firstName} ${ctx.wizard.state.citizen.patronymic}`,
+          `Yangi abonent yaratish uchun ariza yuborildi. Abonent: ${ctx.wizard.state.citizen?.lastName} ${ctx.wizard.state.citizen?.firstName} ${ctx.wizard.state.citizen?.patronymic}`,
           keyboards.mainKeyboard
         );
         const users = await Admin.find({
@@ -565,7 +575,7 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
         ctx.scene.leave();
         await ctx.deleteMessage();
       }
-    } catch (error) {
+    } catch (error: any) {
       ctx.reply("Error: " + error.message);
       console.error(error);
     }

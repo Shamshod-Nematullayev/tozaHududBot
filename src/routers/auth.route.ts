@@ -1,10 +1,10 @@
-import { Admin } from "@models/Admin.ts";
+import { Admin } from "@models/Admin";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { bot } from "../bot/core/bot.js";
+import { bot } from "../bot/core/bot";
 import axios from "axios";
-import isAuth from "../middlewares/isAuth.ts";
-import { Company } from "@models/Company.ts";
+import isAuth from "../middlewares/isAuth";
+import { Company } from "@models/Company";
 import { NextFunction, Request, Response, Router } from "express";
 
 const router = Router();

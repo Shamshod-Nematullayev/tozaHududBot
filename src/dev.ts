@@ -10,7 +10,7 @@ process.on("unhandledRejection", (reason, promise) => {
 
 (async () => {
   try {
-    await import("./index.ts");
+    await import("./index");
   } catch (error) {
     console.error("🚨 [IMPORT ERROR]:", error);
     if (error instanceof Error && error.stack) {

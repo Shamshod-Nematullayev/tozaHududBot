@@ -1,5 +1,4 @@
-import { Response } from "express";
-import { MyRequest } from "interfaces/express.interfaces";
+import { Request, Response } from "express";
 
 import { Abonent } from "@models/Abonent";
 
@@ -7,7 +6,7 @@ import { LastUpdate } from "@models/LastUpdate";
 
 import { NewAbonent } from "@models/NewAbonents";
 
-export const getIdentityStat = async (req: MyRequest, res: Response) => {
+export const getIdentityStat = async (req: Request, res: Response) => {
   try {
     const allAbonentsCount = await Abonent.countDocuments({
       companyId: req.user?.companyId,
@@ -31,7 +30,7 @@ export const getIdentityStat = async (req: MyRequest, res: Response) => {
   }
 };
 
-export const getETKConfirmStat = async (req: MyRequest, res: Response) => {
+export const getETKConfirmStat = async (req: Request, res: Response) => {
   try {
     const allAbonentsCount = await Abonent.countDocuments({
       companyId: req.user?.companyId,
@@ -56,7 +55,7 @@ export const getETKConfirmStat = async (req: MyRequest, res: Response) => {
 };
 
 export const getLastUpdateDateAbonentsSaldo = async (
-  req: MyRequest,
+  req: Request,
   res: Response
 ) => {
   try {
@@ -64,7 +63,7 @@ export const getLastUpdateDateAbonentsSaldo = async (
       await LastUpdate.findOne({
         key: `abonents-update-${req.user?.companyId}`,
       })
-    ).last_update;
+    )?.last_update;
     res.json({ lastUpdateDate });
   } catch (error) {
     res.status(500).json({
@@ -75,7 +74,7 @@ export const getLastUpdateDateAbonentsSaldo = async (
 };
 
 export const getNewAbonentRequstsCount = async (
-  req: MyRequest,
+  req: Request,
   res: Response
 ) => {
   try {

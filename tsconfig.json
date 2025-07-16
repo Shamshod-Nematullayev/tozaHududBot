@@ -12,9 +12,8 @@
     "allowJs": true,
     "checkJs": false,
     "resolveJsonModule": true,
-    "noEmit": true,
+    "noEmit": false,
     "baseUrl": "./src",
-    "allowImportingTsExtensions": true,
     "paths": {
       "@controllers/*": ["controllers/*"],
       "@models/*": ["models/*"],
