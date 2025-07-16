@@ -1,6 +1,6 @@
 import { bot } from "../core/bot.js";
 
-import { messages } from "../lib/messages";
+import { messages } from "../lib/messages.js";
 
 bot.use(async (ctx, next) => {
   try {

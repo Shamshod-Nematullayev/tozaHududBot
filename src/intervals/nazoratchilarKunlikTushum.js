@@ -3,8 +3,8 @@ import { Company } from "@models/Company.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 
 import ejs from "ejs";
-import generateImage from "../helpers/puppeteer-wrapper";
-import { ekopayApi } from "../api/ekopayApi";
+import generateImage from "../helpers/puppeteer-wrapper.js";
+import { ekopayApi } from "../api/ekopayApi.js";
 
 export async function nazoratchilarKunlikTushum(companyId = 1144) {
   try {

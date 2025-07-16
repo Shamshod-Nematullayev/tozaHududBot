@@ -6,7 +6,7 @@ import { messages } from "@lib/messages.js";
 
 import { MultiplyRequest } from "@models/MultiplyRequest.js";
 
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 import { Abonent } from "@models/Abonent.js";
 
 import { createTozaMakonApi } from "@api/tozaMakon.js";

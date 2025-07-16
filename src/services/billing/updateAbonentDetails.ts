@@ -1,6 +1,6 @@
 import { Axios } from "axios";
 import { AbonentDetails } from "types/billing";
-import { getAbonentDetails } from "./getAbonentDetails";
+import { getAbonentDetails } from "./getAbonentDetails.js";
 
 type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];

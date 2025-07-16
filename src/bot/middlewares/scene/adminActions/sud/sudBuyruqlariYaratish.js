@@ -4,7 +4,7 @@ import { SudBuyruqInputExcel } from "../../../../../constants.js";
 
 import { keyboards } from "@lib/keyboards.js";
 
-import isCancel from "../../../smallFunctions/isCancel";
+import isCancel from "../../../smallFunctions/isCancel.js";
 import fs from "fs";
 import https from "https";
 import excelToJson from "convert-excel-to-json";

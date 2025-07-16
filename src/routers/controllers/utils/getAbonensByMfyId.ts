@@ -1,8 +1,8 @@
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril.js";
 import { Abonent } from "@models/Abonent.js";
-import { getAbonentsByMfyIdQuerySchema } from "@schemas/billing.schema";
-import { searchAbonent } from "@services/billing";
+import { getAbonentsByMfyIdQuerySchema } from "@schemas/billing.schema.js";
+import { searchAbonent } from "@services/billing/index.js";
 import { Request } from "express";
 
 export async function getAbonentsByMfyId(req: Request) {

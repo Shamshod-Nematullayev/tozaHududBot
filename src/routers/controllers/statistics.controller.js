@@ -1,8 +1,8 @@
-import { Abonent } from "../../models/Abonent";
+import { Abonent } from "../../models/Abonent.js";
 
-import { LastUpdate } from "../../models/LastUpdate";
+import { LastUpdate } from "../../models/LastUpdate.js";
 
-import { NewAbonent } from "../../models/NewAbonents";
+import { NewAbonent } from "../../models/NewAbonents.js";
 
 export const getIdentityStat = async (req, res) => {
   try {

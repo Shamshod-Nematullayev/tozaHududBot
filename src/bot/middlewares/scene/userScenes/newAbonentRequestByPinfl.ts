@@ -1,7 +1,7 @@
 import { Scenes, Markup, Context } from "telegraf";
 
-import isCancel from "../../smallFunctions/isCancel";
-import isRealPinflValidate from "../../smallFunctions/isPinfl";
+import isCancel from "../../smallFunctions/isCancel.js";
+import isRealPinflValidate from "../../smallFunctions/isPinfl.js";
 import { messages } from "@lib/messages.js";
 
 import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
@@ -16,7 +16,7 @@ import { NewAbonent } from "@models/NewAbonents.js";
 
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 
-import { extractBirthDateString } from "../../../../helpers/extractBirthDateFromPinfl";
+import { extractBirthDateString } from "../../../../helpers/extractBirthDateFromPinfl.js";
 import { EtkAbonent } from "@models/EtkAbonent.js";
 
 import { Notification } from "@models/Notification.js";
@@ -27,14 +27,17 @@ import axios from "axios";
 
 import { caotoNames } from "../../../../constants.js";
 
-import { io, usersMapSocket } from "../../../../config/socketConfig";
+import { io, usersMapSocket } from "../../../../config/socketConfig.js";
 import { WizardWithState } from "@bot/helpers/WizardWithState.js";
 import {
   InlineKeyboardButton,
   Message,
 } from "telegraf/typings/core/types/typegram";
 import { Citizen } from "types/billing";
-import { getCitizen, getResidentHousesByPnfl } from "@services/billing";
+import {
+  getCitizen,
+  getResidentHousesByPnfl,
+} from "@services/billing/index.js";
 import { getStreetsByMahallaId } from "@services/billing/getStreetsByMahallaId.js";
 import { getElectricResidentDetails } from "@services/payme.js";
 // import { MyContext } from "types/botContext";

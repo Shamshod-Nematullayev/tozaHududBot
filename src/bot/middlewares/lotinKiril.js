@@ -1,5 +1,5 @@
 import { bot } from "../core/bot.js";
-import { kirillga } from "./smallFunctions/lotinKiril";
+import { kirillga } from "./smallFunctions/lotinKiril.js";
 
 // Faqat matnlarni tarjima qilish
 function translateText(text) {

@@ -4,8 +4,8 @@ import { SudAkt } from "@models/SudAkt.js";
 
 import { keyboards } from "@lib/keyboards.js";
 
-import { handleTelegramExcel } from "../../smallFunctions/handleTelegramExcel";
-import isCancel from "../../smallFunctions/isCancel";
+import { handleTelegramExcel } from "../../smallFunctions/handleTelegramExcel.js";
+import isCancel from "../../smallFunctions/isCancel.js";
 import fs from "fs";
 import { sudXujjatlariBiriktirish } from "@api/cleancity/dxsh/sudXujjatlariBiriktirish.js";
 

@@ -1,7 +1,7 @@
 import {
   find_one_by_pinfil_from_mvd,
   find_address_by_pinfil_from_mvd,
-} from "./mvd-pinfil";
+} from "./mvd-pinfil.js";
 const pochta_harajati_belgilangan_summa = 17000;
 import fs from "fs";
 import blobUtil from "blob-util";

@@ -1,6 +1,6 @@
 import { Axios } from "axios";
-import { calculateKSaldo } from "./calculateKSaldo";
-import { createAct } from "./createAct";
+import { calculateKSaldo } from "./calculateKSaldo.js";
+import { createAct } from "./createAct.js";
 
 export async function transferAmountBetweenAccounts(
   tozaMakonApi: Axios,

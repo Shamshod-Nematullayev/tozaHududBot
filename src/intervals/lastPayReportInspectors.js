@@ -1,5 +1,5 @@
 import nodeHtmlToImage from "node-html-to-image";
-import { ekopayApi } from "../api/ekopayApi";
+import { ekopayApi } from "../api/ekopayApi.js";
 
 import { bot } from "@bot/core/bot.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";

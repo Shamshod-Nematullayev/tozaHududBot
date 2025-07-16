@@ -1,4 +1,4 @@
-import nodeHtmlToImage from "../helpers/puppeteer-wrapper";
+import nodeHtmlToImage from "../helpers/puppeteer-wrapper.js";
 import { Mahalla } from "@models/Mahalla.js";
 
 import { Abonent } from "@models/Abonent.js";

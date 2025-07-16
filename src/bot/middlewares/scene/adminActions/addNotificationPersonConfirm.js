@@ -5,12 +5,15 @@ import { messages } from "@lib/messages.js";
 import { Counter } from "@models/Counter.js";
 import { Bildirishnoma } from "@models/SudBildirishnoma.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 import * as fs from "fs";
 import * as https from "https";
 import * as excelToJson from "convert-excel-to-json";
 import axios from "axios";
-import mahallalar from "@lib/mahallalar.json";
+import { readFile } from "fs/promises";
+const mahallalar = JSON.parse(
+  await readFile(new URL("./mahallalar.json", import.meta.url))
+);
 
 export const personConfirm = new Scenes.WizardScene(
   "shaxsi_tashdiqlandi_bildirish_xati",

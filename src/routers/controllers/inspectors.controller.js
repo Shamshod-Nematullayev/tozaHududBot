@@ -4,7 +4,7 @@ import { Mahalla } from "../../models/Mahalla.js";
 
 import { createTozaMakonApi } from "../../api/tozaMakon.js";
 
-import { User } from "../../models/User";
+import { User } from "../../models/User.js";
 
 export const getAllInspectors = async (req, res) => {
   try {

@@ -1,6 +1,9 @@
 import { Markup } from "telegraf";
 
-import mahallalar from "@lib/mahallalar.json";
+import { readFile } from "fs/promises";
+const mahallalar = JSON.parse(
+  await readFile(new URL("./mahallalar.json", import.meta.url))
+);
 
 import { Mahalla } from "@models/Mahalla.js";
 

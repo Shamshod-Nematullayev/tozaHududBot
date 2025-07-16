@@ -1,4 +1,4 @@
-import { getAktsFromPacket } from "../api/cleancity/dxsh/getAktsFromPacket";
+import { getAktsFromPacket } from "../api/cleancity/dxsh/getAktsFromPacket.js";
 import { bot } from "../core/bot.js";
 
 import { Ariza } from "@models/Ariza.js";

@@ -4,8 +4,8 @@ import { CustomDataRequest } from "@models/CustomDataRequest.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Company } from "@models/Company.js";
 import { Admin } from "@models/Admin.js";
-import handleApproveRequest from "./handlers/handleApproveRequest";
-import handleRejectRequest from "./handlers/handleRejectRequest";
+import handleApproveRequest from "./handlers/handleApproveRequest.js";
+import handleRejectRequest from "./handlers/handleRejectRequest.js";
 
 const composer = new Composer();
 

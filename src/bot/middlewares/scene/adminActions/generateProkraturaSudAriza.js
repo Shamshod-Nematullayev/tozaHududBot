@@ -1,4 +1,4 @@
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 import { Scenes } from "telegraf";
 
 import {

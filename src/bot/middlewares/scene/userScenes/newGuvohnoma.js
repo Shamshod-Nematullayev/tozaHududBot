@@ -6,7 +6,7 @@ import { messages } from "@lib/messages.js";
 
 import { Guvohnoma } from "@models/Guvohnoma.js";
 
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 
 export const guvohnomaKiritishScene = new Scenes.WizardScene(
   "GUVOHNOMA_KIRITISH",

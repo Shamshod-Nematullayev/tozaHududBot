@@ -26,7 +26,7 @@ import {
   ICreateActPayload,
   getAbonentDetails,
   getActPacks,
-} from "@services/billing";
+} from "@services/billing/index.js";
 import { Request, response, Response } from "express";
 import z from "zod";
 import {
@@ -35,13 +35,13 @@ import {
   getAbonentDataRowIdQuerySchema,
   getAbonentsByMfyIdQuerySchema,
   sendAbonentsListToTelegramQuerySchema,
-} from "@schemas/billing.schema";
-import { mergePhotosWithPdf } from "./utils/mergePhotosWithPdf";
+} from "@schemas/billing.schema.js";
+import { mergePhotosWithPdf } from "./utils/mergePhotosWithPdf.js";
 import { transferAmountBetweenAccounts } from "@services/billing/transferAmountBetweenAccounts.js";
 import { InputMediaDocument } from "telegraf/typings/core/types/typegram";
-import { chunkArray } from "helpers/chunkArray";
-import { generateMessageForAbonentList } from "./utils/generateMessageForAbonentList";
-import { getAbonentsByMfyId } from "./utils/getAbonensByMfyId";
+import { chunkArray } from "helpers/chunkArray.js";
+import { generateMessageForAbonentList } from "./utils/generateMessageForAbonentList.js";
+import { getAbonentsByMfyId } from "./utils/getAbonensByMfyId.js";
 import { createMoneyTransferActs } from "@services/billing/createMoneyTransferActs.js";
 
 export const downloadPdfFileFromBillingAsBase64 = async (

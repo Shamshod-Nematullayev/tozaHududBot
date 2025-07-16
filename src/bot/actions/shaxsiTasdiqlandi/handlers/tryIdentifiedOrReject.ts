@@ -3,9 +3,9 @@ import {
   identificationAbonent,
   searchAbonent,
   updateAbonentDetails,
-} from "@services/billing";
+} from "@services/billing/index.js";
 import { Axios, AxiosError } from "axios";
-import { parseDublicateError } from "./dublicateParseResult";
+import { parseDublicateError } from "./dublicateParseResult.js";
 import { AbonentDoc } from "@models/Abonent.js";
 import { ICustomDataRequestDoc } from "@models/CustomDataRequest.js";
 

@@ -6,7 +6,7 @@ import { Abonent } from "@models/Abonent.js";
 
 import { Nazoratchi } from "@models/Nazoratchi.js";
 
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 import { EtkKodRequest } from "@models/EtkKodRequest.js";
 
 import { createTozaMakonApi } from "@api/tozaMakon.js";

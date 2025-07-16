@@ -22,7 +22,7 @@ import { generateProkuraturaSudAriza } from "./scene/adminActions/generateProkra
 import { pochtaHarajatiniTekshirishScene } from "./scene/adminActions/pochtaHarajatlariniTekshirish.js";
 import { new_abonent_request_by_pinfl_scene } from "./scene/userScenes/newAbonentRequestByPinfl.js";
 import { sudBuyruqlariYaratish } from "./scene/adminActions/sud/sudBuyruqlariYaratish.js";
-// import { sendWarningLettersByHybrid } from "./scene/adminActions/sendWarningLettersByHybrid";
+// import { sendWarningLettersByHybrid } from './scene/adminActions/sendWarningLettersByHybrid.js'
 import { updateElektrKod } from "./scene/userScenes/updateElektrKod.js";
 import { changeAbonentStreet } from "./scene/userScenes/changeAbonentStreet.js";
 import { sendWarningLettersByHybrid } from "./scene/adminActions/sendWarningLettersByHybrid.js";

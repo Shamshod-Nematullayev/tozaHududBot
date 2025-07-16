@@ -8,8 +8,8 @@ import { Admin } from "@models/Admin.js";
 import { Company } from "@models/Company.js";
 import { HybridMail } from "@models/HybridMail.js";
 
-import { handleTelegramExcel } from "../../smallFunctions/handleTelegramExcel";
-import isCancel from "../../smallFunctions/isCancel";
+import { handleTelegramExcel } from "../../smallFunctions/handleTelegramExcel.js";
+import isCancel from "../../smallFunctions/isCancel.js";
 import ejs from "ejs";
 import path from "path";
 

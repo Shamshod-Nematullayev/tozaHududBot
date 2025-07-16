@@ -9,12 +9,12 @@ import {
   updateAbonentDetails,
   searchAbonent,
   getResidentHousesByPnfl,
-} from "@services/billing";
+} from "@services/billing/index.js";
 import { Context } from "telegraf";
-import { tryDeleteOrEditMessage } from "./tryDeleteOrEditMessage";
+import { tryDeleteOrEditMessage } from "./tryDeleteOrEditMessage.js";
 import { Axios, AxiosError } from "axios";
-import { parseDublicateError } from "./dublicateParseResult";
-import { tryIdentifiedOrReject } from "./tryIdentifiedOrReject";
+import { parseDublicateError } from "./dublicateParseResult.js";
+import { tryIdentifiedOrReject } from "./tryIdentifiedOrReject.js";
 
 export default async function handleApproveRequest(
   ctx: Context,

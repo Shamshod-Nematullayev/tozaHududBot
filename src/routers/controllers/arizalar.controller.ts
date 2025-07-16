@@ -1,20 +1,20 @@
 import { createTozaMakonApi } from "../../api/tozaMakon.js";
 
-import { Ariza } from "../../models/Ariza";
+import { Ariza } from "../../models/Ariza.js";
 
 import { Abonent } from "@models/Abonent.js";
 import { Counter } from "@models/Counter.js";
 import FormData from "form-data";
 import { getOrCreateActPackId } from "@services/billing/getOrCreateActPackId.js";
 import { Handler, Request, Response } from "express";
-import { getPagination } from "./utils/pagination";
+import { getPagination } from "./utils/pagination.js";
 import {
   cancelArizaByIdSchema,
   changeArizaActBodySchema,
   createArizaBodySchema,
   createMonayTransferArizaBodySchema,
   getArizalarQuerySchema,
-} from "@schemas/ariza.schema";
+} from "@schemas/ariza.schema.js";
 import z, { ZodError } from "zod";
 import {
   calculateKSaldo,
@@ -25,8 +25,8 @@ import {
   getResidentActs,
   updateAct,
   uploadFileToTozaMakon,
-} from "@services/billing";
-import { mergePhotosWithPdf } from "./utils/mergePhotosWithPdf";
+} from "@services/billing/index.js";
+import { mergePhotosWithPdf } from "./utils/mergePhotosWithPdf.js";
 
 export const getArizalar = async (
   req: Request,

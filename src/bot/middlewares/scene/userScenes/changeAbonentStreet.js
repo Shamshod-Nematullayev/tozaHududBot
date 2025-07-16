@@ -2,7 +2,7 @@ import { Scenes, Markup } from "telegraf";
 
 import { keyboards } from "@lib/keyboards.js";
 
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 
 import { Abonent } from "@models/Abonent.js";

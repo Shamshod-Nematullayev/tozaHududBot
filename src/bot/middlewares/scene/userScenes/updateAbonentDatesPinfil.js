@@ -4,14 +4,14 @@ import { Abonent } from "@models/Abonent.js";
 
 import { Company } from "@models/Company.js";
 
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 import { messages } from "@lib/messages.js";
 
 import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
 
 import { find_one_by_pinfil_from_mvd } from "@api/mvd-pinfil.js";
 
-import isPinfl from "../../smallFunctions/isPinfl";
+import isPinfl from "../../smallFunctions/isPinfl.js";
 import { CustomDataRequest } from "@models/CustomDataRequest.js";
 
 import { Nazoratchi } from "@models/Nazoratchi.js";
@@ -19,7 +19,7 @@ import { Nazoratchi } from "@models/Nazoratchi.js";
 import fs from "fs";
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 
-import { extractBirthDateString } from "../../../../helpers/extractBirthDateFromPinfl";
+import { extractBirthDateString } from "../../../../helpers/extractBirthDateFromPinfl.js";
 
 export const updateAbonentDatesByPinfl = new Scenes.WizardScene(
   "update_abonent_date_by_pinfil",

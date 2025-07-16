@@ -1,6 +1,6 @@
 // require("./haveUsername");
-import "./lotinKiril";
-import "./scenes";
-import "./notGroup";
-import "./setLanguage";
-import "./saveUser";
+import "./lotinKiril.js";
+import "./scenes.js";
+import "./notGroup.js";
+import "./setLanguage.js";
+import "./saveUser.js";

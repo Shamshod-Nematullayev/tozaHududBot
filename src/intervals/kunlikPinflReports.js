@@ -1,4 +1,4 @@
-import nodeHtmlToImage from "../helpers/puppeteer-wrapper";
+import nodeHtmlToImage from "../helpers/puppeteer-wrapper.js";
 import { Abonent } from "@models/Abonent.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Company } from "@models/Company.js";

@@ -1,6 +1,6 @@
 import { WizardScene } from "telegraf/scenes";
 
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 import { Abonent } from "@models/Abonent.js";
 
 import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";

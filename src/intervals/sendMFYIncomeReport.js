@@ -1,4 +1,4 @@
-import nodeHtmlToImage from "../helpers/puppeteer-wrapper";
+import nodeHtmlToImage from "../helpers/puppeteer-wrapper.js";
 import ejs from "ejs";
 import { bot } from "@bot/core/bot.js";
 import { Company } from "@models/Company.js";

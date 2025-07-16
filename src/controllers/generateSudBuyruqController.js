@@ -10,7 +10,7 @@ import {
   LevelFormat,
   AlignmentType,
 } from "docx";
-import { kirillga } from "../bot/middlewares/smallFunctions/lotinKiril";
+import { kirillga } from "../bot/middlewares/smallFunctions/lotinKiril.js";
 
 import path from "path";
 

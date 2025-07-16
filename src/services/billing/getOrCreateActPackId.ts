@@ -1,8 +1,8 @@
 import { arizaDocumentTypes } from "@models/Ariza.js";
 import { Company } from "@models/Company.js";
 import { Axios } from "axios";
-import { packNames, packTypes } from "types/billing";
-import { formatDate } from "services/utils/formatDate";
+import { packNames, packTypes } from "types/billing.js";
+import { formatDate } from "@services/utils/formatDate.js";
 
 /**
  * Akt pachkasi mavjud bo‘lmasa yaratadi va qaytaradi

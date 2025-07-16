@@ -4,8 +4,8 @@ import { keyboards } from "@lib/keyboards.js";
 
 import { messages } from "@lib/messages.js";
 
-import isCancel from "../../smallFunctions/isCancel";
-import { kirillga, lotinga } from "../../smallFunctions/lotinKiril";
+import isCancel from "../../smallFunctions/isCancel.js";
+import { kirillga, lotinga } from "../../smallFunctions/lotinKiril.js";
 
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Abonent } from "@models/Abonent.js";

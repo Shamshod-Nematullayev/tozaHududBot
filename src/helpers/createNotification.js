@@ -1,4 +1,4 @@
-import { usersMapSocket, io } from "../config/socketConfig";
+import { usersMapSocket, io } from "../config/socketConfig.js";
 
 import { Notification } from "@models/Notification.js";
 

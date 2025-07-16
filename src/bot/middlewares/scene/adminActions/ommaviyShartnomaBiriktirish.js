@@ -4,7 +4,7 @@ import { Mahalla } from "@models/Mahalla.js";
 
 import { createInlineKeyboard, keyboards } from "@lib/keyboards.js";
 
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 
 export const ommaviyShartnomaBiriktirish = new Scenes.WizardScene(
   "ommaviy_shartnoma_biriktirish",

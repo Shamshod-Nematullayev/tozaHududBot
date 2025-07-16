@@ -5,7 +5,7 @@ import { Company } from "@models/Company.js";
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 import { Markup } from "telegraf";
 import { createInlineKeyboard, keyboards } from "@lib/keyboards.js";
-import isCancel from "../../../middlewares/smallFunctions/isCancel";
+import isCancel from "../../../middlewares/smallFunctions/isCancel.js";
 // mini map
 // 0 entry
 // 1 picking mahalla

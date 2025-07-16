@@ -2,7 +2,7 @@ import { Scenes } from "telegraf";
 import { keyboards } from "@lib/keyboards.js";
 import { messages } from "@lib/messages.js";
 import { Guvohnoma } from "@models/Guvohnoma.js";
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 
 export const confirmGuvohnomaScene = new Scenes.WizardScene(
   "confirm_game_over",

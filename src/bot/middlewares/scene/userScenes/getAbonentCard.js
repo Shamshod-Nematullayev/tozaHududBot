@@ -10,7 +10,7 @@ import ejs from "ejs";
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 import puppeter from "puppeteer";
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 
 export const getAbonentCard = new WizardScene(
   "getAbonentCard",

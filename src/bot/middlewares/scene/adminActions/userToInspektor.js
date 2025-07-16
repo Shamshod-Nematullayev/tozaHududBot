@@ -6,7 +6,7 @@ import { Nazoratchi } from "@models/Nazoratchi.js";
 
 import { User } from "@models/User.js";
 
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 import { Admin } from "@models/Admin.js";
 
 export const userToInspektor = new Scenes.WizardScene(

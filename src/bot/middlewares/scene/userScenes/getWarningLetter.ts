@@ -4,10 +4,10 @@ import { keyboards } from "@lib/keyboards.js";
 
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 
-import isCancel from "../../smallFunctions/isCancel";
-import { isValidAccountNumber } from "../utils/validator";
-import { getAbonentAndInspector } from "../utils/getAbonentAndInspector";
-import { getAbonentById } from "@services/billing";
+import isCancel from "../../smallFunctions/isCancel.js";
+import { isValidAccountNumber } from "../utils/validator.js";
+import { getAbonentAndInspector } from "../utils/getAbonentAndInspector.js";
+import { getAbonentById } from "@services/billing/index.js";
 import { generateWarningLetter } from "@services/billing/generateWarningLetter.js";
 import { errorHandler } from "@bot/utils/errorHandler.js";
 

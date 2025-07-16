@@ -1,5 +1,8 @@
 import { createTozaMakonApi } from "@api/tozaMakon.js";
-import { identificationAbonent, searchAbonent } from "@services/billing";
+import {
+  identificationAbonent,
+  searchAbonent,
+} from "@services/billing/index.js";
 import fs from "fs";
 export async function idenAllAbonents() {
   const tozaMakonApi = createTozaMakonApi(1144);

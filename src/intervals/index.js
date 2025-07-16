@@ -1,16 +1,16 @@
-import { agenda } from "../config/agenda";
+import { agenda } from "../config/agenda.js";
 import { Company } from "@models/Company.js";
-import { sendKunlikEtkReports } from "./kunlikEtkReports";
-import { sendKunlikPhoneReports } from "./kunlikPhoneReports";
-import { sendKunlikPinflReports } from "./kunlikPinflReports";
-import { lastPayReportInspectors } from "./lastPayReportInspectors";
-import { nazoratchilarKunlikTushum } from "./nazoratchilarKunlikTushum";
-import { sendEtkMfyReport } from "./sendEtkMfyReport";
-import { sendIdentifietMfyReport } from "./sendIdentifietMfyReport";
-import { sendMFYIncomeReport } from "./sendMFYIncomeReport";
-import { sendPinflMfyReport } from "./sendPinflMfyReport";
-// import { addUpdateArizaAktTask } from "./updateArizaAkt";
-import xatlovchilarIshiHisobot from "./xatlovchilarIshiHisobot";
+import { sendKunlikEtkReports } from "./kunlikEtkReports.js";
+import { sendKunlikPhoneReports } from "./kunlikPhoneReports.js";
+import { sendKunlikPinflReports } from "./kunlikPinflReports.js";
+import { lastPayReportInspectors } from "./lastPayReportInspectors.js";
+import { nazoratchilarKunlikTushum } from "./nazoratchilarKunlikTushum.js";
+import { sendEtkMfyReport } from "./sendEtkMfyReport.js";
+import { sendIdentifietMfyReport } from "./sendIdentifietMfyReport.js";
+import { sendMFYIncomeReport } from "./sendMFYIncomeReport.js";
+import { sendPinflMfyReport } from "./sendPinflMfyReport.js";
+// import { addUpdateArizaAktTask } from './updateArizaAkt.js'
+import xatlovchilarIshiHisobot from "./xatlovchilarIshiHisobot.js";
 
 // Define tasks with Agenda
 

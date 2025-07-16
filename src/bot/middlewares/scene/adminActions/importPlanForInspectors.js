@@ -11,7 +11,7 @@ import { importPlanInspectorsFileId } from "../../../../constants.js";
 
 import { Mahalla } from "@models/Mahalla.js";
 
-import isCancel from "../../smallFunctions/isCancel";
+import isCancel from "../../smallFunctions/isCancel.js";
 
 export const importPlanForInspectors = new Scenes.WizardScene(
   "import_plan_for_inspectors",

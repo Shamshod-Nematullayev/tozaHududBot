@@ -7,10 +7,10 @@ import { Abonent } from "@models/Abonent.js";
 import { Admin } from "@models/Admin.js";
 import { Mahalla } from "@models/Mahalla.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
-import { searchAbonent } from "@services/billing";
+import { searchAbonent } from "@services/billing/index.js";
 import { Composer, Markup } from "telegraf";
 import { MyContext } from "types/botContext";
-import { scenaNames } from "types/scenes";
+import { scenaNames } from "types/scenes.js";
 
 const composer = new Composer<MyContext>();
 
