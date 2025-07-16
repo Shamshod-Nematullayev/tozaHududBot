@@ -58,7 +58,7 @@ const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         licshet: new RegExp(ctx.message.text),
         companyId: inspektor.companyId,
       });
-      if (!abonents.length !== 1) {
+      if (abonents.length !== 1) {
         return ctx.reply(
           "Siz kiritgan hisob raqami bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
           keyboards.cancelBtn.resize()
