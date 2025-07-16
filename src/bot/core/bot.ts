@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { MyContext } from "types/botContext";
-import composer from "@bot/commands";
-import { errorHandler } from "@bot/utils/errorHandler";
+import composer from "@bot/commands/index.js";
+import { errorHandler } from "@bot/utils/errorHandler.js";
 
 // BOT o'zgaruvchisi
 const TOKEN = process.env.TOKEN as string;

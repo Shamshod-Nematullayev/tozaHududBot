@@ -4,7 +4,7 @@ import {
   getAllNotifications,
   markNotificationAsRead,
   markAllNotificationsAsRead,
-} from "./controllers/notification.controller";
+} from "./controllers/notification.controller.js";
 
 router.get("/", getAllNotifications);
 

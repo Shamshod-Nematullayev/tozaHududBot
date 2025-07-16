@@ -6,7 +6,7 @@ import {
   getDocumentTargetsById,
   getDocumentTargets,
   cancelTargetById,
-} from "./controllers/targets.controller";
+} from "./controllers/targets.controller.js";
 import { uploadAsBlob } from "../middlewares/multer";
 const router = Router();
 

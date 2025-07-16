@@ -6,7 +6,7 @@ import {
   getFreeAbonentIdForNewAbonent,
   castlingWithNewAbonent,
   generateAccountNumber,
-} from "./controllers/newAbonents.controller";
+} from "./controllers/newAbonents.controller.js";
 
 import express from "express";
 const router = express.Router();

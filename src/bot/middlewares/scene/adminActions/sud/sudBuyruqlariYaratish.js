@@ -8,7 +8,7 @@ import isCancel from "../../../smallFunctions/isCancel";
 import fs from "fs";
 import https from "https";
 import excelToJson from "convert-excel-to-json";
-import { createNewSudBuyruq } from "../../../../../controllers/generateSudBuyruqController";
+import { createNewSudBuyruq } from "../../../../../controllers/generateSudBuyruqController.js";
 import { messages } from "@lib/messages";
 
 export const sudBuyruqlariYaratish = new Scenes.WizardScene(

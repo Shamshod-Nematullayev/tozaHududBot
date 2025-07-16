@@ -10,7 +10,7 @@ import {
   confirmDalolatnoma,
   getRowsByIds,
   getDalolatnomalar,
-} from "./controllers/xatlovInhabitantCnt.controller";
+} from "./controllers/xatlovInhabitantCnt.controller.js";
 
 import express from "express";
 const router = express.Router();

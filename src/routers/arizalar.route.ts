@@ -11,9 +11,9 @@ import {
   addImageToAriza,
   createMonayTransferAriza,
   createMonayTransferActByAriza,
-} from "./controllers/arizalar.controller";
-import { uploadAsBlob } from "../middlewares/multer";
-import { catchAsync } from "./controllers/utils/catchAsync";
+} from "./controllers/arizalar.controller.js";
+import { uploadAsBlob } from "../middlewares/multer.js";
+import { catchAsync } from "./controllers/utils/catchAsync.js";
 
 const router = express.Router();
 

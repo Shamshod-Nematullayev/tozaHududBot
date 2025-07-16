@@ -9,7 +9,7 @@ import {
   setInspectorTelegramId,
   getInspectorsFromTozaMakon,
   checkTelegramId,
-} from "./controllers/inspectors.controller";
+} from "./controllers/inspectors.controller.js";
 
 router.get("/", getAllInspectors);
 

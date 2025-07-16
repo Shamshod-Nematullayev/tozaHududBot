@@ -1,4 +1,4 @@
-import { uploadAsBlob } from "@middlewares/multer";
+import { uploadAsBlob } from "@middlewares/multer.js";
 
 import {
   getAbonentDHJByAbonentId,
@@ -17,11 +17,11 @@ import {
   createResidentAct,
   downloadPdfFileFromBillingAsBase64,
   transferMoneyBetweenResidents,
-} from "./controllers/billing.controller";
+} from "./controllers/billing.controller.js";
 
 import express from "express";
-import { catchAsync } from "./controllers/utils/catchAsync";
-import { getActPacks } from "./controllers/acts.controller";
+import { catchAsync } from "./controllers/utils/catchAsync.js";
+import { getActPacks } from "./controllers/acts.controller.js";
 const router = express.Router();
 
 // --- GET routes ---

@@ -8,7 +8,7 @@ import {
   getPdfByFileId,
   addLogToAct,
   calculateAmount,
-} from "./controllers/acts.controller";
+} from "./controllers/acts.controller.js";
 
 import express from "express";
 const router = express.Router();

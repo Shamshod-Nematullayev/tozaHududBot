@@ -3,7 +3,7 @@ import {
   getETKConfirmStat,
   getLastUpdateDateAbonentsSaldo,
   getNewAbonentRequstsCount,
-} from "./controllers/statistics.controller.ts";
+} from "./controllers/statistics.controller.js";
 
 import express from "express";
 const router = express.Router();

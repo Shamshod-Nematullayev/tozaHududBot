@@ -1,7 +1,7 @@
 import {
   getConfirmedAbonentCountsReportByInspectors,
   getConfirmedAbonentCountsReportByInspectorsExcel,
-} from "./controllers/reports.controller";
+} from "./controllers/reports.controller.js";
 
 import express from "express";
 const router = express.Router();

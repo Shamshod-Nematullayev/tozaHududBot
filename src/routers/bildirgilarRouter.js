@@ -1,7 +1,7 @@
 import {
   getAllBildirgilar,
   getBildirgiById,
-} from "../controllers/bildirgilarController";
+} from "../controllers/bildirgilarController.js";
 
 import express from "express";
 const router = express.Router();

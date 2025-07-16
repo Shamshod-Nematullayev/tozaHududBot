@@ -2,10 +2,10 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import isAuth from "./middlewares/isAuth";
+import isAuth from "./middlewares/isAuth.js";
 import { app, server } from "./config/socketConfig.js";
 import { agenda } from "./config/agenda.js";
-import { connectDb } from "./config/connectDB";
+import { connectDb } from "./config/connectDB.js";
 import { bot } from "./bot/core/bot.js";
 import updateAbonentsFromTozamakon from "./intervals/updateAbonentsFromTozamakon.js";
 import { queueNames } from "./constants.js";
@@ -61,7 +61,7 @@ connectDb();
 // idenAllAbonents(); vaqtincha foydalaniladigan funksiya
 
 // use routers
-import authRouter from "./routers/auth.route";
+import authRouter from "./routers/auth.route.js";
 import statisticsRouter from "./routers/statisticsRouter.js";
 import notificationRouter from "./routers/notificationRouter.js";
 import sudRouter from "./routers/sudRouter.js";
@@ -78,8 +78,8 @@ import newAbonentsRouter from "./routers/newAbonentsRouter.js";
 import yashovchiSoniXatlovRouter from "./routers/yashovchiSoniXatlov.js";
 import reportsRouter from "./routers/reportsRouter.js";
 import actsRouter from "./routers/actsRouter.js";
-import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler";
-import { idenAllAbonents } from "test/index";
+import { globalErrorHandler } from "./routers/controllers/utils/globalErrorHandler.js";
+import { idenAllAbonents } from "test/index.js";
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);
@@ -104,7 +104,7 @@ app.use(globalErrorHandler);
 function useTelegramBot() {
   import("./bot/core/bot.js");
   import("./bot/middlewares/index.js");
-  import("./bot/actions/index");
+  import("./bot/actions/index.js");
 }
 useTelegramBot();
 

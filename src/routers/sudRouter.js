@@ -1,13 +1,13 @@
 import express from "express";
 const router = express.Router();
 import ejs from "ejs";
-import { HybridMail } from "@models/HybridMail";
+import { HybridMail } from "@models/HybridMail.js";
 
-import { uploadAsBlob, isLimitFileSize } from "../middlewares/multer";
-import { createHybridPochtaApi } from "../api/hybridPochta";
+import { uploadAsBlob, isLimitFileSize } from "../middlewares/multer.js";
+import { createHybridPochtaApi } from "../api/hybridPochta.js";
 
 import PDFMerger from "pdf-merger-js";
-import { createTozaMakonApi } from "../api/tozaMakon";
+import { createTozaMakonApi } from "../api/tozaMakon.js";
 
 import FormData from "form-data";
 import {
@@ -20,7 +20,7 @@ import {
   uploadSudArizaFile,
   getDebitorAbonents,
   getDebitorAbonentsExcel,
-} from "./controllers/sud.controller";
+} from "./controllers/sud.controller.js";
 
 router.get("/", getSudAkts);
 
