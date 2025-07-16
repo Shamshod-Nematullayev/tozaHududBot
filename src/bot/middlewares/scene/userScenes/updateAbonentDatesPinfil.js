@@ -1,23 +1,23 @@
 import { Scenes, Markup } from "telegraf";
 
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
-import { Company } from "@models/Company";
+import { Company } from "@models/Company.js";
 
 import isCancel from "../../smallFunctions/isCancel";
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
-import { keyboards, createInlineKeyboard } from "@lib/keyboards";
+import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
 
-import { find_one_by_pinfil_from_mvd } from "@api/mvd-pinfil";
+import { find_one_by_pinfil_from_mvd } from "@api/mvd-pinfil.js";
 
 import isPinfl from "../../smallFunctions/isPinfl";
-import { CustomDataRequest } from "@models/CustomDataRequest";
+import { CustomDataRequest } from "@models/CustomDataRequest.js";
 
-import { Nazoratchi } from "@models/Nazoratchi";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 
 import fs from "fs";
-import { createTozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 import { extractBirthDateString } from "../../../../helpers/extractBirthDateFromPinfl";
 

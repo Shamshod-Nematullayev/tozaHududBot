@@ -1,9 +1,9 @@
-import { errorHandler } from "@bot/utils/errorHandler";
-import { getInspector } from "@bot/utils/getInspector";
-import { keyboards } from "@lib/keyboards";
-import { Mahalla } from "@models/Mahalla";
-import { Nazoratchi } from "@models/Nazoratchi";
-import { Target } from "@models/TargetAbonent";
+import { errorHandler } from "@bot/utils/errorHandler.js";
+import { getInspector } from "@bot/utils/getInspector.js";
+import { keyboards } from "@lib/keyboards.js";
+import { Mahalla } from "@models/Mahalla.js";
+import { Nazoratchi } from "@models/Nazoratchi.js";
+import { Target } from "@models/TargetAbonent.js";
 import { Composer, Markup } from "telegraf";
 
 const composer = new Composer();

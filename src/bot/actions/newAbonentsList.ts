@@ -1,4 +1,4 @@
-import { NewAbonent } from "@models/NewAbonents";
+import { NewAbonent } from "@models/NewAbonents.js";
 import { Composer } from "telegraf";
 
 const composer = new Composer();

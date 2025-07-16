@@ -1,13 +1,13 @@
 import { Scenes } from "telegraf";
 
-import { SudAkt } from "@models/SudAkt";
+import { SudAkt } from "@models/SudAkt.js";
 
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 
 import { handleTelegramExcel } from "../../smallFunctions/handleTelegramExcel";
 import isCancel from "../../smallFunctions/isCancel";
 import fs from "fs";
-import { sudXujjatlariBiriktirish } from "@api/cleancity/dxsh/sudXujjatlariBiriktirish";
+import { sudXujjatlariBiriktirish } from "@api/cleancity/dxsh/sudXujjatlariBiriktirish.js";
 
 export const uploadSudBuyruqlarBillingga = new Scenes.WizardScene(
   "upload_execution_to_billing",

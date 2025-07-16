@@ -1,13 +1,13 @@
 import { Scenes, Markup } from "telegraf";
 
-import { createInlineKeyboard, keyboards } from "@lib/keyboards";
+import { createInlineKeyboard, keyboards } from "@lib/keyboards.js";
 
-import { Nazoratchi } from "@models/Nazoratchi";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 
-import { User } from "@models/User";
+import { User } from "@models/User.js";
 
 import isCancel from "../../smallFunctions/isCancel";
-import { Admin } from "@models/Admin";
+import { Admin } from "@models/Admin.js";
 
 export const userToInspektor = new Scenes.WizardScene(
   "user_to_inspektor",

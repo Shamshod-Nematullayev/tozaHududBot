@@ -1,15 +1,15 @@
 import { Scenes } from "telegraf";
 
-import { SudBuyruqInputExcel } from "../../../../../constants";
+import { SudBuyruqInputExcel } from "../../../../../constants.js";
 
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 
 import isCancel from "../../../smallFunctions/isCancel";
 import fs from "fs";
 import https from "https";
 import excelToJson from "convert-excel-to-json";
 import { createNewSudBuyruq } from "../../../../../controllers/generateSudBuyruqController.js";
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
 export const sudBuyruqlariYaratish = new Scenes.WizardScene(
   "sudBuyruqlariYaratish",

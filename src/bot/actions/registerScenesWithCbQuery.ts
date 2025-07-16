@@ -1,4 +1,4 @@
-import { Nazoratchi } from "@models/Nazoratchi";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Composer } from "telegraf";
 import { MyContext } from "types/botContext";
 

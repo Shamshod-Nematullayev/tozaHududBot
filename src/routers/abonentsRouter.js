@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
 router.get("/", (req, res) => res.json({ ok: true }));
 

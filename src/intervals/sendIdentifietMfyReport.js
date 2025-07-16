@@ -1,8 +1,8 @@
 import nodeHtmlToImage from "node-html-to-image";
-import { createTozaMakonApi } from "../api/tozaMakon";
+import { createTozaMakonApi } from "../api/tozaMakon.js";
 
-import { Company } from "@models/Company";
-import { bot } from "@bot/core/bot";
+import { Company } from "@models/Company.js";
+import { bot } from "@bot/core/bot.js";
 
 import ejs from "ejs";
 

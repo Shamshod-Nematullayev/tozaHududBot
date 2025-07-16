@@ -1,9 +1,9 @@
 import https from "https";
 import fs from "fs";
 import xlsx from "xlsx";
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 
 // Helper function to download file using HTTPS
 function downloadFile(url, dest) {

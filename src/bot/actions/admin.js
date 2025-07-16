@@ -1,19 +1,19 @@
-import { NOTIFICATIONS_CHANNEL_ID } from "../../constants";
+import { NOTIFICATIONS_CHANNEL_ID } from "../../constants.js";
 import { sendKunlikPhoneReports } from "../../intervals/kunlikPhoneReports";
 import { sendKunlikPinflReports } from "../../intervals/kunlikPinflReports";
 import { nazoratchilarKunlikTushum } from "../../intervals/nazoratchilarKunlikTushum";
 import { sendMFYIncomeReport } from "../../intervals/sendMFYIncomeReport";
 import xatlovchilarIshiHisobot from "../../intervals/xatlovchilarIshiHisobot";
 import { kirillga } from "../middlewares/smallFunctions/lotinKiril";
-import { Notification } from "@models/Notification";
+import { Notification } from "@models/Notification.js";
 import { find_address_by_pinfil_from_mvd } from "../../api/mvd-pinfil";
 import { Composer } from "telegraf";
-import { bot } from "../core/bot";
-import { keyboards } from "@lib/keyboards";
-import { messages } from "@lib/messages";
-import { Admin } from "@models/Admin";
-import { Counter } from "@models/Counter";
-import { Guvohnoma } from "@models/Guvohnoma";
+import { bot } from "../core/bot.js";
+import { keyboards } from "@lib/keyboards.js";
+import { messages } from "@lib/messages.js";
+import { Admin } from "@models/Admin.js";
+import { Counter } from "@models/Counter.js";
+import { Guvohnoma } from "@models/Guvohnoma.js";
 
 // small required functions =========================================================================
 async function isAdmin(ctx) {

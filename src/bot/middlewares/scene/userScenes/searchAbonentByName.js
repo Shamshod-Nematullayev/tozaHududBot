@@ -1,15 +1,15 @@
 import { Scenes, Markup } from "telegraf";
 
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
 import isCancel from "../../smallFunctions/isCancel";
 import { kirillga, lotinga } from "../../smallFunctions/lotinKiril";
 
-import { Nazoratchi } from "@models/Nazoratchi";
-import { Abonent } from "@models/Abonent";
-import { Mahalla } from "@models/Mahalla";
+import { Nazoratchi } from "@models/Nazoratchi.js";
+import { Abonent } from "@models/Abonent.js";
+import { Mahalla } from "@models/Mahalla.js";
 
 export const searchAbonentbyName = new Scenes.WizardScene(
   "SEARCH_BY_NAME",

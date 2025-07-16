@@ -1,10 +1,10 @@
 import excelToJson from "convert-excel-to-json";
 import { Scenes } from "telegraf";
 
-import { pochtaHarajatlariTekshirishInputExcelShablon } from "../../../../constants";
+import { pochtaHarajatlariTekshirishInputExcelShablon } from "../../../../constants.js";
 import https from "https";
 import fs from "fs";
-import { pochtaHarajatiniTekshirish } from "@api/pochtaHarajatiniTekshirish";
+import { pochtaHarajatiniTekshirish } from "@api/pochtaHarajatiniTekshirish.js";
 import xlsx from "json-as-xlsx";
 import path from "path";
 

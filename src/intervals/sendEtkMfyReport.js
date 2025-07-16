@@ -1,11 +1,11 @@
-import { Mahalla } from "@models/Mahalla";
+import { Mahalla } from "@models/Mahalla.js";
 
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
 import ejs from "ejs";
 import nodeHtmlToImage from "node-html-to-image";
-import { bot } from "@bot/core/bot";
-import { Company } from "@models/Company";
+import { bot } from "@bot/core/bot.js";
+import { Company } from "@models/Company.js";
 
 function bugungiSana() {
   const date = new Date();

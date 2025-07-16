@@ -1,8 +1,8 @@
-import { createTozaMakonApi } from "../../api/tozaMakon";
+import { createTozaMakonApi } from "../../api/tozaMakon.js";
 
-import { Act } from "@models/Act";
+import { Act } from "@models/Act.js";
 
-import { Admin } from "@models/Admin";
+import { Admin } from "@models/Admin.js";
 
 export const getActPacks = async (req, res) => {
   try {

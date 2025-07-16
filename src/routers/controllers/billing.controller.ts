@@ -1,14 +1,14 @@
 import PDFMerger from "pdf-merger-js";
-import { createTozaMakonApi } from "../../api/tozaMakon";
+import { createTozaMakonApi } from "../../api/tozaMakon.js";
 
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
-import { Ariza } from "@models/Ariza";
+import { Ariza } from "@models/Ariza.js";
 
-import { bot } from "@bot/core/bot";
-import { Company } from "@models/Company";
+import { bot } from "@bot/core/bot.js";
+import { Company } from "@models/Company.js";
 
-import { Mahalla } from "@models/Mahalla";
+import { Mahalla } from "@models/Mahalla.js";
 
 import Excel from "exceljs";
 
@@ -37,12 +37,12 @@ import {
   sendAbonentsListToTelegramQuerySchema,
 } from "@schemas/billing.schema";
 import { mergePhotosWithPdf } from "./utils/mergePhotosWithPdf";
-import { transferAmountBetweenAccounts } from "@services/billing/transferAmountBetweenAccounts";
+import { transferAmountBetweenAccounts } from "@services/billing/transferAmountBetweenAccounts.js";
 import { InputMediaDocument } from "telegraf/typings/core/types/typegram";
 import { chunkArray } from "helpers/chunkArray";
 import { generateMessageForAbonentList } from "./utils/generateMessageForAbonentList";
 import { getAbonentsByMfyId } from "./utils/getAbonensByMfyId";
-import { createMoneyTransferActs } from "@services/billing/createMoneyTransferActs";
+import { createMoneyTransferActs } from "@services/billing/createMoneyTransferActs.js";
 
 export const downloadPdfFileFromBillingAsBase64 = async (
   req: Request,

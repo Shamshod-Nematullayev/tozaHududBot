@@ -1,5 +1,5 @@
 import { agenda } from "../config/agenda";
-import { Company } from "@models/Company";
+import { Company } from "@models/Company.js";
 import { sendKunlikEtkReports } from "./kunlikEtkReports";
 import { sendKunlikPhoneReports } from "./kunlikPhoneReports";
 import { sendKunlikPinflReports } from "./kunlikPinflReports";

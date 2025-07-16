@@ -1,4 +1,4 @@
-import { bot } from "../core/bot";
+import { bot } from "../core/bot.js";
 
 import { messages } from "../lib/messages";
 

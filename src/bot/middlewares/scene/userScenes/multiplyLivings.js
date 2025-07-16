@@ -1,18 +1,18 @@
 import { Scenes } from "telegraf";
 
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
-import { MultiplyRequest } from "@models/MultiplyRequest";
+import { MultiplyRequest } from "@models/MultiplyRequest.js";
 
 import isCancel from "../../smallFunctions/isCancel";
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
-import { createTozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 
-import { Nazoratchi } from "@models/Nazoratchi";
-import { Company } from "@models/Company";
+import { Nazoratchi } from "@models/Nazoratchi.js";
+import { Company } from "@models/Company.js";
 
 export const multiplyLivingsScene = new Scenes.WizardScene(
   "multiply_livings",

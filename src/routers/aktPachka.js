@@ -4,7 +4,7 @@ import {
   createNewPachka,
   updatePachkaById,
   deletePachkaById,
-} from "../controllers/sudAktPachkaControllers";
+} from "../controllers/sudAktPachkaControllers.js";
 
 import express from "express";
 const router = express.Router();

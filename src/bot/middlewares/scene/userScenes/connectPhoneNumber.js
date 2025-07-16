@@ -1,15 +1,15 @@
 import { Scenes } from "telegraf";
 
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
 import isCancel from "../../smallFunctions/isCancel";
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
-import { Nazoratchi } from "@models/Nazoratchi";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 
-import { createTozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 export const connectPhoneNumber = new Scenes.WizardScene(
   "connect_phone_number",

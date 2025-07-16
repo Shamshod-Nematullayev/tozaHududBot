@@ -1,9 +1,9 @@
-import { bot } from "../bot/core/bot";
+import { bot } from "../bot/core/bot.js";
 
 import https from "https";
-import { uploadAsBlob } from "@middlewares/multer";
+import { uploadAsBlob } from "@middlewares/multer.js";
 
-import { TEST_BASE_CHANNEL_ID } from "../constants";
+import { TEST_BASE_CHANNEL_ID } from "../constants.js";
 
 import express from "express";
 const router = express.Router();

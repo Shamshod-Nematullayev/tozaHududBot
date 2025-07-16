@@ -1,8 +1,8 @@
-import { Nazoratchi } from "../../models/Nazoratchi";
+import { Nazoratchi } from "../../models/Nazoratchi.js";
 
-import { Mahalla } from "../../models/Mahalla";
+import { Mahalla } from "../../models/Mahalla.js";
 
-import { createTozaMakonApi } from "../../api/tozaMakon";
+import { createTozaMakonApi } from "../../api/tozaMakon.js";
 
 import { User } from "../../models/User";
 

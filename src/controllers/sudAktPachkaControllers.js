@@ -1,9 +1,9 @@
-import { SudAktPachka } from "@models/SudAktPachka";
+import { SudAktPachka } from "@models/SudAktPachka.js";
 
-import { SudAkt } from "@models/SudAkt";
+import { SudAkt } from "@models/SudAkt.js";
 
 import compresser from "compressing";
-import { bot } from "../bot/core/bot";
+import { bot } from "../bot/core/bot.js";
 
 import https from "https";
 import fs from "fs";

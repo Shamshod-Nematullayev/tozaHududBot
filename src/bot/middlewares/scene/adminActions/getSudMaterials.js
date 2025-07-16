@@ -1,9 +1,9 @@
 import isCancel from "../../smallFunctions/isCancel";
 import { Scenes } from "telegraf";
 
-import { keyboards, createInlineKeyboard } from "@lib/keyboards";
+import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
 
-import { SudMaterial } from "@models/SudMaterial";
+import { SudMaterial } from "@models/SudMaterial.js";
 
 import fs from "fs";
 
@@ -12,22 +12,22 @@ import {
   guvohnomaFileID,
   shartnomaSSPFileID,
   ishonchnomaFileID,
-} from "../../../../constants";
+} from "../../../../constants.js";
 import excelToJson from "convert-excel-to-json";
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
 import https from "https";
 import compressing from "compressing";
-import { bot } from "../../../core/bot";
+import { bot } from "../../../core/bot.js";
 
 import rimraf from "rimraf";
 import path from "path";
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
-import { Mahalla } from "@models/Mahalla";
+import { Mahalla } from "@models/Mahalla.js";
 
 import PDFMerger from "pdf-merger-js";
-import { sendToSud } from "@api/sendToSud";
+import { sendToSud } from "@api/sendToSud.js";
 
 async function downloadFileToBaseDir(baseDirectory, filename, file_id) {
   const fileTelegramPath = await bot.telegram.getFileLink(file_id);

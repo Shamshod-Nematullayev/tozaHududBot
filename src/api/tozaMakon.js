@@ -1,4 +1,4 @@
-import { Company } from "@models/Company";
+import { Company } from "@models/Company.js";
 import axios from "axios";
 
 export function createTozaMakonApi(companyId, type = "billing") {

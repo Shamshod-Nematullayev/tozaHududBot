@@ -1,4 +1,4 @@
-import { bot } from "../core/bot";
+import { bot } from "../core/bot.js";
 import { kirillga } from "./smallFunctions/lotinKiril";
 
 // Faqat matnlarni tarjima qilish

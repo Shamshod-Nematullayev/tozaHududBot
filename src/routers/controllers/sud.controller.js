@@ -1,6 +1,6 @@
-import { SudAkt } from "@models/SudAkt";
-import { Abonent } from "@models/Abonent";
-import { Counter } from "@models/Counter";
+import { SudAkt } from "@models/SudAkt.js";
+import { Abonent } from "@models/Abonent.js";
+import { Counter } from "@models/Counter.js";
 import Excel from "exceljs";
 
 export const getSudAkts = async (req, res) => {

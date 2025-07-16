@@ -1,5 +1,5 @@
-import { Abonent, IAbonentDoc } from "@models/Abonent";
-import { INazoratchi, Nazoratchi } from "@models/Nazoratchi";
+import { Abonent, IAbonentDoc } from "@models/Abonent.js";
+import { INazoratchi, Nazoratchi } from "@models/Nazoratchi.js";
 import { Types } from "mongoose";
 import { Document } from "mongoose";
 

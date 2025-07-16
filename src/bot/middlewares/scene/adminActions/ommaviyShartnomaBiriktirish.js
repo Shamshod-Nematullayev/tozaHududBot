@@ -1,8 +1,8 @@
 import { Scenes, Markup } from "telegraf";
 
-import { Mahalla } from "@models/Mahalla";
+import { Mahalla } from "@models/Mahalla.js";
 
-import { createInlineKeyboard, keyboards } from "@lib/keyboards";
+import { createInlineKeyboard, keyboards } from "@lib/keyboards.js";
 
 import isCancel from "../../smallFunctions/isCancel";
 

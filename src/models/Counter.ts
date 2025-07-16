@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { arizaDocumentTypes } from "./Ariza";
-import { Company } from "./Company";
+import { arizaDocumentTypes } from "./Ariza.js";
+import { Company } from "./Company.js";
 
 interface ICounter {
   value: number;

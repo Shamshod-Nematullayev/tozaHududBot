@@ -1,6 +1,6 @@
-import { createTozaMakonApi } from "@api/tozaMakon";
-import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril";
-import { Abonent } from "@models/Abonent";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
+import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril.js";
+import { Abonent } from "@models/Abonent.js";
 import { getAbonentsByMfyIdQuerySchema } from "@schemas/billing.schema";
 import { searchAbonent } from "@services/billing";
 import { Request } from "express";

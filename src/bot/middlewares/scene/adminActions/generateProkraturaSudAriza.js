@@ -4,10 +4,10 @@ import { Scenes } from "telegraf";
 import {
   importSudBuyruqlariExample,
   INPUT_ALERT_LETTER_EXCEL,
-} from "../../../../constants";
-import { keyboards } from "@lib/keyboards";
+} from "../../../../constants.js";
+import { keyboards } from "@lib/keyboards.js";
 
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
 import ejs from "ejs";
 import fs from "fs";

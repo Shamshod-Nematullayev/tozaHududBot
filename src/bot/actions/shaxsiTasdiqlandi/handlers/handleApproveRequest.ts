@@ -1,8 +1,8 @@
-import { createTozaMakonApi } from "@api/tozaMakon";
-import { Abonent } from "@models/Abonent";
-import { Company } from "@models/Company";
-import { ICustomDataRequestDoc } from "@models/CustomDataRequest";
-import { Nazoratchi } from "@models/Nazoratchi";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
+import { Abonent } from "@models/Abonent.js";
+import { Company } from "@models/Company.js";
+import { ICustomDataRequestDoc } from "@models/CustomDataRequest.js";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 import {
   getCitizen,
   identificationAbonent,

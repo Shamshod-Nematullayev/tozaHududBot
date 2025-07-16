@@ -1,9 +1,9 @@
 import nodeHtmlToImage from "../helpers/puppeteer-wrapper";
-import { Mahalla } from "@models/Mahalla";
+import { Mahalla } from "@models/Mahalla.js";
 
-import { Abonent } from "@models/Abonent";
-import { Company } from "@models/Company";
-import { bot } from "@bot/core/bot";
+import { Abonent } from "@models/Abonent.js";
+import { Company } from "@models/Company.js";
+import { bot } from "@bot/core/bot.js";
 
 import ejs from "ejs";
 

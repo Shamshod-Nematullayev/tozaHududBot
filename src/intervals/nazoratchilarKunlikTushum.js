@@ -1,6 +1,6 @@
-import { bot } from "@bot/core/bot";
-import { Company } from "@models/Company";
-import { Nazoratchi } from "@models/Nazoratchi";
+import { bot } from "@bot/core/bot.js";
+import { Company } from "@models/Company.js";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 
 import ejs from "ejs";
 import generateImage from "../helpers/puppeteer-wrapper";

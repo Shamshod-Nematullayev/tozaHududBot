@@ -1,8 +1,8 @@
 import { WizardScene } from "telegraf/scenes";
 
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
-import { HybridMail } from "@models/HybridMail";
+import { HybridMail } from "@models/HybridMail.js";
 
 import PDFMerger from "pdf-merger-js";
 import ejs from "ejs";
@@ -10,7 +10,7 @@ import path from "path";
 import axios from "axios";
 
 import FormData from "form-data";
-import { createTozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 export const uploadWarningTozamakonScene = new WizardScene(
   "uploadWarningTozamakonScene",

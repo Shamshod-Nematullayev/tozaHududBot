@@ -1,8 +1,8 @@
 import nodeHtmlToImage from "node-html-to-image";
 import { ekopayApi } from "../api/ekopayApi";
 
-import { bot } from "@bot/core/bot";
-import { Nazoratchi } from "@models/Nazoratchi";
+import { bot } from "@bot/core/bot.js";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 
 String.prototype.toHHMMSS = function () {
   var sec_num = parseInt(this, 10); // don't forget the second param

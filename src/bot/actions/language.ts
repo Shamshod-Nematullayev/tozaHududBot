@@ -1,7 +1,7 @@
 import { Composer } from "telegraf";
-import { bot } from "../core/bot";
-import { keyboards } from "@lib/keyboards";
-import { messages } from "@lib/messages";
+import { bot } from "../core/bot.js";
+import { keyboards } from "@lib/keyboards.js";
+import { messages } from "@lib/messages.js";
 import { MyContext, MyWizardSession } from "types/botContext";
 
 const composer = new Composer<MyContext>();

@@ -1,4 +1,4 @@
-import { bot } from "../core/bot";
+import { bot } from "../core/bot.js";
 
 bot.use((ctx, next) => {
   if (ctx.session.til) {

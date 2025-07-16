@@ -2,12 +2,12 @@ import { WizardScene } from "telegraf/scenes";
 
 import os from "os";
 import path from "path";
-import { Abonent } from "@models/Abonent";
-import { Nazoratchi } from "@models/Nazoratchi";
-import { keyboards } from "@lib/keyboards";
+import { Abonent } from "@models/Abonent.js";
+import { Nazoratchi } from "@models/Nazoratchi.js";
+import { keyboards } from "@lib/keyboards.js";
 import fs from "fs";
 import ejs from "ejs";
-import { createTozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 import puppeter from "puppeteer";
 import isCancel from "../../smallFunctions/isCancel";

@@ -2,7 +2,7 @@ import { Markup } from "telegraf";
 
 import mahallalar from "@lib/mahallalar.json";
 
-import { Mahalla } from "@models/Mahalla";
+import { Mahalla } from "@models/Mahalla.js";
 
 // ============ Helper functions ================
 function mahallaKeys() {

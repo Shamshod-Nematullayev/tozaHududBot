@@ -1,11 +1,11 @@
 import nodeHtmlToImage from "../helpers/puppeteer-wrapper";
 import ejs from "ejs";
-import { bot } from "@bot/core/bot";
-import { Company } from "@models/Company";
+import { bot } from "@bot/core/bot.js";
+import { Company } from "@models/Company.js";
 
-import { createTozaMakonApi } from "../api/tozaMakon";
+import { createTozaMakonApi } from "../api/tozaMakon.js";
 
-import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril";
+import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril.js";
 
 const formatDate = (date) => {
   const year = date.getFullYear();

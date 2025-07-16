@@ -1,6 +1,6 @@
-import { bot } from "../core/bot";
+import { bot } from "../core/bot.js";
 
-import { User } from "@models/User";
+import { User } from "@models/User.js";
 
 bot.use(async (ctx, next) => {
   const users = await User.find();

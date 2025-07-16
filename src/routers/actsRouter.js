@@ -1,4 +1,4 @@
-import isSTMRole from "@middlewares/isSTMRole";
+import isSTMRole from "@middlewares/isSTMRole.js";
 import {
   getActs,
   getActById,

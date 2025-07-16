@@ -6,8 +6,8 @@ import {
 } from "@services/billing";
 import { Axios, AxiosError } from "axios";
 import { parseDublicateError } from "./dublicateParseResult";
-import { AbonentDoc } from "@models/Abonent";
-import { ICustomDataRequestDoc } from "@models/CustomDataRequest";
+import { AbonentDoc } from "@models/Abonent.js";
+import { ICustomDataRequestDoc } from "@models/CustomDataRequest.js";
 
 function createAccountNumberGenerator(start = 9000000) {
   let current = start;

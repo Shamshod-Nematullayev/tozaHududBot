@@ -1,8 +1,8 @@
 import { Composer } from "telegraf";
-import slashCommands from "./slashCommonds";
-import hearsCommands from "./hearsCommands";
-import actionsCommands from "../actions/bindex";
-import { MyContext } from "types/botContext";
+import slashCommands from "./slashCommonds.js";
+import hearsCommands from "./hearsCommands.js";
+import actionsCommands from "../actions/bindex.js";
+import { MyContext } from "types/botContext.js";
 
 const composer = new Composer<MyContext>();
 

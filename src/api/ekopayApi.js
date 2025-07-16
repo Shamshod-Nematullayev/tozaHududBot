@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { Company } from "@models/Company";
+import { Company } from "@models/Company.js";
 
 export const ekopayApi = axios.create({
   baseURL: "https://ekopay.uz/api/",

@@ -1,11 +1,11 @@
 import isCancel from "../../smallFunctions/isCancel";
 import { Scenes } from "telegraf";
 
-import { importSudBuyruqlariExample } from "../../../../constants";
+import { importSudBuyruqlariExample } from "../../../../constants.js";
 
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
 import ejs from "ejs";
 import HTMLtoDOCX from "html-to-docx";

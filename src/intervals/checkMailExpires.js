@@ -1,12 +1,12 @@
-import { NOTIFICATIONS_CHANNEL_ID } from "../constants";
+import { NOTIFICATIONS_CHANNEL_ID } from "../constants.js";
 
-import { HybridMail } from "@models/HybridMail";
+import { HybridMail } from "@models/HybridMail.js";
 
-import { Notification } from "@models/Notification";
+import { Notification } from "@models/Notification.js";
 
-import { SudAkt } from "@models/SudAkt";
+import { SudAkt } from "@models/SudAkt.js";
 
-import { bot } from "@bot/core/bot";
+import { bot } from "@bot/core/bot.js";
 
 const checkMails = async () => {
   const date = new Date(Date.now() - 1000 * 60 * 60 * 24 * 15); // 15 kun oldingi sana

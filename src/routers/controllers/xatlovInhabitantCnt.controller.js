@@ -1,8 +1,8 @@
-import { XatlovDocument } from "@models/XatlovDocument";
-import { MultiplyRequest } from "@models/MultiplyRequest";
-import { Mahalla } from "@models/Mahalla";
-import { Company } from "@models/Company";
-import { createTozaMakonApi } from "../../api/tozaMakon";
+import { XatlovDocument } from "@models/XatlovDocument.js";
+import { MultiplyRequest } from "@models/MultiplyRequest.js";
+import { Mahalla } from "@models/Mahalla.js";
+import { Company } from "@models/Company.js";
+import { createTozaMakonApi } from "../../api/tozaMakon.js";
 import FormData from "form-data";
 
 export const cancelDalolatnoma = async (req, res) => {

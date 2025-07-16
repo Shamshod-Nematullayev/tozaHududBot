@@ -7,7 +7,7 @@ import {
   getDocumentTargets,
   cancelTargetById,
 } from "./controllers/targets.controller.js";
-import { uploadAsBlob } from "../middlewares/multer";
+import { uploadAsBlob } from "../middlewares/multer.js";
 const router = Router();
 
 router.get("/", getTargets);

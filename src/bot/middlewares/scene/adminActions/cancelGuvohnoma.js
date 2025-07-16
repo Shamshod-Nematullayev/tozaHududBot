@@ -1,7 +1,7 @@
 import { Scenes } from "telegraf";
-import { keyboards } from "@lib/keyboards";
-import { messages } from "@lib/messages";
-import { Guvohnoma } from "@models/Guvohnoma";
+import { keyboards } from "@lib/keyboards.js";
+import { messages } from "@lib/messages.js";
+import { Guvohnoma } from "@models/Guvohnoma.js";
 import isCancel from "../../smallFunctions/isCancel";
 
 const cancelGuvohnoma = new Scenes.WizardScene(

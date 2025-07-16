@@ -1,15 +1,15 @@
 import { Scenes } from "telegraf";
 
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
 import https from "https";
 import fs from "fs";
 import excelToJson from "convert-excel-to-json";
-import { importPlanInspectorsFileId } from "../../../../constants";
+import { importPlanInspectorsFileId } from "../../../../constants.js";
 
-import { Mahalla } from "@models/Mahalla";
+import { Mahalla } from "@models/Mahalla.js";
 
 import isCancel from "../../smallFunctions/isCancel";
 

@@ -2,41 +2,41 @@ import { Scenes, Markup, Context } from "telegraf";
 
 import isCancel from "../../smallFunctions/isCancel";
 import isRealPinflValidate from "../../smallFunctions/isPinfl";
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
-import { keyboards, createInlineKeyboard } from "@lib/keyboards";
+import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
 
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
-import { INazoratchi, Nazoratchi } from "@models/Nazoratchi";
+import { INazoratchi, Nazoratchi } from "@models/Nazoratchi.js";
 
-import { Mahalla } from "@models/Mahalla";
+import { Mahalla } from "@models/Mahalla.js";
 
-import { NewAbonent } from "@models/NewAbonents";
+import { NewAbonent } from "@models/NewAbonents.js";
 
-import { createTozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 import { extractBirthDateString } from "../../../../helpers/extractBirthDateFromPinfl";
-import { EtkAbonent } from "@models/EtkAbonent";
+import { EtkAbonent } from "@models/EtkAbonent.js";
 
-import { Notification } from "@models/Notification";
-import { Admin } from "@models/Admin";
-import { Company, ICompany } from "@models/Company";
+import { Notification } from "@models/Notification.js";
+import { Admin } from "@models/Admin.js";
+import { Company, ICompany } from "@models/Company.js";
 
 import axios from "axios";
 
-import { caotoNames } from "../../../../constants";
+import { caotoNames } from "../../../../constants.js";
 
 import { io, usersMapSocket } from "../../../../config/socketConfig";
-import { WizardWithState } from "@bot/helpers/WizardWithState";
+import { WizardWithState } from "@bot/helpers/WizardWithState.js";
 import {
   InlineKeyboardButton,
   Message,
 } from "telegraf/typings/core/types/typegram";
 import { Citizen } from "types/billing";
 import { getCitizen, getResidentHousesByPnfl } from "@services/billing";
-import { getStreetsByMahallaId } from "@services/billing/getStreetsByMahallaId";
-import { getElectricResidentDetails } from "@services/payme";
+import { getStreetsByMahallaId } from "@services/billing/getStreetsByMahallaId.js";
+import { getElectricResidentDetails } from "@services/payme.js";
 // import { MyContext } from "types/botContext";
 // 1. Lokal state tipi
 // 1. State tipi

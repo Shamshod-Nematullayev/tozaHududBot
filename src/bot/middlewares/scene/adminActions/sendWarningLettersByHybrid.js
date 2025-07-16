@@ -1,12 +1,12 @@
 import { Scenes } from "telegraf";
 
-import { INPUT_ABONENTS_LICSHET } from "../../../../constants";
+import { INPUT_ABONENTS_LICSHET } from "../../../../constants.js";
 
-import { keyboards, createInlineKeyboard } from "@lib/keyboards";
-import { Abonent } from "@models/Abonent";
-import { Admin } from "@models/Admin";
-import { Company } from "@models/Company";
-import { HybridMail } from "@models/HybridMail";
+import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
+import { Abonent } from "@models/Abonent.js";
+import { Admin } from "@models/Admin.js";
+import { Company } from "@models/Company.js";
+import { HybridMail } from "@models/HybridMail.js";
 
 import { handleTelegramExcel } from "../../smallFunctions/handleTelegramExcel";
 import isCancel from "../../smallFunctions/isCancel";
@@ -14,9 +14,9 @@ import ejs from "ejs";
 import path from "path";
 
 import PDFMerger from "pdf-merger-js";
-import { createTozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 
-import { createHybridPochtaApi } from "@api/hybridPochta";
+import { createHybridPochtaApi } from "@api/hybridPochta.js";
 
 import FormData from "form-data";
 import puppeteer from "puppeteer";

@@ -1,10 +1,10 @@
 import { WizardScene } from "telegraf/scenes";
-import { Mahalla } from "@models/Mahalla";
-import { Admin } from "@models/Admin";
-import { Company } from "@models/Company";
-import { createTozaMakonApi } from "@api/tozaMakon";
+import { Mahalla } from "@models/Mahalla.js";
+import { Admin } from "@models/Admin.js";
+import { Company } from "@models/Company.js";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 import { Markup } from "telegraf";
-import { createInlineKeyboard, keyboards } from "@lib/keyboards";
+import { createInlineKeyboard, keyboards } from "@lib/keyboards.js";
 import isCancel from "../../../middlewares/smallFunctions/isCancel";
 // mini map
 // 0 entry

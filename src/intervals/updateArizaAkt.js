@@ -1,7 +1,7 @@
 import Queue from "bull";
-import { Ariza } from "@models/Ariza";
+import { Ariza } from "@models/Ariza.js";
 
-import { createTozaMakonApi } from "../api/tozaMakon";
+import { createTozaMakonApi } from "../api/tozaMakon.js";
 
 const updateArizalarAkt = new Queue(
   "updateArizalarAkt",

@@ -1,17 +1,17 @@
 import { WizardScene } from "telegraf/scenes";
 
 import isCancel from "../../smallFunctions/isCancel";
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
-import { keyboards, createInlineKeyboard } from "@lib/keyboards";
+import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
 
-import { Nazoratchi } from "@models/Nazoratchi";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 
-import { Mahalla } from "@models/Mahalla";
+import { Mahalla } from "@models/Mahalla.js";
 
-import { Target } from "@models/TargetAbonent";
+import { Target } from "@models/TargetAbonent.js";
 
-import { createTozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 export const createTargetScene = new WizardScene(
   "createTarget",

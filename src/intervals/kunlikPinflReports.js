@@ -1,8 +1,8 @@
 import nodeHtmlToImage from "../helpers/puppeteer-wrapper";
-import { Abonent } from "@models/Abonent";
-import { Nazoratchi } from "@models/Nazoratchi";
-import { Company } from "@models/Company";
-import { bot } from "@bot/core/bot";
+import { Abonent } from "@models/Abonent.js";
+import { Nazoratchi } from "@models/Nazoratchi.js";
+import { Company } from "@models/Company.js";
+import { bot } from "@bot/core/bot.js";
 
 import ejs from "ejs";
 

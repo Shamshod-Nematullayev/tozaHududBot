@@ -1,8 +1,8 @@
 import { Scenes } from "telegraf";
 
-import { messages } from "@lib/messages";
-import { keyboards } from "@lib/keyboards";
-import { Admin } from "@models/Admin";
+import { messages } from "@lib/messages.js";
+import { keyboards } from "@lib/keyboards.js";
+import { Admin } from "@models/Admin.js";
 
 import bcrypt from "bcrypt";
 

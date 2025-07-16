@@ -1,4 +1,4 @@
-import { SudMaterial } from "@models/SudMaterial";
+import { SudMaterial } from "@models/SudMaterial.js";
 
 import fs from "fs";
 import {

@@ -1,5 +1,5 @@
-import { Abonent } from "@models/Abonent";
-import { Nazoratchi } from "@models/Nazoratchi";
+import { Abonent } from "@models/Abonent.js";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 import Excel from "exceljs";
 async function countConfirmed(inspectorId, companyId, field, fromDate, toDate) {
   const baseFilter = {

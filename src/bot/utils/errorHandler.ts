@@ -1,4 +1,4 @@
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 import { Context } from "telegraf";
 
 export function errorHandler(err: any, ctx: Context) {

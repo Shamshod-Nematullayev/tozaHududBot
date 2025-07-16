@@ -1,4 +1,4 @@
-import { bot } from "@bot/core/bot";
+import { bot } from "@bot/core/bot.js";
 import axios from "axios";
 import { PDFDocument } from "pdf-lib";
 import PDFMerger from "pdf-merger-js";

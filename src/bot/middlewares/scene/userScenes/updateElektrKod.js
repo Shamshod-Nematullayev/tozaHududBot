@@ -1,21 +1,21 @@
 import { Scenes, Markup } from "telegraf";
 
-import { keyboards, createInlineKeyboard } from "@lib/keyboards";
+import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
 
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
-import { Nazoratchi } from "@models/Nazoratchi";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 
 import isCancel from "../../smallFunctions/isCancel";
-import { EtkKodRequest } from "@models/EtkKodRequest";
+import { EtkKodRequest } from "@models/EtkKodRequest.js";
 
-import { createTozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 
-import { EtkAbonent } from "@models/EtkAbonent";
+import { EtkAbonent } from "@models/EtkAbonent.js";
 
 import axios from "axios";
 
-import { caotoNames } from "../../../../constants";
+import { caotoNames } from "../../../../constants.js";
 
 export const updateElektrKod = new Scenes.WizardScene(
   "updateElektrKod",

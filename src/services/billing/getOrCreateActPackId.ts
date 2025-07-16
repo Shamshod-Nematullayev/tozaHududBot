@@ -1,5 +1,5 @@
-import { arizaDocumentTypes } from "@models/Ariza";
-import { Company } from "@models/Company";
+import { arizaDocumentTypes } from "@models/Ariza.js";
+import { Company } from "@models/Company.js";
 import { Axios } from "axios";
 import { packNames, packTypes } from "types/billing";
 import { formatDate } from "services/utils/formatDate";

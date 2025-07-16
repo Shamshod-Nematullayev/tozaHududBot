@@ -1,7 +1,7 @@
 import { Scenes, Markup } from "telegraf";
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 import { v4 as uui4 } from "uuid";
-import { Mahalla } from "@models/Mahalla";
+import { Mahalla } from "@models/Mahalla.js";
 import isCancel from "../../smallFunctions/isCancel";
 
 export const connect_mfy_tg_group_scene = new Scenes.WizardScene(

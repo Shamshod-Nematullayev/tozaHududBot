@@ -1,11 +1,11 @@
-import { createTozaMakonApi } from "../../api/tozaMakon";
+import { createTozaMakonApi } from "../../api/tozaMakon.js";
 
 import { Ariza } from "../../models/Ariza";
 
-import { Abonent } from "@models/Abonent";
-import { Counter } from "@models/Counter";
+import { Abonent } from "@models/Abonent.js";
+import { Counter } from "@models/Counter.js";
 import FormData from "form-data";
-import { getOrCreateActPackId } from "@services/billing/getOrCreateActPackId";
+import { getOrCreateActPackId } from "@services/billing/getOrCreateActPackId.js";
 import { Handler, Request, Response } from "express";
 import { getPagination } from "./utils/pagination";
 import {

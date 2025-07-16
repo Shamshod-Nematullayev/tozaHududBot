@@ -1,8 +1,8 @@
-import { createTozaMakonApi } from "../api/tozaMakon";
-import { queueNames } from "../constants";
-import { LastUpdate } from "@models/LastUpdate";
-import { Abonent } from "@models/Abonent";
-import { Company } from "@models/Company";
+import { createTozaMakonApi } from "../api/tozaMakon.js";
+import { queueNames } from "../constants.js";
+import { LastUpdate } from "@models/LastUpdate.js";
+import { Abonent } from "@models/Abonent.js";
+import { Company } from "@models/Company.js";
 import XLSX from "xlsx";
 
 const BATCH_SIZE = 1000;

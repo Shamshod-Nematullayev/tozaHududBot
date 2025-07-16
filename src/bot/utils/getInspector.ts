@@ -1,4 +1,4 @@
-import { Nazoratchi } from "@models/Nazoratchi";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 
 export async function getInspector(telegramId: number) {
   const inspector = await Nazoratchi.findOne({

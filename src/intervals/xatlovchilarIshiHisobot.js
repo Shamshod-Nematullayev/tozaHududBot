@@ -1,10 +1,10 @@
 import nodeHtmlToImage from "../helpers/puppeteer-wrapper";
-import { bot } from "bot/core/bot";
-import { Abonent } from "@models/Abonent";
-import { Nazoratchi } from "@models/Nazoratchi";
-import { Company } from "@models/Company";
+import { bot } from "bot/core/bot.js";
+import { Abonent } from "@models/Abonent.js";
+import { Nazoratchi } from "@models/Nazoratchi.js";
+import { Company } from "@models/Company.js";
 import ejs from "ejs";
-import { NewAbonent } from "@models/NewAbonents";
+import { NewAbonent } from "@models/NewAbonents.js";
 
 function bugungiSana() {
   const date = new Date();

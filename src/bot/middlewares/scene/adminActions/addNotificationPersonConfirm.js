@@ -1,10 +1,10 @@
 import { Scenes, Markup } from "telegraf";
-import { shaxsiTasdiqlandiBildirishXatiImportExcel } from "../../../../constants";
-import { keyboards } from "@lib/keyboards";
-import { messages } from "@lib/messages";
-import { Counter } from "@models/Counter";
-import { Bildirishnoma } from "@models/SudBildirishnoma";
-import { Nazoratchi } from "@models/Nazoratchi";
+import { shaxsiTasdiqlandiBildirishXatiImportExcel } from "../../../../constants.js";
+import { keyboards } from "@lib/keyboards.js";
+import { messages } from "@lib/messages.js";
+import { Counter } from "@models/Counter.js";
+import { Bildirishnoma } from "@models/SudBildirishnoma.js";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 import isCancel from "../../smallFunctions/isCancel";
 import * as fs from "fs";
 import * as https from "https";

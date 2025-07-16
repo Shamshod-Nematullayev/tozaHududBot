@@ -1,15 +1,15 @@
 import { Scenes, Markup } from "telegraf";
 
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 
 import isCancel from "../../smallFunctions/isCancel";
-import { Nazoratchi } from "@models/Nazoratchi";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 
-import { Abonent } from "@models/Abonent";
+import { Abonent } from "@models/Abonent.js";
 
-import { Company } from "@models/Company";
+import { Company } from "@models/Company.js";
 
-import { createTozaMakonApi } from "@api/tozaMakon";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 export const changeAbonentStreet = new Scenes.WizardScene(
   "changeAbonentStreet",

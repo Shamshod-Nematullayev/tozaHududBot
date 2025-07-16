@@ -1,10 +1,10 @@
 import { Scenes, Markup } from "telegraf";
 
-import { keyboards } from "@lib/keyboards";
+import { keyboards } from "@lib/keyboards.js";
 
-import { messages } from "@lib/messages";
+import { messages } from "@lib/messages.js";
 
-import { Guvohnoma } from "@models/Guvohnoma";
+import { Guvohnoma } from "@models/Guvohnoma.js";
 
 import isCancel from "../../smallFunctions/isCancel";
 

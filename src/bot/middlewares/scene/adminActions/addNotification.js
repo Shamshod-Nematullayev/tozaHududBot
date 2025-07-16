@@ -1,8 +1,8 @@
 import { Scenes, Markup } from "telegraf";
-import { keyboards, createInlineKeyboard } from "@lib/keyboards";
-import { messages } from "@lib/messages";
-import { Bildirishnoma } from "@models/SudBildirishnoma";
-import { Nazoratchi } from "@models/Nazoratchi";
+import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
+import { messages } from "@lib/messages.js";
+import { Bildirishnoma } from "@models/SudBildirishnoma.js";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 import isCancel from "../../smallFunctions/isCancel";
 import mahallalar from "@lib/mahallalar.json";
 

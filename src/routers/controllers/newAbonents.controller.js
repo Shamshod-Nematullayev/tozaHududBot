@@ -1,13 +1,13 @@
-import { NewAbonent, StatusNewAbonent } from "@models/NewAbonents";
+import { NewAbonent, StatusNewAbonent } from "@models/NewAbonents.js";
 
-import { bot } from "../../bot/core/bot";
+import { bot } from "../../bot/core/bot.js";
 
-import { createTozaMakonApi } from "../../api/tozaMakon";
+import { createTozaMakonApi } from "../../api/tozaMakon.js";
 
-import { Nazoratchi } from "@models/Nazoratchi";
-import { Abonent } from "@models/Abonent";
+import { Nazoratchi } from "@models/Nazoratchi.js";
+import { Abonent } from "@models/Abonent.js";
 
-import { FreeAbonent } from "@models/FreeAbonent";
+import { FreeAbonent } from "@models/FreeAbonent.js";
 
 export const getPendingNewAbonents = async (req, res) => {
   try {

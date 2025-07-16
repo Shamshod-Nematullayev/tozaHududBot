@@ -1,4 +1,4 @@
-import { uploadAsBlob } from "../middlewares/multer";
+import { uploadAsBlob } from "../middlewares/multer.js";
 import {
   cancelDalolatnoma,
   createXatlovDocument,

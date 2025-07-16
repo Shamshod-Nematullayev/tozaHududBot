@@ -1,11 +1,11 @@
-import { upload } from "@middlewares/multer";
+import { upload } from "@middlewares/multer.js";
 
-import { IncomingDocument } from "@models/IncomingDocument";
+import { IncomingDocument } from "@models/IncomingDocument.js";
 
 import path from "path";
-import { bot } from "../bot/core/bot";
+import { bot } from "../bot/core/bot.js";
 
-import { Counter } from "@models/Counter";
+import { Counter } from "@models/Counter.js";
 
 import fs from "fs";
 

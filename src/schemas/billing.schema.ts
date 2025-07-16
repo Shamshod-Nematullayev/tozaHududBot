@@ -1,4 +1,4 @@
-import { arizaDocumentTypes } from "@models/Ariza";
+import { arizaDocumentTypes } from "@models/Ariza.js";
 import { Types } from "mongoose";
 import z from "zod";
 const accountNumberRegex = [

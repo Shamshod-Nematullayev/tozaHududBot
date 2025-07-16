@@ -1,9 +1,9 @@
-import { Company } from "@models/Company";
+import { Company } from "@models/Company.js";
 import {
   CustomDataRequest,
   ICustomDataRequestDoc,
-} from "@models/CustomDataRequest";
-import { Nazoratchi } from "@models/Nazoratchi";
+} from "@models/CustomDataRequest.js";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Context } from "telegraf";
 
 export default async function handleRejectRequest(

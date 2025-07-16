@@ -1,7 +1,7 @@
 import { Scenes } from "telegraf";
-import { Admin } from "@models/Admin";
-import { messages } from "@lib/messages";
-import { keyboards } from "@lib/keyboards";
+import { Admin } from "@models/Admin.js";
+import { messages } from "@lib/messages.js";
+import { keyboards } from "@lib/keyboards.js";
 import bcrypt from "bcrypt";
 
 const changePasswordScene = new Scenes.WizardScene(

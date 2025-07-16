@@ -1,11 +1,11 @@
 import { getAktsFromPacket } from "../api/cleancity/dxsh/getAktsFromPacket";
-import { bot } from "../core/bot";
+import { bot } from "../core/bot.js";
 
-import { Ariza } from "@models/Ariza";
+import { Ariza } from "@models/Ariza.js";
 
-import { NOTIFICATIONS_CHANNEL_ID } from "../constants";
+import { NOTIFICATIONS_CHANNEL_ID } from "../constants.js";
 
-import { Notification } from "@models/Notification";
+import { Notification } from "@models/Notification.js";
 
 import { Markup } from "telegraf";
 

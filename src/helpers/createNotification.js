@@ -1,6 +1,6 @@
 import { usersMapSocket, io } from "../config/socketConfig";
 
-import { Notification } from "@models/Notification";
+import { Notification } from "@models/Notification.js";
 
 export async function createNotification({
   message,

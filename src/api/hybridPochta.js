@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Company } from "@models/Company";
+import { Company } from "@models/Company.js";
 
 export const createHybridPochtaApi = (companyId) => {
   const instance = axios.create({

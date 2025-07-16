@@ -1,4 +1,4 @@
-import { Bildirishnoma } from "@models/SudBildirishnoma";
+import { Bildirishnoma } from "@models/SudBildirishnoma.js";
 
 // GET get all datas
 export const getAllBildirgilar = async (req, res, next) => {
