@@ -5,7 +5,7 @@ export async function searchAbonent(
   tozaMakonApi: Axios,
   query: AbonentSearchQuery,
   withMetaData?: boolean
-): Promise<{ content: IAbonent[]; totalPages: number }> {
+): Promise<{ content: IAbonent[]; totalPages: number; totalElements: number }> {
   const data = (
     await tozaMakonApi.get("/user-service/residents", {
       params: query,

@@ -58,8 +58,8 @@ if (launchBot) {
 
 connectDb();
 
-// idenAllAbonents(); vaqtincha foydalaniladigan funksiya
-
+// idenAllAbonents(); //vaqtincha foydalaniladigan funksiya
+idenOneAbonent();
 // use routers
 import authRouter from "./routers/auth.route.js";
 import statisticsRouter from "./routers/statisticsRouter.js";
@@ -78,8 +78,10 @@ import newAbonentsRouter from "./routers/newAbonentsRouter.js";
 import yashovchiSoniXatlovRouter from "./routers/yashovchiSoniXatlov.js";
 import reportsRouter from "./routers/reportsRouter.js";
 import actsRouter from "./routers/actsRouter.js";
-import { globalErrorHandler } from "./routers/controllers/utils/globalErrorHandler.js";
-import { idenAllAbonents } from "test/index.js";
+import { idenOneAbonent } from "test/index.js";
+import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.js";
+// import { globalErrorHandler } from idenAllAbonents"./routers/controllers/utils/globalErrorHandler.js";
+// import { idenAllAbonents, idenOneAbonent } from "test/index.js";
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);
@@ -131,7 +133,7 @@ agenda.on("error", (error: Error) => {
   console.error("Agenda error:", error);
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });

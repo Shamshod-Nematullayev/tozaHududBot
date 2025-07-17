@@ -5,7 +5,7 @@ import {
   updateAbonentDetails,
 } from "@services/billing/index.js";
 import { Axios, AxiosError } from "axios";
-import { parseDublicateError } from "./dublicateParseResult.js";
+import { parseError } from "./parseErrorMessage.js";
 import { AbonentDoc } from "@models/Abonent.js";
 import { ICustomDataRequestDoc } from "@models/CustomDataRequest.js";
 
@@ -53,7 +53,7 @@ export async function tryIdentifiedOrReject(
     }
 
     const error = err as AxiosError<ErrorResponseData>;
-    const resultErr = parseDublicateError(
+    const resultErr = parseError(
       error.response?.data.message || "",
       abonent.accountNumber
     );

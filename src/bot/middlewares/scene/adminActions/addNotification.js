@@ -3,10 +3,7 @@ import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
 import { messages } from "@lib/messages.js";
 import { Bildirishnoma } from "@models/SudBildirishnoma.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
-import { readFile } from "fs/promises";
-const mahallalar = JSON.parse(
-  await readFile(new URL("./mahallalar.json", import.meta.url))
-);
+import mahallalar from "@lib/mahallalar.js";
 import isCancel from "../../smallFunctions/isCancel.js";
 
 export const addNotification = new Scenes.WizardScene(

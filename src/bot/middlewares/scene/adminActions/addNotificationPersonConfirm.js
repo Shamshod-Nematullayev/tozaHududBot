@@ -10,11 +10,7 @@ import * as fs from "fs";
 import * as https from "https";
 import * as excelToJson from "convert-excel-to-json";
 import axios from "axios";
-import { readFile } from "fs/promises";
-const mahallalar = JSON.parse(
-  await readFile(new URL("./mahallalar.json", import.meta.url))
-);
-
+import mahallalar from "@lib/mahallalar.js";
 export const personConfirm = new Scenes.WizardScene(
   "shaxsi_tashdiqlandi_bildirish_xati",
   async (ctx) => {

@@ -1,11 +1,15 @@
-type DublicateType = "cadastrDublicate" | "HETDublicate" | "other_error";
+type DublicateType =
+  | "cadastrDublicate"
+  | "HETDublicate"
+  | "notPhoto"
+  | "other_error";
 
 interface DublicateParseResult {
   type: DublicateType;
   dublicateLicshet?: string;
 }
 
-export function parseDublicateError(
+export function parseError(
   message: string,
   originalLicshet: string
 ): DublicateParseResult {
@@ -33,6 +37,12 @@ export function parseDublicateError(
         };
       }
     }
+  }
+
+  if (message.includes("Rasm mavjud emas")) {
+    return {
+      type: "notPhoto",
+    };
   }
 
   return {

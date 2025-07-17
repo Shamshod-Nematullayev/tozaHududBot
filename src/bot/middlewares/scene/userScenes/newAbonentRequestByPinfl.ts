@@ -384,6 +384,15 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
         );
         return;
       }
+      const existingAbonent = await Abonent.findOne({
+        companyId: ctx.wizard.state.companyId,
+        "ekt_kod_tasdiqlandi.confirm": true,
+        energy_licshet: ctx.message.text,
+      });
+      if (existingAbonent)
+        return ctx.reply(
+          `Ushbu elekt kodi allaqachon ${existingAbonent.licshet} hisob raqamli abonentga biriktirilgan`
+        );
       const findedETKAbonents = (await EtkAbonent.find({
         accountNumber: ctx.message.text,
         companyId: ctx.wizard.state.companyId,
