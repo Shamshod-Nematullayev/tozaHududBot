@@ -58,8 +58,6 @@ if (launchBot) {
 
 connectDb();
 
-// idenAllAbonents(); //vaqtincha foydalaniladigan funksiya
-idenOneAbonent();
 // use routers
 import authRouter from "./routers/auth.route.js";
 import statisticsRouter from "./routers/statisticsRouter.js";

@@ -6,6 +6,7 @@ import { Company } from "@models/Company.js";
 import { createTozaMakonApi } from "../api/tozaMakon.js";
 
 import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril.js";
+import path from "path";
 
 const formatDate = (date) => {
   const year = date.getFullYear();
@@ -95,7 +96,7 @@ export async function sendMFYIncomeReport(
         parseFloat(a.tushum / a.xisoblandi)
     );
     ejs.renderFile(
-      "./src/views/mfyIncome.ejs",
+      path.join(process.cwd(), "src", "views", "mfyIncome.ejs"),
       {
         data: mahallas,
         jamiTushum: allTransactionAmount,
@@ -116,8 +117,8 @@ export async function sendMFYIncomeReport(
         const buffer = Buffer.from(binaryData, "binary");
 
         bot.telegram.sendPhoto(
-          company.GROUP_ID_NAZORATCHILAR,
-          // process.env.ME,
+          // company.GROUP_ID_NAZORATCHILAR,
+          process.env.ME,
           { source: buffer }
         );
       }

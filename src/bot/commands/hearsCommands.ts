@@ -26,7 +26,10 @@ const hearsActions = [
   },
   {
     buttons: ["📅Abonent karta"],
-    listener: (ctx: MyContext) => ctx.scene.enter("getAbonentCard"),
+    listener: (ctx: MyContext) => {
+      console.log(ctx);
+      ctx.scene.enter("getAbonentCard");
+    },
   },
   {
     buttons: ["✉️Ogohlantrish xati"],

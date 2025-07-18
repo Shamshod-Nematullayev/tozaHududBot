@@ -5,6 +5,7 @@ import { Nazoratchi } from "@models/Nazoratchi.js";
 import ejs from "ejs";
 import generateImage from "../helpers/puppeteer-wrapper.js";
 import { ekopayApi } from "../api/ekopayApi.js";
+import path from "path";
 
 export async function nazoratchilarKunlikTushum(companyId = 1144) {
   try {
@@ -51,7 +52,7 @@ export async function nazoratchilarKunlikTushum(companyId = 1144) {
     rows.sort((a, b) => parseFloat(b.summasi) - parseFloat(a.summasi));
 
     ejs.renderFile(
-      "./src/views/nazoratchilarKunlikTushum.ejs",
+      path.join(process.cwd(), "src", "views", "nazoratchilarKunlikTushum.ejs"),
       {
         sana: dateString,
         rows,

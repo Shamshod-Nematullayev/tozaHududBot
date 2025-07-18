@@ -1,7 +1,4 @@
 import { Scenes } from "telegraf";
-import { bot } from "../core/bot.js";
-import LocalSession from "telegraf-session-local";
-import newAdminScene from "./scene/userScenes/newAdminScene.js";
 import { addNotification } from "./scene/adminActions/addNotification.js";
 import { searchAbonentbyName } from "./scene/userScenes/searchAbonentByName.js";
 import { multiplyLivingsScene } from "./scene/userScenes/multiplyLivings.js";
@@ -33,8 +30,7 @@ import { uploadWarningTozamakonScene } from "./scene/adminActions/uploadWarningT
 import { abonentlarniGeozonagaBiriktirish } from "./scene/adminActions/abonentlarniGeozonagaBiriktirish.js";
 import { getWarningLetter } from "./scene/userScenes/getWarningLetter.js";
 
-const stage = new Scenes.Stage([
-  newAdminScene,
+export const stage = new Scenes.Stage([
   addNotification,
   searchAbonentbyName,
   multiplyLivingsScene,
@@ -65,6 +61,3 @@ const stage = new Scenes.Stage([
   abonentlarniGeozonagaBiriktirish,
   getWarningLetter,
 ]);
-
-bot.use(new LocalSession({ database: "./session.json" }).middleware());
-bot.use(stage.middleware());

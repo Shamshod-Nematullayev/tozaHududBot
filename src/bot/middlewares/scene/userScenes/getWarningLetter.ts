@@ -9,7 +9,6 @@ import { isValidAccountNumber } from "../utils/validator.js";
 import { getAbonentAndInspector } from "../utils/getAbonentAndInspector.js";
 import { getAbonentById } from "@services/billing/index.js";
 import { generateWarningLetter } from "@services/billing/generateWarningLetter.js";
-import { errorHandler } from "@bot/utils/errorHandler.js";
 
 export const getWarningLetter = new Scenes.WizardScene(
   "getWarningLetter",

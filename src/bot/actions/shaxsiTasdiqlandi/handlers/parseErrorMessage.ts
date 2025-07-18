@@ -2,7 +2,13 @@ type DublicateType =
   | "cadastrDublicate"
   | "HETDublicate"
   | "notPhoto"
-  | "other_error";
+  | "brokenCaoto"
+  | "brokenETK"
+  | "brokenPasport"
+  | "hasKirillOnName"
+  | "other_error"
+  | "brokenCadastr"
+  | "brokenJSHSHIR";
 
 interface DublicateParseResult {
   type: DublicateType;
@@ -43,6 +49,42 @@ export function parseError(
     return {
       type: "notPhoto",
     };
+  }
+
+  if (
+    message.includes(
+      "Elektr energiyasi soato identifikatsiya qoidalariga mos emas"
+    )
+  ) {
+    return {
+      type: "brokenCaoto",
+    };
+  }
+
+  if (
+    message.includes(
+      "Elektr energiyasi hisob raqami identifikatsiya qoidalariga mos emas"
+    )
+  ) {
+    return { type: "brokenETK" };
+  }
+
+  if (
+    message.includes("Pasport seriyasi identifikatsiya qoidalariga mos emas")
+  ) {
+    return { type: "brokenPasport" };
+  }
+
+  if (message.includes("Ism familiyasida kirill harflari mavjud")) {
+    return { type: "hasKirillOnName" };
+  }
+
+  if (message.includes("JSHSHIR identifikatsiya qoidalariga mos emas")) {
+    return { type: "brokenJSHSHIR" };
+  }
+
+  if (message.includes("Kadastr raqami identifikatsiya qoidalariga mos emas")) {
+    return { type: "brokenCadastr" };
   }
 
   return {

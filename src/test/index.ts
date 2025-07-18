@@ -1,13 +1,14 @@
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 import { parseError } from "@bot/actions/shaxsiTasdiqlandi/handlers/parseErrorMessage";
+import { lotinga } from "@bot/middlewares/smallFunctions/lotinKiril";
 import { Abonent } from "@models/Abonent";
 import {
+  getAbonentDetails,
   identificationAbonent,
   searchAbonent,
   updateAbonentDetails,
 } from "@services/billing/index.js";
 import { Axios } from "axios";
-import fs from "fs";
 import { chunkArray } from "helpers/chunkArray";
 import { IAbonent } from "types/billing";
 // export async function idenAllAbonents() {
@@ -93,26 +94,38 @@ export async function idenOneAbonent() {
     const abonents = await searchAbonent(tozaMakonApi, {
       identified: false,
       companyId: 1144,
-      size: 1,
+      size: 300,
       sort: "id,DESC",
     });
-    await tryToIdentify(tozaMakonApi, abonents.content[0]);
-    console.log("done", abonents.content[0].accountNumber);
+    const chunks = chunkArray(abonents.content, 5);
+    for (let chunk of chunks) {
+      await Promise.all(
+        chunk.map(async (abonent) => {
+          await tryToIdentify(tozaMakonApi, abonent);
+          console.log("done", abonent.accountNumber);
+        })
+      );
+    }
   } catch (error: any) {
     console.error(error.response?.data?.message);
+    // console.error(error);
   }
 }
 
+// Identifikatsiyadan o'tkazish bo'yicha makros
 async function tryToIdentify(tozaMakonApi: Axios, abonent: IAbonent) {
   console.log(abonent.accountNumber, "trying");
   try {
+    // identifikatsiyadan o'tkazishga urinish
     await identificationAbonent(tozaMakonApi, abonent.id, true);
     return true;
   } catch (error: any) {
+    // xatolikni tekshirish
     const err = parseError(
       error.response?.data?.message,
       abonent.accountNumber
     );
+    // rasm yo'q bo'lsa rasm qo'shish
     if (err.type === "notPhoto") {
       await updateAbonentDetails(tozaMakonApi, abonent.id, {
         citizen: {
@@ -120,14 +133,17 @@ async function tryToIdentify(tozaMakonApi: Axios, abonent: IAbonent) {
             "tozamakon/nfs/resident_image/2025/05/20/db71ca6e47c34cc5a834777957f1ff7e32001666060015_ad1545711.jpg",
         },
       });
-      return await tryToIdentify(tozaMakonApi, abonent);
+      // qayta urinish
+      return await tryToIdentify(tozaMakonApi, abonent); // qayta urinish
     }
+    // elektr kodi dublikat bo'lsa
     if (err.type === "HETDublicate") {
+      // dublikat abonentni olish
       const abonentDubl = await Abonent.findOne({
-        energy_licshet: abonent.electricityAccountNumber,
-        "ekt_kod_tasdiqlandi.confirm": true,
+        licshet: err.dublicateLicshet,
       });
-      if (abonentDubl) {
+      // dublikat abonent elektr kodi tasdiqlandi bo'lsa joriy abonentni elektr kodini o'zgartirish
+      if (abonentDubl && abonentDubl.ekt_kod_tasdiqlandi?.confirm) {
         await updateAbonentDetails(tozaMakonApi, abonent.id, {
           electricityAccountNumber: abonent.electricityAccountNumber + "0",
         });
@@ -135,8 +151,90 @@ async function tryToIdentify(tozaMakonApi: Axios, abonent: IAbonent) {
           { id: abonent.id, "ekt_kod_tasdiqlandi.confirm": true },
           { $set: { ekt_kod_tasdiqlandi: { confirm: false } } }
         );
-        return await tryToIdentify(tozaMakonApi, abonent);
+        abonent.electricityAccountNumber =
+          abonent.electricityAccountNumber + "0";
+        return await tryToIdentify(tozaMakonApi, abonent); // qayta urinish
+      } else if (abonentDubl) {
+        await updateAbonentDetails(tozaMakonApi, abonentDubl?.id, {
+          electricityAccountNumber: abonent.electricityAccountNumber + "0",
+        });
+        return await tryToIdentify(tozaMakonApi, abonent); // qayta urinish
+      } else {
+        const abonentDubl = (
+          await searchAbonent(tozaMakonApi, {
+            accountNumber: err.dublicateLicshet,
+            companyId: 1144,
+          })
+        ).content[0];
+        if (!abonentDubl) {
+          await updateAbonentDetails(tozaMakonApi, abonent.id, {
+            electricityAccountNumber: abonent.electricityAccountNumber + "0",
+          });
+          return await tryToIdentify(tozaMakonApi, abonent); // qayta urinish
+        }
+        await updateAbonentDetails(tozaMakonApi, abonentDubl?.id, {
+          electricityAccountNumber: abonent.electricityAccountNumber + "0",
+        });
+        abonent.electricityAccountNumber =
+          abonent.electricityAccountNumber + "0";
+
+        return await tryToIdentify(tozaMakonApi, abonent); // qayta urinish
       }
+    }
+    if (err.type === "brokenCaoto") {
+      await updateAbonentDetails(tozaMakonApi, abonent.id, {
+        electricityCoato: "18214",
+      });
+      return await tryToIdentify(tozaMakonApi, abonent);
+    }
+    if (err.type === "brokenETK") {
+      await updateAbonentDetails(tozaMakonApi, abonent.id, {
+        electricityAccountNumber: "9561650",
+      });
+      return await tryToIdentify(tozaMakonApi, abonent);
+    }
+    if (err.type === "brokenPasport") {
+      await updateAbonentDetails(tozaMakonApi, abonent.id, {
+        citizen: {
+          passport: "AA1234567",
+        },
+      });
+      return await tryToIdentify(tozaMakonApi, abonent);
+    }
+    if (err.type === "hasKirillOnName") {
+      const abonentDeteils = await getAbonentDetails(tozaMakonApi, abonent.id);
+      await updateAbonentDetails(tozaMakonApi, abonent.id, {
+        citizen: {
+          firstName: lotinga(abonentDeteils.citizen.firstName),
+          lastName: lotinga(abonentDeteils.citizen.lastName),
+          patronymic: lotinga(abonentDeteils.citizen.patronymic || "XXX"),
+        },
+      });
+      return await tryToIdentify(tozaMakonApi, abonent);
+    }
+    if (err.type === "brokenJSHSHIR") {
+      await updateAbonentDetails(tozaMakonApi, abonent.id, {
+        citizen: {
+          pnfl: "42907998901231",
+        },
+      });
+      return await tryToIdentify(tozaMakonApi, abonent);
+    }
+    if (err.type === "cadastrDublicate") {
+      await updateAbonentDetails(tozaMakonApi, abonent.id, {
+        house: {
+          cadastralNumber: abonent.cadastralNumber + "123",
+        },
+      });
+      return await tryToIdentify(tozaMakonApi, abonent);
+    }
+    if (err.type === "brokenCadastr") {
+      await updateAbonentDetails(tozaMakonApi, abonent.id, {
+        house: {
+          cadastralNumber: formatCustom(abonent.accountNumber),
+        },
+      });
+      return await tryToIdentify(tozaMakonApi, abonent);
     }
     throw error;
   }
