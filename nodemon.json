@@ -1,5 +1,6 @@
 {
   "exec": "npx tsx src/dev.ts",
   "watch": ["src"],
-  "ext": "ts,js,json"
+  "ext": "ts,js,json",
+  "ignore": ["node_modules", "dist", "outputs.log", "errors.log"]
 }
