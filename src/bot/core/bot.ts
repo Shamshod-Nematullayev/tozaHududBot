@@ -11,7 +11,7 @@ const TOKEN = process.env.TOKEN as string;
 export const bot = new Telegraf<MyContext>(TOKEN);
 
 bot.use(session.middleware());
-bot.use(stage);
+bot.use(stage.middleware());
 
 bot.use(composer);
 bot.catch((error: any, ctx) => {

@@ -9,8 +9,9 @@ import { isValidAccountNumber } from "../utils/validator.js";
 import { getAbonentAndInspector } from "../utils/getAbonentAndInspector.js";
 import { getAbonentById } from "@services/billing/index.js";
 import { generateWarningLetter } from "@services/billing/generateWarningLetter.js";
+import { MyContext } from "types/botContext.js";
 
-export const getWarningLetter = new Scenes.WizardScene(
+export const getWarningLetter = new Scenes.WizardScene<MyContext>(
   "getWarningLetter",
   (ctx) => {
     ctx.reply("Abonent hisob raqamini kiriting", keyboards.cancelBtn);
