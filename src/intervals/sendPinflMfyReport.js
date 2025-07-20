@@ -6,6 +6,7 @@ import { Company } from "@models/Company.js";
 import { bot } from "@bot/core/bot.js";
 
 import ejs from "ejs";
+import path from "path";
 
 function bugungiSana() {
   const date = new Date();
@@ -64,7 +65,7 @@ export async function sendPinflMfyReport(companyId) {
     mahallalar.sort((a, b) => b.procent - a.procent);
 
     ejs.renderFile(
-      "./src/views/pnfilKiritishHisobot.ejs",
+      path.join(process.cwd(), "src", "views", "pnfilKiritishHisobot.ejs"),
       {
         data: mahallalar,
         jamiKiritilgan,

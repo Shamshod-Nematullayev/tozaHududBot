@@ -21,6 +21,7 @@ import {
   getDebitorAbonents,
   getDebitorAbonentsExcel,
 } from "./controllers/sud.controller.js";
+import path from "path";
 
 router.get("/", getSudAkts);
 
@@ -161,7 +162,7 @@ router.put(
         })
       ).data;
       ejs.renderFile(
-        "./src/views/hybridPochtaCash.ejs",
+        path.join(process.cwd(), "src", "views", "hybridPochtaCash.ejs"),
         { mail },
         (err, result) => {
           if (err) throw err;

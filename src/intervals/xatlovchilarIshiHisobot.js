@@ -5,6 +5,7 @@ import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Company } from "@models/Company.js";
 import ejs from "ejs";
 import { NewAbonent } from "@models/NewAbonents.js";
+import path from "path";
 
 function bugungiSana() {
   const date = new Date();
@@ -94,7 +95,7 @@ async function xatlovchilarIshiHisobot(companyId = 1144) {
 
     inspectors.sort((a, b) => b.ball - a.ball);
     const res = await ejs.renderFile(
-      "./src/views/xatlovchilarIshiHisobot.ejs",
+      path.join(process.cwd(), "src", "views", "xatlovchilarIshiHisobot.ejs"),
       {
         sana: bugungiSana(),
         inspectors,

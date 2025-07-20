@@ -6,6 +6,7 @@ import ejs from "ejs";
 import nodeHtmlToImage from "node-html-to-image";
 import { bot } from "@bot/core/bot.js";
 import { Company } from "@models/Company.js";
+import path from "path";
 
 function bugungiSana() {
   const date = new Date();
@@ -48,7 +49,7 @@ export const sendEtkMfyReport = async (companyId = 1144) => {
       row.bajarilishi_foizda = Math.floor(row.procent) + " %";
     });
     ejs.renderFile(
-      "./src/views/pnfilKiritishHisobot.ejs",
+      path.join(process.cwd(), "src", "views", "pnfilKiritishHisobot.ejs"),
       {
         data: rows,
         jamiKiritilgan,
