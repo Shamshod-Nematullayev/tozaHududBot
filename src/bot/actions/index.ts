@@ -1,11 +1,20 @@
-import { bot } from "../core/bot.js";
-import { keyboards } from "@lib/keyboards.js";
-import { messages } from "@lib/messages.js";
+import { Composer } from "telegraf";
+import { MyContext } from "types/botContext.js";
 
-import "./start.js";
-import "./admin.js";
-import "./language.js";
-import "./shaxsiTasdiqlandi/index.js";
-bot.on("text", (ctx) => {
-  ctx.reply(messages.startGreeting, keyboards.mainKeyboard);
-});
+const composer = new Composer<MyContext>();
+
+import registerScenesWithCbQuery from "./registerScenesWithCbQuery.js";
+import targets from "./targets.js";
+import language from "./language.js";
+import newAbonentsList from "./newAbonentsList.js";
+import adminActions from "./adminActions.js";
+import shaxsiTasdiqlandi from "./shaxsiTasdiqlandi/index.js";
+
+composer.use(registerScenesWithCbQuery);
+composer.use(targets);
+composer.use(language);
+composer.use(newAbonentsList);
+composer.use(adminActions);
+composer.use(shaxsiTasdiqlandi);
+
+export default composer;

@@ -27,7 +27,6 @@ import { createTargetScene } from "./scene/userScenes/createTarget.js";
 import changePasswordScene from "./scene/adminActions/changePassword.js";
 import { getAbonentCard } from "./scene/userScenes/getAbonentCard.js";
 import { uploadWarningTozamakonScene } from "./scene/adminActions/uploadWarningTozamakon.js";
-import { abonentlarniGeozonagaBiriktirish } from "./scene/adminActions/abonentlarniGeozonagaBiriktirish.js";
 import { getWarningLetter } from "./scene/userScenes/getWarningLetter.js";
 
 export const stage = new Scenes.Stage([
@@ -58,6 +57,5 @@ export const stage = new Scenes.Stage([
   changePasswordScene,
   getAbonentCard,
   uploadWarningTozamakonScene,
-  abonentlarniGeozonagaBiriktirish,
   getWarningLetter,
 ]);

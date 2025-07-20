@@ -100,14 +100,6 @@ app.use("/api/reports", isAuth, reportsRouter);
 app.use("/api/acts", isAuth, actsRouter);
 app.use(globalErrorHandler);
 
-// telegram bot
-function useTelegramBot() {
-  import("./bot/core/bot.js");
-  import("./bot/middlewares/index.js");
-  import("./bot/actions/index.js");
-}
-useTelegramBot();
-
 process.on("warning", (warning) => {
   console.warn(warning.stack);
 });

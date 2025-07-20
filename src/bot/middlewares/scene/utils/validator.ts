@@ -1,3 +1,4 @@
+import { Admin } from "@models/Admin";
 import { Context } from "telegraf";
 import { Message } from "telegraf/typings/core/types/typegram";
 
@@ -13,4 +14,11 @@ export function isTextMessage(
 
 export function isDigitOnly(text: string) {
   return /^\d+$/.test(text);
+}
+
+export async function isAdmin(id: number): Promise<boolean> {
+  const admin = await Admin.findOne({ user_id: id });
+  if (!admin) return false;
+
+  return true;
 }

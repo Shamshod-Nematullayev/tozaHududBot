@@ -1,4 +1,5 @@
 import { createTozaMakonApi } from "@api/tozaMakon.js";
+import { isAdmin } from "@bot/middlewares/isAdmin";
 import { isValidAccountNumber } from "@bot/middlewares/scene/utils/validator.js";
 import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril.js";
 import { keyboards } from "@lib/keyboards.js";
@@ -9,38 +10,41 @@ import { Mahalla } from "@models/Mahalla.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { searchAbonent } from "@services/billing/index.js";
 import { Composer, Markup } from "telegraf";
+import { button } from "telegraf/typings/markup";
 import { MyContext } from "types/botContext";
 import { scenaNames } from "types/scenes.js";
 
 const composer = new Composer<MyContext>();
 
-const hearsActions = [
+const hearsActions: {
+  buttons: string[];
+  listener: (ctx: MyContext) => void;
+}[] = [
   {
     buttons: ["👤Yangi abonent ochish"],
-    listener: (ctx: MyContext) =>
-      ctx.scene.enter(scenaNames.new_abonent_request),
+    listener: (ctx) => ctx.scene.enter(scenaNames.new_abonent_request),
   },
   {
     buttons: ["🔎Izlash"],
-    listener: (ctx: MyContext) => ctx.scene.enter("SEARCH_BY_NAME"),
+    listener: (ctx) => ctx.scene.enter("SEARCH_BY_NAME"),
   },
   {
     buttons: ["📅Abonent karta"],
-    listener: (ctx: MyContext) => ctx.scene.enter("getAbonentCard"),
+    listener: (ctx) => ctx.scene.enter("getAbonentCard"),
   },
   {
     buttons: ["✉️Ogohlantrish xati"],
-    listener: (ctx: MyContext) => ctx.scene.enter("getWarningLetter"),
+    listener: (ctx) => ctx.scene.enter("getWarningLetter"),
   },
   {
     buttons: ["🔌 ELEKTR KODI🔌"],
-    listener: async (ctx: MyContext) => {
+    listener: async (ctx) => {
       ctx.scene.enter("updateElektrKod");
     },
   },
   {
     buttons: ["👥Mening abonentlarim"],
-    listener: async (ctx: MyContext) => {
+    listener: async (ctx) => {
       try {
         const nazoratchi = await Nazoratchi.findOne({
           telegram_id: ctx.from?.id,
@@ -72,29 +76,37 @@ const hearsActions = [
   },
   {
     buttons: ["📓Qo`llanma"],
-    listener: (ctx: MyContext) => {
+    listener: (ctx) => {
       ctx.reply("Hozircha video qo'llanma mavjud emas. 🧠 Ishlatish kifoya");
     },
   },
   {
     buttons: ["✏️Ma'lumotlarini o'zgartirish"],
-    listener: (ctx: MyContext) => {
+    listener: (ctx) => {
       ctx.reply(messages.chooseEditType, keyboards.editTypes);
     },
   },
   {
     buttons: ["⚙Sozlamalar"],
-    listener: (ctx: MyContext) => {
+    listener: (ctx) => {
       ctx.reply(messages.chooseMenu, keyboards.settings);
     },
   },
   {
     buttons: ["✒️Sudga xat✒️"],
-    listener: (ctx: MyContext) => {
+    listener: (ctx) => {
       ctx.reply(
         `To'lov qilishdan bosh tortgan abonentlarni majburiy undiruvga qaratish bo'limi`,
         keyboards.targetMenuKeyboard
       );
+    },
+  },
+  {
+    buttons: ["👨‍💻 Ish maydoni"],
+    listener: async (ctx) => {
+      if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+
+      ctx.reply(messages.chooseMenu, keyboards.adminWorkSpace);
     },
   },
 ];

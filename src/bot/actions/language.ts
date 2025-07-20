@@ -1,5 +1,4 @@
 import { Composer } from "telegraf";
-import { bot } from "../core/bot.js";
 import { keyboards } from "@lib/keyboards.js";
 import { messages } from "@lib/messages.js";
 import { MyContext, MyWizardSession } from "types/botContext";
@@ -35,4 +34,4 @@ composer.action("kiril_tili_tanlash", async (ctx) => {
   }
 });
 
-bot.use(composer);
+export default composer;

@@ -1,5 +1,4 @@
 import { Composer } from "telegraf";
-import { bot } from "@bot/core/bot.js";
 import { CustomDataRequest } from "@models/CustomDataRequest.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Company } from "@models/Company.js";
@@ -61,4 +60,4 @@ composer.action(/shaxsitasdiqlandi_/g, async (ctx) => {
   }
 });
 
-bot.use(composer);
+export default composer;
