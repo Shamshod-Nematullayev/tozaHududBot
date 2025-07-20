@@ -11,6 +11,8 @@ import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 import puppeter from "puppeteer";
 import isCancel from "../../smallFunctions/isCancel.js";
+import { isTextMessage } from "../utils/validator.js";
+import { MyContext } from "types/botContext.js";
 
 export const getAbonentCard = new WizardScene(
   "getAbonentCard",
@@ -22,16 +24,15 @@ export const getAbonentCard = new WizardScene(
       console.error(error);
     }
   },
-  async (ctx) => {
+  async (ctx: MyContext) => {
     try {
-      const text = ctx.message.text;
-      if (isNaN(text) || text.length < 12) {
-        return ctx.reply(
-          "Abonent hisob raqamini to'g'ri kiriting",
-          keyboards.cancelBtn
-        );
+      if (!isTextMessage(ctx)) {
+        await ctx.reply("Faqat matn yuboring, iltimos.");
+        return;
       }
-      const inspector = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
+      const text = ctx.message.text;
+
+      const inspector = await Nazoratchi.findOne({ telegram_id: ctx.from?.id });
       if (!inspector) {
         ctx.reply(
           "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!",
@@ -39,19 +40,19 @@ export const getAbonentCard = new WizardScene(
         );
         return ctx.scene.leave();
       }
-      const abonent = await Abonent.findOne({
-        licshet: text,
+      const abonents = await Abonent.find({
+        licshet: new RegExp(text),
         companyId: inspector.companyId,
       });
-      if (!abonent) return ctx.reply("Abonent topilmadi");
-
+      if (abonents.length !== 1) return ctx.reply("Abonent topilmadi");
+      const abonent = abonents[0];
       const tozaMakonApi = createTozaMakonApi(abonent.companyId);
       const data = (
         await tozaMakonApi(
           `/user-service/residents/${abonent.id}/print-card?lang=UZ`
         )
       ).data;
-      const html = await new Promise((resolve, reject) => {
+      const html = (await new Promise((resolve, reject) => {
         ejs.renderFile(
           path.join(process.cwd(), "src", "views", "abonentKarta.ejs"),
           { ...data },
@@ -61,7 +62,7 @@ export const getAbonentCard = new WizardScene(
             resolve(str);
           }
         );
-      });
+      })) as string;
       let optionsByOs = {};
       if (os.platform() === "win32") {
         optionsByOs = {
