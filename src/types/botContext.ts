@@ -1,7 +1,7 @@
 import { Scenes } from "telegraf";
 
 export interface MyWizardSession extends Scenes.WizardSessionData {
-  til: "lotin" | "kiril";
+  til?: "lotin" | "kiril";
   [key: string]: any;
 }
 

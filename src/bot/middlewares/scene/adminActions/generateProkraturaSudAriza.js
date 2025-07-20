@@ -18,7 +18,6 @@ import path from "path";
 export const generateProkuraturaSudAriza = new Scenes.WizardScene(
   "generateProkuraturaSudAriza",
   async (ctx) => {
-    console.log(ctx.message);
     const [kun, oy] = ctx.message.text.split("-");
     ctx.wizard.state.kun = kun;
     ctx.wizard.state.oy = oy;

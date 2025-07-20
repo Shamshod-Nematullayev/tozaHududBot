@@ -114,24 +114,24 @@ process.on("warning", (warning) => {
 
 // Schedule jobs
 
-// agenda.on("ready", async () => {
-//   console.log("Agenda is ready to use!");
-//   import("./intervals/index.js");
-//   agenda.start();
-//   agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask");
-//   agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod");
-//   agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask");
-//   agenda.every("8 9-22 * * *", "sendKunlikEtkReportsTask");
-//   agenda.every("0 9-22 * * *", "sendPinflMfyReportTask");
-//   agenda.every("0 9-22 * * *", "sendEtkMfyReportTask");
-//   agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask");
-// });
+agenda.on("ready", async () => {
+  console.log("Agenda is ready to use!");
+  import("./intervals/index.js");
+  agenda.start();
+  agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask");
+  agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod");
+  agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask");
+  agenda.every("8 9-22 * * *", "sendKunlikEtkReportsTask");
+  agenda.every("0 9-22 * * *", "sendPinflMfyReportTask");
+  agenda.every("0 9-22 * * *", "sendEtkMfyReportTask");
+  agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask");
+});
 
 agenda.on("error", (error: Error) => {
   console.error("Agenda error:", error);
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });

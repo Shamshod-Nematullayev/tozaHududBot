@@ -15,6 +15,7 @@ import { tryDeleteOrEditMessage } from "./tryDeleteOrEditMessage.js";
 import { Axios, AxiosError } from "axios";
 import { parseError } from "./parseErrorMessage.js";
 import { tryIdentifiedOrReject } from "./tryIdentifiedOrReject.js";
+import { tryToIdentify } from "@services/billing/tryToIdentify.js";
 
 export default async function handleApproveRequest(
   ctx: Context,
@@ -53,14 +54,13 @@ export default async function handleApproveRequest(
   });
 
   // identifikatsiyadan o'tkazish
-  const result = await tryIdentifiedOrReject(req, abonent, tozaMakonApi);
-
-  if (!result.success) {
-    return await ctx.answerCbQuery(
-      "Ma'lumotlar yangilandi, ammo identifikatsiya qilib bo'lmadi. Xatolik: " +
-        result.errorMessage
-    );
-  }
+  let resident = (
+    await searchAbonent(tozaMakonApi, {
+      accountNumber: abonent.accountNumber,
+      companyId: abonent.companyId,
+    })
+  ).content[0];
+  await tryToIdentify(tozaMakonApi, resident, abonent.companyId);
 
   //   mongodb ma'lumotlar bazada yangilanish
   await abonent.updateOne({
