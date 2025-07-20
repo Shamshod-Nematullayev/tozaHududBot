@@ -1,6 +1,5 @@
-import { Admin } from "@models/Admin";
+import { Admin } from "@models/Admin.js";
 import { Context } from "telegraf";
-import { Message } from "telegraf/typings/core/types/typegram";
 
 export function isValidAccountNumber(text: string): boolean {
   return /^\d{12,}$/.test(text);

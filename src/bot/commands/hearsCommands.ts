@@ -1,5 +1,5 @@
 import { createTozaMakonApi } from "@api/tozaMakon.js";
-import { isAdmin } from "@bot/middlewares/isAdmin";
+import { isAdmin } from "@bot/middlewares/isAdmin.js";
 import { isValidAccountNumber } from "@bot/middlewares/scene/utils/validator.js";
 import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril.js";
 import { keyboards } from "@lib/keyboards.js";
@@ -10,7 +10,6 @@ import { Mahalla } from "@models/Mahalla.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { searchAbonent } from "@services/billing/index.js";
 import { Composer, Markup } from "telegraf";
-import { button } from "telegraf/typings/markup";
 import { MyContext } from "types/botContext";
 import { scenaNames } from "types/scenes.js";
 

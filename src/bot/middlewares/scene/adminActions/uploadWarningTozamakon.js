@@ -154,7 +154,7 @@ async function createWarningLetterPDF(abonentData) {
 
   const createHtmlString = new Promise((resolve, reject) => {
     ejs.renderFile(
-      path.join(__dirname, "../../../", "views", "gibrid.ogohlantirish.ejs"),
+      path.join(process.cwd(), "src", "views", "gibrid.ogohlantirish.ejs"),
       { warningDataPrint },
       {},
       (err, str) => {

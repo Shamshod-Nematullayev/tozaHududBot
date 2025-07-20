@@ -5,6 +5,7 @@ import { Company } from "@models/Company.js";
 import { bot } from "@bot/core/bot.js";
 
 import ejs from "ejs";
+import path from "path";
 
 // small function
 function bugungiSana() {
@@ -78,7 +79,12 @@ export async function sendKunlikPhoneReports(
     });
 
     ejs.renderFile(
-      "./src/views/kunlikMalumotKiritishHisoboti.ejs",
+      path.join(
+        process.cwd(),
+        "src",
+        "views",
+        "kunlikMalumotKiritishHisoboti.ejs"
+      ),
       {
         allConfirmed,
         allConfirmedHourly,
@@ -98,7 +104,9 @@ export async function sendKunlikPhoneReports(
         const buffer = Buffer.from(binaryData, "binary");
 
         bot.telegram.sendPhoto(
-          company.GROUP_ID_NAZORATCHILAR,
+          process.env.NODE_ENV == "production"
+            ? company.GROUP_ID_NAZORATCHILAR
+            : process.env.ME,
           { source: buffer },
           {
             caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,

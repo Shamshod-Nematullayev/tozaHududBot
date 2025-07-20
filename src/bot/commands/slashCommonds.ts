@@ -1,6 +1,6 @@
-import { keyboards } from "@lib/keyboards";
-import { messages } from "@lib/messages";
-import { Admin } from "@models/Admin";
+import { keyboards } from "@lib/keyboards.js";
+import { messages } from "@lib/messages.js";
+import { Admin } from "@models/Admin.js";
 import { Composer } from "telegraf";
 import { MyContext } from "types/botContext";
 

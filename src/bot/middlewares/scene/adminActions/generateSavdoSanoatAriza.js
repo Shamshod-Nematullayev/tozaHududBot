@@ -53,7 +53,7 @@ export const generateSavdoSanoatAriza = new Scenes.WizardScene(
               });
             }
             ejs.renderFile(
-              path.join(__dirname, `../../../views/sudbuyruq copy.ejs`),
+              path.join(process.cwd(), "src", "views", "sudbuyruq copy.ejs"),
               { rows },
               {},
               async (err, str) => {

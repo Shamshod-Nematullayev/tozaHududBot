@@ -53,7 +53,7 @@ export const generateSBuyruq = new Scenes.WizardScene(
               });
             }
             ejs.renderFile(
-              path.join(__dirname, `../../../views/sudbuyruq.ejs`),
+              path.join(process.cwd(), "src", "views", `sudbuyruq.ejs`),
               { rows },
               {},
               async (err, str) => {

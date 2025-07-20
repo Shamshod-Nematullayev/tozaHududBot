@@ -66,7 +66,7 @@ export const generateProkuraturaSudAriza = new Scenes.WizardScene(
             }
 
             ejs.renderFile(
-              path.join(__dirname, `../../../views/arizaProkuratura.ejs`),
+              path.join(process.cwd(), "src", "views", "arizaProkuratura.ejs"),
               { rows, kun: ctx.wizard.state.kun, oy: ctx.wizard.state.oy },
               {},
               async (err, str) => {

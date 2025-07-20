@@ -1,5 +1,5 @@
-import { isAdmin } from "@bot/middlewares/isAdmin";
-import { messages } from "@lib/messages";
+import { isAdmin } from "@bot/middlewares/isAdmin.js";
+import { messages } from "@lib/messages.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Composer } from "telegraf";
 import { MyContext } from "types/botContext";

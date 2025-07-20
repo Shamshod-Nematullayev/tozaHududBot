@@ -198,7 +198,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene(
       ).data;
       const html = await new Promise(async (resolve, reject) => {
         ejs.renderFile(
-          "./src/views/hybridPochtaCash.ejs",
+          path.join(process.cwd(), "src", "views", "hybridPochtaCash.ejs"),
           { mail },
           async (err, html) => {
             if (err) return reject(err);
@@ -327,7 +327,7 @@ async function createWarningLetterPDF(abonentData, companyId) {
 
   const html = await new Promise((resolve, reject) => {
     ejs.renderFile(
-      path.join(__dirname, "../../../", "views", "gibrid.ogohlantirish.ejs"),
+      path.join(process.cwd(), "src", "views", "gibrid.ogohlantirish.ejs"),
       { warningDataPrint },
       {},
       (err, str) => {

@@ -6,6 +6,7 @@ import { Company } from "@models/Company.js";
 import { bot } from "@bot/core/bot.js";
 
 import ejs from "ejs";
+import path from "path";
 
 // small function
 function bugungiSana() {
@@ -80,7 +81,12 @@ export async function sendKunlikEtkReports(
     });
 
     ejs.renderFile(
-      "./src/views/kunlikMalumotKiritishHisoboti.ejs",
+      path.join(
+        process.cwd(),
+        "src",
+        "views",
+        "kunlikMalumotKiritishHisoboti.ejs"
+      ),
       {
         allConfirmed,
         allConfirmedHourly,
