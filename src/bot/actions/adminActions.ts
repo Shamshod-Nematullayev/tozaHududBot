@@ -8,7 +8,7 @@ import { Composer } from "telegraf";
 import { messages } from "@lib/messages.js";
 import { Admin } from "@models/Admin.js";
 import { MyContext } from "types/botContext.js";
-import { isAdmin } from "@bot/middlewares/isAdmin.js";
+import { isAdmin } from "@bot/middlewares/scene/utils/validator.js";
 
 // Main codes =====================================================================================
 const composer = new Composer<MyContext>();
@@ -18,7 +18,7 @@ composer.command("admin", async (ctx) => {
   if (admins.length === 0) ctx.scene.enter("newAdmin");
 });
 composer.command("change_password", async (ctx) => {
-  if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+  if (!(await isAdmin(ctx.from.id))) return ctx.reply(messages.youAreNotAdmin);
   ctx.scene.enter("changePasswordScene");
 });
 

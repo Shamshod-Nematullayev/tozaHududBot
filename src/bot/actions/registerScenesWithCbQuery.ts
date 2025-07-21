@@ -1,4 +1,4 @@
-import { isAdmin } from "@bot/middlewares/isAdmin.js";
+import { isAdmin } from "@bot/middlewares/scene/utils/validator";
 import { messages } from "@lib/messages.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Composer } from "telegraf";

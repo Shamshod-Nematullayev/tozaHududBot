@@ -1,15 +1,22 @@
-import { bot } from "../core/bot.js";
+import { Composer } from "telegraf";
 
-import { Mahalla } from "@models/Mahalla.js";
-bot.use(async (ctx, next) => {
-  if (ctx.chat.id < 0 && !ctx.callbackQuery?.data) {
-    if (ctx.message?.text == "chat_id") {
-      ctx.reply(ctx.chat.id);
+const composer = new Composer();
+const chatIdMiddleware = async (ctx, next) => {
+  const chatId = Number(ctx.chat?.id);
+
+  if (chatId < 0 && !ctx.callbackQuery?.data) {
+    if (ctx.message?.text === "chat_id") {
+      await ctx.reply(String(chatId));
     }
-    if (ctx.channelPost?.text == "chat_id") {
-      ctx.reply(ctx.chat.id);
+    if (ctx.channelPost?.text === "chat_id") {
+      await ctx.reply(String(chatId));
     }
     return;
   }
-  next();
-});
+
+  return next();
+};
+
+composer.use(chatIdMiddleware);
+
+export default composer;

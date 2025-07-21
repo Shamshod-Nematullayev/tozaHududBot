@@ -1,8 +1,10 @@
-import { bot } from "../core/bot.js";
+import { Composer } from "telegraf";
 
 import { User } from "@models/User.js";
 
-bot.use(async (ctx, next) => {
+const composer = new Composer();
+
+composer.use(async (ctx, next) => {
   const users = await User.find();
   let topildi = false;
   users.forEach((user) => {
@@ -16,3 +18,5 @@ bot.use(async (ctx, next) => {
     next();
   });
 });
+
+export default composer;
