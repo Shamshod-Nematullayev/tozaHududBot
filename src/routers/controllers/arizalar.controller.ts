@@ -191,6 +191,7 @@ export const createAriza: Handler = async (
     photos,
     recalculationPeriods,
     muzlatiladi,
+    fullName,
   } = createArizaBodySchema.parse(req.body);
   // validate the request
 
@@ -221,6 +222,7 @@ export const createAriza: Handler = async (
     recalculationPeriods: recalculationPeriods,
     muzlatiladi: muzlatiladi,
     companyId: req.user.companyId,
+    fio: fullName,
   });
   await counter.updateOne({ $set: { value: counter.value + 1 } });
   res.json({ ok: true, ariza: newAriza });

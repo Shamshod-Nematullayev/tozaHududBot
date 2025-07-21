@@ -44,7 +44,7 @@ export default async function handleApproveRequest(
   const [yil, oy, kun] = req.data.birth_date.split("-");
   const citizen = await getCitizen(tozaMakonApi, {
     passport: req.data.passport_serial + req.data.passport_number,
-    birthDate: `${yil}-${oy}-${kun}`,
+    birthdate: `${yil}-${oy}-${kun}`,
     pinfl: req.data.pinfl,
   });
 
@@ -56,8 +56,10 @@ export default async function handleApproveRequest(
   // identifikatsiyadan o'tkazish
   let resident = (
     await searchAbonent(tozaMakonApi, {
-      accountNumber: abonent.accountNumber,
+      accountNumber: abonent.licshet,
       companyId: abonent.companyId,
+      districtId: company.districtId,
+      size: 10,
     })
   ).content[0];
   await tryToIdentify(tozaMakonApi, resident, abonent.companyId);

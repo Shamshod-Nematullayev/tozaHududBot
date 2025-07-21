@@ -169,15 +169,16 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
       }
       ctx.wizard.state.mahallalarButtons = mahallalarButtons;
 
-      const birthDate = extractBirthDateString(ctx.message.text);
+      const birthdate = extractBirthDateString(ctx.message.text);
 
       const tozaMakonApi = createTozaMakonApi(
         inspektor?.companyId || admin?.companyId
       );
       const citizen = await getCitizen(tozaMakonApi, {
         pinfl: ctx.message.text,
-        birthDate,
+        birthdate,
       });
+      console.log(citizen);
 
       if (!citizen.passport || !citizen.photo) {
         await ctx.reply(

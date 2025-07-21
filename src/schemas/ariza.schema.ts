@@ -35,6 +35,7 @@ export const createArizaBodySchema = z
     document_type: z.enum(arizaDocumentTypes),
     abonentId: z.coerce.number(),
     account_number: z.string().regex(...accountNumberRegex),
+    fullName: z.string(),
     dublicat_account_number: z
       .string()
       .regex(...accountNumberRegex)

@@ -7,7 +7,6 @@ export interface IAbonent {
   first_name: string;
   middle_name: string;
   licshet: string;
-  accountNumber: string;
   caotoNumber: string;
   companyId: number;
   isConfirm: any;
