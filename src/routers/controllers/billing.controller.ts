@@ -514,7 +514,7 @@ export const getAbonentsByMfyIdController = async (
   res: Response
 ) => {
   try {
-    const data = await getAbonentsByMfyId(req);
+    const data = await getAbonentsByMfyId(req as any);
     res.json({ ok: true, data });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
@@ -523,7 +523,7 @@ export const getAbonentsByMfyIdController = async (
 };
 
 export const getAbonentsByMfyIdExcel = async (req: Request, res: Response) => {
-  const filteredData = await getAbonentsByMfyId(req);
+  const filteredData = await getAbonentsByMfyId(req as any);
   const workbook = new Excel.Workbook();
   const worksheet = workbook.addWorksheet("Abonents");
   worksheet.columns = [

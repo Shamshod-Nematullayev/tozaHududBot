@@ -62,7 +62,8 @@ export default async function handleApproveRequest(
       size: 10,
     })
   ).content[0];
-  await tryToIdentify(tozaMakonApi, resident, abonent.companyId);
+  if (!resident.identified)
+    await tryToIdentify(tozaMakonApi, resident, abonent.companyId);
 
   //   mongodb ma'lumotlar bazada yangilanish
   await abonent.updateOne({

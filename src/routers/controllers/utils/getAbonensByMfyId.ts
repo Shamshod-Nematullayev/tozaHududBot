@@ -3,9 +3,27 @@ import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril.js";
 import { Abonent } from "@models/Abonent.js";
 import { getAbonentsByMfyIdQuerySchema } from "@schemas/billing.schema.js";
 import { searchAbonent } from "@services/billing/index.js";
-import { Request } from "express";
+import { IAbonent } from "types/billing";
 
-export async function getAbonentsByMfyId(req: Request) {
+interface IFilteredAbonent extends IAbonent {
+  accountNumber: string; // tozaMakon API'dan
+  ksaldo: number; // balans
+  fullName: string; // kirillga o'zgartirilgan fio
+  isElektrKodConfirmForExcel?: "✅" | "❌"; // eksport uchun
+  isElektrKodConfirm?: boolean; // checkbox yoki boshqa logic uchun
+  isIdentified?: "✅" | "❌"; // shaxsi tasdiqlanganmi
+}
+
+export async function getAbonentsByMfyId(req: {
+  params: { mfy_id: string };
+  query: {
+    minSaldo?: number;
+    maxSaldo?: number;
+    identified?: "true" | "false";
+    etkStatus?: "true" | "false";
+  };
+  user: { companyId: number };
+}): Promise<IFilteredAbonent[]> {
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const { minSaldo, maxSaldo, identified, etkStatus } =
     getAbonentsByMfyIdQuerySchema.parse(req.query);

@@ -11,6 +11,12 @@ export function isTextMessage(
   return !!ctx.message && "text" in ctx.message;
 }
 
+export function isCallbackQueryMessage(
+  ctx: Context
+): ctx is Context & { callbackQuery: { data: string } } {
+  return !!ctx.callbackQuery && "data" in ctx.callbackQuery;
+}
+
 export function isDigitOnly(text: string) {
   return /^\d+$/.test(text);
 }

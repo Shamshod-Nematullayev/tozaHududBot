@@ -3,6 +3,10 @@ import { Markup } from "telegraf";
 import mahallalar from "./mahallalar.js";
 
 import { Mahalla } from "@models/Mahalla.js";
+import {
+  InlineKeyboardMarkup,
+  ReplyKeyboardMarkup,
+} from "telegraf/typings/core/types/typegram.js";
 
 // ============ Helper functions ================
 function mahallaKeys() {
@@ -20,7 +24,14 @@ function mahallaKeys() {
   return buttons;
 }
 
-export function createInlineKeyboard(buttonDataArray) {
+/**
+ *
+ * @param buttonDataArray [[buttonText, buttonCallback]]
+ * @returns InlineKeyboardMarkup
+ */
+export function createInlineKeyboard(
+  buttonDataArray: Array<Array<[string, string]>>
+): Markup.Markup<InlineKeyboardMarkup> {
   const inlineKeyboard = buttonDataArray.map((buttonDataSet) => {
     return buttonDataSet.map(([buttonText, buttonCallback]) => {
       return Markup.button.callback(buttonText, buttonCallback);
