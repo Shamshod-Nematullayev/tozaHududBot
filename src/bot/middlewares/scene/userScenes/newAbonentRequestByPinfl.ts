@@ -67,6 +67,7 @@ interface MySceneState {
   inhabitantCount?: number;
   etk_abonent?: IEtk_Abonent;
   findedETKAbonents?: IEtk_Abonent[];
+  session?: any;
 }
 
 type Ctx = WizardWithState<MySceneState>;
@@ -413,6 +414,7 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
             caoto: caoto.caoto,
           });
 
+          if (!electrAbonentDetails) continue;
           findedETKAbonents.push({
             caotoNumber: electrAbonentDetails.subRegion,
             accountNumber: electrAbonentDetails.account,

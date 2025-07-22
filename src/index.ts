@@ -76,7 +76,7 @@ import newAbonentsRouter from "./routers/newAbonentsRouter.js";
 import yashovchiSoniXatlovRouter from "./routers/yashovchiSoniXatlov.js";
 import reportsRouter from "./routers/reportsRouter.js";
 import actsRouter from "./routers/actsRouter.js";
-// import { idenOneAbonent } from "test/index.js";
+import "test/index.js";
 import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.js";
 // import { globalErrorHandler } from idenAllAbonents"./routers/controllers/utils/globalErrorHandler.js";
 // import { idenAllAbonents, idenOneAbonent } from "test/index.js";

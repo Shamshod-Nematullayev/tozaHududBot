@@ -1,4 +1,4 @@
-import { Scenes } from "telegraf";
+import { Composer, Scenes } from "telegraf";
 import { addNotification } from "./scene/adminActions/addNotification.js";
 import { searchAbonentbyName } from "./scene/userScenes/searchAbonentByName.js";
 import { multiplyLivingsScene } from "./scene/userScenes/multiplyLivings.js";
@@ -28,8 +28,9 @@ import changePasswordScene from "./scene/adminActions/changePassword.js";
 import { getAbonentCard } from "./scene/userScenes/getAbonentCard.js";
 import { uploadWarningTozamakonScene } from "./scene/adminActions/uploadWarningTozamakon.js";
 import { getWarningLetter } from "./scene/userScenes/getWarningLetter.js";
+import { MyContext } from "types/botContext.js";
 
-export const stage = new Scenes.Stage([
+const stage = new Scenes.Stage<any>([
   addNotification,
   searchAbonentbyName,
   multiplyLivingsScene,
@@ -59,3 +60,8 @@ export const stage = new Scenes.Stage([
   uploadWarningTozamakonScene,
   getWarningLetter,
 ]);
+
+const composer = new Composer();
+composer.use(stage.middleware());
+
+export default composer;

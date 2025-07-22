@@ -22,6 +22,9 @@
 // //     cadastralNumber: null,
 // //   });
 
+import { Abonent } from "@models/Abonent";
+import { Ariza } from "@models/Ariza";
+
 // //   let done = 0;
 // //   let error = 0;
 // //   const errors: { accountNumber: string; message: string }[] = [];

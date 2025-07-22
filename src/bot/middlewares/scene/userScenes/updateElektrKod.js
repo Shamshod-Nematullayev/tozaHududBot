@@ -16,6 +16,7 @@ import { EtkAbonent } from "@models/EtkAbonent.js";
 import axios from "axios";
 
 import { caotoNames } from "../../../../constants.js";
+import { getElectricResidentDetails } from "@services/payme.js";
 
 export const updateElektrKod = new Scenes.WizardScene(
   "updateElektrKod",
@@ -105,31 +106,19 @@ export const updateElektrKod = new Scenes.WizardScene(
         for (let caoto of caotoNames.filter(
           (c) => c.companyId == ctx.wizard.state.companyId
         )) {
-          const { data } = await axios.post(
-            "https://api-e3abced5.payme.uz/api/cheque.create",
-            {
-              method: "cheque.create",
-              params: {
-                amount: 50000,
-                merchant_id: "5a5dffd8687ee421a5c4b0e6",
-                account: {
-                  account: ctx.message.text,
-                  region: caoto.region,
-                  subRegion: caoto.caoto,
-                },
-              },
-            }
-          );
+          const etkResultFromPayme = await getElectricResidentDetails({
+            accountNumber: ctx.message.text,
+            region: caoto.region,
+            caoto: caoto.caoto,
+          });
 
-          if (!data.error) {
-            findedETKAbonents.push({
-              caotoNumber: caoto.caoto,
-              accountNumber: ctx.message.text,
-              customerName: data.result.cheque.account.find(
-                (row) => row.name == "fio"
-              ).value,
-            });
-          }
+          if (!etkResultFromPayme) continue;
+
+          findedETKAbonents.push({
+            caotoNumber: caoto.caoto,
+            accountNumber: ctx.message.text,
+            customerName: etkResultFromPayme.fio,
+          });
         }
       }
       if (!findedETKAbonents[0]) {
@@ -204,12 +193,7 @@ export const updateElektrKod = new Scenes.WizardScene(
               identified: true,
               residentIds: [abonent.id],
             });
-          } catch (error) {
-            ctx.reply(
-              "Idinfikatsiyadan o'tkazishda xatolik yuz berdi " +
-                error.response?.data?.message
-            );
-          }
+          } catch (error) {}
           await Abonent.findByIdAndUpdate(abonent._id, {
             $set: {
               ekt_kod_tasdiqlandi: {

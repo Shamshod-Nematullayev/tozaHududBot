@@ -115,11 +115,14 @@ export const createMonayTransferArizaBodySchema = z
     debitorAct: z.object({
       accountNumber: z.string().regex(...accountNumberRegex),
       amount: z.coerce.number().gt(0),
+      residentId: z.coerce.number(),
+      fullName: z.string(),
     }),
     creditorActs: z.array(
       z.object({
         accountNumber: z.string().regex(...accountNumberRegex),
         amount: z.coerce.number().gt(0),
+        residentId: z.coerce.number(),
         fullName: z.string(),
       })
     ),

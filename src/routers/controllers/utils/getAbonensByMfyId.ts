@@ -35,6 +35,7 @@ export async function getAbonentsByMfyId(req: Request) {
     page,
     size: 300,
     companyId: req.user.companyId,
+    mahallaId: parseInt(req.params.mfy_id),
   });
   rows.push(...data.content);
   totalPages = data.totalPages;
@@ -44,6 +45,7 @@ export async function getAbonentsByMfyId(req: Request) {
         page: i,
         size: 300,
         companyId: req.user.companyId,
+        mahallaId: parseInt(req.params.mfy_id),
       });
       rows.push(...data.content);
     }
