@@ -1,17 +1,17 @@
 import { WizardWithState } from "@bot/helpers/WizardWithState";
-import isCancel from "@bot/middlewares/smallFunctions/isCancel";
-import { createInlineKeyboard, keyboards } from "@lib/keyboards";
+import isCancel from "@bot/middlewares/smallFunctions/isCancel.js";
+import { createInlineKeyboard, keyboards } from "@lib/keyboards.js";
 import { Mahalla } from "@models/Mahalla.js";
-import { Nazoratchi } from "@models/Nazoratchi";
+import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Markup, Scenes } from "telegraf";
-import { isCallbackQueryMessage, isTextMessage } from "../utils/validator";
-import { getAbonentsByMfyId } from "routers/controllers/utils/getAbonensByMfyId";
+import { isCallbackQueryMessage, isTextMessage } from "../utils/validator.js";
+import { getAbonentsByMfyId } from "routers/controllers/utils/getAbonensByMfyId.js";
 import ejs from "ejs";
 import path from "path";
-import { createPdfFromHtml } from "helpers/createPdfFromHtml";
-import { createImgFromHtml } from "helpers/createImgFromHtml";
-import { Company } from "@models/Company";
-import { chunkArray } from "helpers/chunkArray";
+import { createPdfFromHtml } from "helpers/createPdfFromHtml.js";
+import { createImgFromHtml } from "helpers/createImgFromHtml.js";
+import { Company } from "@models/Company.js";
+import { chunkArray } from "helpers/chunkArray.js";
 import { InputMediaPhoto } from "telegraf/typings/core/types/typegram";
 
 interface MyWizardState {
