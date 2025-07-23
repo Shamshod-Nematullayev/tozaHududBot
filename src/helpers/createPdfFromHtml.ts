@@ -1,8 +1,11 @@
-import puppeteer from "puppeteer";
+import puppeteer, { PDFMargin } from "puppeteer";
 import os from "os";
 import path from "path";
 
-export async function createPdfFromHtml(html: string): Promise<Uint8Array> {
+export async function createPdfFromHtml(
+  html: string,
+  margin?: PDFMargin
+): Promise<Uint8Array> {
   let optionsByOs = {};
   if (os.platform() === "win32") {
     optionsByOs = {
@@ -20,11 +23,13 @@ export async function createPdfFromHtml(html: string): Promise<Uint8Array> {
   const browser = await puppeteer.launch({
     headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    userDataDir: "/tmp/puppeteer",
   });
   const page = await browser.newPage();
   await page.setContent(html, { waitUntil: "networkidle0" });
-  const buffer = await page.pdf({ format: "A4" });
+  const buffer = await page.pdf({
+    format: "A4",
+    margin,
+  });
   await browser.close();
   return buffer;
 }

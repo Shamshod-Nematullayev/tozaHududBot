@@ -41,7 +41,10 @@ export function createInlineKeyboard(
   return Markup.inlineKeyboard(inlineKeyboard);
 }
 
-async function nazoratchigaBiriktirilganMahallalar(companyId, inspector_id) {
+async function nazoratchigaBiriktirilganMahallalar(
+  companyId: number,
+  inspector_id?: number
+) {
   const filter = inspector_id
     ? {
         "biriktirilganNazoratchi.inspactor_id": inspector_id,
@@ -71,6 +74,7 @@ export const keyboards = {
     ["👥Mening abonentlarim", "🔎Izlash", "✉️Ogohlantrish xati"],
     ["📓Qo`llanma", "⚙Sozlamalar"],
     ["🔌 ELEKTR KODI🔌", "✒️Sudga xat✒️", "📅Abonent karta"],
+    ["✅Abonentlar ro'yxati"],
   ]).resize(),
   cancelBtn: Markup.keyboard(["🚫Bekor qilish"]).resize(),
   mahallalar: Markup.inlineKeyboard(mahallaKeys()),

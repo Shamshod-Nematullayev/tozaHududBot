@@ -10,6 +10,9 @@ import ejs from "ejs";
 import path from "path";
 import { createPdfFromHtml } from "helpers/createPdfFromHtml";
 import { createImgFromHtml } from "helpers/createImgFromHtml";
+import { Company } from "@models/Company";
+import { chunkArray } from "helpers/chunkArray";
+import { InputMediaPhoto } from "telegraf/typings/core/types/typegram";
 
 interface MyWizardState {
   companyId?: number;
@@ -51,7 +54,7 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
     await ctx.deleteMessage();
     ctx.wizard.state.mahallaId = ctx.callbackQuery.data;
     await ctx.reply(
-      "Shaxsi tasdiqlandi holatini tanlang!",
+      "ELEKTR KODI holatini tanlang!",
       createInlineKeyboard([
         [["✅ Tasdiqlangan", "confirmed"]],
         [["❌ Tasdiqlanmagan", "notConfirmed"]],
@@ -61,7 +64,7 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
     return ctx.wizard.next();
   },
   async (ctx) => {
-    if (!isCallbackQueryMessage(ctx)) return;
+    if (!isCallbackQueryMessage(ctx)) throw "400 bad request";
     ctx.wizard.state.elektrKodStatus = ctx.callbackQuery.data as
       | "confirmed"
       | "notConfirmed"
@@ -78,7 +81,7 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
     return ctx.wizard.next();
   },
   async (ctx) => {
-    if (!isCallbackQueryMessage(ctx)) return;
+    if (!isCallbackQueryMessage(ctx)) throw "400 bad request";
     await ctx.deleteMessage();
     ctx.wizard.state.pnflStatus = ctx.callbackQuery.data as
       | "confirmed"
@@ -89,14 +92,12 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) return;
-    await ctx.deleteMessage();
     ctx.wizard.state.minSaldo = Number(ctx.message.text);
     await ctx.reply("Maksimum qarzdorlik summasini kiriting");
     return ctx.wizard.next();
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) return;
-    await ctx.deleteMessage();
     ctx.wizard.state.maxSaldo = Number(ctx.message.text);
     await ctx.reply(
       "Formatni tanlang!",
@@ -110,7 +111,7 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
     return ctx.wizard.next();
   },
   async (ctx) => {
-    if (!isCallbackQueryMessage(ctx)) return;
+    if (!isCallbackQueryMessage(ctx)) throw "400 bad request";
     ctx.wizard.state.format = ctx.callbackQuery.data as "pdf" | "picture";
     await ctx.deleteMessage();
     const abonents = await getAbonentsByMfyId({
@@ -136,21 +137,46 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
       },
     });
 
-    const html = await ejs.renderFile(
-      path.join(process.cwd(), "src", "views", "<ABONENTS_LIST_EJS_PATH>"), // TODO
-      { abonents }
-    );
+    const company = await Company.findOne({ id: ctx.wizard.state.companyId });
+
+    const mahalla = await Mahalla.findOne({ id: ctx.wizard.state.mahallaId });
     if (ctx.wizard.state.format === "pdf") {
-      const pdf = await createPdfFromHtml(html);
-      await ctx.replyWithDocument({ source: Buffer.from(pdf) });
+      const html = await ejs.renderFile(
+        path.join(process.cwd(), "src", "views", "abonentsList.ejs"),
+        { abonents, company, isWithTitle: true }
+      );
+      const pdf = await createPdfFromHtml(html, {
+        bottom: "5mm",
+        left: "5mm",
+        right: "5mm",
+        top: "5mm",
+      });
+      await ctx.replyWithDocument({
+        source: Buffer.from(pdf),
+        filename: mahalla?.name + ".pdf",
+      });
     } else {
-      const img = (await createImgFromHtml({
-        html: html,
-        encoding: "binary",
-        type: "png",
-        selector: "div",
-      })) as string;
-      await ctx.replyWithPhoto({ source: Buffer.from(img, "binary") });
+      let imgs: InputMediaPhoto[] = [];
+      const chunks = chunkArray(abonents, 50);
+      for (let i = 0; i < chunks.length; i++) {
+        const chunk = chunks[i];
+        const html = await ejs.renderFile(
+          path.join(process.cwd(), "src", "views", "abonentsList.ejs"),
+          {
+            abonents: chunk,
+            company: company,
+            isWithTitle: i === 0 ? true : false,
+          }
+        );
+        const img = (await createImgFromHtml({
+          html: html,
+          encoding: "binary",
+          type: "png",
+          selector: "div",
+        })) as string;
+        imgs.push({ media: { source: Buffer.from(img) }, type: "photo" });
+      }
+      await ctx.replyWithMediaGroup(imgs);
     }
     return ctx.scene.leave();
   }

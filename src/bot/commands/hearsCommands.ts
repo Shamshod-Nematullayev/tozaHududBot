@@ -111,6 +111,10 @@ const hearsActions: {
       ctx.reply(messages.chooseMenu, keyboards.adminWorkSpace);
     },
   },
+  {
+    buttons: ["✅Abonentlar ro'yxati"],
+    listener: (ctx) => ctx.scene.enter("getAbonentsList"),
+  },
 ];
 
 hearsActions.forEach(({ buttons, listener }) => {

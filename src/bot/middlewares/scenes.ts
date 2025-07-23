@@ -29,6 +29,7 @@ import { getAbonentCard } from "./scene/userScenes/getAbonentCard.js";
 import { uploadWarningTozamakonScene } from "./scene/adminActions/uploadWarningTozamakon.js";
 import { getWarningLetter } from "./scene/userScenes/getWarningLetter.js";
 import { MyContext } from "types/botContext.js";
+import { getAbonentsList } from "./scene/userScenes/getAbonentsList.js";
 
 const stage = new Scenes.Stage<any>([
   addNotification,
@@ -59,6 +60,7 @@ const stage = new Scenes.Stage<any>([
   getAbonentCard,
   uploadWarningTozamakonScene,
   getWarningLetter,
+  getAbonentsList,
 ]);
 
 const composer = new Composer();

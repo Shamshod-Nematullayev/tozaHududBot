@@ -157,7 +157,7 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
             inspektor?.companyId || admin.companyId
           )
         : await keyboards.nazoratchigaBiriktirilganMahallalar(
-            inspektor?.companyId,
+            inspektor?.companyId as number,
             inspektor?.id
           );
 

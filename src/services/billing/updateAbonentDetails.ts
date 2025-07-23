@@ -18,7 +18,11 @@ export async function updateAbonentDetails(
     ...existingDetails,
     ...details,
     house: {
-      ...existingDetails.house,
+      ...{
+        ...existingDetails.house,
+        type: existingDetails.house?.type || "HOUSE",
+        homeNumber: existingDetails.house?.homeNumber || "0",
+      },
       ...details.house,
     },
     citizen: {
