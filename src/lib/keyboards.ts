@@ -11,7 +11,7 @@ import {
 // ============ Helper functions ================
 function mahallaKeys() {
   // Use localeCompare for string comparison
-  const compare = (a, b) => a.name.localeCompare(b.name);
+  const compare = (a: any, b: any) => a.name.localeCompare(b.name);
 
   // Create a sorted copy of mahallalar
   const sortedMahallalar = [...mahallalar].sort(compare);
