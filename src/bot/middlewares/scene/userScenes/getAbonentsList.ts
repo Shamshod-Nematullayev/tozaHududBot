@@ -87,18 +87,34 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
       | "confirmed"
       | "notConfirmed"
       | "all";
-    await ctx.reply("Minimum qarzdorlik summasini kiriting");
+    await ctx.reply(
+      "Minimum qarzdorlik summasini kiriting",
+      Markup.keyboard([
+        ["100000", "200000"],
+        ["300000", "400000"],
+        ["Barchasi"],
+      ]).resize()
+    );
     return ctx.wizard.next();
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) return;
-    ctx.wizard.state.minSaldo = Number(ctx.message.text);
-    await ctx.reply("Maksimum qarzdorlik summasini kiriting");
+    if (ctx.message.text !== "Barchasi")
+      ctx.wizard.state.minSaldo = Number(ctx.message.text);
+    await ctx.reply(
+      "Maksimum qarzdorlik summasini kiriting",
+      Markup.keyboard([
+        ["100000", "200000"],
+        ["300000", "400000"],
+        ["Barchasi"],
+      ]).resize()
+    );
     return ctx.wizard.next();
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) return;
-    ctx.wizard.state.maxSaldo = Number(ctx.message.text);
+    if (ctx.message.text !== "Barchasi")
+      ctx.wizard.state.maxSaldo = Number(ctx.message.text);
     await ctx.reply(
       "Formatni tanlang!",
       createInlineKeyboard([
