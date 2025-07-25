@@ -87,7 +87,7 @@ export const searchAbonentbyName = new Scenes.WizardScene<Ctx>(
           "Qidiruv natijalari juda ko'p, iltimos ko'proq belgi kiriting"
         );
       }
-      let messageText = ``;
+      let messageText = `Eski ro'yxat bo'yicha qidiruv natijalari:\n`;
       abonent.forEach((doc, i) => {
         messageText += `${i + 1}. <code>${doc.accountNumber}</code> <b>${
           doc.fullName
@@ -114,11 +114,11 @@ export const searchAbonentbyName = new Scenes.WizardScene<Ctx>(
           "Qidiruv natijalari juda ko'p, iltimos ko'proq belgi kiriting"
         );
       }
-      let messageText = ``;
+      let messageText = `Yangi ro'yxat bo'yicha qidiruv natijalari:\n`;
       abonent.forEach((doc, i) => {
         messageText += `${i + 1}. <code>${doc.licshet}</code> <b>${
           doc.fio
-        }</b> ${doc.streets_name}\n`;
+        }</b>\n`;
       });
       ctx.replyWithHTML(messageText, keyboards.cancelBtn.resize());
     }
