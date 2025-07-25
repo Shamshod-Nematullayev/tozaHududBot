@@ -32,7 +32,7 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
     const inspector = await Nazoratchi.findOne({ telegram_id: ctx.from?.id });
     if (!inspector) {
       ctx.scene.leave();
-      throw new Error("NO_ACCESS");
+      throw "NO_ACCESS";
     }
     ctx.wizard.state.companyId = inspector.companyId;
     const mahallalar = await Mahalla.find({
@@ -50,7 +50,7 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
     return ctx.wizard.next();
   },
   async (ctx) => {
-    if (!isCallbackQueryMessage(ctx)) return;
+    if (!isCallbackQueryMessage(ctx)) throw "400 bad request";
     await ctx.deleteMessage();
     ctx.wizard.state.mahallaId = ctx.callbackQuery.data;
     await ctx.reply(
@@ -98,7 +98,7 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
     return ctx.wizard.next();
   },
   async (ctx) => {
-    if (!isTextMessage(ctx)) return;
+    if (!isTextMessage(ctx)) throw "400 bad request";
     if (ctx.message.text !== "Barchasi")
       ctx.wizard.state.minSaldo = Number(ctx.message.text);
     await ctx.reply(
@@ -112,7 +112,7 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
     return ctx.wizard.next();
   },
   async (ctx) => {
-    if (!isTextMessage(ctx)) return;
+    if (!isTextMessage(ctx)) throw "400 bad request";
     if (ctx.message.text !== "Barchasi")
       ctx.wizard.state.maxSaldo = Number(ctx.message.text);
     await ctx.reply(
