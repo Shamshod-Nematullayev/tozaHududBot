@@ -1,6 +1,27 @@
 import mongoose from "mongoose";
 
-const schema = new mongoose.Schema({
+export interface IMultiplyRequest {
+  KOD: number;
+  YASHOVCHILAR: number;
+  currentInhabitantCount: number;
+  date: Date;
+  from: {
+    id: number;
+    first_name: string;
+    user_name: string;
+  };
+  confirm: boolean;
+  mahallaId: string;
+  abonentId: string;
+  mahallaName: string;
+  fio: string;
+  actId: string;
+  document_id: string;
+  isCancel: boolean;
+  companyId: number;
+}
+
+const schema = new mongoose.Schema<IMultiplyRequest>({
   KOD: {
     type: Number,
     required: true,

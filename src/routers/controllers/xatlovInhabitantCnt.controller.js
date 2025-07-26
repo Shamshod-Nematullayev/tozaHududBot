@@ -299,16 +299,12 @@ export const confirmDalolatnoma = async (req, res) => {
 };
 
 export const getRowsByIds = async (req, res) => {
-  try {
-    const { request_ids } = req.query;
-    const rows = await MultiplyRequest.find({
-      _id: { $in: request_ids },
-      companyId: req.user.companyId,
-    });
-    if (!rows.length)
-      return res.status(404).json({ ok: false, message: "No records found" });
-    res.json({ ok: true, data: rows });
-  } catch (error) {
-    res.status(500).json({ ok: false, message: "Internal server error" });
-  }
+  const { request_ids } = req.body;
+  const rows = await MultiplyRequest.find({
+    _id: { $in: request_ids },
+    companyId: req.user.companyId,
+  });
+  if (!rows.length)
+    return res.status(404).json({ ok: false, message: "No records found" });
+  res.json({ ok: true, data: rows });
 };

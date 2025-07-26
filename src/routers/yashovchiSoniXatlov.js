@@ -30,7 +30,7 @@ router.get("/get-one-dalolatnoma", getOneDalolatnoma);
 
 router.put("/confirm/:_id", uploadAsBlob.single("file"), confirmDalolatnoma);
 
-router.get("/get-rows-by-ids", getRowsByIds);
+router.post("/get-rows-by-ids", getRowsByIds);
 
 router.put("/cancel-document/:_id", cancelDalolatnoma);
 
