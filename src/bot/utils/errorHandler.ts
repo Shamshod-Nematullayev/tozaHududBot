@@ -1,14 +1,20 @@
 import { keyboards } from "@lib/keyboards.js";
 import { Context } from "telegraf";
 
+export enum ErrorTypes {
+  NO_ACCESS = "NO_ACCESS",
+  NOT_FOUND = "NOT_FOUND",
+  BAD_REQUEST = "400 bad request",
+}
+
 export function errorHandler(err: any, ctx: Context) {
-  if (err === "NO_ACCESS") {
+  if (err === ErrorTypes.NO_ACCESS) {
     return ctx.reply("Sizda yetarli huquq yo‘q", keyboards.mainKeyboard);
   }
-  if (err === "NOT_FOUND") {
+  if (err === ErrorTypes.NOT_FOUND) {
     return ctx.reply("Ma'lumot topilmadi");
   }
-  if (err === "400 bad request") {
+  if (err === ErrorTypes.BAD_REQUEST) {
     return ctx.reply("Kutilgan amal bajarilmadi", keyboards.cancelBtn.resize());
   }
 

@@ -108,5 +108,5 @@ getAbonentCard.on("text", async (ctx, next) => {
     ctx.reply("Amaliyot bekor qilindi", keyboards.mainKeyboard);
     return ctx.scene.leave();
   }
-  next();
+  return next();
 });

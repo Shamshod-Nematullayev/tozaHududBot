@@ -602,7 +602,7 @@ new_abonent_request_by_pinfl_scene.on("text", (ctx, next) => {
     ctx.reply("Amaliyot bekor qilindi", keyboards.mainKeyboard);
     return ctx.scene.leave();
   }
-  next();
+  return next();
 });
 new_abonent_request_by_pinfl_scene.leave((ctx) =>
   ctx.reply("Yakunlandi", keyboards.mainKeyboard.resize())

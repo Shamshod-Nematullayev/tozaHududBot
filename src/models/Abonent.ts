@@ -1,5 +1,16 @@
 import { model, Schema } from "mongoose";
 
+interface IConfirmSchema {
+  confirm: boolean;
+  inspector_id: number;
+  inspector_name: string;
+  inspector: {
+    name: string;
+    _id: number;
+  };
+  updated_at: Date;
+}
+
 export interface IAbonent {
   id: number;
   fio: string;
@@ -21,20 +32,11 @@ export interface IAbonent {
   phone?: string;
   pinfl?: number;
   passport_number?: string;
-  shaxsi_tasdiqlandi?: {
-    confirm: boolean;
-    inspector_id: number;
-    inspector_name: string;
-    inspector: {
-      name: string;
-      _id: number;
-    };
-    updated_at: Date;
-  };
+  shaxsi_tasdiqlandi?: IConfirmSchema;
   shaxsi_tasdiqlandi_history?: any[];
-  ekt_kod_tasdiqlandi?: any;
-  street_tasdiqlandi?: any;
-  phone_tasdiqlandi?: any;
+  ekt_kod_tasdiqlandi?: IConfirmSchema;
+  street_tasdiqlandi?: IConfirmSchema;
+  phone_tasdiqlandi?: IConfirmSchema;
   sudAkt?: any;
   warningLetter?: any;
   ksaldo?: number;
@@ -74,7 +76,9 @@ const courtProcessSchema = new Schema(
   { _id: false }
 );
 
-export interface IAbonentDoc extends IAbonent, Document {}
+export interface IAbonentDoc extends IAbonent, Document {
+  _id: string;
+}
 
 const schema = new Schema<IAbonentDoc>(
   {
@@ -161,6 +165,7 @@ export interface AbonentDoc {
   phone_tasdiqlandi?: any;
   sudAkt?: any;
   warningLetter?: any;
+  _id: string;
 }
 
 export const Abonent = model("billing_abonent", schema);
