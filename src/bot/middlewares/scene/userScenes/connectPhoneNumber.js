@@ -10,6 +10,7 @@ import { Abonent } from "@models/Abonent.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 
 import { createTozaMakonApi } from "@api/tozaMakon.js";
+import { updateAbonentDetails } from "@services/billing/updateAbonentDetails.js";
 
 export const connectPhoneNumber = new Scenes.WizardScene(
   "connect_phone_number",
@@ -85,29 +86,11 @@ export const connectPhoneNumber = new Scenes.WizardScene(
         );
       }
       const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId);
-      const abonentDatas = (
-        await tozaMakonApi.get(
-          `/user-service/residents/${ctx.wizard.state.abonent_id}?include=translates`
-        )
-      ).data;
-      await tozaMakonApi.put(
-        "/user-service/residents/" + ctx.wizard.state.abonent_id,
-        {
-          ...abonentDatas,
-          description: `${ctx.wizard.state.inspector_name} ma'lumotiga asosan telefon raqami kiritildi.`,
-          citizen: {
-            ...abonentDatas.citizen,
-            phone: ctx.message.text,
-          },
-          phone: ctx.message.text,
-          house: {
-            ...abonentDatas.house,
-            cadastralNumber: abonentDatas.house.cadastralNumber
-              ? abonentDatas.house.cadastralNumber
-              : "00:00:00:00:00:0000:0000",
-          },
-        }
-      );
+      await updateAbonentDetails(tozaMakonApi, ctx.wizard.state.abonent_id, {
+        phone: ctx.message.text,
+        description: `${ctx.wizard.state.inspector_name} ma'lumotiga asosan telefon raqami kiritildi.`,
+      });
+
       await Abonent.updateOne(
         {
           licshet: ctx.wizard.state.accountNumber,

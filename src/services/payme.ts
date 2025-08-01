@@ -20,8 +20,8 @@ export async function getElectricResidentDetails({
   accountNumber: string;
   region: number;
   caoto: number;
-}): Promise<IElectricCheck> {
-  const data = (
+}): Promise<IElectricCheck | null> {
+  let data = (
     await axios.post("https://api-e3abced5.payme.uz/api/cheque.create", {
       method: "cheque.create",
       params: {
@@ -34,19 +34,21 @@ export async function getElectricResidentDetails({
         },
       },
     })
-  ).data.result.cheque.account as {
-    name: "fio" | "address" | "pay_type" | "region" | "subRegion" | "account";
-    title: string;
-    value: string;
-    main: boolean;
-  }[];
-
+  ).data?.result?.cheque; //.account;
+  let arr: any[] = data?.account;
+  if (!arr) return null;
+  // .cheque.account as {
+  //   name: "fio" | "address" | "pay_type" | "region" | "subRegion" | "account";
+  //   title: string;
+  //   value: string;
+  //   main: boolean;
+  // }[];
+  console.log({ data });
   const details: any = {};
-  data.forEach((d) => {
-    if (d.main) {
-      details[d.name] = d.value;
-    }
+  arr.forEach((d) => {
+    details[d.name] = d.value;
   });
 
+  console.log({ details });
   return details;
 }

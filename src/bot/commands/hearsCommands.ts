@@ -1,6 +1,8 @@
 import { createTozaMakonApi } from "@api/tozaMakon.js";
-import { isAdmin } from "@bot/middlewares/isAdmin.js";
-import { isValidAccountNumber } from "@bot/middlewares/scene/utils/validator.js";
+import {
+  isAdmin,
+  isValidAccountNumber,
+} from "@bot/middlewares/scene/utils/validator.js";
 import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril.js";
 import { keyboards } from "@lib/keyboards.js";
 import { messages } from "@lib/messages.js";
@@ -103,10 +105,15 @@ const hearsActions: {
   {
     buttons: ["👨‍💻 Ish maydoni"],
     listener: async (ctx) => {
-      if (!(await isAdmin(ctx))) return ctx.reply(messages.youAreNotAdmin);
+      if (!(await isAdmin(ctx.chat?.id as number)))
+        return ctx.reply(messages.youAreNotAdmin);
 
       ctx.reply(messages.chooseMenu, keyboards.adminWorkSpace);
     },
+  },
+  {
+    buttons: ["✅Abonentlar ro'yxati"],
+    listener: (ctx) => ctx.scene.enter("getAbonentsList"),
   },
 ];
 

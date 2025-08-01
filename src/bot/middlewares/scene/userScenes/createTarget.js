@@ -138,15 +138,10 @@ export const createTargetScene = new WizardScene(
   }
 );
 
-createTargetScene.on("message", (ctx, next) => {
-  try {
-    if (isCancel(ctx.message.text)) {
-      ctx.reply("Bekor qilindi", keyboards.mainKeyboard);
-      return ctx.scene.leave();
-    }
-    next();
-  } catch (error) {
-    ctx.reply("Xatolik");
-    console.error(error);
+createTargetScene.on("text", (ctx, next) => {
+  if (isCancel(ctx.message.text)) {
+    ctx.reply("Bekor qilindi", keyboards.mainKeyboard);
+    return ctx.scene.leave();
   }
+  return next();
 });

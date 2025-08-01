@@ -67,6 +67,7 @@ interface MySceneState {
   inhabitantCount?: number;
   etk_abonent?: IEtk_Abonent;
   findedETKAbonents?: IEtk_Abonent[];
+  session?: any;
 }
 
 type Ctx = WizardWithState<MySceneState>;
@@ -156,7 +157,7 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
             inspektor?.companyId || admin.companyId
           )
         : await keyboards.nazoratchigaBiriktirilganMahallalar(
-            inspektor?.companyId,
+            inspektor?.companyId as number,
             inspektor?.id
           );
 
@@ -169,15 +170,16 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
       }
       ctx.wizard.state.mahallalarButtons = mahallalarButtons;
 
-      const birthDate = extractBirthDateString(ctx.message.text);
+      const birthdate = extractBirthDateString(ctx.message.text);
 
       const tozaMakonApi = createTozaMakonApi(
         inspektor?.companyId || admin?.companyId
       );
       const citizen = await getCitizen(tozaMakonApi, {
         pinfl: ctx.message.text,
-        birthDate,
+        birthdate,
       });
+      console.log(citizen);
 
       if (!citizen.passport || !citizen.photo) {
         await ctx.reply(
@@ -412,6 +414,7 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
             caoto: caoto.caoto,
           });
 
+          if (!electrAbonentDetails) continue;
           findedETKAbonents.push({
             caotoNumber: electrAbonentDetails.subRegion,
             accountNumber: electrAbonentDetails.account,
@@ -599,7 +602,7 @@ new_abonent_request_by_pinfl_scene.on("text", (ctx, next) => {
     ctx.reply("Amaliyot bekor qilindi", keyboards.mainKeyboard);
     return ctx.scene.leave();
   }
-  next();
+  return next();
 });
 new_abonent_request_by_pinfl_scene.leave((ctx) =>
   ctx.reply("Yakunlandi", keyboards.mainKeyboard.resize())

@@ -25,7 +25,11 @@ router.get("/:id", catchAsync(getArizaById)); // GET specific ariza
 router.post("/create", catchAsync(createAriza)); // CREATE new ariza
 router.post("/cancel", catchAsync(cancelArizaById)); // Cancel ariza (non-idempotent)
 router.post("/money-transfer", catchAsync(createMonayTransferAriza)); // Create transfer
-router.post("/money-transfer-act", catchAsync(createMonayTransferActByAriza));
+router.post(
+  "/money-transfer-act/:ariza_id",
+  uploadAsBlob.single("file"),
+  catchAsync(createMonayTransferActByAriza)
+);
 
 // --- PUT routes ---
 router.put("/:id", catchAsync(updateArizaById)); // Full update

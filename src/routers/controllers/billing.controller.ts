@@ -38,7 +38,10 @@ import {
 } from "@schemas/billing.schema.js";
 import { mergePhotosWithPdf } from "./utils/mergePhotosWithPdf.js";
 import { transferAmountBetweenAccounts } from "@services/billing/transferAmountBetweenAccounts.js";
-import { InputMediaDocument } from "telegraf/typings/core/types/typegram";
+import {
+  InputMediaDocument,
+  InputMediaPhoto,
+} from "telegraf/typings/core/types/typegram";
 import { chunkArray } from "helpers/chunkArray.js";
 import { generateMessageForAbonentList } from "./utils/generateMessageForAbonentList.js";
 import { getAbonentsByMfyId } from "./utils/getAbonensByMfyId.js";
@@ -402,8 +405,13 @@ export const sendAbonentsListToTelegram = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  let { minSaldo, maxSaldo, identified, etkStatus, mahalla_name } =
-    sendAbonentsListToTelegramQuerySchema.parse(req.query);
+  let {
+    minSaldo,
+    maxSaldo,
+    identified,
+    elektrAccountNumberConfirmed,
+    mahalla_name,
+  } = sendAbonentsListToTelegramQuerySchema.parse(req.query);
   const files = req.files;
 
   const company = await Company.findOne({ id: req.user.companyId });
@@ -416,8 +424,8 @@ export const sendAbonentsListToTelegram = async (
   }
 
   // Yuklangan fayllarni Telegram media group formatiga o‘tkazish
-  const mediaGroup: InputMediaDocument[] = files.map((file) => ({
-    type: "document",
+  const mediaGroup: InputMediaPhoto[] = files.map((file) => ({
+    type: "photo",
     media: { source: file.buffer },
   }));
 
@@ -434,7 +442,7 @@ export const sendAbonentsListToTelegram = async (
       minSaldo,
       maxSaldo,
       identified,
-      etkStatus,
+      etkStatus: elektrAccountNumberConfirmed,
       mahalla_name,
     })
   );
@@ -506,7 +514,7 @@ export const getAbonentsByMfyIdController = async (
   res: Response
 ) => {
   try {
-    const data = await getAbonentsByMfyId(req);
+    const data = await getAbonentsByMfyId(req as any);
     res.json({ ok: true, data });
   } catch (error) {
     res.json({ ok: false, message: "Internal server error 500" });
@@ -515,7 +523,7 @@ export const getAbonentsByMfyIdController = async (
 };
 
 export const getAbonentsByMfyIdExcel = async (req: Request, res: Response) => {
-  const filteredData = await getAbonentsByMfyId(req);
+  const filteredData = await getAbonentsByMfyId(req as any);
   const workbook = new Excel.Workbook();
   const worksheet = workbook.addWorksheet("Abonents");
   worksheet.columns = [

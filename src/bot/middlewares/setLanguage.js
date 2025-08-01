@@ -1,6 +1,7 @@
-import { bot } from "../core/bot.js";
+import { Composer } from "telegraf";
 
-bot.use((ctx, next) => {
+const composer = new Composer();
+composer.use((ctx, next) => {
   if (ctx.session.til) {
     next();
   } else {
@@ -8,3 +9,5 @@ bot.use((ctx, next) => {
     next();
   }
 });
+
+export default composer;

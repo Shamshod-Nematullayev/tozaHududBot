@@ -117,7 +117,7 @@ multiplyLivingsScene.on("text", (ctx, next) => {
   if (isNaN(ctx.message.text)) {
     return ctx.reply(messages.enterYashovchiSoni, keyboards.cancelBtn);
   }
-  next();
+  return next();
 });
 multiplyLivingsScene.leave((ctx) => {
   ctx.reply(messages.startGreeting, keyboards.mainKeyboard.resize());

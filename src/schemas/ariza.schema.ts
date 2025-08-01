@@ -35,6 +35,7 @@ export const createArizaBodySchema = z
     document_type: z.enum(arizaDocumentTypes),
     abonentId: z.coerce.number(),
     account_number: z.string().regex(...accountNumberRegex),
+    fullName: z.string(),
     dublicat_account_number: z
       .string()
       .regex(...accountNumberRegex)
@@ -114,11 +115,14 @@ export const createMonayTransferArizaBodySchema = z
     debitorAct: z.object({
       accountNumber: z.string().regex(...accountNumberRegex),
       amount: z.coerce.number().gt(0),
+      residentId: z.coerce.number(),
+      fullName: z.string(),
     }),
     creditorActs: z.array(
       z.object({
         accountNumber: z.string().regex(...accountNumberRegex),
         amount: z.coerce.number().gt(0),
+        residentId: z.coerce.number(),
         fullName: z.string(),
       })
     ),

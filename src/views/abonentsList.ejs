@@ -1,0 +1,100 @@
+<% var date = new Date(); %>
+<html>
+
+<head>
+  <style>
+    table {
+      font-size: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+
+    .abonent_rows_head {
+      border: 1px solid black;
+    }
+
+    .abonent_rows_head th,
+    .abonent_rows td {
+      border: 1px solid #000;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .abonent_rows>td:nth-child(3) {
+      text-overflow: ellipsis;
+      max-width: 300px;
+    }
+
+    .abonent_rows>td:nth-child(4) {
+      text-overflow: ellipsis;
+      max-width: 70px;
+    }
+  </style>
+
+<body>
+  <div>
+    <% if(isWithTitle){%>
+    <table>
+      <tbody>
+        <tr>
+          <td colspan="7">
+            <i>Oliy Ong</i>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="7">
+            Сана: <%= date.getDate()%>.<%=date.getMonth() + 1%>.<%=date.getFullYear()%>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="7">
+            <%= (company?.locationName || '') %> / <%= company?.name %>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="7">
+            Махалла: <%= abonents[0]?.mahallaName %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <% } %>
+    <table>
+      <thead>
+        <tr class="abonent_rows_head" style="border: 1px solid black;">
+          <th>№</th>
+          <th>Лицавой</th>
+          <th style="width: 180px;">ФИО</th>
+          <th>Кўча</th>
+          <th>Я/с</th>
+          <th>Қарздор</th>
+          <th colspan="2">Охирги тўлов</th>
+          <th>ЭТК</th>
+          <th>Телефон</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (let i = 0; i < abonents.length; i++) { %>
+        <tr class="abonent_rows">
+          <td style="text-align: center;"><%= i + 1 %></td>
+          <td><%= abonents[i].accountNumber %></td>
+          <td><%= (abonents[i].fullName.length < 30 ? abonents[i].fullName : abonents[i].fullName.slice(0, 30) + '..') %></td>
+          <td><%= abonents[i].streetName %></td>
+          <td style="text-align: center;"><%= abonents[i].inhabitantCnt %></td>
+          <td style="text-align: right;"><%= Math.floor(Number(abonents[i].ksaldo)).toLocaleString() %></td>
+          <td style="text-align: right;"><%= abonents[i].lastPaymentAmount %></td>
+          <td><%= String(abonents[i].lastPayDate).split('T')[0] %></td>
+          <td style="text-decoration: <%= abonents[i].isElektrKodConfirm ? 'line-through' : 'none' %>;"><%= abonents[i].electricityAccountNumber %></td>
+          <td><%= abonents[i].phone %></td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</body>
+
+</html>

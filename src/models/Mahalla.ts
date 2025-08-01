@@ -1,6 +1,38 @@
 import mongoose from "mongoose";
 
-const schema = new mongoose.Schema({
+interface IMahalla {
+  id: number;
+  name: string;
+  companyId: number;
+  reja: number;
+  biriktirilganNazoratchi?: {
+    inspector_name: string;
+    inspactor_id: number;
+  };
+  groups: any[];
+  ommaviy_shartnoma?: any;
+  sektor?: string;
+  mfy_rais_name: string;
+  mfy_rais_phone?: string;
+  hokim_yordamchi_name?: string;
+  hokim_yordamchi_phone?: string;
+  yoshlar_yetakchi_name?: string;
+  yoshlar_yetakchi_phone?: string;
+  xotinqizlar_name?: string;
+  xotinqizlar_phone?: string;
+  uchastkavoy_name?: string;
+  uchastkavoy_phone?: string;
+  shaxsi_tasdiqlandi_reja?: number;
+  abarotka_berildi?: boolean;
+  publicOfferFileId?: string;
+  publicOfferFileName?: string;
+  publicOfferFileUrl?: string;
+  publicOfferFileUpdatedAt?: Date;
+  geoZoneBiriktirilganKochalar?: any[];
+  created_at: Date;
+}
+
+const schema = new mongoose.Schema<IMahalla>({
   id: {
     type: Number,
     required: true,
@@ -25,7 +57,7 @@ const schema = new mongoose.Schema({
     },
   },
   groups: {
-    type: Array,
+    type: [Object],
     default: [],
   },
   ommaviy_shartnoma: Object,
@@ -47,7 +79,7 @@ const schema = new mongoose.Schema({
   },
   publicOfferFileId: String,
   geoZoneBiriktirilganKochalar: {
-    type: Array,
+    type: [Object],
     default: [],
   },
 });

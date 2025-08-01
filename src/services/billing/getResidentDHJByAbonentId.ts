@@ -4,9 +4,12 @@ import { DHJRow } from "types/billing";
 export async function getResidentDHJByAbonentId(
   tozaMakonApi: Axios,
   residentId: number,
-  params?: {
+  params: {
     page: number;
     size: number;
+  } = {
+    size: 100,
+    page: 0,
   }
 ): Promise<DHJRow[]> {
   return (

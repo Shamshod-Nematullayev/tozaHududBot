@@ -3,11 +3,15 @@ import { Markup } from "telegraf";
 import mahallalar from "./mahallalar.js";
 
 import { Mahalla } from "@models/Mahalla.js";
+import {
+  InlineKeyboardMarkup,
+  ReplyKeyboardMarkup,
+} from "telegraf/typings/core/types/typegram.js";
 
 // ============ Helper functions ================
 function mahallaKeys() {
   // Use localeCompare for string comparison
-  const compare = (a, b) => a.name.localeCompare(b.name);
+  const compare = (a: any, b: any) => a.name.localeCompare(b.name);
 
   // Create a sorted copy of mahallalar
   const sortedMahallalar = [...mahallalar].sort(compare);
@@ -20,7 +24,14 @@ function mahallaKeys() {
   return buttons;
 }
 
-export function createInlineKeyboard(buttonDataArray) {
+/**
+ *
+ * @param buttonDataArray [[buttonText, buttonCallback]]
+ * @returns InlineKeyboardMarkup
+ */
+export function createInlineKeyboard(
+  buttonDataArray: Array<Array<[string, string]>>
+): Markup.Markup<InlineKeyboardMarkup> {
   const inlineKeyboard = buttonDataArray.map((buttonDataSet) => {
     return buttonDataSet.map(([buttonText, buttonCallback]) => {
       return Markup.button.callback(buttonText, buttonCallback);
@@ -30,7 +41,10 @@ export function createInlineKeyboard(buttonDataArray) {
   return Markup.inlineKeyboard(inlineKeyboard);
 }
 
-async function nazoratchigaBiriktirilganMahallalar(companyId, inspector_id) {
+async function nazoratchigaBiriktirilganMahallalar(
+  companyId: number,
+  inspector_id?: number
+) {
   const filter = inspector_id
     ? {
         "biriktirilganNazoratchi.inspactor_id": inspector_id,
@@ -60,6 +74,7 @@ export const keyboards = {
     ["👥Mening abonentlarim", "🔎Izlash", "✉️Ogohlantrish xati"],
     ["📓Qo`llanma", "⚙Sozlamalar"],
     ["🔌 ELEKTR KODI🔌", "✒️Sudga xat✒️", "📅Abonent karta"],
+    ["✅Abonentlar ro'yxati"],
   ]).resize(),
   cancelBtn: Markup.keyboard(["🚫Bekor qilish"]).resize(),
   mahallalar: Markup.inlineKeyboard(mahallaKeys()),

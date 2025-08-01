@@ -191,6 +191,7 @@ export const createAriza: Handler = async (
     photos,
     recalculationPeriods,
     muzlatiladi,
+    fullName,
   } = createArizaBodySchema.parse(req.body);
   // validate the request
 
@@ -221,6 +222,7 @@ export const createAriza: Handler = async (
     recalculationPeriods: recalculationPeriods,
     muzlatiladi: muzlatiladi,
     companyId: req.user.companyId,
+    fio: fullName,
   });
   await counter.updateOne({ $set: { value: counter.value + 1 } });
   res.json({ ok: true, ariza: newAriza });
@@ -419,6 +421,8 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
   ariza.akt_date = date;
 
   // Arizani yangilash
+  ariza.abonentId = abonent.id;
+  ariza.fio = abonent.fio;
   await ariza.save();
 
   res.json({ ok: true, ariza });
@@ -491,7 +495,7 @@ export const createMonayTransferActByAriza = async (
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   try {
     const ariza = await Ariza.findOne({
-      _id: req.params._id,
+      _id: req.params.ariza_id,
       companyId: req.user.companyId,
     });
     if (!ariza) {
@@ -556,6 +560,12 @@ export const createMonayTransferActByAriza = async (
       ).id;
       actIds.push(actId);
     }
+
+    ariza.akt_id = actIds[0];
+    ariza.actStatus = "NEW";
+    ariza.status = "akt_kiritilgan";
+    await ariza.save();
+    res.json({ ok: true, ariza, message: "Muvaffaqiyatli akt kiritildi" });
   } catch (error) {
     for (let actId of actIds) {
       await deleteActById(tozaMakonApi, actId);

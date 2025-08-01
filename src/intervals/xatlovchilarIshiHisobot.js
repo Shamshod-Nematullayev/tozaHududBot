@@ -110,7 +110,7 @@ async function xatlovchilarIshiHisobot(companyId = 1144) {
     const buffer = Buffer.from(binaryData, "binary");
     try {
       await bot.telegram.sendPhoto(
-        company.GROUP_ID_NAZORATCHILAR,
+        company.GROUP_ID_XATLOVCHILAR,
         // process.env.ME,
         { source: buffer },
         {

@@ -41,14 +41,26 @@ export const createDublicateActBodySchema = z.object({
 export const sendAbonentsListToTelegramQuerySchema = z.object({
   minSaldo: z.string().optional(),
   maxSaldo: z.string().optional(),
-  identified: z.enum(["true", "false"]).optional(),
-  etkStatus: z.enum(["true", "false"]).optional(),
+  identified: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.enum(["true", "false"]).optional()
+  ),
+  elektrAccountNumberConfirmed: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.enum(["true", "false"]).optional()
+  ),
   mahalla_name: z.string(),
 });
 
 export const getAbonentsByMfyIdQuerySchema = z.object({
   minSaldo: z.coerce.number().optional(),
   maxSaldo: z.coerce.number().optional(),
-  identified: z.enum(["true", "false"]).optional(),
-  etkStatus: z.enum(["true", "false"]).optional(),
+  identified: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.enum(["true", "false"]).optional()
+  ),
+  etkStatus: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.enum(["true", "false"]).optional()
+  ),
 });

@@ -1,5 +1,6 @@
-import { bot } from "../core/bot.js";
+import { Composer } from "telegraf";
 import { kirillga } from "./smallFunctions/lotinKiril.js";
+const composer = new Composer();
 
 // Faqat matnlarni tarjima qilish
 function translateText(text) {
@@ -60,12 +61,6 @@ function modifyReply(ctx) {
   };
 }
 
-// Bot uchun middleware
-bot.use((ctx, next) => {
-  modifyReply(ctx);
-  return next();
-});
-
 function modifyReplyFunctions(ctx) {
   const methods = [
     "reply",
@@ -113,7 +108,7 @@ function modifyReplyFunctions(ctx) {
             }
           }
 
-          return originalMethod(message, extra);
+          originalMethod(message, extra);
         } catch (error) {
           console.error(`${method} uchun tarjima xatosi:`, error);
         }
@@ -123,7 +118,11 @@ function modifyReplyFunctions(ctx) {
 }
 
 // Bot uchun middleware
-bot.use((ctx, next) => {
+composer.use((ctx, next) => {
   modifyReplyFunctions(ctx);
-  return next();
+  next();
 });
+
+// composer.use(modifyReply);
+
+export default composer;

@@ -29,4 +29,6 @@ composer.start(async (ctx) => {
   }
 });
 
+composer.command("list", (ctx) => ctx.scene.enter("getAbonentsList"));
+
 export default composer;
