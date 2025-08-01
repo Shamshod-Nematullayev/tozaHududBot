@@ -1,0 +1,60 @@
+import { createTozaMakonApi } from "@api/tozaMakon.js";
+import { Abonent } from "@models/Abonent.js";
+import { SudAkt } from "@models/SudAkt.js";
+import { getResidentDHJByAbonentId } from "@services/billing/index.js";
+
+// 03.2025: string => 2025-03-31: Date
+function periodToDate(period: string) {
+  const [month, year] = period.split(".").map(Number);
+
+  return new Date(year, month, 0); //oyning oxirgi kuni
+}
+
+export async function checkPaymentSudAkts(companyId: number) {
+  let counter = 0;
+  console.log("checkPaymentSudAkts started");
+  const sudAkts = await SudAkt.find({
+    status: {
+      $ne: "yakunlandi",
+    },
+    companyId,
+  });
+
+  for (const akt of sudAkts) {
+    const abonent = await Abonent.findOne({ licshet: akt.licshet });
+
+    if (!abonent) {
+      await SudAkt.updateOne(
+        { licshet: akt.licshet },
+        {
+          $set: {
+            status: "yakunlandi",
+          },
+        }
+      );
+      counter++;
+      continue;
+    }
+
+    const tozaMakonApi = createTozaMakonApi(companyId);
+    const dhj = await getResidentDHJByAbonentId(tozaMakonApi, abonent.id);
+    const allPaymentsAfterWarning = dhj
+      .filter((d) => periodToDate(d.period) >= akt.warningDate)
+      .reduce((a, b) => a + b.allPaymentsSum, 0);
+
+    if (allPaymentsAfterWarning >= akt.claimAmount) {
+      await SudAkt.updateOne(
+        { licshet: akt.licshet },
+        {
+          $set: {
+            status: "yakunlandi",
+            yakunlandiDate: new Date(),
+          },
+        }
+      );
+      counter++;
+    }
+  }
+  console.log(`Jami aktlar soni: ${sudAkts.length}`);
+  console.log(`Yakunlandi aktlar soni: ${counter}`);
+}

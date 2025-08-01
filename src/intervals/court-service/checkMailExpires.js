@@ -1,4 +1,4 @@
-import { NOTIFICATIONS_CHANNEL_ID } from "../constants.js";
+import { NOTIFICATIONS_CHANNEL_ID } from "../../constants.js";
 
 import { HybridMail } from "@models/HybridMail.js";
 

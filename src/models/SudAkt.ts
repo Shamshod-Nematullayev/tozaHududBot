@@ -1,8 +1,45 @@
 import mongoose from "mongoose";
 
-const schema = new mongoose.Schema(
+interface ISudAkt {
+  reg_number: number;
+  licshet: string;
+  mfy_id: number;
+  mfy_name: string;
+  sud_process_id_billing: string;
+  sud_process_status: string;
+  case_current_status: string;
+  fio: string;
+  case_id: string;
+  sud_case_id: string;
+  sud_case_number: string;
+  judge_name: string;
+  claimAmount: number;
+  sudQaroriBillinggaYuklandi: boolean;
+  warningDate: Date;
+  case_documents: any[];
+  ariza_date: Date;
+  ariza_order_num: number;
+  ariza_type: "prokuratura" | "savdo-sanoat";
+  ariza_file_name: string;
+  ariza_file_id: string;
+  tushum: number;
+  akt: number;
+  isDelete: boolean;
+  pinfl: number;
+  abonentId: number;
+  status:
+    | "yangi"
+    | "ariza_yaratildi"
+    | "ariza_imzolandi"
+    | "sudga_ariza_berildi"
+    | "sud_qarori_chiqorildi"
+    | "rad_etildi";
+  companyId: number;
+  yakunlandiDate: Date;
+}
+
+const schema = new mongoose.Schema<ISudAkt>(
   {
-    "№": String,
     reg_number: Number,
     licshet: String,
     mfy_id: Number,
@@ -52,12 +89,14 @@ const schema = new mongoose.Schema(
         "sudga_ariza_berildi",
         "sud_qarori_chiqorildi",
         "rad_etildi",
+        "yakunlandi",
       ],
     },
     companyId: {
       type: Number,
       required: true,
     },
+    yakunlandiDate: Date,
   },
   {
     timestamps: true,
