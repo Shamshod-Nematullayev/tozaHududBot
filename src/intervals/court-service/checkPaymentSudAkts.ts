@@ -2,6 +2,7 @@ import { createTozaMakonApi } from "@api/tozaMakon.js";
 import { Abonent } from "@models/Abonent.js";
 import { SudAkt } from "@models/SudAkt.js";
 import { getResidentDHJByAbonentId } from "@services/billing/index.js";
+import { chunkArray } from "helpers/chunkArray";
 
 // 03.2025: string => 2025-03-31: Date
 function periodToDate(period: string) {
@@ -19,41 +20,46 @@ export async function checkPaymentSudAkts(companyId: number) {
     },
     companyId,
   });
+  const chunks = chunkArray(sudAkts, 10);
+  let decounter = chunks.length;
+  for (const chunk of chunks) {
+    console.log(decounter--);
+    const promises = chunk.map(async (akt) => {
+      const abonent = await Abonent.findOne({ licshet: akt.licshet });
 
-  for (const akt of sudAkts) {
-    const abonent = await Abonent.findOne({ licshet: akt.licshet });
+      if (!abonent) {
+        await SudAkt.updateOne(
+          { licshet: akt.licshet },
+          {
+            $set: {
+              status: "yakunlandi",
+            },
+          }
+        );
+        counter++;
+        return;
+      }
 
-    if (!abonent) {
-      await SudAkt.updateOne(
-        { licshet: akt.licshet },
-        {
-          $set: {
-            status: "yakunlandi",
-          },
-        }
-      );
-      counter++;
-      continue;
-    }
+      const tozaMakonApi = createTozaMakonApi(companyId);
+      const dhj = await getResidentDHJByAbonentId(tozaMakonApi, abonent.id);
+      const allPaymentsAfterWarning = dhj
+        .filter((d) => periodToDate(d.period) >= akt.warningDate)
+        .reduce((a, b) => a + b.allPaymentsSum, 0);
 
-    const tozaMakonApi = createTozaMakonApi(companyId);
-    const dhj = await getResidentDHJByAbonentId(tozaMakonApi, abonent.id);
-    const allPaymentsAfterWarning = dhj
-      .filter((d) => periodToDate(d.period) >= akt.warningDate)
-      .reduce((a, b) => a + b.allPaymentsSum, 0);
-
-    if (allPaymentsAfterWarning >= akt.claimAmount) {
-      await SudAkt.updateOne(
-        { licshet: akt.licshet },
-        {
-          $set: {
-            status: "yakunlandi",
-            yakunlandiDate: new Date(),
-          },
-        }
-      );
-      counter++;
-    }
+      if (allPaymentsAfterWarning >= akt.claimAmount) {
+        await SudAkt.updateOne(
+          { licshet: akt.licshet },
+          {
+            $set: {
+              status: "yakunlandi",
+              yakunlandiDate: new Date(),
+            },
+          }
+        );
+        counter++;
+      }
+    });
+    await Promise.all(promises);
   }
   console.log(`Jami aktlar soni: ${sudAkts.length}`);
   console.log(`Yakunlandi aktlar soni: ${counter}`);
