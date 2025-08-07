@@ -2,6 +2,7 @@ import { SudAkt } from "@models/SudAkt.js";
 import { Abonent } from "@models/Abonent.js";
 import { Counter } from "@models/Counter.js";
 import Excel from "exceljs";
+import { createManySudArizaBodySchema } from "@schemas/court.schema";
 
 export const getSudAkts = async (req, res) => {
   try {
@@ -205,58 +206,48 @@ export const createSudAriza = async (req, res) => {
 };
 
 export const createManySudAriza = async (req, res) => {
-  try {
-    const { sudAktIds, ariza_date, ariza_type } = req.body;
-    if (!sudAktIds || sudAktIds.length === 0) {
-      return res.json({ ok: false, message: "SudAkt idlari kiritilmadi" });
-    }
-
-    if (!ariza_date || !ariza_type) {
-      return res.json({
-        ok: false,
-        message: "Ariza sanasi yoki turi kiritilmadi",
-      });
-    }
-    if (!SudAkt.schema.paths.ariza_type.options.enum.includes(ariza_type)) {
-      return res.json({
-        ok: false,
-        message: "Ariza turi mavjud emas",
-      });
-    }
-    const sudAkts = await SudAkt.find({ _id: { $in: sudAktIds } });
-    if (sudAkts.length !== sudAktIds.length) {
-      return res.json({ ok: false, message: "SudAkt topilmadi" });
-    }
-    const counter = await Counter.findOne({
-      name: "sudga_ariza_tartib_raqami",
-    });
-    const updatedSudAkts = [];
-    for (const sudAkt of sudAkts) {
-      if (sudAkt.status === "yangi") {
-        const newOrderNum = counter.value + updatedSudAkts.length + 1;
-        await sudAkt.updateOne({
-          $set: {
-            ariza_order_num: newOrderNum,
-            ariza_date: ariza_date,
-            ariza_type: ariza_type,
-            status: "ariza_yaratildi",
-          },
-        });
-        updatedSudAkts.push({
-          ...sudAkt.toObject(),
-          ariza_order_num: newOrderNum,
-          status: "ariza_yaratildi",
-        });
-        await counter.updateOne({ $set: { value: newOrderNum } });
-      } else {
-        updatedSudAkts.push(sudAkt.toObject());
-      }
-    }
-    return res.json({ ok: true, rows: updatedSudAkts });
-  } catch (error) {
-    res.json({ ok: false, message: "Internal server error 500" });
-    console.error(error);
+  const { sudAktIds, ariza_date, ariza_type } =
+    createManySudArizaBodySchema.parse(req.body);
+  if (!sudAktIds || sudAktIds.length === 0) {
+    return res.json({ ok: false, message: "SudAkt idlari kiritilmadi" });
   }
+
+  if (!ariza_date || !ariza_type) {
+    return res.json({
+      ok: false,
+      message: "Ariza sanasi yoki turi kiritilmadi",
+    });
+  }
+  if (!SudAkt.schema.paths.ariza_type.options.enum.includes(ariza_type)) {
+    return res.json({
+      ok: false,
+      message: "Ariza turi mavjud emas",
+    });
+  }
+  const sudAkts = await SudAkt.find({ _id: { $in: sudAktIds } });
+  if (sudAkts.length !== sudAktIds.length) {
+    return res.json({ ok: false, message: "SudAkt topilmadi" });
+  }
+  const updatedSudAkts = [];
+  for (const sudAkt of sudAkts) {
+    if (sudAkt.status === "yangi") {
+      const counter = await Counter.findOne({
+        name: "sudga_ariza_tartib_raqami",
+      });
+      const newOrderNum = counter.value + 1;
+      sudAkt.ariza_order_num = newOrderNum;
+      sudAkt.ariza_date = ariza_date;
+      sudAkt.ariza_type = ariza_type;
+      sudAkt.status = "ariza_yaratildi";
+      await sudAkt.save();
+      updatedSudAkts.push(sudAkt.toObject());
+      await counter.updateOne({ $set: { value: newOrderNum } });
+    } else {
+      !sudAkt.ariza_date ? (sudAkt.ariza_date = ariza_date) : null;
+      updatedSudAkts.push(sudAkt.toObject());
+    }
+  }
+  return res.json({ ok: true, rows: updatedSudAkts });
 };
 
 export const uploadSudArizaFile = async (req, res) => {

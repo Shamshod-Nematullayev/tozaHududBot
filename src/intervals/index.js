@@ -19,8 +19,8 @@ import { checkPaymentSudAkts } from "./court-service/checkPaymentSudAkts.js";
 agenda.define("sendKunlikPinflReportsTask", async () => {
   // await sendKunlikPinflReports(1265);
   // await sendKunlikPinflReports(1143);
-  await sendKunlikPinflReports(621);
-  await sendKunlikPinflReports(337);
+  // await sendKunlikPinflReports(621);
+  // await sendKunlikPinflReports(337);
   // await sendKunlikPinflReports(1263);
   await sendKunlikPhoneReports(1144);
   await xatlovchilarIshiHisobot(1144);
@@ -44,13 +44,13 @@ agenda.define("sendMFYIncomeReportTaskNurobod", async () => {
 });
 
 agenda.define("sendPinflMfyReportTask", async () => {
-  await sendPinflMfyReport(1144);
+  // await sendPinflMfyReport(1144);
   // sendPinflMfyReport(1143);
   // await sendIdentifietMfyReport(1265);
 });
 
 agenda.define("sendEtkMfyReportTask", async () => {
-  await sendEtkMfyReport(1144);
+  // await sendEtkMfyReport(1144);
   // sendEtkMfyReport(1143);
   // await sendIdentifietMfyReport(1265);
 });

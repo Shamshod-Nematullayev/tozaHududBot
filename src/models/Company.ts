@@ -8,6 +8,11 @@ interface IAktPack {
   name: string;
 }
 
+export interface ICompanyDocument extends ICompany, Document {
+  _id: string;
+  __v: number;
+}
+
 export interface ICompany {
   id: number;
   name: string;

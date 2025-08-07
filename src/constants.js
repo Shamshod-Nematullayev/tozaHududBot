@@ -99,6 +99,12 @@ export const caotoNames = [
     region: 18,
     companyId: 337,
   },
+  {
+    title: "Kattaqo'rg'on TETK",
+    caoto: 18215,
+    region: 18,
+    companyId: 1824,
+  },
 ];
 
 export const queueNames = {

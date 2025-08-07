@@ -3,10 +3,11 @@ import { Scenes } from "telegraf";
 import { INPUT_ABONENTS_LICSHET } from "../../../../constants.js";
 
 import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
-import { Abonent } from "@models/Abonent.js";
-import { Admin } from "@models/Admin.js";
-import { Company } from "@models/Company.js";
-import { HybridMail } from "@models/HybridMail.js";
+import { Abonent, IAbonent, IAbonentDoc } from "@models/Abonent.js";
+import { Admin, IAdmin, IAdminDocument } from "@models/Admin.js";
+import { Company, ICompany, ICompanyDocument } from "@models/Company.js";
+import { HybridMail, IHybridMailDocument } from "@models/HybridMail.js";
+import { AbonentDetails } from "types/billing.js";
 
 import { handleTelegramExcel } from "../../smallFunctions/handleTelegramExcel.js";
 import isCancel from "../../smallFunctions/isCancel.js";
@@ -20,15 +21,51 @@ import { createHybridPochtaApi } from "@api/hybridPochta.js";
 
 import FormData from "form-data";
 import puppeteer from "puppeteer";
+import { WizardWithState } from "@bot/helpers/WizardWithState.js";
+import { createWarningLetterPDF } from "../utils/createWarningLetterPDF.js";
+import { getAbonentById } from "@services/billing/getAbonentById.js";
 
-export const sendWarningLettersByHybrid = new Scenes.WizardScene(
+interface MyWizardState {
+  company?: ICompanyDocument;
+  admin?: IAdminDocument;
+  abonents?: IAbonentDoc[];
+  mails?: {
+    hybridMailId: number;
+    _id: string;
+    licshet: string;
+    residentId: number;
+    createdOn: Date;
+    isCharged: boolean;
+    isDeleted: boolean;
+    isSent: boolean;
+    receiver: string;
+    isSavedBilling: boolean;
+    warning_amount: number;
+    type: "ogohlantirish_by_tg_bot";
+    abonent_deleted: boolean;
+    mahallaId: number;
+    companyId: number;
+  }[];
+}
+type Ctx = WizardWithState<MyWizardState>;
+
+export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
   "Ogohlantish xati yuborish",
   async (ctx) => {
-    const admin = await Admin.findOne({ user_id: ctx.from.id });
+    const admin = (await Admin.findOne({
+      user_id: ctx.from?.id,
+    })) as IAdminDocument;
     if (!admin) return ctx.reply("Sizning adminlik huquqingiz yoq");
-    const company = await Company.findOne({
+    const company = (await Company.findOne({
       id: admin.companyId,
-    }).select(["id", "hybridLogin", "hybridRegion", "hybridArea"]);
+    }).select([
+      "id",
+      "hybridLogin",
+      "hybridRegion",
+      "hybridArea",
+    ])) as ICompanyDocument;
+    if (!company) return ctx.reply("Company not found");
+
     if (!company.hybridLogin)
       return await ctx.reply("Hybrid pochta logini yo'q");
     ctx.wizard.state.company = company;
@@ -45,13 +82,15 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.admin.companyId);
+      const tozaMakonApi = createTozaMakonApi(
+        ctx.wizard.state.admin?.companyId
+      );
       const hybridPochtaApi = createHybridPochtaApi(
-        ctx.wizard.state.admin.companyId
+        ctx.wizard.state.admin?.companyId
       );
       const jsonData = await handleTelegramExcel(ctx);
       // validations
-      if (!jsonData.length) {
+      if (!jsonData || !jsonData.length) {
         return ctx.replyWithHTML(`Xatolik! Faylda hisob raqamlar topilmadi`);
       }
 
@@ -59,7 +98,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene(
         await ctx.reply("Validatsiyadan o'tmadi");
         return;
       }
-      if (ctx.wizard.state.abonents.length == 0)
+      if (!ctx.wizard.state.abonents || ctx.wizard.state.abonents.length == 0)
         return ctx.reply("Abonentlar topilmadi");
 
       const message = await ctx.reply(
@@ -68,21 +107,18 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene(
       let counter = 0;
       for (const abonent of ctx.wizard.state.abonents) {
         try {
-          const abonentData = (
-            await tozaMakonApi.get("/user-service/residents/" + abonent.id)
-          ).data;
-          const { base64, courtWarning } = await createWarningLetterPDF(
-            abonentData,
-            ctx.wizard.state.admin.companyId
+          const abonentDetails = await getAbonentById(tozaMakonApi, abonent.id);
+          const base64Batch = await createWarningLetterPDF(
+            abonentDetails,
+            ctx.wizard.state.admin?.companyId as number
           );
-          console.log(base64, courtWarning);
           const newMail = (
             await hybridPochtaApi.post("/PdfMail", {
-              Address: `${abonentData.mahallaName}, ${abonentData.streetName}`,
-              Receiver: abonentData.fullName,
-              Document64: base64,
-              Region: ctx.wizard.state.company.hybridRegion, //viloyat
-              Area: ctx.wizard.state.company.hybridArea, // tuman
+              Address: `${abonentDetails.mahallaName}, ${abonentDetails.streetName}`,
+              Receiver: abonentDetails.fullName,
+              Document64: base64Batch,
+              Region: ctx.wizard.state.company?.hybridRegion, //viloyat
+              Area: ctx.wizard.state.company?.hybridArea, // tuman
             })
           ).data;
           const newMailOnDB = await HybridMail.create({
@@ -90,22 +126,33 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene(
             type: "ogohlantirish_by_tg_bot",
             hybridMailId: newMail.Id,
             createdOn: new Date(),
-            receiver: abonentData.fullName,
+            receiver: abonentDetails.fullName,
             warning_date_billing: new Date(),
-            companyId: ctx.wizard.state.admin.companyId,
+            companyId: ctx.wizard.state.admin?.companyId,
             residentId: abonent.id,
           });
-          ctx.wizard.state.mails.push({
+          ctx.wizard.state.mails?.push({
             hybridMailId: newMail.Id,
-            _id: newMailOnDB._id,
-            licshet: abonentData.accountNumber,
-            courtWarning_id: courtWarning.id,
+            _id: newMailOnDB._id.toString(),
+            licshet: abonentDetails.accountNumber,
+            residentId: abonent.id,
+            createdOn: new Date(),
+            isCharged: false,
+            isDeleted: false,
+            isSent: false,
+            receiver: abonentDetails.fullName,
+            isSavedBilling: false,
+            warning_amount: abonentDetails.balance.kSaldo,
+            type: "ogohlantirish_by_tg_bot",
+            abonent_deleted: false,
+            mahallaId: abonentDetails.mahallaId,
+            companyId: ctx.wizard.state.admin?.companyId as number,
           });
           counter++;
           await ctx.telegram.editMessageText(
-            ctx.chat.id,
+            ctx.chat?.id,
             message.message_id,
-            null,
+            undefined,
             `Ogohlantirish xatlari yaratilmoqda ${counter} / ${ctx.wizard.state.abonents.length}`
           );
         } catch (error) {
@@ -294,70 +341,6 @@ sendWarningLettersByHybrid.leave((ctx) => {
 });
 
 // required small functions
-
-async function createWarningLetterPDF(abonentData, companyId) {
-  const company = await Company.findOne({ id: companyId });
-  const now = new Date();
-  const tozaMakonApi = createTozaMakonApi(companyId);
-  await tozaMakonApi.post("/user-service/court-warnings/batch", {
-    oneWarningInOnePage: true,
-    residentIds: [abonentData.id],
-    warningBasis: `${abonentData.balance.kSaldo.toLocaleString()} soʻm qarzdor`,
-    warningDate: `${now.getFullYear()}-${
-      now.getMonth() < 9 ? "0" + (now.getMonth() + 1) : now.getMonth() + 1
-    }-${now.getDate()}`,
-  });
-  const courtWarning = (
-    await tozaMakonApi.get("/user-service/court-warnings", {
-      params: {
-        litigationStatus: "NEW",
-        status: "NEW",
-        districtId: company.districtId,
-        page: 0,
-        size: 1,
-        accountNumber: abonentData.accountNumber,
-      },
-    })
-  ).data.content[0];
-  const warningDataPrint = (
-    await tozaMakonApi.get(
-      "/user-service/court-warnings/" + courtWarning.id + "/print"
-    )
-  ).data;
-
-  const html = await new Promise((resolve, reject) => {
-    ejs.renderFile(
-      path.join(process.cwd(), "src", "views", "gibrid.ogohlantirish.ejs"),
-      { warningDataPrint },
-      {},
-      (err, str) => {
-        if (err) return reject(err);
-        resolve(str);
-      }
-    );
-  });
-  const convertPDF = new Promise(async (resolve, reject) => {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      userDataDir: "/tmp/puppeteer",
-    });
-
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
-    const buffer = await page.pdf({
-      format: "letter",
-      printBackground: true,
-    });
-    const newBuffer = Buffer.from(buffer);
-    await page.close();
-    resolve({
-      base64: newBuffer.toString("base64"),
-      courtWarning,
-    });
-  });
-  return await convertPDF;
-}
 
 async function validate(ctx, jsonData) {
   let qator = 1;

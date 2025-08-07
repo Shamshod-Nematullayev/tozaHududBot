@@ -57,6 +57,7 @@ export interface AbonentDetails {
   phone: string | null;
   citizen: Citizen;
   house: House;
+  balance: Balance;
 }
 
 export interface AbonentSearchQuery {

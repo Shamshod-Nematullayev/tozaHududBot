@@ -1,6 +1,7 @@
+import { Document } from "mongoose";
 import { model, Schema } from "mongoose";
 
-interface IAdmin {
+export interface IAdmin {
   user_id: number;
   login: string;
   password: string;
@@ -10,6 +11,11 @@ interface IAdmin {
   companyId: number;
   roles: string[];
   pnfl: string;
+}
+
+export interface IAdminDocument extends IAdmin, Document {
+  _id: string;
+  __v: number;
 }
 
 const schema = new Schema<IAdmin>({

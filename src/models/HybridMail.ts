@@ -1,6 +1,32 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 
-const schema = new Schema({
+interface IHybridMail {
+  residentId: number;
+  licshet: string;
+  hybridMailId: string;
+  createdOn: Date;
+  isCharged: boolean;
+  isDeleted: boolean;
+  isSent: boolean;
+  receiver: string;
+  sentOn?: Date;
+  type: string;
+  isSavedBilling: boolean;
+  warning_amount: number;
+  sud_process_id_billing?: string;
+  warningIdTozamakon?: number;
+  warning_date_billing?: Date;
+  sud_akt_id?: string;
+  abonent_deleted: boolean;
+  mahallaId: number;
+  companyId: number;
+}
+
+export interface IHybridMailDocument extends IHybridMail, Document {
+  _id: string;
+}
+
+const schema = new Schema<IHybridMail>({
   residentId: {
     required: true,
     type: Number,

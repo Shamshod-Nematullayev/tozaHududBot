@@ -32,7 +32,7 @@ interface Abonent {
   phone: string;
   regionId: number;
   regionName: string;
-  residentType: string;
+  residentType: "INDIVIDUAL";
   shirkatId: number | null;
   streetId: number;
   streetName: string;
