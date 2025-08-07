@@ -21,7 +21,7 @@ import { sudBuyruqlariYaratish } from "./scene/adminActions/sud/sudBuyruqlariYar
 // import { sendWarningLettersByHybrid } from './scene/adminActions/sendWarningLettersByHybrid.js'
 import { updateElektrKod } from "./scene/userScenes/updateElektrKod.js";
 import { changeAbonentStreet } from "./scene/userScenes/changeAbonentStreet.js";
-import { sendWarningLettersByHybrid } from "./scene/adminActions/sendWarningLettersByHybrid.js";
+import { sendWarningLettersByHybrid } from "./scene/adminActions/sendWarningLettersByHybrid/index.js";
 import { createTargetScene } from "./scene/userScenes/createTarget.js";
 import changePasswordScene from "./scene/adminActions/changePassword.js";
 import { getAbonentCard } from "./scene/userScenes/getAbonentCard.js";

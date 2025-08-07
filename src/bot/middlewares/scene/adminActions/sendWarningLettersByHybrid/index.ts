@@ -1,16 +1,16 @@
 import { Scenes } from "telegraf";
+import Excel from "exceljs";
 
-import { INPUT_ABONENTS_LICSHET } from "../../../../constants.js";
+import { INPUT_ABONENTS_LICSHET } from "../../../../../constants.js";
 
 import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
-import { Abonent, IAbonent, IAbonentDoc } from "@models/Abonent.js";
-import { Admin, IAdmin, IAdminDocument } from "@models/Admin.js";
-import { Company, ICompany, ICompanyDocument } from "@models/Company.js";
+import { Abonent, IAbonentDoc } from "@models/Abonent.js";
+import { Admin, IAdminDocument } from "@models/Admin.js";
+import { Company, ICompanyDocument } from "@models/Company.js";
 import { HybridMail, IHybridMailDocument } from "@models/HybridMail.js";
-import { AbonentDetails } from "types/billing.js";
 
-import { handleTelegramExcel } from "../../smallFunctions/handleTelegramExcel.js";
-import isCancel from "../../smallFunctions/isCancel.js";
+import { handleTelegramExcel } from "../../../smallFunctions/handleTelegramExcel.js";
+import isCancel from "../../../smallFunctions/isCancel.js";
 import ejs from "ejs";
 import path from "path";
 
@@ -22,13 +22,18 @@ import { createHybridPochtaApi } from "@api/hybridPochta.js";
 import FormData from "form-data";
 import puppeteer from "puppeteer";
 import { WizardWithState } from "@bot/helpers/WizardWithState.js";
-import { createWarningLetterPDF } from "../utils/createWarningLetterPDF.js";
+import { createWarningLetterPDF } from "../../utils/createWarningLetterPDF.js";
 import { getAbonentById } from "@services/billing/getAbonentById.js";
+import { validationInputData } from "./validationInputData.js";
+import { isCallbackQueryMessage } from "../../utils/validator.js";
 
 interface MyWizardState {
   company?: ICompanyDocument;
   admin?: IAdminDocument;
-  abonents?: IAbonentDoc[];
+  abonents?: {
+    id: number;
+    licshet: string;
+  }[];
   mails?: {
     hybridMailId: number;
     _id: string;
@@ -47,7 +52,7 @@ interface MyWizardState {
     companyId: number;
   }[];
 }
-type Ctx = WizardWithState<MyWizardState>;
+export type Ctx = WizardWithState<MyWizardState>;
 
 export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
   "Ogohlantish xati yuborish",
@@ -68,6 +73,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
 
     if (!company.hybridLogin)
       return await ctx.reply("Hybrid pochta logini yo'q");
+
     ctx.wizard.state.company = company;
     ctx.wizard.state.admin = admin;
     ctx.wizard.state.abonents = [];
@@ -94,10 +100,28 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
         return ctx.replyWithHTML(`Xatolik! Faylda hisob raqamlar topilmadi`);
       }
 
-      if (!(await validate(ctx, jsonData))) {
-        await ctx.reply("Validatsiyadan o'tmadi");
+      const checkingResults = await validationInputData(ctx, jsonData);
+
+      if (checkingResults.find((el) => !el.ok)) {
+        const workbook = new Excel.Workbook();
+        const worksheet = workbook.addWorksheet("Sheet1");
+
+        worksheet.columns = [
+          { header: "№", key: "id", width: 10 },
+          { header: "Hisob raqam", key: "accountNumber", width: 20 },
+          { header: "Xatolik", key: "message", width: 30 },
+        ];
+
+        checkingResults.forEach((el, i) => {
+          worksheet.addRow({
+            id: i + 1,
+            accountNumber: el.accountNumber,
+            message: el.message,
+          });
+        });
         return;
       }
+
       if (!ctx.wizard.state.abonents || ctx.wizard.state.abonents.length == 0)
         return ctx.reply("Abonentlar topilmadi");
 
@@ -155,7 +179,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
             undefined,
             `Ogohlantirish xatlari yaratilmoqda ${counter} / ${ctx.wizard.state.abonents.length}`
           );
-        } catch (error) {
+        } catch (error: any) {
           ctx.reply(error.message);
           console.error(error);
         }
@@ -165,13 +189,14 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
         createInlineKeyboard([[["Tekshirish 🔄", "refresh"]]])
       );
       ctx.wizard.next();
-    } catch (error) {
+    } catch (error: any) {
       ctx.reply(error.message);
       console.error(error);
     }
   },
   async (ctx) => {
-    if (ctx.update.callback_query?.data !== "refresh")
+    if (!isCallbackQueryMessage(ctx)) throw "400 bad request";
+    if (ctx.callbackQuery?.data !== "refresh")
       return await ctx.replyWithHTML(
         `Xatlar gibrit pochta bazasiga jo'natildi. <a href="https://hybrid.pochta.uz/#/main/mails/listing/draft?sortBy=createdOn&sortDesc=true&page=1&itemsPerPage=50">Saytga</a> kirib ularni tasdiqlashingiz kerak`,
         createInlineKeyboard([[["Tekshirish 🔄", "refresh"]]])
@@ -333,56 +358,9 @@ sendWarningLettersByHybrid.on("text", (ctx, next) => {
     ctx.reply("Bekor qilindi", keyboards.adminKeyboard.resize());
     return ctx.scene.leave();
   }
-  next();
+  return next();
 });
 
 sendWarningLettersByHybrid.leave((ctx) => {
   ctx.reply("Asosiy menyu", keyboards.adminKeyboard.resize());
 });
-
-// required small functions
-
-async function validate(ctx, jsonData) {
-  let qator = 1;
-  const message = await ctx.reply(`Tekshilmoqda 0 / ${jsonData.length}`);
-  for (const row of jsonData) {
-    qator++;
-    const licshet = row[Object.keys(row)[1]];
-    console.log(licshet);
-    if (licshet === undefined) {
-      ctx.reply(`${qator}-qatorda hisob raqami topilmadi`);
-      return false;
-    }
-    const abonent = await Abonent.findOne({
-      licshet,
-      companyId: ctx.wizard.state.admin.companyId,
-    }).lean();
-    if (!abonent) {
-      ctx.reply(`${licshet} hisob raqamli abonent topilmadi`);
-      return false;
-    }
-    const now = new Date();
-    const oltiOyAvval = new Date(now.getFullYear(), now.getMonth() - 6, 1);
-    const mail = await HybridMail.findOne({
-      licshet,
-      warning_date_billing: {
-        $gte: oltiOyAvval,
-        $lt: now,
-      },
-    });
-    if (mail) {
-      await ctx.reply(
-        `${mail.licshet} hisob raqamiga oxirgi 6 oy ichida allaqachon ogohlantirish xati yuborilgan`
-      );
-      return false;
-    }
-    ctx.wizard.state.abonents.push({ id: abonent.id, licshet });
-    await ctx.telegram.editMessageText(
-      ctx.chat.id,
-      message.message_id,
-      null,
-      `Tekshirilmoqda ${qator - 1} / ${jsonData.length}`
-    );
-  }
-  return true;
-}
