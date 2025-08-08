@@ -26,6 +26,26 @@ import { createWarningLetterPDF } from "../../utils/createWarningLetterPDF.js";
 import { getAbonentById } from "@services/billing/getAbonentById.js";
 import { validationInputData } from "./validationInputData.js";
 import { isCallbackQueryMessage } from "../../utils/validator.js";
+import { createPdfMail } from "@services/hybrydPost/createPdfMail.js";
+
+interface Mail {
+  hybridMailId: number;
+  _id: string;
+  licshet: string;
+  residentId: number;
+  createdOn: Date;
+  isCharged: boolean;
+  isDeleted: boolean;
+  isSent: boolean;
+  receiver: string;
+  isSavedBilling: boolean;
+  warning_amount: number;
+  type: "ogohlantirish_by_tg_bot";
+  abonent_deleted: boolean;
+  mahallaId: number;
+  companyId: number;
+  SentOn: Date | null;
+}
 
 interface MyWizardState {
   company?: ICompanyDocument;
@@ -34,23 +54,7 @@ interface MyWizardState {
     id: number;
     licshet: string;
   }[];
-  mails?: {
-    hybridMailId: number;
-    _id: string;
-    licshet: string;
-    residentId: number;
-    createdOn: Date;
-    isCharged: boolean;
-    isDeleted: boolean;
-    isSent: boolean;
-    receiver: string;
-    isSavedBilling: boolean;
-    warning_amount: number;
-    type: "ogohlantirish_by_tg_bot";
-    abonent_deleted: boolean;
-    mahallaId: number;
-    companyId: number;
-  }[];
+  mails?: Mail[];
 }
 export type Ctx = WizardWithState<MyWizardState>;
 
@@ -119,47 +123,54 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
             message: el.message,
           });
         });
+        await ctx.replyWithDocument(
+          {
+            source: Buffer.from(await workbook.xlsx.writeBuffer()),
+          },
+          {
+            caption: "Xatolik aniqlandi. Excel faylni ko'zdan kechiring.",
+          }
+        );
         return;
       }
 
-      if (!ctx.wizard.state.abonents || ctx.wizard.state.abonents.length == 0)
-        return ctx.reply("Abonentlar topilmadi");
-
       const message = await ctx.reply(
-        `Ogohlantirish xatlari yaratilmoqda 0 / ${ctx.wizard.state.abonents.length}`
+        `Ogohlantirish xatlari yaratilmoqda 0 / ${checkingResults.length}`
       );
       let counter = 0;
-      for (const abonent of ctx.wizard.state.abonents) {
+      for (const abonent of checkingResults) {
         try {
-          const abonentDetails = await getAbonentById(tozaMakonApi, abonent.id);
+          const abonentDetails = await getAbonentById(
+            tozaMakonApi,
+            abonent.residentId
+          );
           const base64Batch = await createWarningLetterPDF(
             abonentDetails,
             ctx.wizard.state.admin?.companyId as number
           );
-          const newMail = (
-            await hybridPochtaApi.post("/PdfMail", {
-              Address: `${abonentDetails.mahallaName}, ${abonentDetails.streetName}`,
-              Receiver: abonentDetails.fullName,
-              Document64: base64Batch,
-              Region: ctx.wizard.state.company?.hybridRegion, //viloyat
-              Area: ctx.wizard.state.company?.hybridArea, // tuman
-            })
-          ).data;
+          const newMail = await createPdfMail(hybridPochtaApi, {
+            Address: `${abonentDetails.mahallaName}, ${abonentDetails.streetName}`,
+            Receiver: abonentDetails.fullName,
+            Document64: base64Batch,
+            Region: ctx.wizard.state.company?.hybridRegion.toString() as string, //viloyat
+            Area: ctx.wizard.state.company?.hybridArea.toString() as string, // tuman
+          });
+
           const newMailOnDB = await HybridMail.create({
-            licshet: abonent.licshet,
+            licshet: abonent.accountNumber,
             type: "ogohlantirish_by_tg_bot",
             hybridMailId: newMail.Id,
             createdOn: new Date(),
             receiver: abonentDetails.fullName,
             warning_date_billing: new Date(),
             companyId: ctx.wizard.state.admin?.companyId,
-            residentId: abonent.id,
+            residentId: abonent.residentId,
           });
           ctx.wizard.state.mails?.push({
             hybridMailId: newMail.Id,
             _id: newMailOnDB._id.toString(),
             licshet: abonentDetails.accountNumber,
-            residentId: abonent.id,
+            residentId: abonent.residentId,
             createdOn: new Date(),
             isCharged: false,
             isDeleted: false,
@@ -171,13 +182,14 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
             abonent_deleted: false,
             mahallaId: abonentDetails.mahallaId,
             companyId: ctx.wizard.state.admin?.companyId as number,
+            SentOn: newMail.SentOn,
           });
           counter++;
           await ctx.telegram.editMessageText(
             ctx.chat?.id,
             message.message_id,
             undefined,
-            `Ogohlantirish xatlari yaratilmoqda ${counter} / ${ctx.wizard.state.abonents.length}`
+            `Ogohlantirish xatlari yaratilmoqda ${counter} / ${checkingResults.length}`
           );
         } catch (error: any) {
           ctx.reply(error.message);
@@ -204,8 +216,9 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
 
     const results = [];
     const hybridPochtaApi = createHybridPochtaApi(
-      ctx.wizard.state.admin.companyId
+      ctx.wizard.state.admin?.companyId
     );
+    if (!ctx.wizard.state.mails) throw new Error("Mails not found");
     for (const mail of ctx.wizard.state.mails) {
       const mailData = (
         await hybridPochtaApi.get("/mail", {
@@ -216,10 +229,10 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
       ).data;
       if (mailData.IsSent) {
         results.push(mailData);
-        await HybridMail.findByIdAndUpdate(row._id, {
+        await HybridMail.findByIdAndUpdate(mail._id, {
           $set: {
             isSent: true,
-            sentOn: response.SentOn,
+            sentOn: mail.SentOn,
           },
         });
       }
@@ -242,21 +255,22 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
     return ctx.wizard.next();
   },
   async (ctx) => {
-    if (ctx.update.callback_query?.data !== "uploadToBilling")
+    if (!isCallbackQueryMessage(ctx)) throw "400 bad request";
+    if (ctx.callbackQuery?.data !== "uploadToBilling")
       return await ctx.reply(
         "Hammasi jonatildi. Ruxsat bersangiz hisobga olishning yagona elektron tizimiga ham pochta kvitansiyalarini yuklab qo'yar edim",
         createInlineKeyboard([[["Billingga yuklash ⬆️", "uploadToBilling"]]])
       );
-    const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.admin.companyId);
+    const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.admin?.companyId);
     const hybridPochtaApi = createHybridPochtaApi(
-      ctx.wizard.state.admin.companyId
+      ctx.wizard.state.admin?.companyId
     );
 
     let counter = 0;
     const { message_id } = await ctx.reply(
-      `Billingga yuklanmoqda 0 / ${ctx.wizard.state.mails.length}`
+      `Billingga yuklanmoqda 0 / ${ctx.wizard.state.mails?.length}`
     );
-    for (const row of ctx.wizard.state.mails) {
+    for (const row of ctx.wizard.state.mails as Mail[]) {
       const pdf = await hybridPochtaApi.get(`/PdfMail/` + row.hybridMailId, {
         responseType: "arraybuffer",
       });
@@ -268,7 +282,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
           },
         })
       ).data;
-      const html = await new Promise(async (resolve, reject) => {
+      const html = (await new Promise(async (resolve, reject) => {
         ejs.renderFile(
           path.join(process.cwd(), "src", "views", "hybridPochtaCash.ejs"),
           { mail },
@@ -277,7 +291,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
             return resolve(html);
           }
         );
-      });
+      })) as string;
       const browser = await puppeteer.launch({
         headless: true,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -312,25 +326,25 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
           headers: { "Content-Type": "multipart/form-data" },
         })
       ).data;
-      await tozaMakonApi.post(
-        "/user-service/court-processes/" + row.courtWarning_id + "/add-file",
-        {
-          description: `warning letter by hybrid`,
-          fileName: `${fileUploadBilling.fileName}*${fileUploadBilling.fileId}`,
-          fileType: "WARNING_FILE",
-        }
-      );
+      // await tozaMakonApi.post(
+      //   "/user-service/court-processes/" + row.courtWarning_id + "/add-file",
+      //   {
+      //     description: `warning letter by hybrid`,
+      //     fileName: `${fileUploadBilling.fileName}*${fileUploadBilling.fileId}`,
+      //     fileType: "WARNING_FILE",
+      //   }
+      // );
 
-      await HybridMail.findByIdAndUpdate(row._id, {
-        $set: {
-          isSavedBilling: true,
-          sud_process_id_billing: row.courtWarning_id,
-        },
-      });
+      // await HybridMail.findByIdAndUpdate(row._id, {
+      //   $set: {
+      //     isSavedBilling: true,
+      //     sud_process_id_billing: row.courtWarning_id,
+      //   },
+      // });
       await Abonent.findOneAndUpdate(
         {
           licshet: row.licshet,
-          companyId: ctx.wizard.state.admin.companyId,
+          companyId: ctx.wizard.state.admin?.companyId,
         },
         {
           $set: {
@@ -342,10 +356,10 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
         }
       );
       await ctx.telegram.editMessageText(
-        ctx.chat.id,
+        ctx.chat?.id,
         message_id,
-        null,
-        `Billingga yuklanmoqda ${++counter} / ${ctx.wizard.state.mails.length}`
+        undefined,
+        `Billingga yuklanmoqda ${++counter} / ${ctx.wizard.state.mails?.length}`
       );
     }
     await ctx.reply("Billingga yuklab bo'ldim.");

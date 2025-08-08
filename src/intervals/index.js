@@ -10,9 +10,9 @@ import { sendIdentifietMfyReport } from "./sendIdentifietMfyReport.js";
 import { sendMFYIncomeReport } from "./sendMFYIncomeReport.js";
 import { sendPinflMfyReport } from "./sendPinflMfyReport.js";
 // import { addUpdateArizaAktTask } from './updateArizaAkt.js'
-checkPaymentSudAkts(1144);
 import xatlovchilarIshiHisobot from "./xatlovchilarIshiHisobot.js";
 import { checkPaymentSudAkts } from "./court-service/checkPaymentSudAkts.js";
+// checkPaymentSudAkts(1144);
 
 // Define tasks with Agenda
 

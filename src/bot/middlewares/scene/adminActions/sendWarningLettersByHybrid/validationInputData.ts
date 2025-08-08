@@ -7,6 +7,7 @@ interface CheckingResults {
   accountNumber: string;
   message: string;
   ok: boolean;
+  residentId: number;
 }
 
 export async function validationInputData(
@@ -27,6 +28,7 @@ export async function validationInputData(
           accountNumber: "",
           message: `hisob raqami topilmadi`,
           ok: false,
+          residentId: 0,
         });
         return false;
       }
@@ -39,6 +41,7 @@ export async function validationInputData(
           accountNumber: licshet,
           message: `${licshet} hisob raqamli abonent ma'lumotlar tizim bazasida topilmadi`,
           ok: false,
+          residentId: 0,
         });
         return false;
       }
@@ -56,6 +59,7 @@ export async function validationInputData(
           accountNumber: licshet,
           message: `${licshet} hisob raqamiga allaqachon ogohlantirish xati yuborilgan`,
           ok: false,
+          residentId: abonent.id,
         });
         return false;
       }
@@ -63,8 +67,8 @@ export async function validationInputData(
         accountNumber: licshet,
         message: "",
         ok: true,
+        residentId: abonent.id,
       });
-      ctx.wizard.state.abonents?.push({ id: abonent.id, licshet });
       await ctx.telegram.editMessageText(
         ctx.chat?.id,
         message.message_id,
