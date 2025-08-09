@@ -2,7 +2,7 @@ import { createTozaMakonApi } from "@api/tozaMakon.js";
 import { Abonent } from "@models/Abonent.js";
 import { SudAkt } from "@models/SudAkt.js";
 import { getResidentDHJByAbonentId } from "@services/billing/index.js";
-import { chunkArray } from "helpers/chunkArray";
+import { chunkArray } from "helpers/chunkArray.js";
 
 // 03.2025: string => 2025-03-31: Date
 function periodToDate(period: string) {

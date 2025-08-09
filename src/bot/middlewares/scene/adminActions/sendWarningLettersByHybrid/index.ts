@@ -7,7 +7,7 @@ import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
 import { Abonent, IAbonentDoc } from "@models/Abonent.js";
 import { Admin, IAdminDocument } from "@models/Admin.js";
 import { Company, ICompanyDocument } from "@models/Company.js";
-import { HybridMail, IHybridMailDocument } from "@models/HybridMail.js";
+import { HybridMail } from "@models/HybridMail.js";
 
 import { handleTelegramExcel } from "../../../smallFunctions/handleTelegramExcel.js";
 import isCancel from "../../../smallFunctions/isCancel.js";

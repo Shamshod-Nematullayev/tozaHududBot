@@ -1,6 +1,6 @@
-import { createTozaMakonApi } from "@api/tozaMakon";
-import { AbonentDetails } from "types/billing";
-import { createCourtWarningBatch } from "@services/court";
+import { createTozaMakonApi } from "@api/tozaMakon.js";
+import { AbonentDetails } from "types/billing.js";
+import { createCourtWarningBatch } from "@services/court/createCourtWarningBatch.js";
 
 export async function createWarningLetterPDF(
   abonentData: AbonentDetails,

@@ -1,7 +1,7 @@
-import { Abonent } from "@models/Abonent";
-import { HybridMail } from "@models/HybridMail";
-import { Ctx } from ".";
-import { chunkArray } from "helpers/chunkArray";
+import { Abonent } from "@models/Abonent.js";
+import { HybridMail } from "@models/HybridMail.js";
+import { Ctx } from "./index.js";
+import { chunkArray } from "helpers/chunkArray.js";
 
 interface CheckingResults {
   accountNumber: string;

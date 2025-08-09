@@ -2,7 +2,7 @@ import { SudAkt } from "@models/SudAkt.js";
 import { Abonent } from "@models/Abonent.js";
 import { Counter } from "@models/Counter.js";
 import Excel from "exceljs";
-import { createManySudArizaBodySchema } from "@schemas/court.schema";
+import { createManySudArizaBodySchema } from "@schemas/court.schema.js";
 
 export const getSudAkts = async (req, res) => {
   try {
