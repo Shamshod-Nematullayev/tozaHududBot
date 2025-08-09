@@ -27,6 +27,7 @@ import { getAbonentById } from "@services/billing/getAbonentById.js";
 import { validationInputData } from "./validationInputData.js";
 import { isCallbackQueryMessage } from "../../utils/validator.js";
 import { createPdfMail } from "@services/hybrydPost/createPdfMail.js";
+import { ErrorTypes } from "@bot/utils/errorHandler.js";
 
 interface Mail {
   hybridMailId: number;
@@ -207,7 +208,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
     }
   },
   async (ctx) => {
-    if (!isCallbackQueryMessage(ctx)) throw "400 bad request";
+    if (!isCallbackQueryMessage(ctx)) throw ErrorTypes.BAD_REQUEST;
     if (ctx.callbackQuery?.data !== "refresh")
       return await ctx.replyWithHTML(
         `Xatlar gibrit pochta bazasiga jo'natildi. <a href="https://hybrid.pochta.uz/#/main/mails/listing/draft?sortBy=createdOn&sortDesc=true&page=1&itemsPerPage=50">Saytga</a> kirib ularni tasdiqlashingiz kerak`,
@@ -218,7 +219,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
     const hybridPochtaApi = createHybridPochtaApi(
       ctx.wizard.state.admin?.companyId
     );
-    if (!ctx.wizard.state.mails) throw new Error("Mails not found");
+    if (!ctx.wizard.state.mails) throw ErrorTypes.NOT_FOUND;
     for (const mail of ctx.wizard.state.mails) {
       const mailData = (
         await hybridPochtaApi.get("/mail", {

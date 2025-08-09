@@ -493,6 +493,8 @@ export const getActPacksController = async (req: Request, res: Response) => {
 };
 
 export const getTariffs = async (req: Request, res: Response) => {
+  let companyId = req.user.companyId;
+  if (companyId == 1824) companyId = 1144;
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const company = await Company.findOne({ id: req.user.companyId });
   const { data } = await tozaMakonApi.get(

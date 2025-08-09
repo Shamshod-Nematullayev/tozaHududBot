@@ -97,8 +97,7 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
     ctx.wizard.next();
   },
   async (ctx) => {
-    if (!isTextMessage(ctx) || Number(ctx.message.text))
-      throw ErrorTypes.BAD_REQUEST;
+    if (!isTextMessage(ctx)) throw ErrorTypes.BAD_REQUEST;
     const findedETKAbonents: IFindedAbonent[] = await EtkAbonent.find({
       accountNumber: ctx.message.text,
       companyId: ctx.wizard.state.companyId,

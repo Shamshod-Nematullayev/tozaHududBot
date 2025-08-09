@@ -16,12 +16,12 @@ export async function validationInputData(
 ): Promise<CheckingResults[]> {
   const checkingResult: CheckingResults[] = [];
 
-  const message = await ctx.reply(`Tekshilmoqda 0 / ${jsonData.length}`);
+  const message = await ctx.reply(`Tekshilmoqda 0%`);
 
   const chunks = chunkArray(jsonData, 10);
 
   for (const chunk of chunks) {
-    chunk.forEach(async (row, i) => {
+    const promises = chunk.map(async (row, i) => {
       const licshet = row[Object.keys(row)[1]];
       if (licshet === undefined) {
         checkingResult.push({
@@ -69,15 +69,16 @@ export async function validationInputData(
         ok: true,
         residentId: abonent.id,
       });
-      await ctx.telegram.editMessageText(
-        ctx.chat?.id,
-        message.message_id,
-        undefined,
-        `Tekshirilmoqda ${Math.floor(
-          (checkingResult.length / jsonData.length) * 100
-        )}%`
-      );
     });
+    await ctx.telegram.editMessageText(
+      ctx.chat?.id,
+      message.message_id,
+      undefined,
+      `Tekshirilmoqda ${Math.floor(
+        (checkingResult.length / jsonData.length) * 100
+      )}%`
+    );
+    await Promise.all(promises);
   }
   return checkingResult;
 }
