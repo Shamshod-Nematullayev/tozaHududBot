@@ -1,14 +1,14 @@
-import nodeHtmlToImage from "../helpers/puppeteer-wrapper.js";
-import ejs from "ejs";
-import { bot } from "@bot/core/bot.js";
 import { Company } from "@models/Company.js";
 
 import { createTozaMakonApi } from "../api/tozaMakon.js";
 
 import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril.js";
-import path from "path";
+import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
+import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto.js";
+import { deletePreviousReport } from "@bot/helpers/deletePreviousReport.js";
+import { ReportType } from "@models/ReportsMessage.js";
 
-const formatDate = (date) => {
+const formatDate = (date: Date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
   const day = String(date.getDate()).padStart(2, "0");
@@ -23,8 +23,9 @@ export async function sendMFYIncomeReport(
   try {
     const now = new Date();
     const company = await Company.findOne({ id: companyId });
+    if (!company) throw new Error("Company not found");
     const tozaMakonApi = createTozaMakonApi(companyId);
-    let incomesFromEkopay;
+    let incomesFromEkopay: any;
     if (onlyEkopay) {
       incomesFromEkopay = (
         await tozaMakonApi.get(
@@ -51,7 +52,7 @@ export async function sendMFYIncomeReport(
       now.getMonth() + 1
     } ${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`;
 
-    let mahallas = (
+    let mahallas: any[] = (
       await tozaMakonApi.get("/report-service/reports/v2/mfa-16", {
         params: {
           companyId: companyId,
@@ -73,9 +74,9 @@ export async function sendMFYIncomeReport(
       let income = 0;
       if (onlyEkopay) {
         income = incomesFromEkopay
-          .find((item) => item.id == mfy.id)
+          .find((item: any) => item.id == mfy.id)
           .partnerTransactions.find(
-            (elem) => elem.partnerName == "EcoPay"
+            (elem: any) => elem.partnerName == "EcoPay"
           ).transactionAmount;
       } else {
         income = mfy.totalAmount;
@@ -92,37 +93,26 @@ export async function sendMFYIncomeReport(
     mahallas = mahallas.filter((item) => item.xisoblandi);
     mahallas.sort(
       (a, b) =>
-        parseFloat(b.tushum / b.xisoblandi) -
-        parseFloat(a.tushum / a.xisoblandi)
+        parseFloat(String(b.tushum / b.xisoblandi)) -
+        parseFloat(String(a.tushum / a.xisoblandi))
     );
-    ejs.renderFile(
-      path.join(process.cwd(), "src", "views", "mfyIncome.ejs"),
+
+    const htmlString = await renderHtmlByEjs("mfyIncome.ejs", {
+      data: mahallas,
+      jamiTushum: allTransactionAmount,
+      jamiXisoblandi: allAccrual,
+      sana,
+      company,
+    });
+
+    const msg = await sendHtmlAsPhoto(
+      { htmlString, selector: "div" },
+      company.GROUP_ID_NAZORATCHILAR,
       {
-        data: mahallas,
-        jamiTushum: allTransactionAmount,
-        jamiXisoblandi: allAccrual,
-        sana,
-        company,
-      },
-      {},
-      async (err, res) => {
-        if (err) throw err;
-
-        const binaryData = await nodeHtmlToImage({
-          html: res,
-          type: "png",
-          encoding: "binary",
-          selector: "div",
-        });
-        const buffer = Buffer.from(binaryData, "binary");
-
-        bot.telegram.sendPhoto(
-          // company.GROUP_ID_NAZORATCHILAR,
-          process.env.ME,
-          { source: buffer }
-        );
+        parse_mode: "HTML",
       }
     );
+    await deletePreviousReport(companyId, ReportType.sendMFYIncomeReport, msg);
   } catch (err) {
     console.error(err);
   }

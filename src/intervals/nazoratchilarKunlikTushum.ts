@@ -7,6 +7,10 @@ import generateImage from "../helpers/puppeteer-wrapper.js";
 import { ekopayApi } from "../api/ekopayApi.js";
 import path from "path";
 import { getIncomeReportFromInspectors } from "@services/ekopay.js";
+import { ReportsMessage, ReportType } from "@models/ReportsMessage.js";
+import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
+import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto.js";
+import { deletePreviousReport } from "@bot/helpers/deletePreviousReport.js";
 
 function formatDateTimeToString(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
@@ -18,6 +22,12 @@ function formatDateTimeToString(date: Date) {
   return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
 }
 
+/**
+ * Sends a report about inspectors' daily income to the specified company's
+ * nazoratchilar group.
+ * @param {number} [companyId=1144] The company ID to send the report to.
+ * @returns {Promise<void>}
+ */
 export async function nazoratchilarKunlikTushum(companyId = 1144) {
   try {
     const company = await Company.findOne({ id: companyId });
@@ -56,34 +66,25 @@ export async function nazoratchilarKunlikTushum(companyId = 1144) {
     });
     rows.sort((a, b) => b.summasi - a.summasi);
 
-    ejs.renderFile(
-      path.join(process.cwd(), "src", "views", "nazoratchilarKunlikTushum.ejs"),
+    const htmlString = await renderHtmlByEjs("nazoratchilarKunlikTushum.ejs", {
+      sana: formatDateTimeToString(new Date()),
+      rows,
+      jamiTushumSoni,
+      jamiTushumSummasi,
+    });
+
+    const msg = await sendHtmlAsPhoto(
+      { htmlString, selector: "div" },
+      company.GROUP_ID_NAZORATCHILAR,
       {
-        sana: formatDateTimeToString(new Date()),
-        rows,
-        jamiTushumSoni,
-        jamiTushumSummasi,
-      },
-      async (err, str) => {
-        if (err) throw err;
-        const binaryData = (await generateImage({
-          html: str,
-          type: "png",
-          encoding: "binary",
-          selector: "div",
-        })) as string;
-        const buffer = Buffer.from(binaryData, "binary");
-        bot.telegram.sendPhoto(
-          process.env.NODE_ENV === "production"
-            ? company.GROUP_ID_NAZORATCHILAR
-            : (process.env.ME as string),
-          { source: buffer },
-          {
-            caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
-            parse_mode: "HTML",
-          }
-        );
+        parse_mode: "HTML",
       }
+    );
+
+    await deletePreviousReport(
+      companyId,
+      ReportType.nazoratchilarKunlikTushum,
+      msg
     );
   } catch (err) {
     console.error(err);

@@ -87,7 +87,7 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
         } tomonidan kiritilib bo'lingan. Baribir kiritmoqchimisiz?`,
         keyboards.yesOrNo
       );
-      ctx.wizard.selectStep(4);
+      ctx.wizard.selectStep(5);
       return;
     }
     await ctx.reply(

@@ -16,6 +16,7 @@ export async function createWarningLetterPDF(
     warningDate: now,
     lang: "UZ-CYRL",
   });
+  console.log(batch);
   const newBuffer = Buffer.from(batch);
 
   return newBuffer.toString("base64");

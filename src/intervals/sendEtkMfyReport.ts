@@ -7,6 +7,10 @@ import nodeHtmlToImage from "node-html-to-image";
 import { bot } from "@bot/core/bot.js";
 import { Company } from "@models/Company.js";
 import path from "path";
+import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs";
+import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto";
+import { deletePreviousReport } from "@bot/helpers/deletePreviousReport";
+import { ReportType } from "@models/ReportsMessage";
 
 function bugungiSana() {
   const date = new Date();
@@ -15,11 +19,24 @@ function bugungiSana() {
   }.${date.getFullYear()}`;
 }
 
+/**
+ * Sends a report of ETK code entries for a specified company.
+ *
+ * This function fetches all mahallas with a plan greater than zero for the given company.
+ * It then calculates the total number of abonents and the number of abonents that have
+ * confirmed ETK codes for each mahalla. The data is used to generate an HTML report
+ * that is sent as a photo to the company's group of inspectors.
+ *
+ * @param {number} [companyId=1144] - The ID of the company for which the report is generated.
+ * @throws Will throw an error if the company is not found.
+ */
+
 export const sendEtkMfyReport = async (companyId = 1144) => {
   try {
     const company = await Company.findOne({ id: companyId });
+    if (!company) throw new Error("Company not found");
     const mahallas = await Mahalla.find({ reja: { $gt: 0 }, companyId });
-    const rows = [];
+    const rows: any[] = [];
     for (const mfy of mahallas) {
       const abonentsCount = await Abonent.countDocuments({
         mahallas_id: mfy.id,
@@ -48,42 +65,24 @@ export const sendEtkMfyReport = async (companyId = 1144) => {
       jamiReja += row.shaxsi_tasdiqlandi_reja;
       row.bajarilishi_foizda = Math.floor(row.procent) + " %";
     });
-    ejs.renderFile(
-      path.join(process.cwd(), "src", "views", "pnfilKiritishHisobot.ejs"),
+
+    const htmlString = await renderHtmlByEjs("pnfilKiritishHisobot.ejs", {
+      data: rows,
+      jamiKiritilgan,
+      heading: "ЭТК код киритиш хисоботи",
+      jamiReja,
+      sana: bugungiSana(),
+    });
+
+    const msg = await sendHtmlAsPhoto(
+      { htmlString, selector: "div" },
+      company.GROUP_ID_NAZORATCHILAR,
       {
-        data: rows,
-        jamiKiritilgan,
-        heading: "ЭТК код киритиш хисоботи",
-        jamiReja,
-        sana: bugungiSana(),
-      },
-      {},
-      async (err, res) => {
-        if (err) throw err;
-
-        const binaryData = await nodeHtmlToImage({
-          html: res,
-          type: "png",
-          encoding: "binary",
-          selector: "div",
-        });
-        const buffer = Buffer.from(binaryData, "binary");
-
-        try {
-          await bot.telegram.sendPhoto(
-            company.GROUP_ID_NAZORATCHILAR,
-            // process.env.ME,
-            { source: buffer },
-            {
-              caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
-              parse_mode: "HTML",
-            }
-          );
-        } catch (error) {
-          console.error(company.GROUP_ID_NAZORATCHILAR, error.message);
-        }
+        parse_mode: "HTML",
       }
     );
+
+    await deletePreviousReport(companyId, ReportType.sendEtkMfyReport, msg);
   } catch (error) {
     console.error(error);
   }

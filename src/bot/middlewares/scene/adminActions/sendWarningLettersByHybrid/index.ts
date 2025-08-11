@@ -4,7 +4,7 @@ import Excel from "exceljs";
 import { INPUT_ABONENTS_LICSHET } from "../../../../../constants.js";
 
 import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
-import { Abonent, IAbonentDoc } from "@models/Abonent.js";
+import { Abonent } from "@models/Abonent.js";
 import { Admin, IAdminDocument } from "@models/Admin.js";
 import { Company, ICompanyDocument } from "@models/Company.js";
 import { HybridMail } from "@models/HybridMail.js";
@@ -22,12 +22,10 @@ import { createHybridPochtaApi } from "@api/hybridPochta.js";
 import FormData from "form-data";
 import puppeteer from "puppeteer";
 import { WizardWithState } from "@bot/helpers/WizardWithState.js";
-import { createWarningLetterPDF } from "../../utils/createWarningLetterPDF.js";
-import { getAbonentById } from "@services/billing/getAbonentById.js";
 import { validationInputData } from "./validationInputData.js";
 import { isCallbackQueryMessage } from "../../utils/validator.js";
-import { createPdfMail } from "@services/hybrydPost/createPdfMail.js";
 import { ErrorTypes } from "@bot/utils/errorHandler.js";
+import creatingWarningQueue from "./creatingWarningQueue.js";
 
 interface Mail {
   hybridMailId: number;
@@ -132,71 +130,26 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
             caption: "Xatolik aniqlandi. Excel faylni ko'zdan kechiring.",
           }
         );
+        ctx.scene.leave();
         return;
       }
 
       const message = await ctx.reply(
         `Ogohlantirish xatlari yaratilmoqda 0 / ${checkingResults.length}`
       );
-      let counter = 0;
-      for (const abonent of checkingResults) {
-        try {
-          const abonentDetails = await getAbonentById(
-            tozaMakonApi,
-            abonent.residentId
-          );
-          const base64Batch = await createWarningLetterPDF(
-            abonentDetails,
-            ctx.wizard.state.admin?.companyId as number
-          );
-          const newMail = await createPdfMail(hybridPochtaApi, {
-            Address: `${abonentDetails.mahallaName}, ${abonentDetails.streetName}`,
-            Receiver: abonentDetails.fullName,
-            Document64: base64Batch,
-            Region: ctx.wizard.state.company?.hybridRegion.toString() as string, //viloyat
-            Area: ctx.wizard.state.company?.hybridArea.toString() as string, // tuman
-          });
 
-          const newMailOnDB = await HybridMail.create({
-            licshet: abonent.accountNumber,
-            type: "ogohlantirish_by_tg_bot",
-            hybridMailId: newMail.Id,
-            createdOn: new Date(),
-            receiver: abonentDetails.fullName,
-            warning_date_billing: new Date(),
-            companyId: ctx.wizard.state.admin?.companyId,
-            residentId: abonent.residentId,
-          });
-          ctx.wizard.state.mails?.push({
-            hybridMailId: newMail.Id,
-            _id: newMailOnDB._id.toString(),
-            licshet: abonentDetails.accountNumber,
-            residentId: abonent.residentId,
-            createdOn: new Date(),
-            isCharged: false,
-            isDeleted: false,
-            isSent: false,
-            receiver: abonentDetails.fullName,
-            isSavedBilling: false,
-            warning_amount: abonentDetails.balance.kSaldo,
-            type: "ogohlantirish_by_tg_bot",
-            abonent_deleted: false,
-            mahallaId: abonentDetails.mahallaId,
-            companyId: ctx.wizard.state.admin?.companyId as number,
-            SentOn: newMail.SentOn,
-          });
-          counter++;
-          await ctx.telegram.editMessageText(
-            ctx.chat?.id,
-            message.message_id,
-            undefined,
-            `Ogohlantirish xatlari yaratilmoqda ${counter} / ${checkingResults.length}`
-          );
-        } catch (error: any) {
-          ctx.reply(error.message);
-          console.error(error);
-        }
-      }
+      await creatingWarningQueue(
+        tozaMakonApi,
+        hybridPochtaApi,
+        {
+          Region: ctx.wizard.state.company?.hybridRegion.toString() as string,
+          Area: ctx.wizard.state.company?.hybridArea.toString() as string,
+        },
+        checkingResults,
+        ctx.wizard.state.admin?.companyId as number,
+        ctx,
+        message.message_id
+      );
       await ctx.replyWithHTML(
         `Xatlar gibrit pochta bazasiga jo'natildi. <a href="https://hybrid.pochta.uz/#/main/mails/listing/draft?sortBy=createdOn&sortDesc=true&page=1&itemsPerPage=50">Saytga</a> kirib ularni tasdiqlashingiz kerak`,
         createInlineKeyboard([[["Tekshirish 🔄", "refresh"]]])
@@ -319,14 +272,14 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
       const bufferWarningWithCash = await merger.saveAsBuffer();
       const formData = new FormData();
       formData.append("file", bufferWarningWithCash, row.hybridMailId + `.pdf`);
-      const fileUploadBilling = (
-        await tozaMakonApi.post("/file-service/buckets/upload", formData, {
-          params: {
-            folderType: "SUD_PROCESS",
-          },
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-      ).data;
+      // const fileUploadBilling = (
+      //   await tozaMakonApi.post("/file-service/buckets/upload", formData, {
+      //     params: {
+      //       folderType: "SUD_PROCESS",
+      //     },
+      //     headers: { "Content-Type": "multipart/form-data" },
+      //   })
+      // ).data;
       // await tozaMakonApi.post(
       //   "/user-service/court-processes/" + row.courtWarning_id + "/add-file",
       //   {

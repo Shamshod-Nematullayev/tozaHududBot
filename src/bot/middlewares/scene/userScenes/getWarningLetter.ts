@@ -8,8 +8,8 @@ import isCancel from "../../smallFunctions/isCancel.js";
 import { isValidAccountNumber } from "../utils/validator.js";
 import { getAbonentAndInspector } from "../utils/getAbonentAndInspector.js";
 import { getAbonentById } from "@services/billing/index.js";
-import { generateWarningLetter } from "@services/billing/generateWarningLetter.js";
 import { MyContext } from "types/botContext.js";
+import { createCourtWarningBatch } from "@services/court/createCourtWarningBatch.js";
 
 export const getWarningLetter = new Scenes.WizardScene<MyContext>(
   "getWarningLetter",
@@ -47,11 +47,13 @@ export const getWarningLetter = new Scenes.WizardScene<MyContext>(
         keyboards.mainKeyboard.resize()
       );
     }
-    const batch = await generateWarningLetter(
-      tozaMakonApi,
-      abonent.id,
-      abonentKSaldo
-    );
+    const batch = await createCourtWarningBatch(tozaMakonApi, {
+      lang: "UZ-CYRL",
+      oneWarningInOnePage: false,
+      residentId: abonent.id,
+      warningBasis: `${abonentKSaldo.toLocaleString()} so'm qarzdor`,
+      warningDate: new Date(),
+    });
     // 4. send response
     await ctx.replyWithDocument({
       source: batch,

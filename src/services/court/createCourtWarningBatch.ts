@@ -15,14 +15,16 @@ export async function createCourtWarningBatch(
     warningDate: Date;
   }
 ): Promise<Buffer> {
-  return await tozaMakonApi.post(
-    "/user-service/court-warnings/batch",
-    {
-      ...params,
-      residentId: [params.residentId],
-      lang: params.lang,
-      warningDate: formatDate(params.warningDate),
-    },
-    { responseType: "arraybuffer" }
-  );
+  return (
+    await tozaMakonApi.post(
+      "/user-service/court-warnings/batch",
+      {
+        ...params,
+        residentIds: [params.residentId],
+        lang: params.lang,
+        warningDate: formatDate(params.warningDate),
+      },
+      { responseType: "arraybuffer" }
+    )
+  ).data;
 }

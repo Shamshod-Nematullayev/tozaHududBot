@@ -3,7 +3,7 @@ import { HybridMail } from "@models/HybridMail.js";
 import { Ctx } from "./index.js";
 import { chunkArray } from "helpers/chunkArray.js";
 
-interface CheckingResults {
+export interface CheckingResults {
   accountNumber: string;
   message: string;
   ok: boolean;
@@ -70,6 +70,7 @@ export async function validationInputData(
         residentId: abonent.id,
       });
     });
+    await Promise.all(promises);
     await ctx.telegram.editMessageText(
       ctx.chat?.id,
       message.message_id,
@@ -78,7 +79,6 @@ export async function validationInputData(
         (checkingResult.length / jsonData.length) * 100
       )}%`
     );
-    await Promise.all(promises);
   }
   return checkingResult;
 }
