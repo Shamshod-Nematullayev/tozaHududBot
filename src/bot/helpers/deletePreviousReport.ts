@@ -1,5 +1,5 @@
-import { bot } from "@bot/core/bot";
-import { ReportsMessage, ReportType } from "@models/ReportsMessage";
+import { bot } from "@bot/core/bot.js";
+import { ReportsMessage, ReportType } from "@models/ReportsMessage.js";
 import { Message } from "telegraf/typings/core/types/typegram";
 
 export async function deletePreviousReport(

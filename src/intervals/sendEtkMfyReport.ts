@@ -2,15 +2,11 @@ import { Mahalla } from "@models/Mahalla.js";
 
 import { Abonent } from "@models/Abonent.js";
 
-import ejs from "ejs";
-import nodeHtmlToImage from "node-html-to-image";
-import { bot } from "@bot/core/bot.js";
 import { Company } from "@models/Company.js";
-import path from "path";
-import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs";
-import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto";
-import { deletePreviousReport } from "@bot/helpers/deletePreviousReport";
-import { ReportType } from "@models/ReportsMessage";
+import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
+import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto.js";
+import { deletePreviousReport } from "@bot/helpers/deletePreviousReport.js";
+import { ReportType } from "@models/ReportsMessage.js";
 
 function bugungiSana() {
   const date = new Date();

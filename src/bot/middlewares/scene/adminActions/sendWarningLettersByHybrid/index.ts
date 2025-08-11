@@ -246,32 +246,34 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
           }
         );
       })) as string;
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        userDataDir: "/tmp/puppeteer",
-      });
 
-      const page = await browser.newPage();
-      await page.setContent(html, { waitUntil: "networkidle0" });
-      const bufferCash = await page.pdf({
-        format: "A4",
-        printBackground: true,
-      });
-      await page.close();
+      //
+      // const browser = await puppeteer.launch({
+      //   headless: true,
+      //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      //   userDataDir: "/tmp/puppeteer",
+      // });
 
-      const merger = new PDFMerger();
-      await merger.add(buffer);
-      await merger.add(bufferCash);
-      await merger.setMetadata({
-        producer: "oliy ong",
-        author: "Shamshod Nematullayev",
-        creator: "Toza Hudud bot",
-        title: "Ogohlantirish xati",
-      });
-      const bufferWarningWithCash = await merger.saveAsBuffer();
-      const formData = new FormData();
-      formData.append("file", bufferWarningWithCash, row.hybridMailId + `.pdf`);
+      // const page = await browser.newPage();
+      // await page.setContent(html, { waitUntil: "networkidle0" });
+      // const bufferCash = await page.pdf({
+      //   format: "A4",
+      //   printBackground: true,
+      // });
+      // await page.close();
+
+      // const merger = new PDFMerger();
+      // await merger.add(buffer);
+      // await merger.add(bufferCash);
+      // await merger.setMetadata({
+      //   producer: "oliy ong",
+      //   author: "Shamshod Nematullayev",
+      //   creator: "Toza Hudud bot",
+      //   title: "Ogohlantirish xati",
+      // });
+      // const bufferWarningWithCash = await merger.saveAsBuffer();
+      // const formData = new FormData();
+      // formData.append("file", bufferWarningWithCash, row.hybridMailId + `.pdf`);
       // const fileUploadBilling = (
       //   await tozaMakonApi.post("/file-service/buckets/upload", formData, {
       //     params: {

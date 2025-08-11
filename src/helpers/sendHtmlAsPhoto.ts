@@ -1,6 +1,6 @@
 import { ExtraPhoto } from "telegraf/typings/telegram-types";
 import generateImage from "@helpers/puppeteer-wrapper.js";
-import { bot } from "@bot/core/bot";
+import { bot } from "@bot/core/bot.js";
 import { Message } from "telegraf/typings/core/types/typegram";
 
 /**
