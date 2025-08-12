@@ -13,12 +13,19 @@ import { createImgFromHtml } from "helpers/createImgFromHtml.js";
 import { Company } from "@models/Company.js";
 import { chunkArray } from "helpers/chunkArray.js";
 import { InputMediaPhoto } from "telegraf/typings/core/types/typegram";
+import { Admin } from "@models/Admin.js";
+
+enum Status {
+  Tasdiqlangan = "✅ Tasdiqlangan",
+  Tasdiqlanmagan = "❌ Tasdiqlanmagan",
+  Hammasi = "🔎 Hammasi",
+}
 
 interface MyWizardState {
   companyId?: number;
   mahallaId?: string;
-  elektrKodStatus?: "confirmed" | "notConfirmed" | "all";
-  pnflStatus?: "confirmed" | "notConfirmed" | "all";
+  elektrKodStatus?: Status;
+  pnflStatus?: Status;
   minSaldo?: number;
   maxSaldo?: number;
   format?: "pdf" | "picture";
@@ -30,15 +37,16 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
   "getAbonentsList",
   async (ctx) => {
     const inspector = await Nazoratchi.findOne({ telegram_id: ctx.from?.id });
-    if (!inspector) {
+    const admin = await Admin.findOne({ user_id: ctx.from?.id });
+    if (!inspector && !admin) {
       ctx.scene.leave();
       throw "NO_ACCESS";
     }
-    ctx.wizard.state.companyId = inspector.companyId;
-    const mahallalar = await Mahalla.find({
-      companyId: inspector.companyId,
-      "biriktirilganNazoratchi.inspactor_id": inspector.id,
-    });
+    ctx.wizard.state.companyId = inspector?.companyId || admin?.companyId;
+    let filters: any = { companyId: inspector?.companyId || admin?.companyId };
+    if (inspector && !admin)
+      filters["biriktirilganNazoratchi.inspactor_id"] = inspector.id;
+    const mahallalar = await Mahalla.find(filters);
     if (!mahallalar.length) {
       ctx.scene.leave();
       return await ctx.reply("Sizga biriktirilgan mahallalar yo'q!");
@@ -55,66 +63,63 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
     ctx.wizard.state.mahallaId = ctx.callbackQuery.data;
     await ctx.reply(
       "ELEKTR KODI holatini tanlang!",
-      createInlineKeyboard([
-        [["✅ Tasdiqlangan", "confirmed"]],
-        [["❌ Tasdiqlanmagan", "notConfirmed"]],
-        [["Barchasi", "all"]],
-      ])
+      Markup.keyboard([
+        ["✅ Tasdiqlangan", "❌ Tasdiqlanmagan"],
+        ["🔎 Hammasi"],
+      ]).resize()
     );
     return ctx.wizard.next();
   },
   async (ctx) => {
-    if (!isCallbackQueryMessage(ctx)) throw "400 bad request";
-    ctx.wizard.state.elektrKodStatus = ctx.callbackQuery.data as
-      | "confirmed"
-      | "notConfirmed"
-      | "all";
+    if (!isTextMessage(ctx)) throw "400 bad request";
+    ctx.wizard.state.elektrKodStatus = ctx.message.text as Status;
     await ctx.deleteMessage();
     await ctx.reply(
       "PNFL holatini tanlang!",
-      createInlineKeyboard([
-        [["✅ Tasdiqlangan", "confirmed"]],
-        [["❌ Tasdiqlanmagan", "notConfirmed"]],
-        [["Barchasi", "all"]],
-      ])
-    );
-    return ctx.wizard.next();
-  },
-  async (ctx) => {
-    if (!isCallbackQueryMessage(ctx)) throw "400 bad request";
-    await ctx.deleteMessage();
-    ctx.wizard.state.pnflStatus = ctx.callbackQuery.data as
-      | "confirmed"
-      | "notConfirmed"
-      | "all";
-    await ctx.reply(
-      "Minimum qarzdorlik summasini kiriting",
       Markup.keyboard([
-        ["100000", "200000"],
-        ["300000", "400000"],
-        ["Barchasi"],
+        ["✅ Tasdiqlangan", "❌ Tasdiqlanmagan"],
+        ["🔎 Hammasi"],
       ]).resize()
     );
     return ctx.wizard.next();
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) throw "400 bad request";
-    if (ctx.message.text !== "Barchasi")
+    await ctx.deleteMessage();
+    ctx.wizard.state.pnflStatus = ctx.message.text as Status;
+    await ctx.reply(
+      "Eng kam qarzdorlik summasini kiriting (X Qarzdorlik summasi dan yuqorisi)",
+      Markup.keyboard([
+        ["100000", "200000"],
+        ["300000", "400000"],
+        ["🔎 Hammasi"],
+      ]).resize()
+    );
+    return ctx.wizard.next();
+  },
+  async (ctx) => {
+    if (!isTextMessage(ctx)) throw "400 bad request";
+    if (ctx.message.text !== "🔎 Hammasi")
       ctx.wizard.state.minSaldo = Number(ctx.message.text);
     await ctx.reply(
-      "Maksimum qarzdorlik summasini kiriting",
+      "Eng ko'p qarzdorlik summasini kiriting (X Qarzdorlik summasi dan kamligi)",
       Markup.keyboard([
-        ["100000", "200000"],
         ["300000", "400000"],
-        ["Barchasi"],
+        ["500000", "1000000"],
+        ["🔎 Hammasi"],
       ]).resize()
     );
     return ctx.wizard.next();
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) throw "400 bad request";
-    if (ctx.message.text !== "Barchasi")
-      ctx.wizard.state.maxSaldo = Number(ctx.message.text);
+    if (ctx.message.text !== "🔎 Hammasi")
+      if (Number(ctx.message.text) <= Number(ctx.wizard.state.minSaldo))
+        return ctx.reply(
+          "Siz kiritgan summa eng kam qarzdorlik summasidan ham kichkina. Eng kam qarzdorlik summasi: " +
+            ctx.wizard.state.minSaldo
+        );
+    ctx.wizard.state.maxSaldo = Number(ctx.message.text);
     await ctx.reply(
       "Formatni tanlang!",
       createInlineKeyboard([
@@ -130,19 +135,20 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
     if (!isCallbackQueryMessage(ctx)) throw "400 bad request";
     ctx.wizard.state.format = ctx.callbackQuery.data as "pdf" | "picture";
     await ctx.deleteMessage();
+    const tempMessageid = (await ctx.reply("Bajarilmoqda...")).message_id;
     const abonents = await getAbonentsByMfyId({
       params: { mfy_id: ctx.wizard.state.mahallaId as string },
       query: {
         etkStatus:
-          ctx.wizard.state.elektrKodStatus == "confirmed"
+          ctx.wizard.state.elektrKodStatus == Status.Tasdiqlangan
             ? "true"
-            : ctx.wizard.state.elektrKodStatus == "notConfirmed"
+            : ctx.wizard.state.elektrKodStatus == Status.Tasdiqlanmagan
             ? "false"
             : undefined,
         identified:
-          ctx.wizard.state.pnflStatus == "confirmed"
+          ctx.wizard.state.pnflStatus == Status.Tasdiqlangan
             ? "true"
-            : ctx.wizard.state.pnflStatus == "notConfirmed"
+            : ctx.wizard.state.pnflStatus == Status.Tasdiqlanmagan
             ? "false"
             : undefined,
         minSaldo: ctx.wizard.state.minSaldo,
@@ -194,6 +200,8 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
       }
       await ctx.replyWithMediaGroup(imgs);
     }
+    await ctx.deleteMessage(tempMessageid);
+    ctx.reply("Asosiy menyu", keyboards.mainKeyboard);
     return ctx.scene.leave();
   }
 );
