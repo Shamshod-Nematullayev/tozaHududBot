@@ -246,7 +246,7 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
       await ctx.reply(
         `FIO: ${ctx.wizard.state.abonent?.fio}\nElektr kodini bazaga kiriting:`
       );
-      ctx.wizard.selectStep(1);
+      ctx.wizard.selectStep(2);
       return;
     } else if (ctx.callbackQuery.data === "no") {
       await ctx.deleteMessage();

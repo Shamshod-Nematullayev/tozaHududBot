@@ -15,7 +15,7 @@ import { Message } from "telegraf/typings/core/types/typegram";
 export async function sendHtmlAsPhoto(
   htmlParams: { htmlString: string; selector: string },
   chatId: number | string,
-  extra: ExtraPhoto
+  extra?: ExtraPhoto
 ): Promise<Message.PhotoMessage> {
   const binaryData = (await generateImage({
     html: htmlParams.htmlString,

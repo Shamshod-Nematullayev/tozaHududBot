@@ -6,6 +6,10 @@ import { Company } from "@models/Company.js";
 import ejs from "ejs";
 import { NewAbonent } from "@models/NewAbonents.js";
 import path from "path";
+import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
+import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto.js";
+import { deletePreviousReport } from "@bot/helpers/deletePreviousReport.js";
+import { ReportType } from "@models/ReportsMessage.js";
 
 function bugungiSana() {
   const date = new Date();
@@ -16,13 +20,14 @@ function bugungiSana() {
 async function xatlovchilarIshiHisobot(companyId = 1144) {
   try {
     const company = await Company.findOne({ id: 1144 });
+    if (!company) throw new Error("Company not found");
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const inspectors = await Nazoratchi.find({
+    const inspectors = (await Nazoratchi.find({
       companyId,
       activ: true,
       isXatlovchi: true,
-    }).lean();
+    }).lean()) as any[];
     const abonents = await Abonent.find({
       companyId,
       $or: [
@@ -62,7 +67,7 @@ async function xatlovchilarIshiHisobot(companyId = 1144) {
       }
       if (abonent.shaxsi_tasdiqlandi?.confirm) {
         const ins = inspectors.find(
-          (i) => i._id == abonent.shaxsi_tasdiqlandi.inspector._id
+          (i) => i._id == abonent.shaxsi_tasdiqlandi?.inspector._id
         );
 
         if (ins) {
@@ -94,33 +99,24 @@ async function xatlovchilarIshiHisobot(companyId = 1144) {
     });
 
     inspectors.sort((a, b) => b.ball - a.ball);
-    const res = await ejs.renderFile(
-      path.join(process.cwd(), "src", "views", "xatlovchilarIshiHisobot.ejs"),
-      {
-        sana: bugungiSana(),
-        inspectors,
-      }
-    );
-    const binaryData = await nodeHtmlToImage({
-      html: res,
-      type: "png",
-      encoding: "binary",
-      selector: "div",
+
+    const htmlString = await renderHtmlByEjs("xatlovchilarIshiHisobot.ejs", {
+      sana: bugungiSana(),
+      inspectors,
     });
-    const buffer = Buffer.from(binaryData, "binary");
-    try {
-      await bot.telegram.sendPhoto(
-        company.GROUP_ID_XATLOVCHILAR,
-        // process.env.ME,
-        { source: buffer },
-        {
-          caption: `Coded by <a href="https://t.me/oliy_ong_leader">Oliy Ong</a>`,
-          parse_mode: "HTML",
-        }
-      );
-    } catch (error) {
-      console.error(company.GROUP_ID_NAZORATCHILAR, error.message);
-    }
+    const msg = await sendHtmlAsPhoto(
+      {
+        htmlString,
+        selector: "div",
+      },
+      company.GROUP_ID_XATLOVCHILAR
+    );
+
+    await deletePreviousReport(
+      companyId,
+      ReportType.xatlovchilarIshiHisobot,
+      msg
+    );
   } catch (error) {
     console.error(error);
   }

@@ -51,6 +51,7 @@ export default async function handleApproveRequest(
   //   billingga yangilov so'rovini yuborish
   await updateAbonentDetails(tozaMakonApi, abonent.id, {
     citizen: citizen,
+    description: `${inspector.id} ${inspector.name} ma'lumotiga asosan o'zgartirildi.`,
   });
 
   // identifikatsiyadan o'tkazish

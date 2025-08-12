@@ -22,8 +22,11 @@
 // //     cadastralNumber: null,
 // //   });
 
+import { createTozaMakonApi } from "@api/tozaMakon";
+import { chunkArray } from "@helpers/chunkArray";
 import { Abonent } from "@models/Abonent";
 import { Ariza } from "@models/Ariza";
+import { getAbonentDetails } from "@services/billing";
 
 // //   let done = 0;
 // //   let error = 0;
@@ -242,3 +245,26 @@ import { Ariza } from "@models/Ariza";
 //     throw error;
 //   }
 // }
+
+export async function setMahallaId() {
+  const abonents = await Abonent.find({ companyId: 1824 });
+  const tozaMakonApi = createTozaMakonApi(1824);
+  const chunks = chunkArray(abonents, 10);
+  console.log(`Found ${abonents.length} abonents`);
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
+    console.log(`Processing chunk ${i + 1} of ${chunks.length}`);
+    await Promise.all(
+      chunk.map(async (abonent) => {
+        const abonentDetails = await getAbonentDetails(
+          tozaMakonApi,
+          abonent.id
+        );
+        abonent.mahallas_id = abonentDetails.mahallaId;
+        await abonent.save();
+      })
+    );
+    console.log(`Finished chunk ${i + 1} of ${chunks.length}`);
+  }
+  console.log("Finished updating all abonents");
+}
