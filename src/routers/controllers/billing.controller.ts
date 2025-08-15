@@ -26,6 +26,7 @@ import {
   ICreateActPayload,
   getAbonentDetails,
   getActPacks,
+  searchAbonent,
 } from "@services/billing/index.js";
 import { Request, response, Response } from "express";
 import z from "zod";
@@ -590,26 +591,26 @@ export const getResidents = async (
 
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const result: any = {};
-  const resultByCadastralNum = (
-    await tozaMakonApi.get("/billing-service/residents", {
-      params: {
-        cadastralNumber,
-        page: 0,
-        size: 10,
-      },
-    })
-  ).data.content;
+  // const resultByCadastralNum = (
+  //   await tozaMakonApi.get("/billing-service/residents", {
+  //     params: {
+  //       cadastralNumber,
+  //       page: 0,
+  //       size: 10,
+  //     },
+  //   })
+  // ).data.content;
 
   const resultByPnfl = (
-    await tozaMakonApi.get("/billing-service/residents", {
-      params: {
-        pnfl,
-        page: 0,
-        size: 10,
-      },
+    await searchAbonent(tozaMakonApi, {
+      pnfl: pnfl?.toString(),
+      size: 10,
+      page: 0,
+      companyId: req.user.companyId,
     })
-  ).data.content;
-  result.cadastralNumber = resultByCadastralNum;
+  ).content;
+
+  // result.cadastralNumber = resultByCadastralNum;
   result.pnfl = resultByPnfl;
 
   res.json(result);

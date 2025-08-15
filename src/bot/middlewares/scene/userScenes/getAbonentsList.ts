@@ -14,6 +14,7 @@ import { Company } from "@models/Company.js";
 import { chunkArray } from "helpers/chunkArray.js";
 import { InputMediaPhoto } from "telegraf/typings/core/types/typegram";
 import { Admin } from "@models/Admin.js";
+import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
 
 enum Status {
   Tasdiqlangan = "✅ Tasdiqlangan",
@@ -113,13 +114,14 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) throw "400 bad request";
-    if (ctx.message.text !== "🔎 Hammasi")
+    if (ctx.message.text !== "🔎 Hammasi") {
       if (Number(ctx.message.text) <= Number(ctx.wizard.state.minSaldo))
         return ctx.reply(
           "Siz kiritgan summa eng kam qarzdorlik summasidan ham kichkina. Eng kam qarzdorlik summasi: " +
             ctx.wizard.state.minSaldo
         );
-    ctx.wizard.state.maxSaldo = Number(ctx.message.text);
+      ctx.wizard.state.maxSaldo = Number(ctx.message.text);
+    }
     await ctx.reply(
       "Formatni tanlang!",
       createInlineKeyboard([
@@ -182,16 +184,14 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
       const chunks = chunkArray(abonents, 50);
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
-        const html = await ejs.renderFile(
-          path.join(process.cwd(), "src", "views", "abonentsList.ejs"),
-          {
-            abonents: chunk,
-            company: company,
-            isWithTitle: i === 0 ? true : false,
-          }
-        );
+        const htmlString = await renderHtmlByEjs("abonentsList.ejs", {
+          abonents: chunk,
+          company,
+          isWithTitle: i === 0 ? true : false,
+        });
+
         const img = (await createImgFromHtml({
-          html: html,
+          html: htmlString,
           encoding: "binary",
           type: "png",
           selector: "div",
