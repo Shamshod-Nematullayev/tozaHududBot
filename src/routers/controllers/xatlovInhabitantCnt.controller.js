@@ -203,6 +203,13 @@ export const getOneDalolatnoma = async (req, res) => {
   }
 };
 
+export const getOneDalolatnomaById = async (req, res) => {
+  const dalolatnoma = await XatlovDocument.findById(req.params._id);
+  if (!dalolatnoma)
+    return res.status(404).json({ ok: false, message: "Not found" });
+  res.json({ ok: true, data: dalolatnoma });
+};
+
 export const getDalolatnomalar = async (req, res) => {
   try {
     const { page = 0, pageSize = 15, ...filters } = req.query;

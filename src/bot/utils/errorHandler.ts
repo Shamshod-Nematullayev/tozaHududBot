@@ -9,10 +9,10 @@ export enum ErrorTypes {
 
 export function errorHandler(err: any, ctx: Context) {
   if (err === ErrorTypes.NO_ACCESS) {
-    return ctx.reply("Sizda yetarli huquq yo‘q", keyboards.mainKeyboard);
+    return ctx.reply("Sizda yetarli huquq yo‘q", keyboards.cancelBtn.resize());
   }
   if (err === ErrorTypes.NOT_FOUND) {
-    return ctx.reply("Ma'lumot topilmadi");
+    return ctx.reply("Ma'lumot topilmadi", keyboards.cancelBtn.resize());
   }
   if (err === ErrorTypes.BAD_REQUEST) {
     return ctx.reply("Kutilgan amal bajarilmadi", keyboards.cancelBtn.resize());

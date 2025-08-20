@@ -1,4 +1,5 @@
 import { uploadAsBlob } from "../middlewares/multer.js";
+import { catchAsync } from "./controllers/utils/catchAsync.js";
 import {
   cancelDalolatnoma,
   createXatlovDocument,
@@ -10,25 +11,29 @@ import {
   confirmDalolatnoma,
   getRowsByIds,
   getDalolatnomalar,
+  getOneDalolatnomaById,
 } from "./controllers/xatlovInhabitantCnt.controller.js";
 
 import express from "express";
 const router = express.Router();
 
-router.post("/", createXatlovDocument);
 router.get("/", getMultiplyRequests);
 
 router.get("/mahallas", getMahallasMultiplyRequests);
-
-router.patch("/update-from-tozamakon/:_id", updateFromTozamakon);
-
-router.put("/:_id", updateMultiplyRequest);
 
 router.get("/get-dalolatnomalar", getDalolatnomalar);
 
 router.get("/get-one-dalolatnoma", getOneDalolatnoma);
 
+router.get("/:_id", catchAsync(getOneDalolatnomaById));
+
+router.patch("/update-from-tozamakon/:_id", updateFromTozamakon);
+
+router.put("/:_id", updateMultiplyRequest);
+
 router.put("/confirm/:_id", uploadAsBlob.single("file"), confirmDalolatnoma);
+
+router.post("/", createXatlovDocument);
 
 router.post("/get-rows-by-ids", getRowsByIds);
 

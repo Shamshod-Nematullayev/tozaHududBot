@@ -44,7 +44,8 @@ export const getAbonentCard = new WizardScene(
         licshet: new RegExp(text),
         companyId: inspector.companyId,
       });
-      if (abonents.length !== 1) return ctx.reply("Abonent topilmadi");
+      if (abonents.length !== 1)
+        return ctx.reply("Abonent topilmadi", keyboards.cancelBtn);
       const abonent = abonents[0];
       const tozaMakonApi = createTozaMakonApi(abonent.companyId);
       const data = (
