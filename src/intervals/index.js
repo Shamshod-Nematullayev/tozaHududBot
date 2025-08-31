@@ -37,10 +37,7 @@ agenda.define("sendKunlikEtkReportsTask", async () => {
 agenda.define("sendMFYIncomeReportTask", async () => {
   // await sendMFYIncomeReport(1265);
   // await sendMFYIncomeReport(1143);
-  await sendMFYIncomeReport(1144);
-});
-agenda.define("sendMFYIncomeReportTaskNurobod", async () => {
-  // await sendMFYIncomeReport(1263, false, true);
+  await sendMFYIncomeReport(1144, false);
 });
 
 agenda.define("sendPinflMfyReportTask", async () => {

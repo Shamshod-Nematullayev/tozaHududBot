@@ -110,8 +110,8 @@ agenda.on("ready", async () => {
   console.log("Agenda is ready to use!");
   import("./intervals/index.js");
   agenda.start();
-  agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask");
-  agenda.every("0 9-21 * * *", "sendMFYIncomeReportTaskNurobod");
+  // agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask");
+  agenda.every("0 9-21 * * *", "sendMFYIncomeReportTask");
   agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask");
   agenda.every("8 9-22 * * *", "sendKunlikEtkReportsTask");
   agenda.every("0 9-22 * * *", "sendPinflMfyReportTask");

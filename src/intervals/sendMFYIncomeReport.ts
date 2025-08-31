@@ -17,7 +17,7 @@ const formatDate = (date: Date) => {
 
 export async function sendMFYIncomeReport(
   companyId = 1144,
-  onlyEkopay = true,
+  onlyEkopay = false,
   onlyToday = false
 ) {
   try {
