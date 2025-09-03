@@ -38,6 +38,7 @@ agenda.define("sendMFYIncomeReportTask", async () => {
   // await sendMFYIncomeReport(1265);
   // await sendMFYIncomeReport(1143);
   await sendMFYIncomeReport(1144, false);
+  await sendMFYIncomeReport(1824, true);
 });
 
 agenda.define("sendPinflMfyReportTask", async () => {
