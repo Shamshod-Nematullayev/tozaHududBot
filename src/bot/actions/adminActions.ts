@@ -26,7 +26,8 @@ composer.command("change_password", async (ctx) => {
 
 composer.command("tushum", async (ctx) => {
   await nazoratchilarKunlikTushum();
-  sendMFYIncomeReport(1144, false);
+  await sendMFYIncomeReport(1144, false);
+  await sendMFYIncomeReport(1824, true);
 });
 composer.hears(/pnflreport_\w/g, async (ctx) => {
   const companyId = Number(ctx.message.text.split("_")[1]);
