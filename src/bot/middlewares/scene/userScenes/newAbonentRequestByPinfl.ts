@@ -23,8 +23,6 @@ import { Notification } from "@models/Notification.js";
 import { Admin } from "@models/Admin.js";
 import { Company, ICompany } from "@models/Company.js";
 
-import axios from "axios";
-
 import { caotoNames } from "../../../../constants.js";
 
 import { io, usersMapSocket } from "../../../../config/socketConfig.js";
@@ -367,6 +365,23 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
         );
 
       ctx.wizard.state.inhabitantCount = parseInt(ctx.message.text);
+      if (ctx.wizard.state.mahalla?.id == 23624) {
+        await ctx.replyWithHTML(
+          `
+          Abonent: <code>${ctx.wizard.state.citizen?.lastName} ${ctx.wizard.state.citizen?.firstName} ${ctx.wizard.state.citizen?.patronymic}</code> \n
+          Kadastr: <code>${ctx.wizard.state.abonentCadastr}</code> \n
+          Mahalla: <code>${ctx.wizard.state.mahalla?.name}</code> \n
+          Ko'cha: <code>${ctx.wizard.state.street?.name}</code> \n
+          Yashovchilar soni: <code>${ctx.wizard.state.inhabitantCount}</code> \n
+          ETK hisob raqami: <code>${ctx.wizard.state.etk_abonent?.accountNumber}</code> \n
+          ETK abonent: <code>${ctx.wizard.state.etk_abonent?.customerName}</code> \n
+          Barcha ma'lumotlar to'g'rimi?
+          `,
+          keyboards.yesOrNo
+        );
+
+        return await ctx.wizard.selectStep(8);
+      }
       await ctx.reply("Abonent elektr kodini kiriting", keyboards.cancelBtn);
       return ctx.wizard.next();
     } catch (error: any) {
