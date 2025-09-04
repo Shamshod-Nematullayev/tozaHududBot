@@ -11,6 +11,14 @@ import { ReportsMessage, ReportType } from "@models/ReportsMessage.js";
 import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
 import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto.js";
 import { deletePreviousReport } from "@bot/helpers/deletePreviousReport.js";
+import { kirillga } from "@bot/middlewares/smallFunctions/lotinKiril.js";
+
+function formatName(name: string) {
+  return name
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 function formatDateTimeToString(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
@@ -51,7 +59,7 @@ export async function nazoratchilarKunlikTushum(companyId = 1144) {
       if (!tushum)
         return rows.push({
           id: inspector.id,
-          name: inspector.name,
+          name: formatName(kirillga(inspector.name)),
           tushumSoni: 0,
           summasi: 0,
         });
