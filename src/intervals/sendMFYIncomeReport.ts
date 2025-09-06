@@ -37,7 +37,11 @@ export async function sendMFYIncomeReport(
               regionId: 5,
               districtId: 47,
               fromDate: formatDate(
-                new Date(now.getFullYear(), now.getMonth(), 1)
+                new Date(
+                  now.getFullYear(),
+                  now.getMonth(),
+                  onlyToday ? now.getDate() : 1
+                )
               ),
               toDate: formatDate(now),
             },
@@ -52,6 +56,15 @@ export async function sendMFYIncomeReport(
       now.getMonth() + 1
     } ${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`;
 
+    console.log(
+      formatDate(
+        new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          onlyToday ? now.getDate() : 1
+        )
+      )
+    );
     let mahallas: any[] = (
       await tozaMakonApi.get("/report-service/reports/v2/mfa-16", {
         params: {
