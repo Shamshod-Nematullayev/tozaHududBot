@@ -117,6 +117,7 @@ agenda.on("ready", async () => {
   agenda.every("0 9-22 * * *", "sendPinflMfyReportTask");
   agenda.every("0 9-22 * * *", "sendEtkMfyReportTask");
   agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask");
+  agenda.every("0 9 * * *", "sendKattakurganShaharTushum");
 });
 
 agenda.on("error", (error: Error) => {

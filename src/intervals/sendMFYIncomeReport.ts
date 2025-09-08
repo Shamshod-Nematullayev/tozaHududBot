@@ -18,7 +18,8 @@ const formatDate = (date: Date) => {
 export async function sendMFYIncomeReport(
   companyId = 1144,
   onlyEkopay = false,
-  onlyToday = false
+  onlyToday = false,
+  deleteLastReport = true
 ) {
   try {
     const now = new Date();
@@ -125,7 +126,12 @@ export async function sendMFYIncomeReport(
         parse_mode: "HTML",
       }
     );
-    await deletePreviousReport(companyId, ReportType.sendMFYIncomeReport, msg);
+    if (deleteLastReport)
+      await deletePreviousReport(
+        companyId,
+        ReportType.sendMFYIncomeReport,
+        msg
+      );
   } catch (err) {
     console.error(err);
   }
