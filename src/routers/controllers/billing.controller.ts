@@ -458,9 +458,23 @@ export const getMfyById = async (req: Request, res: Response): Promise<any> => {
   });
   if (!mahalla) return res.json({ ok: false, message: "MFY not found" });
 
-  const company = await Company.findOne({ id: req.user.companyId });
+  const company = await Company.findOne({ id: req.user.companyId }).lean();
+  if (!company) return res.json({ ok: false, message: "Company not found" });
 
-  res.json({ ok: true, data: mahalla, company });
+  const companyForReturn = {
+    id: company.id,
+    name: company.name,
+    phone: company.phone,
+    manager: company.manager,
+    billingAdmin: company.billingAdmin,
+    gpsOperator: company.gpsOperator,
+    locationName: company.locationName,
+    regionId: company.regionId,
+    abonentsPrefix: company.abonentsPrefix,
+    districtId: company.districtId,
+  };
+
+  res.json({ ok: true, data: mahalla, company: companyForReturn });
 };
 
 export const getAbonentDataByLicshet = async (
