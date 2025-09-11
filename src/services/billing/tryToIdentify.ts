@@ -104,7 +104,7 @@ export async function tryToIdentify(
     }
     if (err.type === "brokenETK") {
       await updateAbonentDetails(tozaMakonApi, abonent.id, {
-        electricityAccountNumber: "9561650",
+        electricityAccountNumber: abonent.electricityAccountNumber + abonent.id,
       });
       return await tryToIdentify(tozaMakonApi, abonent, companyId);
     }
@@ -138,7 +138,7 @@ export async function tryToIdentify(
     if (err.type === "cadastrDublicate") {
       await updateAbonentDetails(tozaMakonApi, abonent.id, {
         house: {
-          cadastralNumber: abonent.cadastralNumber + "123",
+          cadastralNumber: abonent.cadastralNumber + abonent.id,
         },
       });
       return await tryToIdentify(tozaMakonApi, abonent, companyId);

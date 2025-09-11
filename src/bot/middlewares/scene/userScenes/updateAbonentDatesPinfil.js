@@ -20,6 +20,7 @@ import fs from "fs";
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 import { extractBirthDateString } from "../../../../helpers/extractBirthDateFromPinfl.js";
+import { getAbonentById } from "@services/billing/getAbonentById.js";
 
 export const updateAbonentDatesByPinfl = new Scenes.WizardScene(
   "update_abonent_date_by_pinfil",
@@ -70,12 +71,17 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         licshet: ctx.message.text,
         companyId: inspektor.companyId,
       });
-      if (!abonent) {
+      const abonentOnBilling = await getAbonentById(
+        createTozaMakonApi(inspektor.companyId),
+        abonent.id
+      );
+      if (!abonent || !abonentOnBilling) {
         return ctx.reply(
           "Siz kiritgan hisob raqami bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
           keyboards.cancelBtn.resize()
         );
       }
+      abonent.pinfl = abonentOnBilling.citizen.pnfl;
       ctx.wizard.state.abonent = abonent;
       if (abonent.shaxsi_tasdiqlandi && abonent.shaxsi_tasdiqlandi.confirm) {
         ctx.reply(
@@ -94,7 +100,8 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         return;
       }
       ctx.replyWithHTML(
-        `<b>${abonent.fio}</b>\n Pasport pinfil raqamini kiriting`
+        `<b>${abonent.fio}</b>\n Pasport pinfil raqamini kiriting! \nDiqqat! pastda ko'rsatilgan raqam abonentning joriy raqami hisoblanadi`,
+        Markup.keyboard([[abonent.pinfl], ["🚫Bekor qilish"]])
       );
       ctx.wizard.next();
     } catch (error) {
@@ -295,7 +302,11 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       if (ctx.callbackQuery.data === "yes") {
         ctx.wizard.state.reUpdating = true;
         ctx.replyWithHTML(
-          `<b>${ctx.wizard.state.abonent.fio}</b>\n Pasport pinfil raqamini kiriting`
+          `<b>${ctx.wizard.state.abonent.fio}</b>\n Pasport pinfil raqamini kiriting! \nDiqqat! pastda ko'rsatilgan raqam abonentning joriy raqami hisoblanadi`,
+          Markup.keyboard([
+            [ctx.wizard.state.abonent.pinfl.toString()],
+            ["🚫Bekor qilish"],
+          ]).resize()
         );
         ctx.wizard.selectStep(1);
       } else {
