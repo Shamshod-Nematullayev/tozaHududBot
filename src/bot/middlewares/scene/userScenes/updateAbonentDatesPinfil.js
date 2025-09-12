@@ -99,9 +99,14 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         ctx.wizard.selectStep(4);
         return;
       }
+      const buttons = [];
+      if (ctx.wizard.state.abonent.pinfl) {
+        buttons.push([ctx.wizard.state.abonent.pinfl.toString()]);
+      }
+      buttons.push(["🚫Bekor qilish"]);
       ctx.replyWithHTML(
-        `<b>${abonent.fio}</b>\n Pasport pinfil raqamini kiriting! \nDiqqat! pastda ko'rsatilgan raqam abonentning joriy raqami hisoblanadi`,
-        Markup.keyboard([[abonent.pinfl], ["🚫Bekor qilish"]])
+        `<b>${ctx.wizard.state.abonent.fio}</b>\n Pasport pinfil raqamini kiriting! \nDiqqat! pastda ko'rsatilgan raqam abonentning joriy raqami hisoblanadi`,
+        Markup.keyboard(buttons).resize()
       );
       ctx.wizard.next();
     } catch (error) {
@@ -301,12 +306,14 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene(
       if (ctx.callbackQuery?.data) await ctx.deleteMessage();
       if (ctx.callbackQuery.data === "yes") {
         ctx.wizard.state.reUpdating = true;
+        const buttons = [];
+        if (ctx.wizard.state.abonent.pinfl) {
+          buttons.push([ctx.wizard.state.abonent.pinfl.toString()]);
+        }
+        buttons.push(["🚫Bekor qilish"]);
         ctx.replyWithHTML(
           `<b>${ctx.wizard.state.abonent.fio}</b>\n Pasport pinfil raqamini kiriting! \nDiqqat! pastda ko'rsatilgan raqam abonentning joriy raqami hisoblanadi`,
-          Markup.keyboard([
-            [ctx.wizard.state.abonent.pinfl.toString()],
-            ["🚫Bekor qilish"],
-          ]).resize()
+          Markup.keyboard(buttons).resize()
         );
         ctx.wizard.selectStep(1);
       } else {
