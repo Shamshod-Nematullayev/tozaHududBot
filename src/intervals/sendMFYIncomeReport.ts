@@ -7,6 +7,7 @@ import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
 import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto.js";
 import { deletePreviousReport } from "@bot/helpers/deletePreviousReport.js";
 import { ReportType } from "@models/ReportsMessage.js";
+import { getReportsPaymentpartnersIncomes } from "@services/billing/getReportsPaymentpartnersIncomes.js";
 
 const formatDate = (date: Date) => {
   const year = date.getFullYear();
@@ -28,27 +29,20 @@ export async function sendMFYIncomeReport(
     const tozaMakonApi = createTozaMakonApi(companyId);
     let incomesFromEkopay: any;
     if (onlyEkopay) {
-      incomesFromEkopay = (
-        await tozaMakonApi.get(
-          "/billing-service/reports/payment-partners/incomes",
-          {
-            params: {
-              reportType: "MAHALLA",
-              companyId: companyId, // hozircha hard kod
-              regionId: 5,
-              districtId: 47,
-              fromDate: formatDate(
-                new Date(
-                  now.getFullYear(),
-                  now.getMonth(),
-                  onlyToday ? now.getDate() : 1
-                )
-              ),
-              toDate: formatDate(now),
-            },
-          }
-        )
-      ).data;
+      incomesFromEkopay = await getReportsPaymentpartnersIncomes(tozaMakonApi, {
+        reportType: "MAHALLA",
+        companyId,
+        regionId: company.regionId,
+        districtId: company.districtId,
+        fromDate: formatDate(
+          new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            onlyToday ? now.getDate() : 1
+          )
+        ),
+        toDate: formatDate(now),
+      });
     }
 
     let allAccrual = 0;

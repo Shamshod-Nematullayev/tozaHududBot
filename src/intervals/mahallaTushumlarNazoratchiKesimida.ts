@@ -13,6 +13,15 @@ interface Params {
   shouldDeleteLastReport: boolean;
 }
 
+interface IRow {
+  mfy_id: number[];
+  inspector_id: number;
+  inspector_name: string;
+  ekopaySumma: number;
+  count: number;
+  allSumma: number;
+}
+
 export async function mahallaTushumlarNazoratchiKesimida({
   companyId,
   from,
@@ -24,24 +33,34 @@ export async function mahallaTushumlarNazoratchiKesimida({
     const company = await Company.findOne({ id: companyId });
     if (!company) throw "Company not found";
     const tozaMakonApi = createTozaMakonApi(companyId);
-    const inspectors = await Nazoratchi.find({ activ: true, companyId });
+    const inspectors = await Nazoratchi.find({ activ: true, companyId }).lean();
+    const rows: IRow[] = [];
     const mahallas = await Mahalla.find({ companyId });
 
     if (inspectors.length === 0 || mahallas.length === 0)
       throw "Nazoratchilar yoki mahallalar topilmadi";
 
     // 1) Nazoratchilarni id bo‘yicha map qilish
-    const inspectorMap = new Map<string, any>();
     inspectors.forEach((i) => {
-      i.biriktirilgan = [];
-      inspectorMap.set(i.id.toString(), i);
+      rows.push({
+        inspector_id: i.id,
+        inspector_name: i.name,
+        ekopaySumma: 0,
+        count: 0,
+        mfy_id: [],
+        allSumma: 0,
+      });
     });
 
     // 2) Har bir mahallani bir marta aylanib chiqish
     mahallas.forEach((m) => {
       const inspId = m.biriktirilganNazoratchi?.inspactor_id?.toString();
-      if (inspId && inspectorMap.has(inspId)) {
-        inspectorMap.get(inspId).biriktirilgan.push(m.id);
+
+      if (inspId) {
+        const row = rows.find((r) => r.inspector_id.toString() === inspId);
+        if (row) {
+          row.mfy_id.push(m.id);
+        }
       }
     });
 
@@ -56,11 +75,17 @@ export async function mahallaTushumlarNazoratchiKesimida({
     });
 
     // 4) Mahallalar tushumini bir marta aylanib chiqish
-    // const mahalla
-    // mahallaTushum.forEach((m) => {
-    //   inspectorMap.has
-    // });
-    return inspectors;
+    mahallaTushum.forEach((m) => {
+      const row = rows.find((r) => r.mfy_id.includes(m.id));
+      if (row) {
+        const ekopay = m.partnerTransactions.find((p) => p.partnerId === 7);
+        row.ekopaySumma += ekopay?.transactionAmount || 0;
+        row.count += ekopay?.transactionCount || 0;
+      }
+    });
+
+    // 5) Nazoratchilar bilan bir marta aylanib chiqish
+    console.log(rows);
   } catch (error) {
     console.error(error);
   }

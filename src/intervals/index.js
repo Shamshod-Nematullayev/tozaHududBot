@@ -12,9 +12,18 @@ import { sendPinflMfyReport } from "./sendPinflMfyReport.js";
 // import { addUpdateArizaAktTask } from './updateArizaAkt.js'
 import xatlovchilarIshiHisobot from "./xatlovchilarIshiHisobot.js";
 import { checkPaymentSudAkts } from "./court-service/checkPaymentSudAkts.js";
+import { mahallaTushumlarNazoratchiKesimida } from "./mahallaTushumlarNazoratchiKesimida.js";
 // checkPaymentSudAkts(1144);
 
 // Define tasks with Agenda
+
+mahallaTushumlarNazoratchiKesimida({
+  companyId: 1144,
+  from: new Date("2025-09-01"),
+  to: new Date("2025-09-30"),
+  onlyEcopay: false,
+  shouldDeleteLastReport: false,
+});
 
 agenda.define("sendKunlikPinflReportsTask", async () => {
   // await sendKunlikPinflReports(1265);

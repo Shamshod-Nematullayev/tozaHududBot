@@ -42,8 +42,11 @@ export async function getReportsPaymentpartnersIncomes(
   }
 ): Promise<IMahallaRow[]> {
   return (
-    await tozaMakonApi.get("/billing-service/reports/paymentpartners-incomes", {
-      params: params,
-    })
+    await tozaMakonApi.get(
+      "/billing-service/reports/payment-partners/incomes",
+      {
+        params: params,
+      }
+    )
   ).data;
 }
