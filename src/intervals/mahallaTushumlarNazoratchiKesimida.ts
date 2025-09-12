@@ -1,7 +1,11 @@
 import { createTozaMakonApi } from "@api/tozaMakon.js";
+import { deletePreviousReport } from "@bot/helpers/deletePreviousReport.js";
+import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
+import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto.js";
 import { Company } from "@models/Company.js";
 import { Mahalla } from "@models/Mahalla.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
+import { ReportType } from "@models/ReportsMessage.js";
 import { getReportsPaymentpartnersIncomes } from "@services/billing/getReportsPaymentpartnersIncomes.js";
 import { formatDate } from "@services/utils/formatDate.js";
 
@@ -9,7 +13,6 @@ interface Params {
   companyId: number;
   from: Date;
   to: Date;
-  onlyEcopay: boolean;
   shouldDeleteLastReport: boolean;
 }
 
@@ -26,7 +29,6 @@ export async function mahallaTushumlarNazoratchiKesimida({
   companyId,
   from,
   to,
-  onlyEcopay,
   shouldDeleteLastReport,
 }: Params) {
   try {
@@ -84,8 +86,34 @@ export async function mahallaTushumlarNazoratchiKesimida({
       }
     });
 
-    // 5) Nazoratchilar bilan bir marta aylanib chiqish
-    console.log(rows);
+    rows.sort((a, b) => b.ekopaySumma - a.ekopaySumma);
+
+    const htmlString = await renderHtmlByEjs("nazoratchilarKunlikTushum.ejs", {
+      sana: formatDate(new Date()),
+      rows: rows.map((r) => ({
+        id: r.inspector_id,
+        name: r.inspector_name,
+        tushumSoni: r.count,
+        summasi: r.ekopaySumma,
+      })),
+      jamiTushumSoni: rows.reduce((a, b) => a + b.count, 0),
+      jamiTushumSummasi: rows.reduce((a, b) => a + b.ekopaySumma, 0),
+    });
+
+    const msg = await sendHtmlAsPhoto(
+      { htmlString, selector: "div" },
+      company.GROUP_ID_NAZORATCHILAR,
+      {
+        parse_mode: "HTML",
+      }
+    );
+
+    if (shouldDeleteLastReport)
+      await deletePreviousReport(
+        companyId,
+        ReportType.mahallaTushumlarNazoratchiKesimida,
+        msg
+      );
   } catch (error) {
     console.error(error);
   }

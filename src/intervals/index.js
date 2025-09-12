@@ -18,9 +18,9 @@ import { mahallaTushumlarNazoratchiKesimida } from "./mahallaTushumlarNazoratchi
 // Define tasks with Agenda
 
 mahallaTushumlarNazoratchiKesimida({
-  companyId: 1144,
-  from: new Date("2025-09-01"),
-  to: new Date("2025-09-30"),
+  companyId: 1824,
+  from: new Date("2025-09-12"),
+  to: new Date("2025-09-12"),
   onlyEcopay: false,
   shouldDeleteLastReport: false,
 });
