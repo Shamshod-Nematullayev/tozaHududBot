@@ -177,9 +177,8 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
         pinfl: ctx.message.text,
         birthdate,
       });
-      console.log(citizen);
 
-      if (!citizen.passport || !citizen.photo) {
+      if (!citizen.passport) {
         await ctx.reply(
           "Ushbu abonent pasport ma'lumotlari bilan muammo bor. Muddati o'tgan, vafot etgan va hokazo bo'lishi mumkin. Iltimos, xonadonda yashovchi boshqa muhim kishining nomiga ochishga urinib ko'ring",
           keyboards.mainKeyboard
