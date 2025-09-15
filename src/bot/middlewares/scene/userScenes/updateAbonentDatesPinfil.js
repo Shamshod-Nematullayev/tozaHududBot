@@ -71,11 +71,17 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene(
         licshet: ctx.message.text,
         companyId: inspektor.companyId,
       });
+      if (!abonent) {
+        return ctx.reply(
+          "Siz kiritgan hisob raqami bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
+          keyboards.cancelBtn.resize()
+        );
+      }
       const abonentOnBilling = await getAbonentById(
         createTozaMakonApi(inspektor.companyId),
         abonent.id
       );
-      if (!abonent || !abonentOnBilling) {
+      if (!abonentOnBilling) {
         return ctx.reply(
           "Siz kiritgan hisob raqami bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
           keyboards.cancelBtn.resize()
