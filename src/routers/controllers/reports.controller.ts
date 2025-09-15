@@ -1,9 +1,14 @@
+import { createTozaMakonApi } from "@api/tozaMakon.js";
 import { Abonent } from "@models/Abonent.js";
+import { Company } from "@models/Company.js";
 import { Mahalla } from "@models/Mahalla.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { getReportDataQuerySchema } from "@schemas/reports.schema.js";
+import { getReportsResidentIdentifications } from "@services/billing/getReportsResidentIdentifications.js";
+import { formatDate } from "@services/utils/formatDate.js";
 import Excel from "exceljs";
 import { Request, Response } from "express";
+import z from "zod";
 async function countConfirmed(
   inspectorId: string,
   companyId: number,
@@ -152,11 +157,40 @@ export const getConfirmedAbonentCountsReportByInspectorsExcel = async (
 
 export const getConfirmedAbonentCountsReportByMahalla = async (
   req: Request,
-  res: Response
+  res: Response,
+  dontSendResponse: "dontSend" | any
 ) => {
+  const { limit = 10, page = 1 } = z
+    .object({
+      limit: z.coerce.number().optional(),
+      page: z.coerce.number().optional(),
+    })
+    .parse(req.query);
+  const skip = (page - 1) * limit;
+  const company = await Company.findOne({ id: req.user.companyId });
+  if (!company) throw "Company not found";
+
   const mahallas = await Mahalla.find({ companyId: req.user.companyId })
     .lean()
-    .select("id name biriktirilganNazoratchi");
+    .select("id name biriktirilganNazoratchi")
+    .skip(skip)
+    .limit(limit);
+  const mahallaCount = await Mahalla.countDocuments({
+    companyId: req.user.companyId,
+  });
+
+  const now = new Date();
+  const identificationsReport = await getReportsResidentIdentifications(
+    createTozaMakonApi(req.user.companyId),
+    {
+      companyId: req.user.companyId,
+      districtId: company.districtId,
+      regionId: company.regionId,
+      dateFrom: formatDate(new Date(now.getFullYear(), now.getMonth(), 1)),
+      dateTo: formatDate(now),
+    }
+  );
+
   const result = await Promise.all(
     mahallas.map(async (mahalla) => {
       const pnflConfirmed = await Abonent.countDocuments({
@@ -169,29 +203,42 @@ export const getConfirmedAbonentCountsReportByMahalla = async (
         mahallas_id: mahalla.id,
         "ekt_kod_tasdiqlandi.confirm": true,
       });
+      const i = identificationsReport.find((i) => i.id == mahalla.id);
       return {
         ...mahalla,
         pnflConfirmed,
         etkConfirmed,
+        allAbonents: i?.residentCount,
+        identified: i?.totalIdentifiedCount,
       };
     })
   );
-  const count = await Mahalla.countDocuments({ companyId: req.user.companyId });
-  res.json({ rows: result, count });
-  return { result, count };
+  if (dontSendResponse !== "dontSend")
+    res.json({ rows: result, count: mahallaCount });
+  return { result, count: mahallaCount };
 };
 
 export const getConfirmedAbonentCountsReportByMahallaExcel = async (
   req: Request,
   res: Response
 ) => {
-  const { result } = await getConfirmedAbonentCountsReportByMahalla(req, res);
+  const { result } = await getConfirmedAbonentCountsReportByMahalla(
+    req,
+    res,
+    "dontSend"
+  );
   const workbook = new Excel.Workbook();
   const worksheet = workbook.addWorksheet("Reports");
   worksheet.columns = [
     { header: "No", key: "index", width: 10 },
     { header: "Mahalla ID", key: "id", width: 30 },
     { header: "Mahalla", key: "name", width: 30 },
+    { header: "Jami abonentlar soni", key: "allAbonents", width: 30 },
+    {
+      header: "Biriktirilgan Nazoratchi",
+      key: "biriktirilganNazoratchi",
+      width: 30,
+    },
     { header: "Jami PNFL", key: "pnflConfirmed", width: 30 },
     { header: "SVET kodi", key: "etkConfirmed", width: 30 },
   ];
@@ -202,6 +249,8 @@ export const getConfirmedAbonentCountsReportByMahallaExcel = async (
       name: row.name,
       pnflConfirmed: row.pnflConfirmed,
       etkConfirmed: row.etkConfirmed,
+      allAbonents: row.allAbonents,
+      biriktirilganNazoratchi: row.biriktirilganNazoratchi?.inspector_name,
     });
   });
   worksheet.getRow(1).eachCell((cell) => {

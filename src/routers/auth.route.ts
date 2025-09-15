@@ -60,15 +60,7 @@ router.post(
           },
         })
         .lean();
-      const ctx = await bot.telegram.getChat(admin.user_id);
-      let photo = { data: null };
-      if (ctx.photo) {
-        const file = await bot.telegram.getFile(ctx.photo.small_file_id);
-        photo = await axios.get(
-          `https://api.telegram.org/file/bot${process.env.TOKEN}/${file.file_path}`,
-          { responseType: "arraybuffer" }
-        );
-      }
+
       const company = await Company.findOne({ id: admin.companyId });
       delete admin.password;
       delete admin.refreshToken;
@@ -78,7 +70,7 @@ router.post(
         refreshToken,
         telegram_id: admin.user_id,
         fullName: admin.fullName,
-        photo: photo.data,
+        photo: { data: null },
         abonentsPrefix: company?.abonentsPrefix,
         user: {
           login: admin.login,
