@@ -43,12 +43,10 @@ export async function getElectricResidentDetails({
   //   value: string;
   //   main: boolean;
   // }[];
-  console.log({ data });
   const details: any = {};
   arr.forEach((d) => {
     details[d.name] = d.value;
   });
 
-  console.log({ details });
   return details;
 }

@@ -241,6 +241,7 @@ export const getConfirmedAbonentCountsReportByMahallaExcel = async (
     },
     { header: "Jami PNFL", key: "pnflConfirmed", width: 30 },
     { header: "SVET kodi", key: "etkConfirmed", width: 30 },
+    { header: "Idintifikatsiyalanganlar", key: "identified", width: 30 },
   ];
   result.forEach((row, index) => {
     worksheet.addRow({
@@ -251,6 +252,7 @@ export const getConfirmedAbonentCountsReportByMahallaExcel = async (
       etkConfirmed: row.etkConfirmed,
       allAbonents: row.allAbonents,
       biriktirilganNazoratchi: row.biriktirilganNazoratchi?.inspector_name,
+      identified: row.identified,
     });
   });
   worksheet.getRow(1).eachCell((cell) => {
