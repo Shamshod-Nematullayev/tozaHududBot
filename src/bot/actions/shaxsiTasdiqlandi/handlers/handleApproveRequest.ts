@@ -16,6 +16,7 @@ import { Axios, AxiosError } from "axios";
 import { parseError } from "./parseErrorMessage.js";
 import { tryIdentifiedOrReject } from "./tryIdentifiedOrReject.js";
 import { tryToIdentify } from "@services/billing/tryToIdentify.js";
+import { formatDate } from "@services/utils/formatDate.js";
 
 export default async function handleApproveRequest(
   ctx: Context,
@@ -41,16 +42,32 @@ export default async function handleApproveRequest(
   const tozaMakonApi = createTozaMakonApi(req.companyId);
 
   //   ma'lumotlarni tayyorlash
-  const [yil, oy, kun] = req.data.birth_date.split("-");
+  // const [yil, oy, kun] = req.data.birth_date.split("-");
   const citizen = await getCitizen(tozaMakonApi, {
     passport: req.data.passport_serial + req.data.passport_number,
-    birthdate: `${yil}-${oy}-${kun}`,
+    birthdate: req.data.birth_date,
     pinfl: req.data.pinfl,
   });
 
   //   billingga yangilov so'rovini yuborish
+  const [yil, oy, kun] = req.data.details.doc_end_date.split("-").map(Number);
+  const passportGivenDate = new Date(yil - 10, oy, kun + 1);
   await updateAbonentDetails(tozaMakonApi, abonent.id, {
-    citizen: citizen,
+    citizen: {
+      birthDate: req.data.birth_date,
+      firstName: req.data.first_name,
+      foreignCitizen: citizen.foreignCitizen || false,
+      lastName: req.data.last_name,
+      email: citizen.email || null,
+      inn: citizen.inn || null,
+      pnfl: req.data.pinfl,
+      patronymic: req.data.middle_name,
+      passport: req.data.passport_serial + req.data.passport_number,
+      passportGivenDate: formatDate(passportGivenDate),
+      passportIssuer: req.data.details.division,
+      passportExpireDate: req.data.details.doc_end_date,
+      photo: citizen.photo || null,
+    },
     description: `${inspector.id} ${inspector.name} ma'lumotiga asosan o'zgartirildi.`,
   });
 

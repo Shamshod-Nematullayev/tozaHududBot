@@ -160,7 +160,7 @@ export const getConfirmedAbonentCountsReportByMahalla = async (
   res: Response,
   dontSendResponse: "dontSend" | any
 ) => {
-  const { limit = 10, page = 1 } = z
+  const { limit = 300, page = 1 } = z
     .object({
       limit: z.coerce.number().optional(),
       page: z.coerce.number().optional(),
