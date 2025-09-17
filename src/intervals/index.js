@@ -17,14 +17,6 @@ import { mahallaTushumlarNazoratchiKesimida } from "./mahallaTushumlarNazoratchi
 
 // Define tasks with Agenda
 
-mahallaTushumlarNazoratchiKesimida({
-  companyId: 1824,
-  from: new Date("2025-09-12"),
-  to: new Date("2025-09-12"),
-  onlyEcopay: false,
-  shouldDeleteLastReport: false,
-});
-
 agenda.define("sendKunlikPinflReportsTask", async () => {
   // await sendKunlikPinflReports(1265);
   // await sendKunlikPinflReports(1143);
@@ -51,7 +43,7 @@ agenda.define("sendMFYIncomeReportTask", async () => {
 });
 
 agenda.define("sendKattakurganShaharTushum", async () => {
-  await sendMFYIncomeReport(1824, true, false, false);
+  await sendMFYIncomeReport(1824, false, false, false);
 });
 
 agenda.define("sendPinflMfyReportTask", async () => {
