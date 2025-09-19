@@ -17,9 +17,9 @@ interface Params {
 }
 
 interface IRow {
-  mfy_id: number[];
-  inspector_id: number;
-  inspector_name: string;
+  _id: number;
+  name: string;
+  mfy_ids: number[];
   ekopaySumma: number;
   count: number;
   allSumma: number;
@@ -35,36 +35,31 @@ export async function mahallaTushumlarNazoratchiKesimida({
     const company = await Company.findOne({ id: companyId });
     if (!company) throw "Company not found";
     const tozaMakonApi = createTozaMakonApi(companyId);
-    const inspectors = await Nazoratchi.find({ activ: true, companyId }).lean();
-    const rows: IRow[] = [];
-    const mahallas = await Mahalla.find({ companyId });
+    const mahallas: IRow[] = await Mahalla.aggregate([
+      {
+        $match: {
+          companyId,
+          biriktirilganNazoratchi: { $exists: true },
+          "biriktirilganNazoratchi.inspactor_id": { $exists: true },
+        },
+      },
+      {
+        $group: {
+          _id: "$biriktirilganNazoratchi.inspactor_id",
+          name: { $last: "$biriktirilganNazoratchi.inspector_name" },
+          mfy_ids: { $push: "$id" },
+        },
+      },
+      {
+        $addFields: {
+          ekopaySumma: 0,
+          count: 0,
+          allSumma: 0,
+        },
+      },
+    ]);
 
-    if (inspectors.length === 0 || mahallas.length === 0)
-      throw "Nazoratchilar yoki mahallalar topilmadi";
-
-    // 1) Nazoratchilarni id bo‘yicha map qilish
-    inspectors.forEach((i) => {
-      rows.push({
-        inspector_id: i.id,
-        inspector_name: i.name,
-        ekopaySumma: 0,
-        count: 0,
-        mfy_id: [],
-        allSumma: 0,
-      });
-    });
-
-    // 2) Har bir mahallani bir marta aylanib chiqish
-    mahallas.forEach((m) => {
-      const inspId = m.biriktirilganNazoratchi?.inspactor_id?.toString();
-
-      if (inspId) {
-        const row = rows.find((r) => r.inspector_id.toString() === inspId);
-        if (row) {
-          row.mfy_id.push(m.id);
-        }
-      }
-    });
+    if (mahallas.length === 0) throw "mahallalar topilmadi";
 
     // 3) Mahallalar tushumini olish
     const mahallaTushum = await getReportsPaymentpartnersIncomes(tozaMakonApi, {
@@ -78,7 +73,7 @@ export async function mahallaTushumlarNazoratchiKesimida({
 
     // 4) Mahallalar tushumini bir marta aylanib chiqish
     mahallaTushum.forEach((m) => {
-      const row = rows.find((r) => r.mfy_id.includes(m.id));
+      const row = mahallas.find((r) => r.mfy_ids.includes(m.id));
       if (row) {
         const ekopay = m.partnerTransactions.find((p) => p.partnerId === 7);
         row.ekopaySumma += ekopay?.transactionAmount || 0;
@@ -86,23 +81,24 @@ export async function mahallaTushumlarNazoratchiKesimida({
       }
     });
 
-    rows.sort((a, b) => b.ekopaySumma - a.ekopaySumma);
+    mahallas.sort((a, b) => b.ekopaySumma - a.ekopaySumma);
 
     const htmlString = await renderHtmlByEjs("nazoratchilarKunlikTushum.ejs", {
       sana: formatDate(new Date()),
-      rows: rows.map((r) => ({
-        id: r.inspector_id,
-        name: r.inspector_name,
+      rows: mahallas.map((r) => ({
+        id: r._id,
+        name: r.name,
         tushumSoni: r.count,
         summasi: r.ekopaySumma,
       })),
-      jamiTushumSoni: rows.reduce((a, b) => a + b.count, 0),
-      jamiTushumSummasi: rows.reduce((a, b) => a + b.ekopaySumma, 0),
+      jamiTushumSoni: mahallas.reduce((a, b) => a + b.count, 0),
+      jamiTushumSummasi: mahallas.reduce((a, b) => a + b.ekopaySumma, 0),
     });
 
     const msg = await sendHtmlAsPhoto(
       { htmlString, selector: "div" },
-      company.GROUP_ID_NAZORATCHILAR,
+      // company.GROUP_ID_NAZORATCHILAR,
+      process.env.ME as string,
       {
         parse_mode: "HTML",
       }

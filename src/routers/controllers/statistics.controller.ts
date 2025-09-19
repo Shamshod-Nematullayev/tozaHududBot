@@ -32,20 +32,18 @@ export const getIdentityStat = async (req: Request, res: Response) => {
 
 export const getETKConfirmStat = async (req: Request, res: Response) => {
   try {
-    const allAbonentsCount = await Abonent.countDocuments({
-      companyId: req.user?.companyId,
+    const totalAbonentsCount = await Abonent.countDocuments({
+      companyId: req.user.companyId,
     });
-    const confirmed = await Abonent.countDocuments({
-      "ekt_kod_tasdiqlandi.confirm": {
-        $ne: true,
-      },
-      companyId: req.user?.companyId,
+    const confirmedCount = await Abonent.countDocuments({
+      "ekt_kod_tasdiqlandi.confirm": true,
+      companyId: req.user.companyId,
     });
     res.json({
-      allAbonentsCount,
-      confirmed: allAbonentsCount - confirmed,
+      allAbonentsCount: totalAbonentsCount,
+      confirmed: confirmedCount,
     });
-    console.log(allAbonentsCount, confirmed, "etk");
+    console.log(totalAbonentsCount, confirmedCount, "etk");
   } catch (error) {
     res.status(500).json({
       message: "Internal Server Error",

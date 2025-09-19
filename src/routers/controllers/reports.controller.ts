@@ -10,15 +10,16 @@ import Excel from "exceljs";
 import { Request, Response } from "express";
 import z from "zod";
 async function countConfirmed(
-  inspectorId: string,
+  inspectorId: string | number,
   companyId: number,
   field: string,
   fromDate: Date,
-  toDate: Date
+  toDate: Date,
+  searchInspectorIdType: "inspector._id" | "inspector_id"
 ) {
   const baseFilter = {
     [`${field}.confirm`]: true,
-    [`${field}.inspector._id`]: inspectorId,
+    [`${field}.${searchInspectorIdType}`]: inspectorId,
     companyId,
   };
 
@@ -68,15 +69,17 @@ async function getReportData(req: Request) {
           req.user.companyId,
           "shaxsi_tasdiqlandi",
           fromDate,
-          toDate
+          toDate,
+          "inspector._id"
         );
       const { total: etkConfirmed, byDate: etkConfirmedByDate } =
         await countConfirmed(
-          inspector._id.toString(),
+          inspector.id,
           req.user.companyId,
           "ekt_kod_tasdiqlandi",
           fromDate,
-          toDate
+          toDate,
+          "inspector_id"
         );
       return {
         ...inspector,
