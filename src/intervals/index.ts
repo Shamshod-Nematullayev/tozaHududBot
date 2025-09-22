@@ -14,7 +14,6 @@ import xatlovchilarIshiHisobot from "./xatlovchilarIshiHisobot.js";
 import { checkPaymentSudAkts } from "./court-service/checkPaymentSudAkts.js";
 import { mahallaTushumlarNazoratchiKesimida } from "./mahallaTushumlarNazoratchiKesimida.js";
 // checkPaymentSudAkts(1144);
-
 // Define tasks with Agenda
 
 agenda.define("sendKunlikPinflReportsTask", async () => {
@@ -36,13 +35,7 @@ agenda.define("sendKunlikEtkReportsTask", async () => {
 });
 
 agenda.define("sendMFYIncomeReportTask", async () => {
-  // await sendMFYIncomeReport(1265);
-  // await sendMFYIncomeReport(1143);
-  await sendMFYIncomeReport(1144, false);
-  await sendMFYIncomeReport(1824, false, false, false);
-});
-
-agenda.define("sendKattakurganShaharTushum", async () => {
+  await sendMFYIncomeReport(1144, false, false, true);
   await sendMFYIncomeReport(1824, false, false, false);
 });
 
@@ -59,6 +52,16 @@ agenda.define("sendEtkMfyReportTask", async () => {
 });
 
 agenda.define("nazoratchilarKunlikTushumTask", async () => {
-  await nazoratchilarKunlikTushum(1144);
-  // await nazoratchilarKunlikTushum(1265);
+  await mahallaTushumlarNazoratchiKesimida({
+    companyId: 1144,
+    from: new Date(),
+    to: new Date(),
+    shouldDeleteLastReport: true,
+  });
+  mahallaTushumlarNazoratchiKesimida({
+    companyId: 1824,
+    from: new Date(),
+    to: new Date(),
+    shouldDeleteLastReport: false,
+  });
 });

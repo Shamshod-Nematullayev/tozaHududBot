@@ -25,6 +25,15 @@ interface IRow {
   allSumma: number;
 }
 
+/**
+ * Sends a report about inspectors' daily income to the specified company's
+ * nazoratchilar group.
+ * @param {number} companyId - The ID of the company to send the report to.
+ * @param {Date} from - The start date of the report period.
+ * @param {Date} to - The end date of the report period.
+ * @param {boolean} shouldDeleteLastReport - Whether to delete the previous report.
+ * @returns {Promise<void>}
+ */
 export async function mahallaTushumlarNazoratchiKesimida({
   companyId,
   from,
@@ -35,12 +44,13 @@ export async function mahallaTushumlarNazoratchiKesimida({
     const company = await Company.findOne({ id: companyId });
     if (!company) throw "Company not found";
     const tozaMakonApi = createTozaMakonApi(companyId);
-    const mahallas: IRow[] = await Mahalla.aggregate([
+    // 1) Mahallalarda biriktirilgan nazoratchilar ro'yxatini shakllantirish
+    const inspectorMahallaSummary: IRow[] = await Mahalla.aggregate([
       {
         $match: {
           companyId,
           biriktirilganNazoratchi: { $exists: true },
-          "biriktirilganNazoratchi.inspactor_id": { $exists: true },
+          "biriktirilganNazoratchi.inspactor_id": { $exists: true, $ne: null },
         },
       },
       {
@@ -59,9 +69,9 @@ export async function mahallaTushumlarNazoratchiKesimida({
       },
     ]);
 
-    if (mahallas.length === 0) throw "mahallalar topilmadi";
+    if (inspectorMahallaSummary.length === 0) throw "mahallalar topilmadi";
 
-    // 3) Mahallalar tushumini olish
+    // 2) Mahallalar tushumini olish
     const mahallaTushum = await getReportsPaymentpartnersIncomes(tozaMakonApi, {
       reportType: "MAHALLA",
       companyId,
@@ -71,9 +81,9 @@ export async function mahallaTushumlarNazoratchiKesimida({
       regionId: company.regionId,
     });
 
-    // 4) Mahallalar tushumini bir marta aylanib chiqish
+    // 3) Mahallalar tushumini tushumlar ro'yxatiga qo'shish
     mahallaTushum.forEach((m) => {
-      const row = mahallas.find((r) => r.mfy_ids.includes(m.id));
+      const row = inspectorMahallaSummary.find((r) => r.mfy_ids.includes(m.id));
       if (row) {
         const ekopay = m.partnerTransactions.find((p) => p.partnerId === 7);
         row.ekopaySumma += ekopay?.transactionAmount || 0;
@@ -81,20 +91,26 @@ export async function mahallaTushumlarNazoratchiKesimida({
       }
     });
 
-    mahallas.sort((a, b) => b.ekopaySumma - a.ekopaySumma);
+    // 4) Tushumlarni summasi bo'yicha so'rtlash
+    inspectorMahallaSummary.sort((a, b) => b.ekopaySumma - a.ekopaySumma);
 
+    // 5) HTML hisobot shakllantirish
     const htmlString = await renderHtmlByEjs("nazoratchilarKunlikTushum.ejs", {
       sana: formatDate(new Date()),
-      rows: mahallas.map((r) => ({
+      rows: inspectorMahallaSummary.map((r) => ({
         id: r._id,
         name: r.name,
         tushumSoni: r.count,
         summasi: r.ekopaySumma,
       })),
-      jamiTushumSoni: mahallas.reduce((a, b) => a + b.count, 0),
-      jamiTushumSummasi: mahallas.reduce((a, b) => a + b.ekopaySumma, 0),
+      jamiTushumSoni: inspectorMahallaSummary.reduce((a, b) => a + b.count, 0),
+      jamiTushumSummasi: inspectorMahallaSummary.reduce(
+        (a, b) => a + b.ekopaySumma,
+        0
+      ),
     });
 
+    // 6) bot orqali nazoratchilar guruhiga yuborish
     const msg = await sendHtmlAsPhoto(
       { htmlString, selector: "div" },
       // company.GROUP_ID_NAZORATCHILAR,
@@ -104,6 +120,7 @@ export async function mahallaTushumlarNazoratchiKesimida({
       }
     );
 
+    // 7) Eski hisobotni o'chirish
     if (shouldDeleteLastReport)
       await deletePreviousReport(
         companyId,
