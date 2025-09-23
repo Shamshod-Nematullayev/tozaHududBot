@@ -9,6 +9,7 @@ import { messages } from "@lib/messages.js";
 import { Admin } from "@models/Admin.js";
 import { MyContext } from "types/botContext.js";
 import { isAdmin } from "@bot/middlewares/scene/utils/validator.js";
+import { mahallaTushumlarNazoratchiKesimida } from "intervals/mahallaTushumlarNazoratchiKesimida.js";
 
 // Main codes =====================================================================================
 const composer = new Composer<MyContext>();
@@ -25,9 +26,13 @@ composer.command("change_password", async (ctx) => {
 // ======================== Special functions (not required just shortcuts) ========================//
 
 composer.command("tushum", async (ctx) => {
-  await nazoratchilarKunlikTushum();
   await sendMFYIncomeReport(1144, false);
-  await sendMFYIncomeReport(1824, true);
+  await mahallaTushumlarNazoratchiKesimida({
+    companyId: 1144,
+    from: new Date(),
+    to: new Date(),
+    shouldDeleteLastReport: true,
+  });
 });
 composer.hears(/pnflreport_\w/g, async (ctx) => {
   const companyId = Number(ctx.message.text.split("_")[1]);
