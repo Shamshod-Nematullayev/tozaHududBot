@@ -4,7 +4,6 @@ import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
 import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto.js";
 import { Company } from "@models/Company.js";
 import { Mahalla } from "@models/Mahalla.js";
-import { Nazoratchi } from "@models/Nazoratchi.js";
 import { ReportType } from "@models/ReportsMessage.js";
 import { getReportsPaymentpartnersIncomes } from "@services/billing/getReportsPaymentpartnersIncomes.js";
 import { formatDate } from "@services/utils/formatDate.js";
@@ -114,7 +113,6 @@ export async function mahallaTushumlarNazoratchiKesimida({
     const msg = await sendHtmlAsPhoto(
       { htmlString, selector: "div" },
       company.GROUP_ID_NAZORATCHILAR,
-      // process.env.ME as string,
       {
         parse_mode: "HTML",
       }
