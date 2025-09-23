@@ -113,8 +113,8 @@ export async function mahallaTushumlarNazoratchiKesimida({
     // 6) bot orqali nazoratchilar guruhiga yuborish
     const msg = await sendHtmlAsPhoto(
       { htmlString, selector: "div" },
-      // company.GROUP_ID_NAZORATCHILAR,
-      process.env.ME as string,
+      company.GROUP_ID_NAZORATCHILAR,
+      // process.env.ME as string,
       {
         parse_mode: "HTML",
       }
