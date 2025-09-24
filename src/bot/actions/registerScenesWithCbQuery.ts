@@ -1,5 +1,6 @@
 import { isAdmin } from "@bot/middlewares/scene/utils/validator.js";
 import { messages } from "@lib/messages.js";
+import { Company } from "@models/Company.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { Composer } from "telegraf";
 import { MyContext } from "types/botContext";
@@ -42,6 +43,15 @@ USER_ACTIONS.forEach((action) => {
       if (!nazoratchi) {
         return await ctx.reply(
           "Ushbu amaliyotni bajarish uchun yetarli huquqqa ega emassiz"
+        );
+      }
+      const company = await Company.findOne({
+        id: nazoratchi.companyId,
+        activeExpiresDate: { $gt: new Date() },
+      });
+      if (!company) {
+        return await ctx.reply(
+          "Dastur faoliyati vaqtincha cheklangan. \nIltimos, xizmatlardan foydalanishni davom ettirish uchun to‘lovni amalga oshiring."
         );
       }
       ctx.scene.enter(action);

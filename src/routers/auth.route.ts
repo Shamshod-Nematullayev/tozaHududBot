@@ -61,7 +61,17 @@ router.post(
         })
         .lean();
 
-      const company = await Company.findOne({ id: admin.companyId });
+      const company = await Company.findOne({
+        id: admin.companyId,
+        activeExpiresDate: { $gt: new Date() },
+      });
+      if (!company) {
+        return res.status(400).json({
+          ok: false,
+          message:
+            "Dastur faoliyati vaqtincha cheklangan. \nIltimos, xizmatlardan foydalanishni davom ettirish uchun to‘lovni amalga oshiring.",
+        });
+      }
       delete admin.password;
       delete admin.refreshToken;
       res.status(200).json({
