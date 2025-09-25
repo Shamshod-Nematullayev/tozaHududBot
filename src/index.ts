@@ -79,8 +79,6 @@ import reportsRouter from "./routers/reportsRouter.js";
 import actsRouter from "./routers/actsRouter.js";
 import "test/index.js";
 import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.js";
-// import { globalErrorHandler } from idenAllAbonents"./routers/controllers/utils/globalErrorHandler.js";
-// import { idenAllAbonents, idenOneAbonent } from "test/index.js";
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);
@@ -110,14 +108,6 @@ process.on("warning", (warning) => {
 agenda.on("ready", async () => {
   console.log("Agenda is ready to use!");
   import("./intervals/index.js");
-  agenda.start();
-  // agenda.every("0 9,11,13,17 * * *", "sendMFYIncomeReportTask");
-  agenda.every("0 9 * * *", "sendMFYIncomeReportTask");
-  agenda.every("5 9-22 * * *", "sendKunlikPinflReportsTask");
-  agenda.every("8 9,11,13,15,17,19,21,23 * * *", "sendKunlikEtkReportsTask");
-  agenda.every("0 9-22 * * *", "sendPinflMfyReportTask");
-  agenda.every("0 9-22 * * *", "sendEtkMfyReportTask");
-  agenda.every("0 9-22 * * *", "nazoratchilarKunlikTushumTask");
 });
 
 agenda.on("error", (error: Error) => {
