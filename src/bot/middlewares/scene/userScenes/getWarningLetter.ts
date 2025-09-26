@@ -60,7 +60,7 @@ export const getWarningLetter = new Scenes.WizardScene<MyContext>(
       filename: ctx.message.text + ".pdf",
     });
 
-    ctx.scene.leave();
+    // ctx.scene.leave();
   }
 );
 
