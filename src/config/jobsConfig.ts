@@ -17,9 +17,10 @@ interface IJobConfig {
 export const jobsConfig: IJobConfig[] = [
   {
     name: "sendKunlikPinflReportsTask",
-    schedule: "5 9-22 * * *",
+    schedule: "15 9-22 * * *",
     handler: async () => {
       // parametrlar oson o'zgarishi uchun massiv ishlating
+      console.log("nahotki");
       xatlovchilarIshiHisobot(1144);
     },
   },

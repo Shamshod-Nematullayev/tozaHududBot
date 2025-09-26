@@ -79,6 +79,7 @@ import reportsRouter from "./routers/reportsRouter.js";
 import actsRouter from "./routers/actsRouter.js";
 import "test/index.js";
 import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.js";
+import { initJobs } from "intervals/index.js";
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);
@@ -107,7 +108,7 @@ process.on("warning", (warning) => {
 
 agenda.on("ready", async () => {
   console.log("Agenda is ready to use!");
-  import("./intervals/index.js");
+  initJobs();
 });
 
 agenda.on("error", (error: Error) => {
