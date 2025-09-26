@@ -60,12 +60,5 @@ composer.hears("phone_report", () => {
 composer.hears("pochtaHarajatiniTekshirishScene", (ctx) =>
   ctx.scene.enter("pochtaHarajatiniTekshirishScene")
 );
-composer.hears(
-  "Talabnomalarni import qilish",
-
-  (ctx) => {
-    ctx.scene.enter("uploadWarningTozamakonScene");
-  }
-);
 
 export default composer;

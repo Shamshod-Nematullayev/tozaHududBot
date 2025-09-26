@@ -25,7 +25,6 @@ import { sendWarningLettersByHybrid } from "./scene/adminActions/sendWarningLett
 import { createTargetScene } from "./scene/userScenes/createTarget.js";
 import changePasswordScene from "./scene/adminActions/changePassword.js";
 import { getAbonentCard } from "./scene/userScenes/getAbonentCard.js";
-import { uploadWarningTozamakonScene } from "./scene/adminActions/uploadWarningTozamakon.js";
 import { getWarningLetter } from "./scene/userScenes/getWarningLetter.js";
 import { getAbonentsList } from "./scene/userScenes/getAbonentsList.js";
 import { searchAbonentbyName } from "./scene/userScenes/searchAbonentByName.js";
@@ -56,7 +55,6 @@ const stage = new Scenes.Stage<any>([
   createTargetScene,
   changePasswordScene,
   getAbonentCard,
-  uploadWarningTozamakonScene,
   getWarningLetter,
   getAbonentsList,
   searchAbonentbyName,
