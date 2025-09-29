@@ -57,7 +57,6 @@ if (launchBot) {
 }
 
 connectDb();
-import abonentLists from "./test/abonents.json";
 
 // use routers
 import authRouter from "./routers/auth.route.js";
@@ -80,6 +79,9 @@ import actsRouter from "./routers/actsRouter.js";
 import "test/index.js";
 import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.js";
 import { initJobs } from "intervals/index.js";
+import { Company } from "@models/Company.js";
+import { getUser } from "@services/court/getUser.js";
+import { createCabinetSudApi } from "@api/cabinetSudApi.js";
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);
@@ -103,6 +105,13 @@ app.use(globalErrorHandler);
 process.on("warning", (warning) => {
   console.warn(warning.stack);
 });
+
+(async () => {
+  const cabinetSudApi = createCabinetSudApi(1144);
+  const user = await getUser(cabinetSudApi);
+
+  console.log(user);
+})();
 
 // Schedule jobs
 

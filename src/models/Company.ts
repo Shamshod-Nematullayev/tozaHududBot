@@ -55,6 +55,7 @@ export interface ICompany {
   hybridArea: 41;
   hybridRegion: 3;
   tozamakonGpsAccessToken?: string;
+  cabinetSudToken?: string;
 }
 
 const aktPackSchema = new Schema({
@@ -122,6 +123,7 @@ const schema = new Schema<ICompany>(
     tozamakonGpsLogin: String,
     tozamakonGpsPassword: String,
     tozamakonGpsAccessToken: String,
+    cabinetSudToken: String,
     type: {
       type: String,
       enum: ["dxsh", "ekopay"],

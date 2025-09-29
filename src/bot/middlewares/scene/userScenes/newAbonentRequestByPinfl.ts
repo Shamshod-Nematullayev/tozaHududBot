@@ -38,6 +38,7 @@ import {
 } from "@services/billing/index.js";
 import { getStreetsByMahallaId } from "@services/billing/getStreetsByMahallaId.js";
 import { getElectricResidentDetails } from "@services/payme.js";
+import { ErrorTypes } from "@bot/utils/errorHandler.js";
 // import { MyContext } from "types/botContext";
 // 1. Lokal state tipi
 // 1. State tipi
@@ -251,7 +252,8 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   },
   async (ctx) => {
     try {
-      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery))
+        throw ErrorTypes.BAD_REQUEST;
       const data = ctx.callbackQuery.data.split("_");
       if (data[0] !== "cadastr") {
         throw "400 bad request. Cadastr raqami tanlanmadi";
@@ -271,7 +273,8 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   async (ctx) => {
     try {
       // mahallani o'zgaruvchiga saqlash
-      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery))
+        throw ErrorTypes.BAD_REQUEST;
       const [key, mahallaId] = ctx.callbackQuery.data.split("_");
       if (key !== "mahalla") {
         throw "status: 400 mahalla tanlanmadi";
@@ -316,7 +319,8 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   async (ctx) => {
     try {
       //ko'cha yoki qishloqni statega olish
-      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery))
+        throw ErrorTypes.BAD_REQUEST;
       const [key, streetId] = ctx.callbackQuery.data.split("_");
       if (key !== "street") {
         throw "400 bad request";
@@ -343,7 +347,8 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   async (ctx) => {
     try {
       // yashovchi sonini o'zgaruvchiga saqlash
-      if (!ctx.message || !("text" in ctx.message)) return;
+      if (!ctx.message || !("text" in ctx.message))
+        throw ErrorTypes.BAD_REQUEST;
       if (!ctx.message)
         return ctx.reply(
           "Yashovchi sonini tanlang yoki kiriting",
@@ -392,7 +397,8 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   },
   async (ctx) => {
     try {
-      if (!ctx.message || !("text" in ctx.message)) return;
+      if (!ctx.message || !("text" in ctx.message))
+        throw ErrorTypes.BAD_REQUEST;
       if (isNaN(Number(ctx.message.text))) {
         ctx.reply(
           "Error: ETK kod to'g'ri kiritilmadi",
@@ -483,7 +489,8 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   async (ctx) => {
     try {
       // caotolar ichidan tanlash
-      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery))
+        throw ErrorTypes.BAD_REQUEST;
       const caoto = ctx.callbackQuery.data;
       const etk_abonent = ctx.wizard.state.findedETKAbonents?.find(
         (abonent) => abonent.caotoNumber == caoto
@@ -511,7 +518,8 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   },
   async (ctx) => {
     try {
-      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery))
+        throw ErrorTypes.BAD_REQUEST;
       if (ctx.callbackQuery.data === "yes") {
         await ctx.replyWithHTML(
           `
@@ -542,7 +550,8 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
   },
   async (ctx) => {
     try {
-      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
+      if (!ctx.callbackQuery || !("data" in ctx.callbackQuery))
+        throw ErrorTypes.BAD_REQUEST;
       if (ctx.callbackQuery.data === "yes") {
         const etk_abonent = ctx.wizard.state.etk_abonent;
         await NewAbonent.create({
