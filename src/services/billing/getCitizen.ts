@@ -17,6 +17,7 @@ export async function getCitizen(
     passport?: string;
     birthdate?: string;
     pinfl?: string;
+    photoStatus?: "WITH_PHOTO" | "WITHOUT_PHOTO";
   }
 ): Promise<Citizen> {
   return (

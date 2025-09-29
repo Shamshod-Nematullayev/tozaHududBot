@@ -24,6 +24,8 @@ import { getAbonentById } from "@services/billing/getAbonentById.js";
 import { WizardWithState } from "@bot/helpers/WizardWithState.js";
 import { isCallbackQueryMessage, isTextMessage } from "../utils/validator.js";
 import { ErrorTypes } from "@bot/utils/errorHandler.js";
+import { getFileAsBuffer } from "@services/billing/getFileAsBufferFromTozamakon.js";
+import { getCitizen } from "@services/billing/getCitizen.js";
 
 interface MyWizardState {
   pinfl?: string;
@@ -158,31 +160,21 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene<Ctx>(
       ) {
         const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId);
         const birthdate = extractBirthDateString(ctx.message.text);
-        const citizen = (
-          await tozaMakonApi.get("/user-service/citizens", {
-            params: {
-              pinfl: ctx.message.text,
-              birthdate,
-            },
-          })
-        ).data;
+        const citizen = await getCitizen(tozaMakonApi, {
+          pinfl: ctx.message.text,
+          birthdate,
+          photoStatus: "WITH_PHOTO",
+        });
         if (citizen) {
           customDates.success = true;
           customDates.last_name = citizen.lastName;
           customDates.first_name = citizen.firstName;
           customDates.middle_name = citizen.patronymic;
           customDates.birth_date = citizen.birthDate;
-          customDates.isFromTozaMakon = true;
           customDates.passport_serial = citizen.passport.slice(0, 2);
           customDates.passport_number = citizen.passport.slice(2);
-          customDates.photo = (
-            await tozaMakonApi.get("/file-service/buckets/download", {
-              params: {
-                file: citizen.photo,
-              },
-              responseType: "arraybuffer",
-            })
-          ).data;
+
+          customDates.photo = citizen.photo;
         }
       } else {
         return ctx.reply(customDates.message, keyboards.cancelBtn.resize());
