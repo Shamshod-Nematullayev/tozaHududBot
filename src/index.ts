@@ -82,6 +82,10 @@ import { initJobs } from "intervals/index.js";
 import { Company } from "@models/Company.js";
 import { getUser } from "@services/court/getUser.js";
 import { createCabinetSudApi } from "@api/cabinetSudApi.js";
+import {
+  getFirstNonMaterialCases,
+  sudIshTartibi,
+} from "@services/court/getFirstNonMaterialCases.js";
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);
@@ -108,9 +112,12 @@ process.on("warning", (warning) => {
 
 (async () => {
   const cabinetSudApi = createCabinetSudApi(1144);
-  const user = await getUser(cabinetSudApi);
+  const cases = await getFirstNonMaterialCases(cabinetSudApi, {
+    claim_kind: sudIshTartibi.buyruq,
+    case_number: "2-1402-2406/1059",
+  });
 
-  console.log(user);
+  console.log(cases);
 })();
 
 // Schedule jobs

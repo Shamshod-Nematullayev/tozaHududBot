@@ -1,12 +1,40 @@
 import { Axios } from "axios";
 
+export enum sudIshTartibi {
+  davo = "SUIT",
+  davoSoddalashtirilgan = "SIMPLIFIED",
+  buyruq = "DECREE",
+  hakamlikSudiningHalQilovchiQarorigaDoir = "ARBITRAGE",
+  alohidaTartibda = "SEPARATE",
+}
+
+export enum sudIshNatijasi {
+  qanoatlantirilgan = "FULFILLED",
+  qismanQanoatlantirilgan = "PARTIALLY_FULFILLED",
+  qanoatlantirilmagan = "REFUSED",
+  korilmayQolgan = "UNCONSIDERED",
+  tugatilgan = "CASE_ENDED",
+  ruyxatgaOlishRadEtilgan = "REGISTRATION_DECLINED",
+  boshqaSudgaYuborilgan = "SENT_TO_OTHER_COURT",
+  tergovgaQaratilgan = "RETURNED_TO_INVESTIGATION",
+  boshqaIshgaBiriktirilgan = "JOINED_TO_OTHER_CASE",
+  radEtilgan = "REJECTED",
+  qaytarilgan = "RETURNED",
+}
+
 interface Params {
-  size: number;
-  page: number;
-  withCreated: boolean;
-  participantType: "owner";
+  claim_kind: sudIshTartibi;
+  size?: number;
+  page?: number;
+  withCreated?: boolean;
+  participantType?: "owner";
   case_number?: string;
-  claim_kind?: "SIMPLIFIED" | "DECREE";
+  status?: "all" | "registered" | "in_process" | "finished";
+  startDate?: string; // YYYY-MM-DD
+  endDate?: string; // YYYY-MM-DD
+  hearing_date_start?: string; // YYYY-MM-DD
+  hearing_date_end?: string; // YYYY-MM-DD
+  case_result?: sudIshNatijasi;
 }
 
 interface Response {
@@ -51,9 +79,25 @@ interface Response {
 
 export async function getFirstNonMaterialCases(
   cabinetSudApi: Axios,
-  params: Params
+  {
+    size = 0,
+    page = 10,
+    withCreated = true,
+    participantType = "owner",
+    case_number,
+    claim_kind,
+  }: Params
 ): Promise<Response> {
   return (
-    await cabinetSudApi.get("/cabinet/cases/first-non-material", { params })
+    await cabinetSudApi.get("/cabinet/case/civil/first-non-material-cases", {
+      params: {
+        size,
+        page,
+        withCreated,
+        participantType,
+        case_number,
+        claim_kind,
+      },
+    })
   ).data;
 }
