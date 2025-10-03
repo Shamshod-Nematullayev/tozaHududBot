@@ -10,100 +10,90 @@ import { NextFunction, Request, Response, Router } from "express";
 const router = Router();
 
 // POST login to admin account
-router.post(
-  "/login",
-  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    try {
-      const { login, password } = req.body;
-      const admin: any = await Admin.findOne({
-        login,
-      });
-      if (!admin) {
-        return res.json({ ok: false, message: "Login yoki parol mos kelmadi" });
-      }
-      const validPassword = await bcrypt.compare(
-        password,
-        admin.password || ""
-      );
-      if (!validPassword) {
-        return res.json({
-          ok: false,
-          message: "Login yoki parol mos kelmadi",
-        });
-      }
-      const accessToken = jwt.sign(
-        {
-          id: admin.id,
-          login: admin.login,
-          companyId: admin.companyId,
-          fullName: admin.fullName,
-          role: admin.roles, // hali rollar berilmagan
-        },
-        process.env.SECRET_JWT_KEY as string,
-        { expiresIn: "1h" }
-      );
-      const refreshToken = jwt.sign(
-        {
-          id: admin.id,
-          login: admin.login,
-          companyId: admin.companyId,
-          fullName: admin.fullName,
-          role: admin.roles,
-        },
-        process.env.REFRESH_JWT_KEY as string,
-        { expiresIn: "12h" }
-      );
-      await admin
-        .updateOne({
-          $set: {
-            refreshToken: refreshToken,
-          },
-        })
-        .lean();
-
-      const company = await Company.findOne({
-        id: admin.companyId,
-        activeExpiresDate: { $gt: new Date() },
-      });
-      if (!company) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Dastur faoliyati vaqtincha cheklangan. \nIltimos, xizmatlardan foydalanishni davom ettirish uchun to‘lovni amalga oshiring.",
-        });
-      }
-      delete admin.password;
-      delete admin.refreshToken;
-      res.status(200).json({
-        ok: true,
-        accessToken,
-        refreshToken,
-        telegram_id: admin.user_id,
-        fullName: admin.fullName,
-        photo: { data: null },
-        abonentsPrefix: company?.abonentsPrefix,
-        user: {
-          login: admin.login,
-          fullName: admin.fullName,
-          pnfl: admin.pnfl,
-          companyId: admin.companyId,
-          roles: admin.roles,
-        },
-        company: {
-          id: company?.id,
-          name: company?.name,
-          locationName: company?.locationName,
-          phone: company?.phone,
-          managerName: company?.manager?.fullName,
-          billingAdminName: company?.billingAdmin?.fullName,
-          gpsOperatorName: company?.gpsOperator?.fullName,
-        },
-      });
-    } catch (ex) {
-      next(ex);
-    }
+router.post("/login", async (req: Request, res: Response): Promise<any> => {
+  const { login, password } = req.body;
+  const admin: any = await Admin.findOne({
+    login,
+  });
+  if (!admin) {
+    return res.json({ ok: false, message: "Login yoki parol mos kelmadi" });
   }
-);
+  const validPassword = await bcrypt.compare(password, admin.password || "");
+  if (!validPassword) {
+    return res.json({
+      ok: false,
+      message: "Login yoki parol mos kelmadi",
+    });
+  }
+  const accessToken = jwt.sign(
+    {
+      id: admin.id,
+      login: admin.login,
+      companyId: admin.companyId,
+      fullName: admin.fullName,
+      role: admin.roles, // hali rollar berilmagan
+    },
+    process.env.SECRET_JWT_KEY as string,
+    { expiresIn: "1h" }
+  );
+  const refreshToken = jwt.sign(
+    {
+      id: admin.id,
+      login: admin.login,
+      companyId: admin.companyId,
+      fullName: admin.fullName,
+      role: admin.roles,
+    },
+    process.env.REFRESH_JWT_KEY as string,
+    { expiresIn: "12h" }
+  );
+  await admin
+    .updateOne({
+      $set: {
+        refreshToken: refreshToken,
+      },
+    })
+    .lean();
+
+  const company = await Company.findOne({
+    id: admin.companyId,
+    activeExpiresDate: { $gt: new Date() },
+  });
+  if (!company) {
+    return res.status(400).json({
+      ok: false,
+      message:
+        "Dastur faoliyati vaqtincha cheklangan. \nIltimos, xizmatlardan foydalanishni davom ettirish uchun to‘lovni amalga oshiring.",
+    });
+  }
+  delete admin.password;
+  delete admin.refreshToken;
+  res.status(200).json({
+    ok: true,
+    accessToken,
+    refreshToken,
+    telegram_id: admin.user_id,
+    fullName: admin.fullName,
+    photo: { data: null },
+    abonentsPrefix: company?.abonentsPrefix,
+    user: {
+      login: admin.login,
+      fullName: admin.fullName,
+      pnfl: admin.pnfl,
+      companyId: admin.companyId,
+      roles: admin.roles,
+    },
+    company: {
+      id: company?.id,
+      name: company?.name,
+      locationName: company?.locationName,
+      phone: company?.phone,
+      managerName: company?.manager?.fullName,
+      billingAdminName: company?.billingAdmin?.fullName,
+      gpsOperatorName: company?.gpsOperator?.fullName,
+    },
+  });
+});
 router.post(
   "/refresh-token",
   async (req: Request, res: Response): Promise<any> => {
