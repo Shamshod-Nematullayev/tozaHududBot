@@ -50,7 +50,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
     await admin.updateOne({ $set: { refreshToken } });
 
     const company = await Company.findOne({
-      _id: admin.companyId, // ✅ id o‘rniga _id
+      id: admin.companyId, // ✅ id o‘rniga _id
       activeExpiresDate: { $gt: new Date() },
     });
 

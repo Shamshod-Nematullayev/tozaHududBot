@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
   cors({
-    origin: true,
+    origin: "*",
     credentials: true,
   })
 );
@@ -79,8 +79,6 @@ import actsRouter from "./routers/actsRouter.js";
 import "test/index.js";
 import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.js";
 import { initJobs } from "intervals/index.js";
-import { Company } from "@models/Company.js";
-import { getUser } from "@services/court/getUser.js";
 import { createCabinetSudApi } from "@api/cabinetSudApi.js";
 import {
   getFirstNonMaterialCases,
@@ -109,16 +107,6 @@ app.use(globalErrorHandler);
 process.on("warning", (warning) => {
   console.warn(warning.stack);
 });
-
-(async () => {
-  const cabinetSudApi = createCabinetSudApi(1144);
-  const cases = await getFirstNonMaterialCases(cabinetSudApi, {
-    claim_kind: sudIshTartibi.buyruq,
-    case_number: "2-1402-2406/1059",
-  });
-
-  console.log(cases);
-})();
 
 // Schedule jobs
 
