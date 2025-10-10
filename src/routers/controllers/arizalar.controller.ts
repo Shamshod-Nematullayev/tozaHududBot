@@ -432,10 +432,10 @@ export const addImageToAriza = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  const { ariza_id } = z.parse(z.object({ ariza_id: z.string() }), req.params);
+  const { id } = z.parse(z.object({ id: z.string() }), req.params);
   const { file_id } = z.parse(z.object({ file_id: z.string() }), req.body);
   const ariza = await Ariza.findOne({
-    _id: ariza_id,
+    _id: id,
     companyId: req.user.companyId,
   });
   if (!ariza) {

@@ -110,15 +110,15 @@ process.on("warning", (warning) => {
   console.warn(warning.stack);
 });
 
-(async () => {
-  const cabinetSudApi = createCabinetSudApi(1144);
-  const cases = await getFirstNonMaterialCases(cabinetSudApi, {
-    claim_kind: sudIshTartibi.buyruq,
-    case_number: "2-1402-2406/1059",
-  });
+// (async () => {
+//   const cabinetSudApi = createCabinetSudApi(1144);
+//   const cases = await getFirstNonMaterialCases(cabinetSudApi, {
+//     claim_kind: sudIshTartibi.buyruq,
+//     case_number: "2-1402-2406/1059",
+//   });
 
-  console.log(cases);
-})();
+//   console.log(cases);
+// })();
 
 // Schedule jobs
 
