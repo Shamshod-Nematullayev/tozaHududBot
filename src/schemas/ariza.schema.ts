@@ -99,7 +99,13 @@ export const cancelArizaByIdSchema = z.object({
 
 export const changeArizaActBodySchema = z.object({
   allAmount: z.coerce.number(),
-  inhabitantCount: z.coerce.number().nullable(),
+  inhabitantCount: z.preprocess((val) => {
+    // Agar qiymat bo‘sh string, null yoki undefined bo‘lsa, null qaytar
+    if (val === "" || val === null || val === undefined) return null;
+    const num = Number(val);
+    // Agar raqamga aylantirib bo‘lmasa (NaN bo‘lsa), null qaytar
+    return isNaN(num) ? null : num;
+  }, z.number().nullable()),
   amountWithQQS: z.coerce.number(),
   amountWithoutQQS: z.coerce.number(),
   description: z.string(),
