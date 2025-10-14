@@ -5,16 +5,11 @@ import { ICustomDataRequestDoc } from "@models/CustomDataRequest.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import {
   getCitizen,
-  identificationAbonent,
   updateAbonentDetails,
   searchAbonent,
-  getResidentHousesByPnfl,
 } from "@services/billing/index.js";
 import { Context } from "telegraf";
 import { tryDeleteOrEditMessage } from "./tryDeleteOrEditMessage.js";
-import { Axios, AxiosError } from "axios";
-import { parseError } from "./parseErrorMessage.js";
-import { tryIdentifiedOrReject } from "./tryIdentifiedOrReject.js";
 import { tryToIdentify } from "@services/billing/tryToIdentify.js";
 import { formatDate } from "@services/utils/formatDate.js";
 

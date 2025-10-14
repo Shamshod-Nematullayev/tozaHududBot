@@ -1,7 +1,7 @@
 import { Axios } from "axios";
 import { Balance, Citizen, House } from "types/billing";
 
-interface Abonent {
+export interface Abonent {
   balance: Balance;
   isFrozen: boolean;
   courtWarningIndicator: string | null;

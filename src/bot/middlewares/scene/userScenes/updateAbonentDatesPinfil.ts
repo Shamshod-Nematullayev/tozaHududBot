@@ -19,7 +19,10 @@ import { Nazoratchi } from "@models/Nazoratchi.js";
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 import { extractBirthDateString } from "../../../../helpers/extractBirthDateFromPinfl.js";
-import { getAbonentById } from "@services/billing/getAbonentById.js";
+import {
+  Abonent as IAbonent,
+  getAbonentById,
+} from "@services/billing/getAbonentById.js";
 
 import { WizardWithState } from "@bot/helpers/WizardWithState.js";
 import { isCallbackQueryMessage, isTextMessage } from "../utils/validator.js";
@@ -35,6 +38,7 @@ interface MyWizardState {
   companyId?: number;
   abonent?: IAbonentDoc;
   customDates?: any;
+  abonentOnBilling?: IAbonent;
 }
 
 type Ctx = WizardWithState<MyWizardState>;
@@ -103,6 +107,8 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene<Ctx>(
       }
       abonent.pinfl = Number(abonentOnBilling.citizen.pnfl);
       ctx.wizard.state.abonent = abonent;
+      ctx.wizard.state.abonentOnBilling = abonentOnBilling;
+      // agar abonentning shaxsi tasdiqlangan bo'lsa ogohlantirish
       if (abonent.shaxsi_tasdiqlandi && abonent.shaxsi_tasdiqlandi.confirm) {
         ctx.reply(
           `Ushbu abonent ${
@@ -239,7 +245,7 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene<Ctx>(
         const buffer = customDates.isFromTozaMakon
           ? customDates.photo
           : Buffer.from(customDates.photo, "base64");
-        let text = `KOD: ${ctx.wizard.state.abonent?.licshet}\nPasport: ${customDates.last_name} ${customDates.first_name} ${customDates.middle_name} ${customDates.birth_date}\nBilling: ${ctx.wizard.state.abonent?.fio}\nInspector: <a href="https://t.me/${ctx.from?.username}">${ctx.from?.first_name}</a>`;
+        let text = `KOD: ${ctx.wizard.state.abonent?.licshet}\nPasport: ${customDates.last_name} ${customDates.first_name} ${customDates.middle_name} ${customDates.birth_date}\nBilling: ${ctx.wizard.state.abonent?.fio}\nInspector: <a href="https://t.me/${ctx.from?.username}">${ctx.from?.first_name}</a> \n🔌KOD: ${ctx.wizard.state.abonentOnBilling?.electricityAccountNumber}`;
         if (ctx.wizard.state.reUpdating)
           text =
             "‼️<b>DIQQAT</b>‼️\nUshbu abonent ikkinchi marta shaxsi tasdiqlanmoqda\n" +
