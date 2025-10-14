@@ -22,6 +22,7 @@ interface IRow {
   ekopaySumma: number;
   count: number;
   allSumma: number;
+  allCount: number;
 }
 
 /**
@@ -64,6 +65,7 @@ export async function mahallaTushumlarNazoratchiKesimida({
           ekopaySumma: 0,
           count: 0,
           allSumma: 0,
+          allCount: 0,
         },
       },
     ]);
@@ -87,6 +89,8 @@ export async function mahallaTushumlarNazoratchiKesimida({
         const ekopay = m.partnerTransactions.find((p) => p.partnerId === 7);
         row.ekopaySumma += ekopay?.transactionAmount || 0;
         row.count += ekopay?.transactionCount || 0;
+        row.allSumma += m.totalTransactionAmount || 0;
+        row.allCount += m.totalTransactionCount || 0;
       }
     });
 
@@ -99,8 +103,8 @@ export async function mahallaTushumlarNazoratchiKesimida({
       rows: inspectorMahallaSummary.map((r) => ({
         id: r._id,
         name: r.name,
-        tushumSoni: r.count,
-        summasi: r.ekopaySumma,
+        tushumSoni: r._id === 10000 ? r.allCount : r.count,
+        summasi: r._id === 10000 ? r.allSumma : r.ekopaySumma, // Ozoda opa uchun istisno
       })),
       jamiTushumSoni: inspectorMahallaSummary.reduce((a, b) => a + b.count, 0),
       jamiTushumSummasi: inspectorMahallaSummary.reduce(
@@ -113,6 +117,7 @@ export async function mahallaTushumlarNazoratchiKesimida({
     const msg = await sendHtmlAsPhoto(
       { htmlString, selector: "div" },
       company.GROUP_ID_NAZORATCHILAR,
+      // process.env.ME as string,
       {
         parse_mode: "HTML",
       }
