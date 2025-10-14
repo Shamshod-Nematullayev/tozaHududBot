@@ -13,6 +13,7 @@ import puppeter from "puppeteer";
 import isCancel from "../../smallFunctions/isCancel.js";
 import { isTextMessage } from "../utils/validator.js";
 import { MyContext } from "types/botContext.js";
+import { createPdfFromHtml } from "@helpers/createPdfFromHtml.js";
 
 export const getAbonentCard = new WizardScene(
   "getAbonentCard",
@@ -64,36 +65,17 @@ export const getAbonentCard = new WizardScene(
           }
         );
       })) as string;
-      let optionsByOs = {};
-      if (os.platform() === "win32") {
-        optionsByOs = {
-          args: [],
-          executablePath:
-            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-        };
-      } else {
-        optionsByOs = {
-          args: ["--no-sandbox", "--disable-setuid-sandbox"],
-          userDataDir: path.join(os.tmpdir(), "puppeteer"),
-          executablePath: "/usr/bin/chromium-browser",
-        };
-      }
-      const browser = await puppeter.launch({
-        headless: true,
-        ...optionsByOs,
+
+      const buffer = await createPdfFromHtml(html, {
+        bottom: "5mm",
+        left: "5mm",
+        right: "5mm",
+        top: "5mm",
       });
-      const page = await browser.newPage();
-      await page.setContent(html, { waitUntil: "networkidle0" });
-      const buffer = await page.pdf({
-        format: "A4",
-        printBackground: true,
-      });
-      await page.close();
-      await browser.close();
 
       await ctx.replyWithDocument({
         source: Buffer.from(buffer),
-        filename: ctx.message.text + ".pdf",
+        filename: `${abonent.fio}.pdf`,
       });
 
       ctx.scene.leave();

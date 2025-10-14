@@ -181,7 +181,11 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
       });
     } else {
       let imgs: InputMediaPhoto[] = [];
-      const chunks = chunkArray(abonents, 50);
+
+      const chunks = chunkArray(
+        abonents.map((a, index) => ({ ...a, index })),
+        50
+      );
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
         const htmlString = await renderHtmlByEjs("abonentsList.ejs", {
@@ -198,7 +202,11 @@ export const getAbonentsList = new Scenes.WizardScene<Ctx>(
         })) as string;
         imgs.push({ media: { source: Buffer.from(img) }, type: "photo" });
       }
-      await ctx.replyWithMediaGroup(imgs);
+      const imgChunks = chunkArray(imgs, 10);
+      for (let i = 0; i < imgChunks.length; i++) {
+        const imgChunk = imgChunks[i];
+        await ctx.replyWithMediaGroup(imgChunk);
+      }
     }
     await ctx.deleteMessage(tempMessageid);
     ctx.reply("Asosiy menyu", keyboards.mainKeyboard);

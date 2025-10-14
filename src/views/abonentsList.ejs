@@ -80,7 +80,7 @@
       <tbody>
         <% for (let i = 0; i < abonents.length; i++) { %>
         <tr class="abonent_rows">
-          <td style="text-align: center;"><%= i + 1 %></td>
+          <td style="text-align: center;"><%= abonents[i].index + 1 %></td>
           <td><%= abonents[i].accountNumber %></td>
           <td><%= (abonents[i].fullName.length < 30 ? abonents[i].fullName : abonents[i].fullName.slice(0, 30) + '..') %></td>
           <td><%= abonents[i].streetName %></td>
