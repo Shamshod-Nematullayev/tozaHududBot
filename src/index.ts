@@ -82,7 +82,7 @@ import { initJobs } from "intervals/index.js";
 import { createActs2 } from "test/create-acts.seed2.js";
 
 import abonents from "./test/abonents.json";
-createActs2(621, abonents);
+// createActs2(621, abonents);
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);
