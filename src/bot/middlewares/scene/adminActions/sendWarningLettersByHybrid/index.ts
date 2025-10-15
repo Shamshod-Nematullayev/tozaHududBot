@@ -14,13 +14,10 @@ import isCancel from "../../../smallFunctions/isCancel.js";
 import ejs from "ejs";
 import path from "path";
 
-import PDFMerger from "pdf-merger-js";
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 
 import { createHybridPochtaApi } from "@api/hybridPochta.js";
 
-import FormData from "form-data";
-import puppeteer from "puppeteer";
 import { WizardWithState } from "@bot/helpers/WizardWithState.js";
 import { validationInputData } from "./validationInputData.js";
 import { isCallbackQueryMessage } from "../../utils/validator.js";
@@ -125,6 +122,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
         await ctx.replyWithDocument(
           {
             source: Buffer.from(await workbook.xlsx.writeBuffer()),
+            filename: "xatoliklar.xlsx",
           },
           {
             caption: "Xatolik aniqlandi. Excel faylni ko'zdan kechiring.",
