@@ -79,11 +79,10 @@ import actsRouter from "./routers/actsRouter.js";
 import "test/index.js";
 import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.js";
 import { initJobs } from "intervals/index.js";
-import { createCabinetSudApi } from "@api/cabinetSudApi.js";
-import {
-  getFirstNonMaterialCases,
-  sudIshTartibi,
-} from "@services/court/getFirstNonMaterialCases.js";
+import { createActs2 } from "test/create-acts.seed2.js";
+
+import abonents from "./test/abonents.json";
+createActs2(621, abonents);
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);

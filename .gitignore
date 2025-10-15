@@ -8,3 +8,5 @@ outputs.log
 main.json
 /tmp
 /dist
+/src/test/files
+src/test/abonents.json
