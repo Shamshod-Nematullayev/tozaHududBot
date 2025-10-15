@@ -12,7 +12,7 @@ import { INazoratchi, Nazoratchi } from "@models/Nazoratchi.js";
 
 import { Mahalla } from "@models/Mahalla.js";
 
-import { NewAbonent } from "@models/NewAbonents.js";
+import { NewAbonent, StatusNewAbonent } from "@models/NewAbonents.js";
 
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 
@@ -554,7 +554,7 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
         throw ErrorTypes.BAD_REQUEST;
       if (ctx.callbackQuery.data === "yes") {
         const etk_abonent = ctx.wizard.state.etk_abonent;
-        await NewAbonent.create({
+        const pendingAbonent = await NewAbonent.create({
           abonent_name: `${ctx.wizard.state.citizen?.lastName} ${ctx.wizard.state.citizen?.firstName} ${ctx.wizard.state.citizen?.patronymic}`,
           nazoratchi_id: ctx.wizard.state.inspector?.id,
           senderId: ctx.from?.id,
@@ -605,6 +605,83 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
 
         ctx.scene.leave();
         await ctx.deleteMessage();
+        setTimeout(async () => {
+          const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId);
+          const generatedAccountNumber = (
+            await tozaMakonApi.get(
+              `/user-service/residents/account-numbers/generate?residentType=INDIVIDUAL&mahallaId=${pendingAbonent.mahallaId}`
+            )
+          ).data;
+          const { data } = await tozaMakonApi.post("/user-service/residents", {
+            accountNumber: generatedAccountNumber,
+            active: true,
+            citizen: pendingAbonent.citizen,
+            companyId: pendingAbonent.companyId,
+            contractDate: null,
+            contractNumber: null,
+            description: `${ctx.wizard.state.inspector?.name} tomonidan yangi abonent ochish uchun ariza qabul qilindi`,
+            electricityAccountNumber: pendingAbonent.etkCustomerCode,
+            electricityCoato: pendingAbonent.etkCaoto,
+            homePhone: null,
+            house: {
+              cadastralNumber: pendingAbonent.cadastr,
+              flatNumber: null,
+              homeIndex: null,
+              homeNumber: 0,
+              inhabitantCnt: pendingAbonent.inhabitant_cnt,
+              temporaryCadastralNumber: null,
+              type: "HOUSE",
+            },
+            isCreditor: false,
+            mahallaId: pendingAbonent.mahallaId,
+            nSaldo: 0,
+            residentType: "INDIVIDUAL",
+            streetId: pendingAbonent.streetId,
+          });
+          await Abonent.create({
+            createdAt: new Date(),
+            fio: pendingAbonent.abonent_name,
+            licshet: generatedAccountNumber,
+            mahallas_id: pendingAbonent.mahallaId,
+            prescribed_cnt: pendingAbonent.inhabitant_cnt,
+            id: data,
+            kadastr_number: pendingAbonent.cadastr,
+            pinfl: pendingAbonent.citizen?.pnfl,
+            mahalla_name: pendingAbonent.mahallaName,
+            passport_number: pendingAbonent.citizen?.passport,
+            streets_id: pendingAbonent.streetId,
+            shaxsi_tasdiqlandi: {
+              confirm: true,
+              inspector: {
+                _id: ctx.wizard.state.inspector?._id,
+                name: ctx.wizard.state.inspector?.name,
+              },
+              inspector_id: ctx.wizard.state.inspector?.id,
+              inspector_name: ctx.wizard.state.inspector?.name,
+              updated_at: new Date(),
+            },
+            ekt_kod_tasdiqlandi: {
+              confirm: true,
+              inspector: {
+                _id: ctx.wizard.state.inspector?._id,
+                name: ctx.wizard.state.inspector?.name,
+              },
+              inspector_id: ctx.wizard.state.inspector?.id,
+              inspector_name: ctx.wizard.state.inspector?.name,
+              updated_at: new Date(),
+            },
+            companyId: pendingAbonent.companyId,
+          });
+          await pendingAbonent.updateOne({
+            status: StatusNewAbonent.APPROVED,
+            accountNumber: generatedAccountNumber,
+          });
+
+          ctx.reply(
+            `Fuqaro: ${pendingAbonent.citizen?.lastName} ${pendingAbonent.citizen?.firstName} ${pendingAbonent.citizen?.patronymic}\nSizning ushbu fuqaroga yangi abonent ochish haqidagi arizangiz qabul qilindi. \n\nSizning yangi abonent raqamingiz: <code>${generatedAccountNumber}</code>`,
+            { parse_mode: "HTML" }
+          );
+        }, 120000);
       } else if (ctx.callbackQuery.data === "no") {
         await ctx.reply(
           "Amaliyot bekor qilindi",

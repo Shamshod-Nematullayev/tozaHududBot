@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 const router = express.Router();
-import ejs from "ejs";
 import { HybridMail } from "@models/HybridMail.js";
 
 import { uploadAsBlob } from "../middlewares/multer.js";
@@ -23,8 +22,7 @@ import {
 import { getHybridMailsQuerySchema } from "@schemas/court.schema.js";
 import { catchAsync } from "./controllers/utils/catchAsync.js";
 import { createHybridPochtaApi } from "@api/hybridPochta.js";
-import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
-import { createPdfFromHtml } from "@helpers/createPdfFromHtml.js";
+import { getHybridMailChek } from "@services/hybrydPost/getHybridMailChek.js";
 
 router.get("/", getSudAkts);
 
@@ -126,29 +124,23 @@ router.patch(
 router.put(
   "/hybrid-mails/upload-cash-to-billing/:mail_id",
   catchAsync(async (req: Request, res: Response): Promise<any> => {
-    const row = await HybridMail.findById(req.params.mail_id);
-    if (!row) {
+    const mailData = await HybridMail.findById(req.params.mail_id);
+    if (!mailData) {
       return res.status(400).json({ ok: false, message: "Mail not found" });
     }
     const hybridPochtaApi = createHybridPochtaApi(req.user.companyId);
 
-    const pdf = await hybridPochtaApi.get(`/PdfMail/` + row.hybridMailId, {
+    const pdf = await hybridPochtaApi.get(`/PdfMail/` + mailData.hybridMailId, {
       responseType: "arraybuffer",
     });
     const warningLetterPDF = Buffer.from(pdf.data);
-    const mail = (
-      await hybridPochtaApi.get("/mail", {
-        params: {
-          id: row.hybridMailId,
-        },
-      })
-    ).data;
-
-    const html = await renderHtmlByEjs("hybridPochtaCash.ejs", { mail });
-    const cashPDF = await createPdfFromHtml(html);
+    const chekPDF = await getHybridMailChek(
+      req.user.companyId,
+      mailData.hybridMailId
+    );
     let merger = new PDFMerger();
     await merger.add(warningLetterPDF);
-    await merger.add(cashPDF);
+    await merger.add(chekPDF);
     await merger.setMetadata({
       producer: "oliy ong",
       author: "Shamshod Nematullayev",
@@ -157,12 +149,16 @@ router.put(
     });
     const bufferWarningWithCash = await merger.saveAsBuffer();
     const formData = new FormData();
-    formData.append("file", bufferWarningWithCash, row.hybridMailId + `.pdf`);
+    formData.append(
+      "file",
+      bufferWarningWithCash,
+      mailData.hybridMailId + `.pdf`
+    );
     // billingdan sudAktini topish
     const tozaMakonApi = createTozaMakonApi(req.user.companyId);
     const courtWarning = (
       await tozaMakonApi.get(
-        `/user-service/court-warnings?accountNumber=${row.licshet}&status=NEW`
+        `/user-service/court-warnings?accountNumber=${mailData.licshet}&status=NEW`
       )
     ).data.content[0];
     if (!courtWarning) {
@@ -188,7 +184,7 @@ router.put(
       }
     );
 
-    const content = await row.updateOne(
+    const content = await mailData.updateOne(
       {
         $set: {
           isSavedBilling: true,

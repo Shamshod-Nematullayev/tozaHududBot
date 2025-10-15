@@ -5,6 +5,7 @@ import { errorHandler } from "@bot/utils/errorHandler.js";
 import { session } from "@bot/middlewares/session.js";
 import scenes from "@bot/middlewares/scenes.js";
 import middlewares from "@bot/middlewares/index.js";
+import { createHybridPochtaApi } from "@api/hybridPochta.js";
 
 // BOT o'zgaruvchisi
 const TOKEN = process.env.TOKEN as string;

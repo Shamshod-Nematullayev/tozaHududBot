@@ -11,6 +11,7 @@ export interface INazoratchi {
   shaxs_tasdiqlash_ball: number;
   companyId: number;
   isXatlovchi: boolean;
+  _id?: string;
 }
 
 const schema = new Schema<INazoratchi>({
