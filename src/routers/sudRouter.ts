@@ -1,14 +1,7 @@
-import express, { Request, Response } from "express";
+import express from "express";
 const router = express.Router();
-import ejs from "ejs";
-import { HybridMail } from "@models/HybridMail.js";
-
 import { uploadAsBlob } from "../middlewares/multer.js";
 
-import PDFMerger from "pdf-merger-js";
-import { createTozaMakonApi } from "../api/tozaMakon.js";
-
-import FormData from "form-data";
 import {
   getSudAkts,
   getCourtCaseBySudAktId,
@@ -19,12 +12,14 @@ import {
   uploadSudArizaFile,
   getDebitorAbonents,
   getDebitorAbonentsExcel,
+  updateHybridMailsStatus,
+  getHybridMails,
+  uploadCashToBilling,
+  getOneHybridMailFromDb,
+  updateMailWarningAmount,
+  updateMailStatus,
 } from "./controllers/sud.controller.js";
-import { getHybridMailsQuerySchema } from "@schemas/court.schema.js";
 import { catchAsync } from "./controllers/utils/catchAsync.js";
-import { createHybridPochtaApi } from "@api/hybridPochta.js";
-import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
-import { createPdfFromHtml } from "@helpers/createPdfFromHtml.js";
 
 router.get("/", getSudAkts);
 
@@ -44,182 +39,20 @@ router.post(
   uploadSudArizaFile
 );
 
-router.get(
-  "/hybrid-mails",
-  catchAsync(async (req: Request, res: Response): Promise<any> => {
-    let {
-      page = 1,
-      limit = 10,
-      sortField = "createdOn",
-      sortDirection = "asc",
-      fromDate,
-      toDate,
-      ...filters
-    } = getHybridMailsQuerySchema.parse(req.query);
+router.get("/hybrid-mails", catchAsync(getHybridMails));
 
-    const sortOptions: any = {};
-    sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
-    const skip = (page - 1) * limit;
-
-    const startDate = new Date(fromDate.getFullYear(), fromDate.getMonth(), 1); // JavaScript oylari 0-indeksli
-    const endDate = new Date(
-      toDate.getFullYear(),
-      toDate.getMonth() + 1,
-      0,
-      23,
-      59,
-      59,
-      999
-    ); // Oy oxiri
-
-    // ma'lumotlarni olish
-    const mails = await HybridMail.find({
-      createdOn: {
-        $gt: startDate,
-        $lt: endDate,
-      },
-      ...filters,
-    })
-      .limit(limit)
-      .skip(skip)
-      .sort(sortOptions);
-    console.log(filters);
-    const total = await HybridMail.countDocuments({
-      createdOn: {
-        $gte: startDate,
-        $lte: endDate,
-      },
-      ...filters,
-    });
-    res.json({
-      ok: true,
-      rows: mails,
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    });
-  })
-);
-
-router.get(
-  "/hybrid-mails/:mail_id",
-  catchAsync(async (req: Request, res: Response): Promise<any> => {
-    const mail = await HybridMail.findById(req.params.mail_id);
-    if (!mail)
-      return res.status(400).json({ ok: false, message: "Mail not found" });
-    res.json({ ok: true, row: mail });
-  })
-);
+router.get("/hybrid-mails/:mail_id", catchAsync(getOneHybridMailFromDb));
 // update one mail by id
-router.patch(
-  "/hybrid-mails/:mail_id",
-  catchAsync(async (req: Request, res: Response): Promise<any> => {
-    const mail = await HybridMail.findByIdAndUpdate(req.params.mail_id, {
-      $set: { warning_amount: req.body.warning_amount },
-    });
-    if (!mail) return res.json({ ok: false, message: "Mail not found" });
-    res.json({ ok: true, message: "Yangilandi" });
-  })
-);
+router.patch("/hybrid-mails/:mail_id", catchAsync(updateMailWarningAmount));
 
 router.put(
   "/hybrid-mails/upload-cash-to-billing/:mail_id",
-  catchAsync(async (req: Request, res: Response): Promise<any> => {
-    const row = await HybridMail.findById(req.params.mail_id);
-    if (!row) {
-      return res.status(400).json({ ok: false, message: "Mail not found" });
-    }
-    const hybridPochtaApi = createHybridPochtaApi(req.user.companyId);
-
-    const pdf = await hybridPochtaApi.get(`/PdfMail/` + row.hybridMailId, {
-      responseType: "arraybuffer",
-    });
-    const warningLetterPDF = Buffer.from(pdf.data);
-    const mail = (
-      await hybridPochtaApi.get("/mail", {
-        params: {
-          id: row.hybridMailId,
-        },
-      })
-    ).data;
-
-    const html = await renderHtmlByEjs("hybridPochtaCash.ejs", { mail });
-    const cashPDF = await createPdfFromHtml(html);
-    let merger = new PDFMerger();
-    await merger.add(warningLetterPDF);
-    await merger.add(cashPDF);
-    await merger.setMetadata({
-      producer: "oliy ong",
-      author: "Shamshod Nematullayev",
-      creator: "Toza Hudud bot",
-      title: "Ogohlantirish xati",
-    });
-    const bufferWarningWithCash = await merger.saveAsBuffer();
-    const formData = new FormData();
-    formData.append("file", bufferWarningWithCash, row.hybridMailId + `.pdf`);
-    // billingdan sudAktini topish
-    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
-    const courtWarning = (
-      await tozaMakonApi.get(
-        `/user-service/court-warnings?accountNumber=${row.licshet}&status=NEW`
-      )
-    ).data.content[0];
-    if (!courtWarning) {
-      return res
-        .status(400)
-        .json({ ok: false, message: "Sud akti billingda topilmadi" });
-    }
-
-    const fileUploadBilling = (
-      await tozaMakonApi.post("/file-service/buckets/upload", formData, {
-        params: {
-          folderType: "SUD_PROCESS",
-        },
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-    ).data;
-    await tozaMakonApi.post(
-      "/user-service/court-processes/" + courtWarning.id + "/add-file",
-      {
-        description: `warning letter by hybrid`,
-        fileName: `${fileUploadBilling.fileName}*${fileUploadBilling.fileId}`,
-        fileType: "WARNING_FILE",
-      }
-    );
-
-    const content = await row.updateOne(
-      {
-        $set: {
-          isSavedBilling: true,
-          sud_process_id_billing: courtWarning.id,
-        },
-      },
-      { new: true }
-    );
-    res.status(200).json({ ok: true, content });
-  })
+  catchAsync(uploadCashToBilling)
 );
 
-router.put(
-  "/hybrid-mails/update-mail-status/:mail_id",
-  catchAsync(async (req: Request, res: Response): Promise<any> => {
-    const mail = await HybridMail.findById(req.params.mail_id);
-    if (!mail) {
-      return res.status(400).json({ ok: false, message: "Mail not found" });
-    }
-    const hybridPochtaApi = createHybridPochtaApi(req.user.companyId);
-    const hybridMail = (await hybridPochtaApi.get("/mail/" + mail.hybridMailId))
-      .data;
-    const content = await mail.updateOne({
-      $set: {
-        isSent: hybridMail.IsSent && hybridMail.Perform.Type === 0,
-        sentOn: hybridMail.Perform.PerformedOn,
-      },
-    });
-    res.status(200).json({ ok: true, content });
-  })
-);
+router.put("/hybrid-mails-status-from-db", catchAsync(updateHybridMailsStatus));
+
+router.put("/update-mail-status/:mail_id", catchAsync(updateMailStatus));
 
 router.get("/debitor-abonents", getDebitorAbonents);
 
