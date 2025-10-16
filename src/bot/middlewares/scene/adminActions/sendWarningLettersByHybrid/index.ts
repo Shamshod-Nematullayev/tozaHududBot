@@ -23,6 +23,8 @@ import { validationInputData } from "./validationInputData.js";
 import { isCallbackQueryMessage } from "../../utils/validator.js";
 import { ErrorTypes } from "@bot/utils/errorHandler.js";
 import creatingWarningQueue from "./creatingWarningQueue.js";
+import PDFMerger from "pdf-merger-js";
+import { getHybridMailChek } from "@services/hybrydPost/getHybridMailChek.js";
 
 interface Mail {
   hybridMailId: number;
@@ -234,67 +236,49 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
           },
         })
       ).data;
-      const html = (await new Promise(async (resolve, reject) => {
-        ejs.renderFile(
-          path.join(process.cwd(), "src", "views", "hybridPochtaCash.ejs"),
-          { mail },
-          async (err, html) => {
-            if (err) return reject(err);
-            return resolve(html);
-          }
-        );
-      })) as string;
+      const chekPDF = await getHybridMailChek(
+        ctx.wizard.state.admin?.companyId as number,
+        row.hybridMailId
+      );
 
-      //
-      // const browser = await puppeteer.launch({
-      //   headless: true,
-      //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      //   userDataDir: "/tmp/puppeteer",
-      // });
+      const merger = new PDFMerger();
+      await merger.add(buffer);
+      await merger.add(chekPDF);
+      await merger.setMetadata({
+        producer: "oliy ong",
+        author: "Shamshod Nematullayev",
+        creator: "Toza Hudud bot",
+        title: "Ogohlantirish xati",
+      });
+      const bufferWarningWithCash = await merger.saveAsBuffer();
+      const formData = new FormData();
 
-      // const page = await browser.newPage();
-      // await page.setContent(html, { waitUntil: "networkidle0" });
-      // const bufferCash = await page.pdf({
-      //   format: "A4",
-      //   printBackground: true,
-      // });
-      // await page.close();
+      const uint8 = new Uint8Array(bufferWarningWithCash);
+      const blob = new Blob([uint8], { type: "application/pdf" });
+      formData.append("file", blob, row.hybridMailId + `.pdf`);
+      const fileUploadBilling = (
+        await tozaMakonApi.post("/file-service/buckets/upload", formData, {
+          params: {
+            folderType: "SUD_PROCESS",
+          },
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+      ).data;
+      await tozaMakonApi.post(
+        "/user-service/court-processes/" + row.courtWarning_id + "/add-file",
+        {
+          description: `warning letter by hybrid`,
+          fileName: `${fileUploadBilling.fileName}*${fileUploadBilling.fileId}`,
+          fileType: "WARNING_FILE",
+        }
+      );
 
-      // const merger = new PDFMerger();
-      // await merger.add(buffer);
-      // await merger.add(bufferCash);
-      // await merger.setMetadata({
-      //   producer: "oliy ong",
-      //   author: "Shamshod Nematullayev",
-      //   creator: "Toza Hudud bot",
-      //   title: "Ogohlantirish xati",
-      // });
-      // const bufferWarningWithCash = await merger.saveAsBuffer();
-      // const formData = new FormData();
-      // formData.append("file", bufferWarningWithCash, row.hybridMailId + `.pdf`);
-      // const fileUploadBilling = (
-      //   await tozaMakonApi.post("/file-service/buckets/upload", formData, {
-      //     params: {
-      //       folderType: "SUD_PROCESS",
-      //     },
-      //     headers: { "Content-Type": "multipart/form-data" },
-      //   })
-      // ).data;
-      // await tozaMakonApi.post(
-      //   "/user-service/court-processes/" + row.courtWarning_id + "/add-file",
-      //   {
-      //     description: `warning letter by hybrid`,
-      //     fileName: `${fileUploadBilling.fileName}*${fileUploadBilling.fileId}`,
-      //     fileType: "WARNING_FILE",
-      //   }
-      // );
-
-      // await HybridMail.findByIdAndUpdate(row._id, {
-      //   $set: {
-      //     isSavedBilling: true,
-      //     sud_process_id_billing: row.courtWarning_id,
-      //   },
-      // });
+      await HybridMail.findByIdAndUpdate(row._id, {
+        $set: {
+          isSavedBilling: true,
+          sud_process_id_billing: row.courtWarning_id,
+        },
+      });
       await Abonent.findOneAndUpdate(
         {
           licshet: row.licshet,

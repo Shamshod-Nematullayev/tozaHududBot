@@ -20,6 +20,8 @@ import {
   updateMailStatus,
 } from "./controllers/sud.controller.js";
 import { catchAsync } from "./controllers/utils/catchAsync.js";
+import { createHybridPochtaApi } from "@api/hybridPochta.js";
+import { getHybridMailChek } from "@services/hybrydPost/getHybridMailChek.js";
 
 router.get("/", getSudAkts);
 
