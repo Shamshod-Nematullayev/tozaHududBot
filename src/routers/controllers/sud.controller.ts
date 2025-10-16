@@ -18,6 +18,7 @@ import { createTozaMakonApi } from "@api/tozaMakon.js";
 import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
 import { createPdfFromHtml } from "@helpers/createPdfFromHtml.js";
 import PDFMerger from "pdf-merger-js";
+import { getHybridMailChek } from "@services/hybrydPost/getHybridMailChek.js";
 
 export const getSudAkts: Handler = async (req, res) => {
   const {
@@ -604,16 +605,7 @@ export const uploadCashToBilling = async (
     responseType: "arraybuffer",
   });
   const warningLetterPDF = Buffer.from(pdf.data);
-  const mail = (
-    await hybridPochtaApi.get("/mail", {
-      params: {
-        id: row.hybridMailId,
-      },
-    })
-  ).data;
-
-  const html = await renderHtmlByEjs("hybridPochtaCash.ejs", { mail });
-  const cashPDF = await createPdfFromHtml(html);
+  const cashPDF = await getHybridMailChek(req.user.companyId, row.hybridMailId);
   let merger = new PDFMerger();
   await merger.add(warningLetterPDF);
   await merger.add(cashPDF);
@@ -632,7 +624,7 @@ export const uploadCashToBilling = async (
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const courtWarning = (
     await tozaMakonApi.get(
-      `/user-service/court-warnings?accountNumber=${row.licshet}&status=NEW`
+      `/user-service/court-warnings?accountNumber=${row.licshet}&litigationStatus=NEW`
     )
   ).data.content[0];
   if (!courtWarning) {
@@ -658,7 +650,8 @@ export const uploadCashToBilling = async (
     }
   );
 
-  const content = await row.updateOne(
+  const content = await HybridMail.findByIdAndUpdate(
+    row._id,
     {
       $set: {
         isSavedBilling: true,
@@ -668,4 +661,16 @@ export const uploadCashToBilling = async (
     { new: true }
   );
   res.status(200).json({ ok: true, content });
+};
+
+export const getHybridMailChekAndSend = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const cashPDF = await getHybridMailChek(
+    req.user.companyId,
+    req.params.mail_id
+  );
+
+  res.status(200).send(cashPDF);
 };

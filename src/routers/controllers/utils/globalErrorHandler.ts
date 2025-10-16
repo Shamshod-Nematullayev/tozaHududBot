@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 
@@ -12,6 +13,14 @@ export const globalErrorHandler: ErrorRequestHandler = (
       ok: false,
       message: "Invalid request data",
       issues: err.issues,
+    });
+  }
+
+  if (err instanceof AxiosError) {
+    return res.status(400).json({
+      ok: false,
+      message: err.response?.data?.message || "Axios error",
+      issues: err.response?.data,
     });
   }
 

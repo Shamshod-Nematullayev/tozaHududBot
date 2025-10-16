@@ -18,6 +18,7 @@ import {
   getOneHybridMailFromDb,
   updateMailWarningAmount,
   updateMailStatus,
+  getHybridMailChekAndSend,
 } from "./controllers/sud.controller.js";
 import { catchAsync } from "./controllers/utils/catchAsync.js";
 import { createHybridPochtaApi } from "@api/hybridPochta.js";
@@ -59,5 +60,7 @@ router.put("/update-mail-status/:mail_id", catchAsync(updateMailStatus));
 router.get("/debitor-abonents", getDebitorAbonents);
 
 router.get("/debitor-abonents/excel", getDebitorAbonentsExcel);
+
+router.get("/hybrid-mail-check/:mail_id", catchAsync(getHybridMailChekAndSend));
 
 export default router;

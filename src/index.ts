@@ -82,7 +82,9 @@ import { initJobs } from "intervals/index.js";
 import { createActs2 } from "test/create-acts.seed2.js";
 
 import abonents from "./test/abonents.json";
+import { checkPaymentSudAkts } from "intervals/court-service/checkPaymentSudAkts.js";
 // createActs2(621, abonents);
+checkPaymentSudAkts(1144);
 
 app.use("/api/auth", authRouter);
 app.use("/api/statistics", isAuth, statisticsRouter);
