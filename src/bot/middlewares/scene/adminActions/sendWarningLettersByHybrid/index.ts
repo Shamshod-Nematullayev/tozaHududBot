@@ -43,6 +43,7 @@ interface Mail {
   mahallaId: number;
   companyId: number;
   SentOn: Date | null;
+  sud_process_id_billing: string;
 }
 
 interface MyWizardState {
@@ -265,7 +266,9 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
         })
       ).data;
       await tozaMakonApi.post(
-        "/user-service/court-processes/" + row.courtWarning_id + "/add-file",
+        "/user-service/court-processes/" +
+          row.sud_process_id_billing +
+          "/add-file",
         {
           description: `warning letter by hybrid`,
           fileName: `${fileUploadBilling.fileName}*${fileUploadBilling.fileId}`,
@@ -276,7 +279,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
       await HybridMail.findByIdAndUpdate(row._id, {
         $set: {
           isSavedBilling: true,
-          sud_process_id_billing: row.courtWarning_id,
+          sud_process_id_billing: row.sud_process_id_billing,
         },
       });
       await Abonent.findOneAndUpdate(

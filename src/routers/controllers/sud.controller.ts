@@ -672,5 +672,10 @@ export const getHybridMailChekAndSend = async (
     req.params.mail_id
   );
 
-  res.status(200).send(cashPDF);
+  const base64 = Buffer.from(cashPDF, "base64").toString("base64");
+
+  res.status(200).send({
+    ok: true,
+    file: `data:application/pdf;base64,${base64}`,
+  });
 };

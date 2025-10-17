@@ -110,6 +110,15 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene<Ctx>(
       ctx.wizard.state.abonentOnBilling = abonentOnBilling;
       // agar abonentning shaxsi tasdiqlangan bo'lsa ogohlantirish
       if (abonent.shaxsi_tasdiqlandi && abonent.shaxsi_tasdiqlandi.confirm) {
+        if (abonent.companyId === 1144 && inspektor.id !== 17413) {
+          ctx.scene.leave();
+          return ctx.reply(
+            `Ushbu abonent ${
+              abonent.shaxsi_tasdiqlandi.inspector?.name ||
+              abonent.shaxsi_tasdiqlandi.inspector_name
+            } tomonidan allaqachon shaxsi tasdiqlangan!`
+          );
+        }
         ctx.reply(
           `Ushbu abonent ${
             abonent.shaxsi_tasdiqlandi.inspector?.name ||

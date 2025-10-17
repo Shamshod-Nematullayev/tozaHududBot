@@ -61,6 +61,6 @@ router.get("/debitor-abonents", getDebitorAbonents);
 
 router.get("/debitor-abonents/excel", getDebitorAbonentsExcel);
 
-router.get("/hybrid-mail-check/:mail_id", catchAsync(getHybridMailChekAndSend));
+router.get("/hybrid-mail-chek/:mail_id", catchAsync(getHybridMailChekAndSend));
 
 export default router;
