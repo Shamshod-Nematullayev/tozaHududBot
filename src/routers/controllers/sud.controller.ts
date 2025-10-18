@@ -622,11 +622,17 @@ export const uploadCashToBilling = async (
   formData.append("file", blob, row.hybridMailId + `.pdf`);
   // billingdan sudAktini topish
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
-  const courtWarning = (
-    await tozaMakonApi.get(
-      `/user-service/court-warnings?accountNumber=${row.licshet}&litigationStatus=NEW`
-    )
-  ).data.content[0];
+  const courtWarnings = (
+    await tozaMakonApi.get(`/user-service/court-warnings`, {
+      params: {
+        accountNumber: row.licshet,
+      },
+    })
+  ).data.content;
+  const courtWarning = courtWarnings.find(
+    (item: any) =>
+      item.litigationStatus === "DEBT_PAID" || item.litigationStatus === "NEW"
+  );
   if (!courtWarning) {
     return res
       .status(400)
@@ -672,7 +678,7 @@ export const getHybridMailChekAndSend = async (
     req.params.mail_id
   );
 
-  const base64 = Buffer.from(cashPDF, "base64").toString("base64");
+  const base64 = cashPDF.toString("base64");
 
   res.status(200).send({
     ok: true,
