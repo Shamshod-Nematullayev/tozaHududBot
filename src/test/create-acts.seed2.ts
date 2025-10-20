@@ -2,13 +2,10 @@ import { createTozaMakonApi } from "@api/tozaMakon.js";
 import { chunkArray } from "@helpers/chunkArray.js";
 import { calculateAmount } from "@services/billing/calculateAmount.js";
 import { createAct } from "@services/billing/createAct.js";
-import { createActPack } from "@services/billing/createActPack.js";
 import { searchAbonent } from "@services/billing/searchAbonent.js";
 import { uploadFileToTozaMakon } from "@services/billing/uploadFileToTozaMakon.js";
-import { formatDate } from "@services/utils/formatDate.js";
 import path from "path";
 import fs from "fs";
-import { packTypes } from "types/billing.js";
 
 export async function createActs2(
   companyId: number,
@@ -21,18 +18,19 @@ export async function createActs2(
   const tozaMakonApi = createTozaMakonApi(621);
   const errors: any[] = [];
 
-  const packId = await createActPack(tozaMakonApi, {
-    companyId: companyId,
-    createdDate: formatDate(new Date()),
-    description: "created by GreenZone service",
-    isActive: true,
-    isSpecialPack: false,
-    name: "Canceling contract acts",
-    packType: packTypes.dvaynik,
-  });
+  // const packId = await createActPack(tozaMakonApi, {
+  //   companyId: companyId,
+  //   createdDate: formatDate(new Date()),
+  //   description: "created by GreenZone service",
+  //   isActive: true,
+  //   isSpecialPack: false,
+  //   name: "Canceling contract acts",
+  //   packType: packTypes.dvaynik,
+  // });
+  const packId = 4454337;
 
   if (packId) {
-    console.log(`   🚀 Act pachka yaratildi: ${packId}`);
+    console.log(`   🚀 Act pachka yaratildi (o'zi bor edi): ${packId}`);
 
     let list = abonentLists.filter((a) => mahallaIds.includes(a.mahallaId));
     const fileIds: any = {};
@@ -48,7 +46,6 @@ export async function createActs2(
     }
 
     const chunks = chunkArray(list, 10);
-    const newChunks = chunks.slice();
     for (let [chunkIndex, chunk] of chunks.entries()) {
       console.log(
         `   ⚡ Chunk ${chunkIndex + 1}/${chunks.length} ishlanmoqda...`

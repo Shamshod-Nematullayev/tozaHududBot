@@ -685,3 +685,10 @@ export const getHybridMailChekAndSend = async (
     file: `data:application/pdf;base64,${base64}`,
   });
 };
+
+// export const createInvoiceForCompany = async (
+//   req: Request,
+//   res: Response
+// ): Promise<any> => {
+//   const
+// };
