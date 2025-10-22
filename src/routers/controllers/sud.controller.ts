@@ -710,10 +710,10 @@ export const createInvoiceForCompany = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  const { invoiceAmount, countInvoice } = z
+  const { invoiceAmount, invoiceCount } = z
     .object({
       invoiceAmount: z.number(),
-      countInvoice: z.number().min(1).max(100),
+      invoiceCount: z.number().min(1).max(100),
     })
     .parse(req.body);
 
@@ -724,23 +724,25 @@ export const createInvoiceForCompany = async (
     return res
       .status(400)
       .json({ ok: false, message: "Court id not set for company" });
+
   if (!company.address)
     return res
       .status(400)
       .json({ ok: false, message: "Address not set for company" });
+
   if (!company.tin)
     return res
       .status(400)
       .json({ ok: false, message: "Tin not set for company" });
 
-  for (let i = 0; i < countInvoice; i++) {
+  for (let i = 0; i < invoiceCount; i++) {
     const invoice = await createInvoice({
       amount: invoiceAmount,
       entityType: "JURIDICAL",
       courtType: "CITIZEN",
       isInFavor: true,
       overdue: 0,
-      payCategoryId: 1,
+      payCategoryId: 3,
       courtId: company.courtId,
       description: "created by GreenZone",
       juridicalEntity: {
@@ -750,10 +752,10 @@ export const createInvoiceForCompany = async (
       },
     });
     await CourtInvoice.create({
-      amount: invoiceAmount,
+      amount: invoiceAmount * 100,
       number: invoice.invoice,
       issued: new Date(invoice.issueDate),
-      mustPayAmount: invoiceAmount,
+      mustPayAmount: invoiceAmount * 100,
       courtId: company.courtId,
       companyId: company.id,
     });

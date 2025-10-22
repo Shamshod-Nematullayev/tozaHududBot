@@ -35,7 +35,7 @@ interface IResponse {
  * @returns {Promise<IResponse>} A promise that resolves to the response data.
  * @example
  * const payload = {
- *     amount: 100000, //100 = 1 so'm
+ *     amount: 100000,
  *     courtId: "1234567890",
  *     courtType: "CITIZEN",
  *     description: "Test invoice",
@@ -52,6 +52,12 @@ interface IResponse {
  * const data = await createInvoice(payload);
  * console.log(data);
  */
+
+const headers = {
+  Accept: "application/json, text/plain, */*",
+  "Content-type": "application/json",
+  referrer: "https://billing.sud.uz/create-receipt",
+};
 export async function createInvoice(
   payload: IPayload = {
     amount: 4120000,
@@ -69,8 +75,22 @@ export async function createInvoice(
     payCategoryId: 3,
   }
 ): Promise<IResponse> {
+  console.log({
+    ...payload,
+    amount: payload.amount * 100,
+  });
   const data = (
-    await axios.post("https://billing.sud.uz/api/invoice/create", payload)
+    await axios.post(
+      "https://billing.sud.uz/api/invoice/create",
+      {
+        ...payload,
+        amount: payload.amount * 100,
+      },
+      {
+        headers,
+        timeout: 10000,
+      }
+    )
   ).data;
   return data;
 }

@@ -22,7 +22,7 @@ export interface ICompany {
   tozamakonGpsPassword: string;
   hybridLogin: string;
   hybridPassword: string;
-  hybridToken?: string;
+  hybridToken: string;
   ekopayLogin: string;
   ekopayPassword: number;
   active: boolean;
@@ -56,9 +56,9 @@ export interface ICompany {
   hybridRegion: 3;
   tozamakonGpsAccessToken?: string;
   cabinetSudToken?: string;
-  courtId?: string;
-  tin?: string;
-  address?: string;
+  courtId: string;
+  tin: string;
+  address: string;
 }
 
 const aktPackSchema = new Schema({
@@ -161,6 +161,8 @@ const schema = new Schema<ICompany>(
     },
     phone: String,
     courtId: String,
+    address: String,
+    tin: String,
   },
   {
     timestamps: true,
