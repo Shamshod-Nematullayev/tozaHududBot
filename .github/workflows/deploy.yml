@@ -1,0 +1,23 @@
+name: Deploy to VPS Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connect and pull from repo
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }} # server IP yoki domain
+          username: ${{ secrets.SERVER_USER }} # foydalanuvchi nomi
+          key: ${{ secrets.SERVER_SSH_KEY }} # private key
+          script: |
+            cd /root/toza-hudud-bot          # repo joylashgan papka
+            git pull origin main           # o‘sha joyda pull qilish
+            yarn run build
+            pm2 restart toza-hudud-bot       # pm2 process nomi
