@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Print SERVER_HOST value
+        run: echo ${{ secrets.SERVER_HOST }} ${{ secrets.SERVER_USER }} ${{ secrets.SERVER_SSH_KEY }}
+
       - name: Connect and pull from repo
         uses: appleboy/ssh-action@v1.0.0
         with:
