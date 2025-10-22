@@ -26,9 +26,9 @@ jobs:
             echo "🌀 Pulling latest code..."
             git pull origin main
             echo "📦 Installing dependencies..."
-            /usr/bin/yarn install --frozen-lockfile
+            yarn install --frozen-lockfile
             echo "🏗️ Building project..."
-            /usr/bin/yarn run build
+            yarn run build
             echo "🚀 Restarting bot..."
             pm2 restart toza-hudud-bot
             echo "✅ Deployment finished successfully!"
