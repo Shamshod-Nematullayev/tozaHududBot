@@ -21,10 +21,10 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script_stop: true # ❗️ agar bitta buyruq xato bersa — workflow to‘xtaydi
           script: |
-            source ~/.bashrc
             cd /root/toza-hudud-bot || exit 1
             echo "🌀 Pulling latest code..."
             git pull origin main
+            command -v yarn >/dev/null 2>&1 || corepack enable
             echo "📦 Installing dependencies..."
             yarn install --frozen-lockfile
             echo "🏗️ Building project..."
