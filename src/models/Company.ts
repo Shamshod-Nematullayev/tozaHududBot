@@ -56,6 +56,9 @@ export interface ICompany {
   hybridRegion: 3;
   tozamakonGpsAccessToken?: string;
   cabinetSudToken?: string;
+  courtId?: string;
+  tin?: string;
+  address?: string;
 }
 
 const aktPackSchema = new Schema({
@@ -157,6 +160,7 @@ const schema = new Schema<ICompany>(
       required: true,
     },
     phone: String,
+    courtId: String,
   },
   {
     timestamps: true,

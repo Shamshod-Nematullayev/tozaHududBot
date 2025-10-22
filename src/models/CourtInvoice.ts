@@ -10,18 +10,21 @@ interface ICourtInvoice {
   issued: Date;
   number: string;
   payer: string;
+  invoiceStatus: "CREATED" | "PAID";
+  overdue: Date;
   companyId: number;
 }
 
 const schema = new Schema<ICourtInvoice>({
   amount: { type: Number, required: true },
-  court: { type: String, required: true },
+  court: { type: String },
   courtId: { type: Number, required: true },
-  forAccount: { type: String, required: true },
+  forAccount: { type: String },
   mustPayAmount: { type: Number, required: true },
   issued: { type: Date, required: true },
   number: { type: String, required: true },
-  payer: { type: String, required: true },
+  payer: { type: String },
+  overdue: { type: Date },
   companyId: { type: Number, required: true },
 });
 

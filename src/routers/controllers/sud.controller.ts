@@ -4,6 +4,7 @@ import { Counter } from "@models/Counter.js";
 import Excel from "exceljs";
 import {
   createManySudArizaBodySchema,
+  getCourtInvoicesQuerySchema,
   getHybridMailsQuerySchema,
   getSudAktsQuerySchema,
 } from "@schemas/court.schema.js";
@@ -19,6 +20,10 @@ import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
 import { createPdfFromHtml } from "@helpers/createPdfFromHtml.js";
 import PDFMerger from "pdf-merger-js";
 import { getHybridMailChek } from "@services/hybrydPost/getHybridMailChek.js";
+import { createInvoice } from "@services/court/createInvoice.js";
+import { Company } from "@models/Company.js";
+import { CourtInvoice } from "@models/CourtInvoice.js";
+import { checkInvoice } from "@services/court/checkInvoice.js";
 
 export const getSudAkts: Handler = async (req, res) => {
   const {
@@ -327,135 +332,122 @@ export const getDebitorAbonents = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  try {
-    const { companyId } = req.user;
-    const { balanceFrom, balanceTo, mahallaId, sudAkt, warning, page, size } =
-      req.query;
+  const { companyId } = req.user;
+  const { balanceFrom, balanceTo, mahallaId, sudAkt, warning, page, size } =
+    req.query;
 
-    const filters: any = { companyId };
-    if (balanceFrom) filters.ksaldo = { $gte: balanceFrom };
-    if (balanceTo) filters.ksaldo = { ...filters.ksaldo, $lte: balanceTo };
-    if (mahallaId) filters.mahallas_id = mahallaId;
-    if (sudAkt) {
-      if (sudAkt === "true") filters["sudAkt.id"] = { $exists: 1 };
-      else if (sudAkt === "false") filters["sudAkt.id"] = { $exists: 0 };
-      else
-        return res.status(400).json({
-          ok: false,
-          message: "sudAkt's value wrong",
-        });
-    }
-    if (warning) {
-      if (warning === "true") filters["warningLetter.id"] = { $exists: 1 };
-      else if (warning === "false")
-        filters["warningLetter.id"] = { $exists: 0 };
-      else
-        return res.status(400).json({
-          ok: false,
-          message: "warning's value wrong",
-        });
-    }
-    const abonents = await Abonent.find(filters);
-    // .skip(size * page)
-    // .limit(size); // typescript xato bergani uchun vaqtincha o'chirib qo'ydim ochish kerak buni
-    const countAbonents = await Abonent.countDocuments(filters);
-
-    res.json({
-      ok: true,
-      rows: abonents,
-      total: countAbonents,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ ok: false, message: "Internal server error 500" });
+  const filters: any = { companyId };
+  if (balanceFrom) filters.ksaldo = { $gte: balanceFrom };
+  if (balanceTo) filters.ksaldo = { ...filters.ksaldo, $lte: balanceTo };
+  if (mahallaId) filters.mahallas_id = mahallaId;
+  if (sudAkt) {
+    if (sudAkt === "true") filters["sudAkt.id"] = { $exists: 1 };
+    else if (sudAkt === "false") filters["sudAkt.id"] = { $exists: 0 };
+    else
+      return res.status(400).json({
+        ok: false,
+        message: "sudAkt's value wrong",
+      });
   }
+  if (warning) {
+    if (warning === "true") filters["warningLetter.id"] = { $exists: 1 };
+    else if (warning === "false") filters["warningLetter.id"] = { $exists: 0 };
+    else
+      return res.status(400).json({
+        ok: false,
+        message: "warning's value wrong",
+      });
+  }
+  const abonents = await Abonent.find(filters);
+  // .skip(size * page)
+  // .limit(size); // typescript xato bergani uchun vaqtincha o'chirib qo'ydim ochish kerak buni
+  const countAbonents = await Abonent.countDocuments(filters);
+
+  res.json({
+    ok: true,
+    rows: abonents,
+    total: countAbonents,
+  });
 };
 
 export const getDebitorAbonentsExcel = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  try {
-    const { companyId } = req.user;
-    const { balanceFrom, balanceTo, mahallaId, sudAkt, warning } = req.query;
+  const { companyId } = req.user;
+  const { balanceFrom, balanceTo, mahallaId, sudAkt, warning } = req.query;
 
-    const filters: any = { companyId };
-    if (balanceFrom)
-      filters.ksaldo = { $gte: parseFloat(balanceFrom as string) };
-    if (balanceTo)
-      filters.ksaldo = {
-        ...filters.ksaldo,
-        $lte: parseFloat(balanceTo as string),
-      };
-    if (mahallaId) filters.mahallas_id = mahallaId;
-    if (sudAkt) {
-      if (sudAkt === "true") filters["sudAkt.id"] = { $exists: 1 };
-      else if (sudAkt === "false") filters["sudAkt.id"] = { $exists: 0 };
-      else
-        return res.status(400).json({
-          ok: false,
-          message: "sudAkt's value wrong",
-        });
-    }
-    if (warning) {
-      if (warning === "true") filters["warningLetter.id"] = { $exists: 1 };
-      else if (warning === "false")
-        filters["warningLetter.id"] = { $exists: 0 };
-      else
-        return res.status(400).json({
-          ok: false,
-          message: "warning's value wrong",
-        });
-    }
-
-    const abonents = await Abonent.find(filters);
-    const workbook = new Excel.Workbook();
-    const worksheet = workbook.addWorksheet("Abonents");
-    worksheet.columns = [
-      { header: "ID", key: "id", width: 15 },
-      { header: "Hisob raqami", key: "licshet", width: 15 },
-      { header: "F.I.O.", key: "fullName", width: 30 },
-      { header: "Mahalla", key: "mahalla", width: 15 },
-      { header: "Qarzdorlik", key: "ksaldo", width: 15 },
-      { header: "Sud Akt id", key: "sudAktId", width: 15 },
-      { header: "Sud Akt sana", key: "sudAktDate", width: 15 },
-      { header: "Ogohlantirish id", key: "warningLetterId", width: 15 },
-      { header: "Ogohlantirish sana", key: "warningLetterDate", width: 15 },
-      { header: "Shaxsi tasdiqlangan", key: "shaxsi_tasdiqlandi", width: 15 },
-    ];
-    abonents.forEach((abonent) => {
-      worksheet.addRow({
-        id: abonent.id,
-        licshet: abonent.licshet,
-        fullName: abonent.fio,
-        mahalla: abonent.mahalla_name,
-        ksaldo: abonent.ksaldo,
-        sudAktId: abonent.sudAkt?.id,
-        sudAktDate: abonent.sudAkt?.createdDate,
-        warningLetterId: abonent.warningLetter?.id,
-        warningLetterDate: abonent.warningLetter?.createdDate,
-        shaxsi_tasdiqlandi: abonent.shaxsi_tasdiqlandi?.confirm ? "✅" : "❌",
+  const filters: any = { companyId };
+  if (balanceFrom) filters.ksaldo = { $gte: parseFloat(balanceFrom as string) };
+  if (balanceTo)
+    filters.ksaldo = {
+      ...filters.ksaldo,
+      $lte: parseFloat(balanceTo as string),
+    };
+  if (mahallaId) filters.mahallas_id = mahallaId;
+  if (sudAkt) {
+    if (sudAkt === "true") filters["sudAkt.id"] = { $exists: 1 };
+    else if (sudAkt === "false") filters["sudAkt.id"] = { $exists: 0 };
+    else
+      return res.status(400).json({
+        ok: false,
+        message: "sudAkt's value wrong",
       });
-    });
-    worksheet.getRow(1).eachCell((cell) => {
-      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FF0070C0" },
-      };
-    });
-    // Export qilish
-    res.setHeader(
-      "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    );
-    res.setHeader("Content-Disposition", "attachment; filename=abonents.xlsx");
-    await workbook.xlsx.write(res);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ ok: false, message: "Internal server error 500" });
   }
+  if (warning) {
+    if (warning === "true") filters["warningLetter.id"] = { $exists: 1 };
+    else if (warning === "false") filters["warningLetter.id"] = { $exists: 0 };
+    else
+      return res.status(400).json({
+        ok: false,
+        message: "warning's value wrong",
+      });
+  }
+
+  const abonents = await Abonent.find(filters);
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet("Abonents");
+  worksheet.columns = [
+    { header: "ID", key: "id", width: 15 },
+    { header: "Hisob raqami", key: "licshet", width: 15 },
+    { header: "F.I.O.", key: "fullName", width: 30 },
+    { header: "Mahalla", key: "mahalla", width: 15 },
+    { header: "Qarzdorlik", key: "ksaldo", width: 15 },
+    { header: "Sud Akt id", key: "sudAktId", width: 15 },
+    { header: "Sud Akt sana", key: "sudAktDate", width: 15 },
+    { header: "Ogohlantirish id", key: "warningLetterId", width: 15 },
+    { header: "Ogohlantirish sana", key: "warningLetterDate", width: 15 },
+    { header: "Shaxsi tasdiqlangan", key: "shaxsi_tasdiqlandi", width: 15 },
+  ];
+  abonents.forEach((abonent) => {
+    worksheet.addRow({
+      id: abonent.id,
+      licshet: abonent.licshet,
+      fullName: abonent.fio,
+      mahalla: abonent.mahalla_name,
+      ksaldo: abonent.ksaldo,
+      sudAktId: abonent.sudAkt?.id,
+      sudAktDate: abonent.sudAkt?.createdDate,
+      warningLetterId: abonent.warningLetter?.id,
+      warningLetterDate: abonent.warningLetter?.createdDate,
+      shaxsi_tasdiqlandi: abonent.shaxsi_tasdiqlandi?.confirm ? "✅" : "❌",
+    });
+  });
+  worksheet.getRow(1).eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF0070C0" },
+    };
+  });
+  // Export qilish
+  res.setHeader(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  res.setHeader("Content-Disposition", "attachment; filename=abonents.xlsx");
+  await workbook.xlsx.write(res);
 };
 
 export const updateHybridMailsStatus = async (
@@ -686,9 +678,113 @@ export const getHybridMailChekAndSend = async (
   });
 };
 
-// export const createInvoiceForCompany = async (
-//   req: Request,
-//   res: Response
-// ): Promise<any> => {
-//   const
-// };
+export const getInvoices = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const { limit, page, sortField, sortDirection, invoiceStatus } =
+    getCourtInvoicesQuerySchema.parse(req.query);
+
+  const skip = (page - 1) * limit;
+
+  const filters: any = {};
+  if (invoiceStatus) filters.status = invoiceStatus;
+
+  const invoices = await CourtInvoice.find({ ...filters })
+    .skip(skip)
+    .limit(limit)
+    .sort({ [sortField]: sortDirection });
+  const totalCount = await CourtInvoice.countDocuments({ ...filters });
+  res.status(200).json({
+    ok: true,
+    invoices,
+    meta: {
+      total: totalCount,
+      page,
+      limit,
+    },
+  });
+};
+
+export const createInvoiceForCompany = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const { invoiceAmount, countInvoice } = z
+    .object({
+      invoiceAmount: z.number(),
+      countInvoice: z.number().min(1).max(100),
+    })
+    .parse(req.body);
+
+  const company = await Company.findOne({ id: req.user.companyId });
+  if (!company)
+    return res.status(400).json({ ok: false, message: "Company not found" });
+  if (!company.courtId)
+    return res
+      .status(400)
+      .json({ ok: false, message: "Court id not set for company" });
+  if (!company.address)
+    return res
+      .status(400)
+      .json({ ok: false, message: "Address not set for company" });
+  if (!company.tin)
+    return res
+      .status(400)
+      .json({ ok: false, message: "Tin not set for company" });
+
+  for (let i = 0; i < countInvoice; i++) {
+    const invoice = await createInvoice({
+      amount: invoiceAmount,
+      entityType: "JURIDICAL",
+      courtType: "CITIZEN",
+      isInFavor: true,
+      overdue: 0,
+      payCategoryId: 1,
+      courtId: company.courtId,
+      description: "created by GreenZone",
+      juridicalEntity: {
+        address: company.address,
+        name: company.name,
+        tin: company.tin,
+      },
+    });
+    await CourtInvoice.create({
+      amount: invoiceAmount,
+      number: invoice.invoice,
+      issued: new Date(invoice.issueDate),
+      mustPayAmount: invoiceAmount,
+      courtId: company.courtId,
+      companyId: company.id,
+    });
+  }
+  res.json({ ok: true, message: "Invoices created" });
+};
+
+export const checkInvoicesStatus = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const { invoiceIds } = z
+    .object({
+      invoiceIds: z.array(z.string()),
+    })
+    .parse(req.body);
+
+  const invoices = await CourtInvoice.find({ _id: { $in: invoiceIds } });
+
+  for (const invoice of invoices) {
+    const response = await checkInvoice({
+      invoice: invoice.number,
+      lang: "name",
+    });
+    invoice.mustPayAmount = response.mustPayAmount;
+    if (response.overdue) invoice.overdue = new Date(response.overdue);
+    invoice.invoiceStatus = response.invoiceStatus;
+    invoice.forAccount = response.forAccount;
+    invoice.court = response.court;
+    invoice.payer = response.payer;
+    await invoice.save();
+  }
+  res.json({ ok: true, invoices });
+};

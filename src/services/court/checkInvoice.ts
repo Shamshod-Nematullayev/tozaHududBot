@@ -18,7 +18,7 @@ interface Response {
   forAccount: string;
   historyList: any[];
   instance: null;
-  invoiceStatus: "CREATED";
+  invoiceStatus: "CREATED" | "PAID";
   isInFavor: boolean;
   issued: number;
   mustPayAmount: number;
@@ -35,6 +35,10 @@ interface Response {
   purposeId: null;
 }
 
-export async function createInvoice(payload: Payload): Promise<Response> {
-  return (await axios.post("/cabinet/invoice", payload)).data;
+export async function checkInvoice(payload: Payload): Promise<Response> {
+  return (
+    await axios.get("https://billing.sud.uz/api/invoice/checkStatus", {
+      params: payload,
+    })
+  ).data;
 }

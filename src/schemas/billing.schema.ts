@@ -35,7 +35,7 @@ export const duplicateActFromRequestBodySchema = z.object({
 export const createDublicateActBodySchema = z.object({
   realAccountNumber: z.string().regex(...accountNumberRegex),
   fakeAccountNumber: z.string().regex(...accountNumberRegex),
-  fakeAccountIncomeAmount: z.coerce.number().gt(0),
+  fakeAccountIncomeAmount: z.coerce.number().min(0),
 });
 
 export const sendAbonentsListToTelegramQuerySchema = z.object({

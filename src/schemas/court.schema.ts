@@ -53,3 +53,24 @@ export const getSudAktsQuerySchema = z.object({
   case_number: z.string().optional(),
   pinfl: z.string().optional(),
 });
+
+export const getCourtInvoicesQuerySchema = z.object({
+  page: z.coerce.number().default(1),
+  limit: z.coerce.number().default(10),
+  sortField: z
+    .enum([
+      "amount",
+      "court",
+      "courtId",
+      "forAccount",
+      "mustPayAmount",
+      "issued",
+      "number",
+      "payer",
+      "invoiceStatus",
+      "overdue",
+    ])
+    .default("issued"),
+  sortDirection: z.enum(["asc", "desc"]).default("desc"),
+  invoiceStatus: z.enum(["CREATED", "PAID"]).optional(),
+});

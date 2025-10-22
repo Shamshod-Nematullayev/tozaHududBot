@@ -19,6 +19,9 @@ import {
   updateMailWarningAmount,
   updateMailStatus,
   getHybridMailChekAndSend,
+  createInvoiceForCompany,
+  checkInvoicesStatus,
+  getInvoices,
 } from "./controllers/sud.controller.js";
 import { catchAsync } from "./controllers/utils/catchAsync.js";
 import { createHybridPochtaApi } from "@api/hybridPochta.js";
@@ -57,10 +60,16 @@ router.put("/hybrid-mails-status-from-db", catchAsync(updateHybridMailsStatus));
 
 router.put("/update-mail-status/:mail_id", catchAsync(updateMailStatus));
 
-router.get("/debitor-abonents", getDebitorAbonents);
+router.get("/debitor-abonents", catchAsync(getDebitorAbonents));
 
-router.get("/debitor-abonents/excel", getDebitorAbonentsExcel);
+router.get("/debitor-abonents/excel", catchAsync(getDebitorAbonentsExcel));
 
 router.get("/hybrid-mail-chek/:mail_id", catchAsync(getHybridMailChekAndSend));
+
+router.get("/court-invoice", catchAsync(getInvoices));
+
+router.post("/court-invoice/create", catchAsync(createInvoiceForCompany));
+
+router.put("/court-invoice/checkStatus", catchAsync(checkInvoicesStatus));
 
 export default router;
