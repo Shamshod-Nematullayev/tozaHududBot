@@ -30,5 +30,6 @@ jobs:
             echo "🏗️ Building project..."
             yarn run build
             echo "🚀 Restarting bot..."
+            command -v pm2 >/dev/null 2>&1 || npm install pm2 -g
             pm2 restart toza-hudud-bot
             echo "✅ Deployment finished successfully!"
