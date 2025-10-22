@@ -10,17 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print SERVER_HOST value
-        run: echo ${{ secrets.SERVER_HOST }} ${{ secrets.SERVER_USER }} ${{ secrets.SERVER_SSH_KEY }}
+      - name: Show which server we deploy to
+        run: echo "Deploying to ${{ secrets.SERVER_HOST }}"
 
-      - name: Connect and pull from repo
+      - name: Deploy to VPS and restart bot
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.SERVER_HOST }} # server IP yoki domain
-          username: ${{ secrets.SERVER_USER }} # foydalanuvchi nomi
-          key: ${{ secrets.SERVER_SSH_KEY }} # private key
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script_stop: true # ❗️ agar bitta buyruq xato bersa — workflow to‘xtaydi
           script: |
-            cd /root/toza-hudud-bot          # repo joylashgan papka
-            git pull origin main           # o‘sha joyda pull qilish
-            yarn run build
-            pm2 restart toza-hudud-bot       # pm2 process nomi
+            cd /root/toza-hudud-bot || exit 1
+            echo "🌀 Pulling latest code..."
+            git fetch origin main
+            git reset --hard origin/main  # ❗️ har safar toza holatni olish uchun
+            echo "📦 Installing dependencies..."
+            yarn install --frozen-lockfile
+            echo "🏗️ Building project..."
+            yarn build
+            echo "🚀 Restarting bot..."
+            pm2 restart toza-hudud-bot || pm2 start dist/index.js --name toza-hudud-bot
+            echo "✅ Deployment finished successfully!"
