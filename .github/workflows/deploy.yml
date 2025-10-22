@@ -23,12 +23,11 @@ jobs:
           script: |
             cd /root/toza-hudud-bot || exit 1
             echo "🌀 Pulling latest code..."
-            git fetch origin main
-            git reset --hard origin/main  # ❗️ har safar toza holatni olish uchun
+            git pull origin main
             echo "📦 Installing dependencies..."
             yarn install --frozen-lockfile
             echo "🏗️ Building project..."
-            yarn build
+            yarn run build
             echo "🚀 Restarting bot..."
             pm2 restart toza-hudud-bot
             echo "✅ Deployment finished successfully!"
