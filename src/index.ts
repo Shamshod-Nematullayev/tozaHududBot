@@ -76,6 +76,7 @@ import newAbonentsRouter from "./routers/newAbonentsRouter.js";
 import yashovchiSoniXatlovRouter from "./routers/yashovchiSoniXatlov.js";
 import reportsRouter from "./routers/reportsRouter.js";
 import actsRouter from "./routers/actsRouter.js";
+import gpsRouter from "./routers/gps.route.js";
 import "test/index.js";
 import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.js";
 import { initJobs } from "intervals/index.js";
@@ -83,6 +84,7 @@ import { createActs2 } from "test/create-acts.seed2.js";
 
 import abonents from "./test/abonents.json";
 import { checkPaymentSudAkts } from "intervals/court-service/checkPaymentSudAkts.js";
+import allowRoles from "@middlewares/allowRoles.js";
 // createActs2(621, abonents);
 // checkPaymentSudAkts(1144);
 
@@ -103,6 +105,7 @@ app.use("/api/pendingNewAbonents", isAuth, newAbonentsRouter);
 app.use("/api/yashovchi-soni-xatlov", isAuth, yashovchiSoniXatlovRouter);
 app.use("/api/reports", isAuth, reportsRouter);
 app.use("/api/acts", isAuth, actsRouter);
+app.use("/api/gps", isAuth, allowRoles(["admin", "gps"]), gpsRouter);
 app.use(globalErrorHandler);
 
 process.on("warning", (warning) => {

@@ -279,3 +279,22 @@ export enum packTypes {
   death = "INVENTORY",
   gps = "INVENTORY",
 }
+
+export interface IAutomobile {
+  active: boolean;
+  automobileNumber: string;
+  automobileNumberAndModel: string;
+  automobileTypeId: number;
+  companyId: number;
+  companyName: string;
+  description: string;
+  districtId: number;
+  driverIds: { fullName: string; id: number }[];
+  id: number;
+  mkub: number;
+  regionId: number;
+  trackerModelId: number;
+  trackerSerialNumber: string | null;
+  trackerSimcardNumber: string | null;
+  wialonId: number;
+}
