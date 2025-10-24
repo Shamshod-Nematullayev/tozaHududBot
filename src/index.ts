@@ -2,14 +2,10 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import isAuth from "./middlewares/isAuth.js";
 import { app, server } from "./config/socketConfig.js";
 import { agenda } from "./config/agenda.js";
 import { connectDb } from "./config/connectDB.js";
 import { bot } from "./bot/core/bot.js";
-import updateAbonentsFromTozamakon from "./intervals/updateAbonentsFromTozamakon.js";
-import { queueNames } from "./constants.js";
-import { LastUpdate } from "./models/LastUpdate.js";
 
 const launchBot = true;
 
@@ -58,55 +54,13 @@ if (launchBot) {
 
 connectDb();
 
-// use routers
-import authRouter from "./routers/auth.route.js";
-import statisticsRouter from "./routers/statisticsRouter.js";
-import notificationRouter from "./routers/notificationRouter.js";
-import sudRouter from "./routers/sudRouter.js";
-import targetsRouter from "./routers/targetsRouter.js";
-import bildirgilarRouter from "./routers/bildirgilarRouter.js";
-import fetchTelegramRouter from "./routers/fetchTelegramRouter.js";
-import aktPachkaRouter from "./routers/aktPachka.js";
-import kiruvchiXujjatlarRouter from "./routers/kiruvchiXujjatlar.js";
-import inspectorsRouter from "./routers/inspectorsRouter.js";
-import abonentsRouter from "./routers/abonentsRouter.js";
-import billingRouter from "./routers/billing.route.js";
-import arizalarRouter from "./routers/arizalar.route.js";
-import newAbonentsRouter from "./routers/newAbonentsRouter.js";
-import yashovchiSoniXatlovRouter from "./routers/yashovchiSoniXatlov.js";
-import reportsRouter from "./routers/reportsRouter.js";
-import actsRouter from "./routers/actsRouter.js";
-import gpsRouter from "./routers/gps.route.js";
 import "test/index.js";
-import { globalErrorHandler } from "routers/controllers/utils/globalErrorHandler.js";
 import { initJobs } from "intervals/index.js";
-import { createActs2 } from "test/create-acts.seed2.js";
-
 import abonents from "./test/abonents.json";
-import { checkPaymentSudAkts } from "intervals/court-service/checkPaymentSudAkts.js";
-import allowRoles from "@middlewares/allowRoles.js";
+import mainRouter from "routers/index.js";
 // createActs2(621, abonents);
-// checkPaymentSudAkts(1144);
 
-app.use("/api/auth", authRouter);
-app.use("/api/statistics", isAuth, statisticsRouter);
-app.use("/api/notification", isAuth, notificationRouter);
-app.use("/api/court-service", isAuth, sudRouter);
-app.use("/api/targets", isAuth, targetsRouter);
-app.use("/api/bildirgilar", isAuth, bildirgilarRouter);
-app.use("/api/fetchTelegram", isAuth, fetchTelegramRouter);
-app.use("/api/pachkalar", isAuth, aktPachkaRouter);
-app.use("/api/documents", isAuth, kiruvchiXujjatlarRouter);
-app.use("/api/inspectors", isAuth, inspectorsRouter);
-app.use("/api/abonents", isAuth, abonentsRouter);
-app.use("/api/billing", isAuth, billingRouter);
-app.use("/api/arizalar", isAuth, arizalarRouter);
-app.use("/api/pendingNewAbonents", isAuth, newAbonentsRouter);
-app.use("/api/yashovchi-soni-xatlov", isAuth, yashovchiSoniXatlovRouter);
-app.use("/api/reports", isAuth, reportsRouter);
-app.use("/api/acts", isAuth, actsRouter);
-app.use("/api/gps", isAuth, allowRoles(["admin", "gps"]), gpsRouter);
-app.use(globalErrorHandler);
+app.use("/api", mainRouter);
 
 process.on("warning", (warning) => {
   console.warn(warning.stack);
