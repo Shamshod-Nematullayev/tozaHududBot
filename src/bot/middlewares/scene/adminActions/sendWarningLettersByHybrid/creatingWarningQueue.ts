@@ -67,6 +67,7 @@ export default async function (
         mahallaId: abonentDetails.mahallaId,
         companyId: ctx.wizard.state.admin?.companyId as number,
         SentOn: newMail.SentOn,
+        sud_process_id_billing: "",
       });
       counter++;
     });

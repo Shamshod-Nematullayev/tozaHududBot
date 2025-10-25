@@ -107,14 +107,14 @@ export const refreshToken = async (
   if (!refreshToken) return res.status(401).json({ message: "Unauthorized" });
 
   const admin = await Admin.findOne({ refreshToken });
-  if (!admin) return res.status(403).json({ message: "Invalid refresh token" });
+  if (!admin) return res.status(401).json({ message: "Invalid refresh token" });
 
   jwt.verify(
     refreshToken,
     process.env.REFRESH_JWT_KEY as string,
     (err: any, decoded: any) => {
       if (err)
-        return res.status(403).json({ message: "Invalid refresh token" });
+        return res.status(401).json({ message: "Invalid refresh token" });
 
       const accessToken = jwt.sign(
         {
