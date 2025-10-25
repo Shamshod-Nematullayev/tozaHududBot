@@ -688,7 +688,7 @@ export const getInvoices = async (
   const skip = (page - 1) * limit;
 
   const filters: any = {};
-  if (invoiceStatus) filters.status = invoiceStatus;
+  if (invoiceStatus) filters.invoiceStatus = invoiceStatus;
 
   const invoices = await CourtInvoice.find({ ...filters })
     .skip(skip)

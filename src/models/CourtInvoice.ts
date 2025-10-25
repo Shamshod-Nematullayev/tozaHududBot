@@ -26,6 +26,7 @@ const schema = new Schema<ICourtInvoice>({
   payer: { type: String },
   overdue: { type: Date },
   companyId: { type: Number, required: true },
+  invoiceStatus: { type: String, required: true },
 });
 
 export const CourtInvoice = model<ICourtInvoice>("court_invoice", schema);
