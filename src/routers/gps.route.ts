@@ -6,7 +6,6 @@ import {
   getGPSDalolatnomalar,
   getOneGPSDalolatnomaById,
 } from "./controllers/gps.controller.js";
-import allowRoles from "@middlewares/allowRoles.js";
 
 const router = Router();
 

@@ -92,7 +92,7 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
   async (ctx) => {
     try {
       const tozaMakonApi = createTozaMakonApi(
-        ctx.wizard.state.admin?.companyId
+        ctx.wizard.state.admin?.companyId as number
       );
       const hybridPochtaApi = createHybridPochtaApi(
         ctx.wizard.state.admin?.companyId
@@ -216,7 +216,9 @@ export const sendWarningLettersByHybrid = new Scenes.WizardScene<Ctx>(
         "Hammasi jonatildi. Ruxsat bersangiz hisobga olishning yagona elektron tizimiga ham pochta kvitansiyalarini yuklab qo'yar edim",
         createInlineKeyboard([[["Billingga yuklash ⬆️", "uploadToBilling"]]])
       );
-    const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.admin?.companyId);
+    const tozaMakonApi = createTozaMakonApi(
+      ctx.wizard.state.admin?.companyId as number
+    );
     const hybridPochtaApi = createHybridPochtaApi(
       ctx.wizard.state.admin?.companyId
     );

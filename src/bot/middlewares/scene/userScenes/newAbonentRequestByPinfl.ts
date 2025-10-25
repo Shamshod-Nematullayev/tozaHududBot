@@ -172,7 +172,7 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
       const birthdate = extractBirthDateString(ctx.message.text);
 
       const tozaMakonApi = createTozaMakonApi(
-        inspektor?.companyId || admin?.companyId
+        inspektor?.companyId || (admin?.companyId as number)
       );
       const citizen = await getCitizen(tozaMakonApi, {
         pinfl: ctx.message.text,
@@ -279,7 +279,9 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
       if (key !== "mahalla") {
         throw "status: 400 mahalla tanlanmadi";
       }
-      const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId);
+      const tozaMakonApi = createTozaMakonApi(
+        ctx.wizard.state.companyId as number
+      );
       await ctx.deleteMessage();
       const mahalla = await Mahalla.findOne({ id: mahallaId });
       if (!mahalla) {
@@ -606,7 +608,9 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
         ctx.scene.leave();
         await ctx.deleteMessage();
         setTimeout(async () => {
-          const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId);
+          const tozaMakonApi = createTozaMakonApi(
+            ctx.wizard.state.companyId as number
+          );
           const generatedAccountNumber = (
             await tozaMakonApi.get(
               `/user-service/residents/account-numbers/generate?residentType=INDIVIDUAL&mahallaId=${pendingAbonent.mahallaId}`

@@ -173,7 +173,9 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene<Ctx>(
         customDates.message ==
         "Hozirda baza ishlamayapti, keyinroq boshqatdan urinib ko'ring"
       ) {
-        const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId);
+        const tozaMakonApi = createTozaMakonApi(
+          ctx.wizard.state.companyId as number
+        );
         const birthdate = extractBirthDateString(ctx.message.text);
         const citizen = await getCitizen(tozaMakonApi, {
           pinfl: ctx.message.text,
