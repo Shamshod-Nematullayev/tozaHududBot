@@ -119,10 +119,10 @@ export const keyboards = {
 
   adminWorkSpace: createInlineKeyboard([
     // [["Yangi abonent", "new_abonent"]],
-    // [
-    //   ["Bildirish xati kiritish", "add_notification"],
-    //   ["Shaxsi tasdiqlandi", "shaxsi_tashdiqlandi_bildirish_xati"],
-    // ],
+    [
+      ["Bildirish xati kiritish", "add_notification"],
+      // ["Shaxsi tasdiqlandi", "shaxsi_tashdiqlandi_bildirish_xati"],
+    ],
     [
       ["Ogohlantish xati yuborish", "Ogohlantish xati yuborish"],
       //   ["SB generation", "sudBuyruqlariYaratish"],

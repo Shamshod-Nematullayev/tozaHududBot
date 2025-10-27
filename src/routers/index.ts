@@ -34,8 +34,18 @@ mainRouter.use(
   allowRoles(["admin", "yurist"]),
   sudRouter
 );
-mainRouter.use("/targets", isAuth, targetsRouter);
-mainRouter.use("/bildirgilar", isAuth, bildirgilarRouter);
+mainRouter.use(
+  "/targets",
+  allowRoles(["admin", "yurist"]),
+  isAuth,
+  targetsRouter
+);
+mainRouter.use(
+  "/bildirgilar",
+  allowRoles(["admin", "yurist"]),
+  isAuth,
+  bildirgilarRouter
+);
 mainRouter.use("/fetchTelegram", isAuth, fetchTelegramRouter);
 mainRouter.use("/pachkalar", isAuth, aktPachkaRouter);
 mainRouter.use("/documents", isAuth, kiruvchiXujjatlarRouter);
@@ -45,7 +55,7 @@ mainRouter.use("/billing", isAuth, billingRouter);
 mainRouter.use(
   "/arizalar",
   isAuth,
-  allowRoles(["admin", "admin"]),
+  allowRoles(["admin", "billing"]),
   arizalarRouter
 );
 mainRouter.use("/pendingNewAbonents", isAuth, newAbonentsRouter);

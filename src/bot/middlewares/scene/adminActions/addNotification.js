@@ -5,6 +5,7 @@ import { Bildirishnoma } from "@models/SudBildirishnoma.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import mahallalar from "@lib/mahallalar.js";
 import isCancel from "../../smallFunctions/isCancel.js";
+import { Admin } from "@models/Admin.js";
 
 export const addNotification = new Scenes.WizardScene(
   "add_notification",
@@ -21,7 +22,8 @@ export const addNotification = new Scenes.WizardScene(
       ctx.wizard.state.file_name = ctx.message.document.file_name;
 
       // Inspektorni tanlash tugmasi
-      let inspectors = await Nazoratchi.find();
+      const admin = await Admin.findOne({ user_id: ctx.from.id });
+      let inspectors = await Nazoratchi.find({ companyId: admin.companyId });
       inspectors = inspectors.sort((a, b) => a.name.localeCompare(b.name));
       const buttonsArray = [];
       inspectors.forEach((ins) => {
