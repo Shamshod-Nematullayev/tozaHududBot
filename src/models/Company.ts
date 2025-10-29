@@ -59,6 +59,9 @@ export interface ICompany {
   courtId: string;
   tin: string;
   address: string;
+  smartGpsLogin: string;
+  smartGpsPassword: string;
+  smartGpsAccessToken?: string;
 }
 
 const aktPackSchema = new Schema({
@@ -163,10 +166,13 @@ const schema = new Schema<ICompany>(
     courtId: String,
     address: String,
     tin: String,
+    smartGpsLogin: String,
+    smartGpsPassword: String,
+    smartGpsAccessToken: String,
   },
   {
     timestamps: true,
   }
 );
 
-export const Company = model("Company", schema);
+export const Company = model<ICompany>("Company", schema);
