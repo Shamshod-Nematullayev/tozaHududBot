@@ -34,23 +34,23 @@ app.use(
   })
 );
 
-if (launchBot) {
-  if (process.env.NODE_ENV === "development") {
-    bot
-      .launch(() => {
-        console.log("Bot has been started. Polling is enabled.");
-      })
-      .catch((err: Error) => {
-        console.log(err);
-      });
-  } else {
-    const WEBHOOK_PATH = "/bot" + process.env.TOKEN;
-    const WEBHOOK_URL = "https://api.greenzone.uz" + WEBHOOK_PATH;
-    app.use(bot.webhookCallback(WEBHOOK_PATH));
-    bot.telegram.setWebhook(WEBHOOK_URL);
-    console.log("Bot has been started. Webhook is enabled.");
-  }
-}
+// if (launchBot) {
+//   if (process.env.NODE_ENV === "development") {
+//     bot
+//       .launch(() => {
+//         console.log("Bot has been started. Polling is enabled.");
+//       })
+//       .catch((err: Error) => {
+//         console.log(err);
+//       });
+//   } else {
+//     const WEBHOOK_PATH = "/bot" + process.env.TOKEN;
+//     const WEBHOOK_URL = "https://api.greenzone.uz" + WEBHOOK_PATH;
+//     app.use(bot.webhookCallback(WEBHOOK_PATH));
+//     bot.telegram.setWebhook(WEBHOOK_URL);
+//     console.log("Bot has been started. Webhook is enabled.");
+//   }
+// }
 
 connectDb();
 
@@ -84,7 +84,16 @@ server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
 
-// (async () => {
-//   const smartGpsApi = createSmartGpsApi(1144);
-//   smartGpsApi.post("/avl_evts");
-// })();
+(async () => {
+  const smartGpsApi = createSmartGpsApi(1144);
+  const a = await smartGpsApi.post(
+    "/wialon/ajax.html?svc=resource/get_zone_data",
+    {
+      params: JSON.stringify({
+        itemId: 37,
+        flags: 28,
+      }),
+    }
+  );
+  console.log(a.data);
+})();
