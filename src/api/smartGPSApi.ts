@@ -6,7 +6,9 @@ export function createSmartGpsApi(companyId: number) {
   const instance = axios.create({
     baseURL: "http://2.smartgps.uz",
     headers: {
-      Accept: "application/json, text/plain, */*",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Content-Type": "multipart/form-data",
     },
     withCredentials: true,
   });
@@ -65,12 +67,14 @@ async function refreshToken(companyId: number, instance: Axios) {
   authFormData.append("passw", company.smartGpsPassword);
   authFormData.append("redirect_uri", "http://2.smartgps.uz/post_message.html");
   authFormData.append("request_id", "1");
-  const auth = await instance.post(
-    "http://2.smartgps.uz/oauth/authorize.html",
-    authFormData
-  );
+  const auth = await instance.post("/oauth/authorize.html", authFormData, {
+    maxRedirects: 0,
+    validateStatus: (status) => status === 301,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
-  console.log(auth.headers);
   const url = auth.headers.location; //http://2.smartgps.uz/post_message.html?request_id=1&access_hash=1c5653589405b81c60a169520f501123&user_name=Anvarjon_Biznes&svc_error=0
   const urlParams = new URLSearchParams(url.split("?")[1]);
 
@@ -93,5 +97,12 @@ async function refreshToken(companyId: number, instance: Axios) {
   );
   //Cookie sessions: 8f98da739acb96a0c0bf69dd55ebeaa6
   const cookie = authHash.headers["set-cookie"];
-  console.log("Cookie sessions:", cookie);
+  if (!cookie || cookie.length === 0) {
+    throw new Error("Failed to refresh token: No cookie received");
+  }
+  company.smartGpsAccessToken = cookie[0]
+    .split(";")[0]
+    .split("=")[1]
+    .slice(0, 32);
+  await company.save();
 }
