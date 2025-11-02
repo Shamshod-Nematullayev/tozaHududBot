@@ -115,6 +115,10 @@ const hearsActions: {
     buttons: ["✅Abonentlar ro'yxati"],
     listener: (ctx) => ctx.scene.enter("getAbonentsList"),
   },
+  {
+    buttons: ["🗒Ma'lumotnoma"],
+    listener: (ctx) => ctx.scene.enter("certificateNoDebtScene"),
+  },
 ];
 
 hearsActions.forEach(({ buttons, listener }) => {

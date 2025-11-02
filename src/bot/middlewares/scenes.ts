@@ -28,6 +28,7 @@ import { getAbonentCard } from "./scene/userScenes/getAbonentCard.js";
 import { getWarningLetter } from "./scene/userScenes/getWarningLetter.js";
 import { getAbonentsList } from "./scene/userScenes/getAbonentsList.js";
 import { searchAbonentbyName } from "./scene/userScenes/searchAbonentByName.js";
+import { certificateNoDebtScene } from "./scene/userScenes/certificateNoDebt.js";
 
 const stage = new Scenes.Stage<any>([
   addNotification,
@@ -58,6 +59,7 @@ const stage = new Scenes.Stage<any>([
   getWarningLetter,
   getAbonentsList,
   searchAbonentbyName,
+  certificateNoDebtScene,
 ]);
 
 const composer = new Composer();

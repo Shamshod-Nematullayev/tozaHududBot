@@ -72,7 +72,7 @@ export const keyboards = {
   mainKeyboard: Markup.keyboard([
     ["👤Yangi abonent ochish", "✏️Ma'lumotlarini o'zgartirish"],
     ["👥Mening abonentlarim", "🔎Izlash", "✉️Ogohlantrish xati"],
-    ["📓Qo`llanma", "⚙Sozlamalar"],
+    ["🗒Ma'lumotnoma", "⚙Sozlamalar"],
     ["🔌 ELEKTR KODI🔌", "✒️Sudga xat✒️", "📅Abonent karta"],
     ["✅Abonentlar ro'yxati"],
   ]).resize(),
