@@ -151,6 +151,6 @@ export async function tryToIdentify(
       });
       return await tryToIdentify(tozaMakonApi, abonent, companyId);
     }
-    throw error;
+    console.error(new Error(error));
   }
 }

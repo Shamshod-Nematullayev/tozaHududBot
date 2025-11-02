@@ -202,6 +202,9 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene<Ctx>(
           customDates.passport_number = citizen.passport.slice(2);
 
           customDates.photo = citizen.photo;
+          customDates.details = {};
+          customDates.details.doc_end_date = citizen.passportExpireDate;
+          delete customDates.message;
         }
       } else {
         return ctx.reply(customDates.message, keyboards.cancelBtn.resize());
