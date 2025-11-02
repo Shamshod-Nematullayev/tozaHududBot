@@ -37,7 +37,11 @@ export const find_one_by_pinfil_from_mvd = async (pinfil) => {
     }
     const { scp_data } = data;
 
-    return { ...scp_data[0].entity_details, success: true };
+    return {
+      ...scp_data[0].entity_details,
+      doc_end_date: scp_data[0].doc_end_date,
+      success: true,
+    };
   } catch (error) {
     console.error(error);
     return {

@@ -13,6 +13,12 @@ import { tryDeleteOrEditMessage } from "./tryDeleteOrEditMessage.js";
 import { tryToIdentify } from "@services/billing/tryToIdentify.js";
 import { formatDate } from "@services/utils/formatDate.js";
 
+function getPassportGivenDate(docEndDate: string | undefined): Date {
+  if (!docEndDate) return new Date();
+  const [yil, oy, kun] = docEndDate.split("-").map(Number);
+  return new Date(yil - 10, oy - 1, kun);
+}
+
 export default async function handleApproveRequest(
   ctx: Context,
   req: ICustomDataRequestDoc
@@ -45,8 +51,9 @@ export default async function handleApproveRequest(
   });
 
   //   billingga yangilov so'rovini yuborish
-  const [yil, oy, kun] = req.data.details.doc_end_date.split("-").map(Number);
-  const passportGivenDate = new Date(yil - 10, oy, kun + 1);
+  const passportGivenDate = getPassportGivenDate(
+    req.data.details?.doc_end_date
+  );
   await updateAbonentDetails(tozaMakonApi, abonent.id, {
     citizen: {
       birthDate: req.data.birth_date,
@@ -59,8 +66,9 @@ export default async function handleApproveRequest(
       patronymic: req.data.middle_name,
       passport: req.data.passport_serial + req.data.passport_number,
       passportGivenDate: formatDate(passportGivenDate),
-      passportIssuer: req.data.details.division,
-      passportExpireDate: req.data.details.doc_end_date,
+      passportIssuer: req.data.details?.division || "IIB",
+      passportExpireDate:
+        req.data.details?.doc_end_date || formatDate(new Date()),
       photo: citizen.photo || null,
     },
     description: `${inspector.id} ${inspector.name} ma'lumotiga asosan o'zgartirildi.`,
@@ -76,12 +84,13 @@ export default async function handleApproveRequest(
     })
   ).content[0];
   if (!resident.identified)
-    await tryToIdentify(tozaMakonApi, resident, abonent.companyId);
+    try {
+      tryToIdentify(tozaMakonApi, resident, abonent.companyId);
+    } catch (error) {}
 
   //   mongodb ma'lumotlar bazada yangilanish
   await abonent.updateOne({
     $set: {
-      brith_date: `${kun}.${oy}.${yil}`,
       fio: `${req.data.last_name} ${req.data.first_name} ${req.data.middle_name}`,
       description: `${inspector.id} ${inspector.name} ma'lumotiga asosan o'zgartirildi.`,
       passport_number: `${req.data.passport_serial}${req.data.passport_number}`,

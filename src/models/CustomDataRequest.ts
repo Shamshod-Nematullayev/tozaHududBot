@@ -13,7 +13,7 @@ export interface ICustomDataRequest {
     last_name: string;
     first_name: string;
     middle_name: string;
-    details: {
+    details?: {
       surname_cyrillic: string;
       name_cyrillic: string;
       patronym_cyrillic: string;
