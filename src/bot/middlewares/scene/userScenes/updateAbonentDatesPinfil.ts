@@ -29,6 +29,7 @@ import { isCallbackQueryMessage, isTextMessage } from "../utils/validator.js";
 import { ErrorTypes } from "@bot/utils/errorHandler.js";
 import { getFileAsBuffer } from "@services/billing/getFileAsBufferFromTozamakon.js";
 import { getCitizen } from "@services/billing/getCitizen.js";
+import { Admin } from "@models/Admin.js";
 
 interface MyWizardState {
   pinfl?: string;
@@ -109,8 +110,17 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene<Ctx>(
       ctx.wizard.state.abonent = abonent;
       ctx.wizard.state.abonentOnBilling = abonentOnBilling;
       // agar abonentning shaxsi tasdiqlangan bo'lsa ogohlantirish
-      if (abonent.shaxsi_tasdiqlandi && abonent.shaxsi_tasdiqlandi.confirm) {
-        if (abonent.companyId === 1144 && inspektor.id !== 17413) {
+      const admin = await Admin.findOne({ user_id: ctx.from?.id });
+      if (
+        abonent.shaxsi_tasdiqlandi &&
+        abonent.shaxsi_tasdiqlandi.confirm === true
+      ) {
+        if (
+          abonent.companyId === 1144 &&
+          inspektor.id !== 17413 &&
+          !admin?.roles.includes("admin") &&
+          !admin?.roles.includes("billing")
+        ) {
           ctx.scene.leave();
           return ctx.reply(
             `Ushbu abonent ${
