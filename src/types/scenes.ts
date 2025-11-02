@@ -30,6 +30,7 @@ export const scenaNames = {
   getSudMaterial: "getSudMaterial",
   addNotification: "addNotification",
   addNotificationPersonConfirm: "addNotificationPersonConfirm",
+  certificateNoDebtScene: "certificateNoDebtScene",
 } as const;
 
 export type SceneNames = keyof typeof scenaNames;

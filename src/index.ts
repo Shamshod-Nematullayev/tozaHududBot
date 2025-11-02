@@ -56,10 +56,8 @@ connectDb();
 
 import "test/index.js";
 import { initJobs } from "intervals/index.js";
-import abonents from "./test/abonents.json";
 import mainRouter from "routers/index.js";
-import axios from "axios";
-import { createSmartGpsApi } from "@api/smartGPSApi.js";
+
 // createActs2(621, abonents);
 
 app.use("/api", mainRouter);

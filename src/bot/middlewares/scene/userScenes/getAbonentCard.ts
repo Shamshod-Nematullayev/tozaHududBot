@@ -14,6 +14,8 @@ import isCancel from "../../smallFunctions/isCancel.js";
 import { isTextMessage } from "../utils/validator.js";
 import { MyContext } from "types/botContext.js";
 import { createPdfFromHtml } from "@helpers/createPdfFromHtml.js";
+import axios from "axios";
+import { readQrFromBase64 } from "@helpers/readQrFromBase64.js";
 
 export const getAbonentCard = new WizardScene(
   "getAbonentCard",
@@ -54,28 +56,14 @@ export const getAbonentCard = new WizardScene(
           `/user-service/residents/${abonent.id}/print-card?lang=UZ`
         )
       ).data;
-      const html = (await new Promise((resolve, reject) => {
-        ejs.renderFile(
-          path.join(process.cwd(), "src", "views", "abonentKarta.ejs"),
-          { ...data },
-          {},
-          (err, str) => {
-            if (err) return reject(err);
-            resolve(str);
-          }
-        );
-      })) as string;
-
-      const buffer = await createPdfFromHtml(html, {
-        bottom: "5mm",
-        left: "5mm",
-        right: "5mm",
-        top: "5mm",
-      });
+      const qrData = await readQrFromBase64(data.qrCodeImage);
+      const abonentCard = (
+        await axios.get(qrData as string, { responseType: "arraybuffer" })
+      ).data;
 
       await ctx.replyWithDocument({
-        source: Buffer.from(buffer),
-        filename: `${abonent.fio}.pdf`,
+        source: Buffer.from(abonentCard),
+        filename: `abonent_card_${abonent.licshet}.pdf`,
       });
 
       ctx.scene.leave();
