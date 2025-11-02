@@ -1,6 +1,7 @@
 import { sendKunlikEtkReports } from "intervals/kunlikEtkReports.js";
 import { sendKunlikPinflReports } from "intervals/kunlikPinflReports.js";
 import { mahallaTushumlarNazoratchiKesimida } from "intervals/mahallaTushumlarNazoratchiKesimida.js";
+import { sendEtkMfyReport } from "intervals/sendEtkMfyReport.js";
 import { sendMFYIncomeReport } from "intervals/sendMFYIncomeReport.js";
 import xatlovchilarIshiHisobot from "intervals/xatlovchilarIshiHisobot.js";
 
@@ -53,12 +54,15 @@ export const jobsConfig: IJobConfig[] = [
         to: new Date(),
         shouldDeleteLastReport: true,
       });
-      mahallaTushumlarNazoratchiKesimida({
+      await mahallaTushumlarNazoratchiKesimida({
         companyId: 1824,
         from: new Date(),
         to: new Date(),
         shouldDeleteLastReport: false,
       });
+
+      await sendKunlikEtkReports(1144);
+      await sendEtkMfyReport(1144);
     },
   },
 ];
