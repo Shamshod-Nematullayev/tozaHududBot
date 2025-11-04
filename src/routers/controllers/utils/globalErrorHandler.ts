@@ -1,4 +1,5 @@
 import { AxiosError } from "axios";
+import AppError from "errors/AppError.js";
 import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 
@@ -24,7 +25,15 @@ export const globalErrorHandler: ErrorRequestHandler = (
     });
   }
 
-  console.error(err);
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      ok: false,
+      message: err.message,
+      issues: err.details,
+    });
+  }
+
+  console.error("🔥 Unhandled Error:", err);
   res.status(500).json({
     ok: false,
     message: "Internal server error",

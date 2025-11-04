@@ -1,6 +1,27 @@
 import { Schema, model } from "mongoose";
+import { Citizen } from "types/billing.js";
 
-const citizenSchema = new Schema({
+export interface INewAbonent {
+  citizen: Citizen;
+  nazoratchi_id?: string;
+  mahallaId: string;
+  mahallaName: string;
+  streetName: string;
+  streetId: string;
+  abonent_name?: string;
+  accountNumber?: string;
+  residentId?: number;
+  cadastr?: string;
+  inhabitant_cnt: number;
+  etkCustomerCode?: string;
+  etkCaoto?: string;
+  senderId: number;
+  companyId: number;
+  status: "pending" | "approved" | "rejected";
+  kadastr_baza_not_worked?: boolean;
+}
+
+const citizenSchema = new Schema<Citizen>({
   pnfl: {
     type: String,
     required: true,
@@ -24,7 +45,10 @@ const citizenSchema = new Schema({
 
 const schema = new Schema(
   {
-    citizen: citizenSchema,
+    citizen: {
+      type: citizenSchema,
+      required: true,
+    },
     nazoratchi_id: String,
     mahallaId: {
       type: String,
@@ -52,7 +76,10 @@ const schema = new Schema(
     },
     etkCustomerCode: String,
     etkCaoto: String,
-    senderId: Number,
+    senderId: {
+      type: Number,
+      required: true,
+    },
     companyId: {
       type: Number,
       required: true,
