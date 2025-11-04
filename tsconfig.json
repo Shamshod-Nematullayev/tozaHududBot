@@ -25,7 +25,8 @@
       "@services/*": ["services/*"],
       "@schemas/*": ["schemas/*"],
       "@views/*": ["views/*"],
-      "@helpers/*": ["helpers/*"]
+      "@helpers/*": ["helpers/*"],
+      "@errors/*": ["errors/*"]
     },
     "sourceMap": true
   },
