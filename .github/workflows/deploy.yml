@@ -23,7 +23,9 @@ jobs:
           script: |
             cd /root/toza-hudud-bot || exit 1
             echo "🌀 Pulling latest code..."
-            git pull origin main
+            git   pull origin main
+            source ~/.nvm/nvm.sh
+            nvm use 22
             command -v yarn >/dev/null 2>&1 || corepack enable
             echo "📦 Installing dependencies..."
             yarn install --frozen-lockfile
