@@ -184,11 +184,13 @@ export const acceptPendingNewAbonent = async (
 
   res.json({ ok: true, message: "Abonent muvaffaqqiyatli yaratildi" });
 
-  pendingAbonent.updateOne({
-    status: StatusNewAbonent.APPROVED,
-    accountNumber: accountNumber,
+  await pendingAbonent.updateOne({
+    $set: {
+      status: StatusNewAbonent.APPROVED,
+      accountNumber: accountNumber,
+    },
   });
-  bot.telegram.sendMessage(
+  await bot.telegram.sendMessage(
     pendingAbonent.senderId,
     `Fuqaro: ${pendingAbonent.citizen.lastName} ${pendingAbonent.citizen.firstName} ${pendingAbonent.citizen.patronymic}\nSizning ushbu fuqaroga yangi abonent ochish haqidagi arizangiz qabul qilindi. \n\nSizning yangi abonent raqamingiz: <code>${accountNumber}</code>`,
     { parse_mode: "HTML" }

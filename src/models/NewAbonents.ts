@@ -3,21 +3,21 @@ import { Citizen } from "types/billing.js";
 
 export interface INewAbonent {
   citizen: Citizen;
-  nazoratchi_id?: string;
   mahallaId: string;
   mahallaName: string;
   streetName: string;
   streetId: string;
+  inhabitant_cnt: number;
+  senderId: number;
+  companyId: number;
+  status: "pending" | "approved" | "rejected";
+  nazoratchi_id?: string;
   abonent_name?: string;
   accountNumber?: string;
   residentId?: number;
   cadastr?: string;
-  inhabitant_cnt: number;
   etkCustomerCode?: string;
   etkCaoto?: string;
-  senderId: number;
-  companyId: number;
-  status: "pending" | "approved" | "rejected";
   kadastr_baza_not_worked?: boolean;
 }
 
