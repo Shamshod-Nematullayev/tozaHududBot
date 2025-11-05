@@ -121,7 +121,7 @@ export const acceptPendingNewAbonent = async (
     cadastr: pendingAbonent.cadastr,
     inhabitant_cnt: pendingAbonent.inhabitant_cnt,
   };
-  let accountNumber: string = "";
+  let accountNumber = "";
   try {
     ({ accountNumber } = await createAbonent(tozaMakonApi, abonentPayload));
   } catch (error: AxiosError | any) {
@@ -163,9 +163,17 @@ export const acceptPendingNewAbonent = async (
                 tozaMakonApi,
                 abonentPayload
               ));
+            } else {
+              throw error;
             }
+          } else {
+            throw error;
           }
+        } else {
+          throw error;
         }
+      } else {
+        throw error;
       }
     } else {
       throw error;
