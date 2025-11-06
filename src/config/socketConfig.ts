@@ -14,16 +14,22 @@ const io = new Server(server, {
   },
 });
 
-const usersMapSocket: any = {};
+const usersMapSocket: { [key: string]: string[] } = {};
 io.on("connection", (socket: Socket) => {
   try {
     const decoded = jwt.verify(
       socket.handshake.query.toString(),
       process.env.SECRET_JWT_KEY as string
     ) as { id: string };
-    usersMapSocket[decoded.id] = socket.id; // User._id = socket.id
+
+    if (!usersMapSocket[decoded.id]) usersMapSocket[decoded.id] = [];
+
+    usersMapSocket[decoded.id].push(socket.id);
+
     socket.on("disconnect", () => {
-      delete usersMapSocket[decoded.id];
+      usersMapSocket[decoded.id] = usersMapSocket[decoded.id].filter(
+        (id) => id !== socket.id
+      );
     });
   } catch (error) {
     // console.error(error.message);

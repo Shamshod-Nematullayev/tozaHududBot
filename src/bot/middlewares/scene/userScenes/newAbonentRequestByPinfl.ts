@@ -39,6 +39,8 @@ import {
 import { getStreetsByMahallaId } from "@services/billing/getStreetsByMahallaId.js";
 import { getElectricResidentDetails } from "@services/payme.js";
 import { ErrorTypes } from "@bot/utils/errorHandler.js";
+import { notificationService } from "@services/notification.js";
+
 // import { MyContext } from "types/botContext";
 // 1. Lokal state tipi
 // 1. State tipi
@@ -581,28 +583,19 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
           roles: "billing",
         });
         users.forEach(async (user) => {
-          await Notification.create({
+          await notificationService.createNotification({
             message: "Yangi abonent ochish bo'yicha ariza qabul qilindi",
             type: "info",
             sender: {
               id: "system",
+              name: "Sistema",
+              role: "system",
             },
             receiver: {
-              id: user._id,
+              id: user._id.toString(),
+              name: user.fullName,
             },
           });
-          if (usersMapSocket[user.id]) {
-            io.to(usersMapSocket[user.id]).emit("notification", {
-              message: "Yangi abonent ochish bo'yicha ariza qabul qilindi",
-              type: "info",
-              sender: {
-                id: "system",
-              },
-              receiver: {
-                id: user._id,
-              },
-            });
-          }
         });
 
         ctx.scene.leave();

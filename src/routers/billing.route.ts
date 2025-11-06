@@ -17,6 +17,7 @@ import {
   createResidentAct,
   downloadPdfFileFromBillingAsBase64,
   transferMoneyBetweenResidents,
+  importActs,
 } from "./controllers/billing.controller.js";
 
 import express from "express";
@@ -72,5 +73,7 @@ router.post(
   uploadAsBlob.single("file"),
   catchAsync(transferMoneyBetweenResidents)
 );
+
+router.post("/import-acts", catchAsync(importActs));
 
 export default router;

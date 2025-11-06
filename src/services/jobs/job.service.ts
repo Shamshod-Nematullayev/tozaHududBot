@@ -1,14 +1,14 @@
 import { Agenda } from "agenda";
 import { importActJob } from "./importAct.job.js";
 import { JobName, JobNames, JobPayloads } from "./job.type.js";
-import test from "node:test";
 
 export class JobService {
   constructor(private readonly agenda: Agenda) {
     this.agenda = agenda;
+    this.defineJobs();
   }
 
-  async defineJobs() {
+  private async defineJobs() {
     this.agenda.define(JobNames.ImportActs, importActJob);
   }
 
@@ -27,5 +27,33 @@ export class JobService {
     const { lastFinishedAt } = job.attrs;
     const status = lastFinishedAt ? "completed" : "in-progress";
     return { status, lastFinishedAt };
+  }
+
+  async getJobsStatusPerUser(userId: string): Promise<
+    {
+      status: "completed" | "in-progress";
+      lastFinishedAt: Date | undefined;
+    }[]
+  > {
+    const jobs = await this.agenda.jobs({ "attrs.data.userId": userId });
+    return jobs.map((job) => {
+      const { lastFinishedAt } = job.attrs;
+      const status = lastFinishedAt ? "completed" : "in-progress";
+      return { status, lastFinishedAt };
+    });
+  }
+
+  async getJobsStatusPerCompany(companyId: number): Promise<
+    {
+      status: "completed" | "in-progress";
+      lastFinishedAt: Date | undefined;
+    }[]
+  > {
+    const jobs = await this.agenda.jobs({ "attrs.data.companyId": companyId });
+    return jobs.map((job) => {
+      const { lastFinishedAt } = job.attrs;
+      const status = lastFinishedAt ? "completed" : "in-progress";
+      return { status, lastFinishedAt };
+    });
   }
 }
