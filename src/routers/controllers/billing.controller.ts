@@ -699,7 +699,7 @@ export const importActs = async (req: Request, res: Response): Promise<any> => {
     });
   }
 
-  jobsService.startJob(JobNames.ImportActs, {
+  await jobsService.startJob(JobNames.ImportActs, {
     acts: acts.map((a) => ({
       actPackId: actPackId,
       actType: a.akt_sum > 0 ? "CREDIT" : ("DEBIT" as "DEBIT" | "CREDIT"),
@@ -717,4 +717,6 @@ export const importActs = async (req: Request, res: Response): Promise<any> => {
     companyId: req.user.companyId,
     userId: req.user.id,
   });
+
+  res.json({ ok: true, message: "Import job started" });
 };

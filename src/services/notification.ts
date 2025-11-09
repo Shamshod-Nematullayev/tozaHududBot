@@ -27,16 +27,24 @@ export class NotificationService {
     };
     data?: any;
   }) {
-    await Notification.create({
+    console.log(usersMapSocket);
+    const notification = await Notification.create({
       data,
       message,
       type,
       sender,
       receiver,
     });
-    this.io
-      .to(usersMapSocket[receiver.id])
-      .emit("notification", { message, type, sender, receiver });
+    this.io.to(usersMapSocket[receiver.id]).emit("notification", {
+      message,
+      type,
+      sender,
+      receiver,
+      createdAt: new Date(),
+      data,
+      status: "new",
+      _id: notification._id,
+    });
   }
 }
 
