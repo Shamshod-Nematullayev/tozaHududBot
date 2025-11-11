@@ -1,5 +1,6 @@
 import { arizaDocumentTypes } from "@models/Ariza.js";
 import { Types } from "mongoose";
+import { packTypes } from "types/billing.js";
 import z from "zod";
 const accountNumberRegex = [
   /^\d{12}$/,
@@ -23,6 +24,7 @@ export const createResidentActBodySchema = z.object({
     message: "Invalid ObjectId",
   }),
   photos: z.array(z.string()).optional(),
+  residentId: z.coerce.number(),
 });
 
 export const duplicateActFromRequestBodySchema = z.object({
@@ -64,3 +66,22 @@ export const getAbonentsByMfyIdQuerySchema = z.object({
     z.enum(["true", "false"]).optional()
   ),
 });
+
+export const importActsBodySchema = z
+  .object({
+    fileId: z.string(),
+    actPackId: z.coerce.number().nullable(),
+    packType: z.enum(packTypes).optional(),
+    acts: z.array(createResidentActBodySchema),
+  })
+  .superRefine((data, ctx) => {
+    if (data.actPackId === null) {
+      if (!data.packType) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "actPackId null bo'lganida packType talab qilinadi.",
+          path: ["packType"],
+        });
+      }
+    }
+  });

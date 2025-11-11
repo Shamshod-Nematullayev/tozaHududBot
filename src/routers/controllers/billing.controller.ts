@@ -35,6 +35,7 @@ import {
   createResidentActBodySchema,
   getAbonentDataRowIdQuerySchema,
   getAbonentsByMfyIdQuerySchema,
+  importActsBodySchema,
   sendAbonentsListToTelegramQuerySchema,
 } from "@schemas/billing.schema.js";
 import { mergePhotosWithPdf } from "./utils/mergePhotosWithPdf.js";
@@ -47,6 +48,15 @@ import { chunkArray } from "helpers/chunkArray.js";
 import { generateMessageForAbonentList } from "./utils/generateMessageForAbonentList.js";
 import { getAbonentsByMfyId } from "./utils/getAbonensByMfyId.js";
 import { createMoneyTransferActs } from "@services/billing/createMoneyTransferActs.js";
+import { JobService } from "@services/jobs/job.service.js";
+import { agenda } from "config/agenda.js";
+import { JobNames } from "@services/jobs/job.type.js";
+import { formatDate } from "@services/utils/formatDate.js";
+import { createActPack } from "@services/billing/createActPack.js";
+import { packTypes } from "types/billing.js";
+import NotFoundError from "@errors/NotFoundError.js";
+
+const jobsService = new JobService(agenda);
 
 export const downloadPdfFileFromBillingAsBase64 = async (
   req: Request,
@@ -107,32 +117,18 @@ export const createResidentAct = async (
   const {
     next_inhabitant_count,
     akt_sum,
-    licshet,
     amountWithoutQQS,
     document_type,
     description,
     ariza_id,
     photos,
+    residentId,
   } = createResidentActBodySchema.parse(req.body);
 
   const companyId = req.user.companyId;
   const date = new Date();
 
-  const abonent = await Abonent.findOne({ licshet, companyId });
-  if (!abonent) {
-    return res.status(404).json({
-      ok: false,
-      message: "Abonent topilmadi",
-    });
-  }
-
-  if (!req.file?.buffer) {
-    return res.status(400).json({
-      ok: false,
-      message: "Faylni yuklang",
-    });
-  }
-
+  if (!req.file?.buffer) throw new NotFoundError("Faylni yuklang");
   // 🖼️ 1. Agar rasm bo‘lsa — PDFga qo‘shamiz
   if (photos?.length) {
     req.file.buffer = await mergePhotosWithPdf(photos, req.file.buffer);
@@ -160,7 +156,7 @@ export const createResidentAct = async (
   // 📊 6. kSaldo hisoblash
   const kSaldo = await calculateKSaldo(tozaMakonApi, {
     amount: Math.abs(akt_sum),
-    residentId: abonent.id,
+    residentId: residentId,
     actPackId,
     actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
   });
@@ -177,7 +173,7 @@ export const createResidentAct = async (
     startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
     fileId,
     kSaldo,
-    residentId: abonent.id,
+    residentId: residentId,
     inhabitantCount: next_inhabitant_count,
   };
 
@@ -683,4 +679,44 @@ export const transferMoneyBetweenResidents = async (
     res.json({ ok: false, message: "Internal server error 500" });
     console.error(error);
   }
+};
+
+export const importActs = async (req: Request, res: Response): Promise<any> => {
+  let { acts, actPackId, fileId, packType } = importActsBodySchema.parse(
+    req.body
+  );
+
+  if (actPackId === null) {
+    const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+    actPackId = await createActPack(tozaMakonApi, {
+      companyId: req.user.companyId,
+      name: "Imported acts",
+      createdDate: formatDate(new Date()),
+      description: "Imported acts",
+      isActive: true,
+      isSpecialPack: false,
+      packType: packType as packTypes,
+    });
+  }
+
+  await jobsService.startJob(JobNames.ImportActs, {
+    acts: acts.map((a) => ({
+      actPackId: actPackId,
+      actType: a.akt_sum > 0 ? "CREDIT" : ("DEBIT" as "DEBIT" | "CREDIT"),
+      amount: a.akt_sum,
+      amountWithQQS: a.akt_sum,
+      amountWithoutQQS: 0,
+      description: a.description,
+      endPeriod: formatDate(new Date(), "M.YYYY"),
+      startPeriod: formatDate(new Date(), "M.YYYY"),
+      fileId,
+      kSaldo: 0,
+      residentId: a.residentId,
+      inhabitantCount: a.next_inhabitant_count,
+    })),
+    companyId: req.user.companyId,
+    userId: req.user.id,
+  });
+
+  res.json({ ok: true, message: "Import job started" });
 };

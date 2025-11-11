@@ -1,7 +1,7 @@
 import Agenda from "agenda";
 const agenda = new Agenda({
   db: { address: process.env.MONGO, collection: "agendaJobs" },
-  processEvery: "10 seconds",
+  processEvery: "30 seconds",
   maxConcurrency: 1,
 });
 

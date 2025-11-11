@@ -1,21 +1,32 @@
 import mongoose, { Schema } from "mongoose";
 
-const senderSchema = new Schema({
+interface IUserSchema {
+  id: string;
+  name: string;
+  role?: string;
+}
+
+interface INotification {
+  type: "alert" | "info" | "task";
+  message: string;
+  sender: IUserSchema;
+  receiver: IUserSchema;
+  status: "new" | "read";
+  data: object;
+}
+
+const senderSchema = new Schema<IUserSchema>({
   id: String,
   name: String,
-  phone: String,
-  email: String,
   role: String,
 });
 
-const receiverSchema = new Schema({
+const receiverSchema = new Schema<IUserSchema>({
   id: String,
   name: String,
-  phone: String,
-  email: String,
 });
 
-const schema = new Schema(
+const schema = new Schema<INotification>(
   {
     type: {
       type: String,
@@ -23,7 +34,6 @@ const schema = new Schema(
       required: true,
     },
     message: String,
-    ariza_id: String,
     status: {
       enum: ["new", "read"],
       type: String,
@@ -32,7 +42,7 @@ const schema = new Schema(
     },
     sender: senderSchema,
     receiver: receiverSchema,
-    params: Object,
+    data: Object,
   },
   { timestamps: true, versionKey: false }
 );
