@@ -3,6 +3,8 @@ import { JobNames, JobPayloads } from "./job.type.js";
 import { chunkArray } from "@helpers/chunkArray.js";
 import { createAct } from "@services/billing/createAct.js";
 import { createTozaMakonApi } from "@api/tozaMakon.js";
+import { notificationService } from "@services/notification.js";
+import { Admin } from "@models/Admin.js";
 
 export async function importActJob(
   job: Job<JobPayloads[typeof JobNames.ImportActs]>
@@ -18,4 +20,20 @@ export async function importActJob(
       })
     );
   }
+
+  const admin = await Admin.findById(job.attrs.data.userId);
+
+  notificationService.createNotification({
+    message: `${acts.length} ta akt muvaffaqiyatli import qilindi.`,
+    type: "info",
+    sender: {
+      id: "system",
+      name: "GreenZone System",
+    },
+    receiver: {
+      id: job.attrs.data.userId,
+      name: admin?.fullName || "Admin",
+    },
+    data: { importedActsCount: acts.length },
+  });
 }
