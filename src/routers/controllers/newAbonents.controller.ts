@@ -96,8 +96,16 @@ export const acceptPendingNewAbonent = async (
 ): Promise<any> => {
   const { _id } = req.params;
   const { companyId } = req.user;
-  const pendingAbonent = await NewAbonent.findOne({ _id, companyId });
-  if (!pendingAbonent) throw new NotFoundError("New Abonent");
+  const pendingAbonent = await NewAbonent.findOneAndUpdate(
+    { _id, companyId, status: StatusNewAbonent.PENDING },
+    { $set: { status: StatusNewAbonent.APPROVED } }
+  );
+
+  if (!pendingAbonent)
+    return res.status(409).json({
+      ok: false,
+      message: "Abonent already processed or not found",
+    });
 
   const nazoratchi = await Nazoratchi.findOne({
     companyId,
@@ -186,7 +194,7 @@ export const acceptPendingNewAbonent = async (
 
   await pendingAbonent.updateOne({
     $set: {
-      status: StatusNewAbonent.APPROVED,
+      status: StatusNewAbonent.COMPLETED,
       accountNumber: accountNumber,
     },
   });

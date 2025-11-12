@@ -103,6 +103,7 @@ export const StatusNewAbonent = {
   PENDING: "pending",
   APPROVED: "approved",
   REJECTED: "rejected",
+  COMPLETED: "compaleted",
 };
 
 export const NewAbonent = model("new_abonent", schema);
