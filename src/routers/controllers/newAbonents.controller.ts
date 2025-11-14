@@ -98,7 +98,8 @@ export const acceptPendingNewAbonent = async (
   const { companyId } = req.user;
   const pendingAbonent = await NewAbonent.findOneAndUpdate(
     { _id, companyId, status: StatusNewAbonent.PENDING },
-    { $set: { status: StatusNewAbonent.APPROVED } }
+    { $set: { status: StatusNewAbonent.APPROVED } },
+    { new: false, upsert: false }
   );
 
   if (!pendingAbonent)
@@ -190,12 +191,14 @@ export const acceptPendingNewAbonent = async (
 
   if (accountNumber === "") throw new Error("Account number is not defined");
 
-  await pendingAbonent.updateOne({
-    $set: {
-      status: StatusNewAbonent.COMPLETED,
-      accountNumber: accountNumber,
-    },
-  });
+  await pendingAbonent
+    .updateOne({
+      $set: {
+        status: StatusNewAbonent.COMPLETED,
+        accountNumber: accountNumber,
+      },
+    })
+    .catch(console.error);
   await bot.telegram.sendMessage(
     pendingAbonent.senderId,
     `Fuqaro: ${pendingAbonent.citizen.lastName} ${pendingAbonent.citizen.firstName} ${pendingAbonent.citizen.patronymic}\nSizning ushbu fuqaroga yangi abonent ochish haqidagi arizangiz qabul qilindi. \n\nSizning yangi abonent raqamingiz: <code>${accountNumber}</code>`,

@@ -10,7 +10,7 @@ export interface INewAbonent {
   inhabitant_cnt: number;
   senderId: number;
   companyId: number;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "compaleted";
   nazoratchi_id?: string;
   abonent_name?: string;
   accountNumber?: string;
@@ -86,7 +86,7 @@ const schema = new Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected"],
+      enum: ["pending", "approved", "rejected", "compaleted"],
       default: "pending",
     },
     kadastr_baza_not_worked: {
