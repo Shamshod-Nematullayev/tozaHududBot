@@ -13,7 +13,7 @@ export class JobService {
   }
 
   async startJob<T extends JobPayloads[JobName]>(jobName: JobName, data: T) {
-    const job = await this.agenda.create(jobName, { data }).save();
+    const job = await this.agenda.create(jobName, data).save();
     return job.attrs._id;
   }
 

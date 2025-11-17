@@ -1,6 +1,6 @@
 export function formatDate(date: Date, delimiter?: "M.YYYY") {
   if (delimiter == "M.YYYY") {
-    date
+    return date
       .toLocaleString("en-US", {
         year: "numeric",
         month: "2-digit",

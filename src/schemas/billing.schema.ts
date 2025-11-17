@@ -70,12 +70,14 @@ export const getAbonentsByMfyIdQuerySchema = z.object({
 export const importActsBodySchema = z
   .object({
     fileId: z.string(),
-    actPackId: z.coerce.number().nullable(),
+    actPackId: z.coerce.number().optional(),
     packType: z.enum(packTypes).optional(),
-    acts: z.array(createResidentActBodySchema),
+    acts: z.array(
+      createResidentActBodySchema.omit({ ariza_id: true, document_type: true })
+    ),
   })
   .superRefine((data, ctx) => {
-    if (data.actPackId === null) {
+    if (isNaN(Number(data.actPackId))) {
       if (!data.packType) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
