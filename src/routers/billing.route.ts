@@ -74,6 +74,10 @@ router.post(
   catchAsync(transferMoneyBetweenResidents)
 );
 
-router.post("/import-acts", catchAsync(importActs));
+router.post(
+  "/import-acts",
+  uploadAsBlob.single("file"),
+  catchAsync(importActs)
+);
 
 export default router;

@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import AppError from "errors/AppError.js";
 import { ErrorRequestHandler } from "express";
+import { MulterError } from "multer";
 import { ZodError } from "zod";
 
 export const globalErrorHandler: ErrorRequestHandler = (
@@ -9,6 +10,12 @@ export const globalErrorHandler: ErrorRequestHandler = (
   res,
   next
 ): any => {
+  if (err instanceof MulterError && err.code === "LIMIT_UNEXPECTED_FILE") {
+    return res.status(400).json({
+      ok: false,
+      message: "LIMIT_UNEXPECTED_FILE",
+    });
+  }
   if (err instanceof ZodError) {
     return res.status(400).json({
       ok: false,
