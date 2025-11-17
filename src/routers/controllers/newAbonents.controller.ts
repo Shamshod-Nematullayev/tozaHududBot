@@ -191,8 +191,6 @@ export const acceptPendingNewAbonent = async (
 
   if (accountNumber === "") throw new Error("Account number is not defined");
 
-  res.json({ ok: true, message: "Abonent muvaffaqqiyatli yaratildi" });
-
   await pendingAbonent
     .updateOne({
       $set: {
@@ -206,6 +204,8 @@ export const acceptPendingNewAbonent = async (
     `Fuqaro: ${pendingAbonent.citizen.lastName} ${pendingAbonent.citizen.firstName} ${pendingAbonent.citizen.patronymic}\nSizning ushbu fuqaroga yangi abonent ochish haqidagi arizangiz qabul qilindi. \n\nSizning yangi abonent raqamingiz: <code>${accountNumber}</code>`,
     { parse_mode: "HTML" }
   );
+
+  res.json({ ok: true, message: "Abonent muvaffaqqiyatli yaratildi" });
 };
 
 export const getFreeAbonentIdForNewAbonent = async (
