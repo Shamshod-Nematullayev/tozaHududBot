@@ -8,7 +8,7 @@ export async function uploadFileToTozaMakon(
   tozaMakonApi: Axios,
   buffer: Buffer,
   filename: string,
-  folderType: "SPECIFIC_ACT"
+  folderType: "SPECIFIC_ACT" | "PUBLIC_MAHALLA_CONTRACTS"
 ): Promise<string> {
   const formData = new FormData();
   formData.append("file", buffer, filename);
