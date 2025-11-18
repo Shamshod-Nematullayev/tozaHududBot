@@ -56,6 +56,8 @@ import { createActPack } from "@services/billing/createActPack.js";
 import { packTypes } from "types/billing.js";
 import NotFoundError from "@errors/NotFoundError.js";
 import { readExcel } from "@helpers/getJsonFromExcel.js";
+import { readFileSync } from "fs";
+import path from "path";
 
 const jobsService = new JobService(agenda);
 
@@ -689,14 +691,20 @@ export const importActs = async (req: Request, res: Response): Promise<any> => {
     return res.json({ ok: false, message: "file not found on body" });
   const data = readExcel(req.file?.buffer);
   console.log(data);
-  res.json({ ok: true, data });
-  return;
+  req.body.acts = data.map((a) => ({
+    ...a,
+    next_inhabitant_count: a.inhabitantCount,
+    akt_sum: a.Summa,
+    licshet: a.accountNumber,
+    // document_type: "odam_soni", //VAQTINGCHA
+    description: a.comment,
+  }));
 
   let { acts, actPackId, fileId, packType } = importActsBodySchema.parse(
     req.body
   );
-
-  if (actPackId === null) {
+  console.log(actPackId);
+  if (actPackId === undefined) {
     const tozaMakonApi = createTozaMakonApi(req.user.companyId);
     actPackId = await createActPack(tozaMakonApi, {
       companyId: req.user.companyId,
@@ -709,24 +717,39 @@ export const importActs = async (req: Request, res: Response): Promise<any> => {
     });
   }
 
-  // await jobsService.startJob(JobNames.ImportActs, {
-  //   acts: acts.map((a) => ({
-  //     actPackId: actPackId,
-  //     actType: a.akt_sum > 0 ? "CREDIT" : ("DEBIT" as "DEBIT" | "CREDIT"),
-  //     amount: a.akt_sum,
-  //     amountWithQQS: a.akt_sum,
-  //     amountWithoutQQS: 0,
-  //     description: a.description,
-  //     endPeriod: formatDate(new Date(), "M.YYYY"),
-  //     startPeriod: formatDate(new Date(), "M.YYYY"),
-  //     fileId,
-  //     kSaldo: 0,
-  //     residentId: a.residentId,
-  //     inhabitantCount: a.next_inhabitant_count,
-  //   })),
-  //   companyId: req.user.companyId,
-  //   userId: req.user.id,
-  // });
+  await jobsService.startJob(JobNames.ImportActs, {
+    acts: acts.map((a) => ({
+      actPackId: actPackId,
+      actType: a.akt_sum > 0 ? "CREDIT" : ("DEBIT" as "DEBIT" | "CREDIT"),
+      amount: a.akt_sum,
+      amountWithQQS: a.akt_sum,
+      amountWithoutQQS: 0,
+      description: a.description,
+      endPeriod: formatDate(new Date(), "M.YYYY"),
+      startPeriod: formatDate(new Date(), "M.YYYY"),
+      fileId,
+      kSaldo: 0,
+      residentId: a.residentId,
+      inhabitantCount: a.next_inhabitant_count,
+    })),
+    companyId: req.user.companyId,
+    userId: req.user.id,
+  });
 
   res.json({ ok: true, message: "Import job started" });
+};
+
+export const importActsDownloadTemplate = async (
+  req: Request,
+  res: Response
+) => {
+  res.download(
+    path.join(
+      process.cwd(),
+      "src",
+      "lib",
+      "templates",
+      "importActTemplate.xlsx"
+    )
+  );
 };
