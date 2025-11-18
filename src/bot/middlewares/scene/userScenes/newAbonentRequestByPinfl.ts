@@ -601,6 +601,16 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
         ctx.scene.leave();
         await ctx.deleteMessage();
         setTimeout(async () => {
+          const pendingAbonentN = await NewAbonent.findOneAndUpdate(
+            {
+              _id: pendingAbonent._id,
+              companyId: pendingAbonent.companyId,
+              status: StatusNewAbonent.PENDING,
+            },
+            { $set: { status: StatusNewAbonent.APPROVED } },
+            { new: false, upsert: false }
+          );
+          if (!pendingAbonentN) return;
           const tozaMakonApi = createTozaMakonApi(
             ctx.wizard.state.companyId as number
           );
@@ -612,41 +622,41 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
           const { data } = await tozaMakonApi.post("/user-service/residents", {
             accountNumber: generatedAccountNumber,
             active: true,
-            citizen: pendingAbonent.citizen,
-            companyId: pendingAbonent.companyId,
+            citizen: pendingAbonentN.citizen,
+            companyId: pendingAbonentN.companyId,
             contractDate: null,
             contractNumber: null,
             description: `${ctx.wizard.state.inspector?.name} tomonidan yangi abonent ochish uchun ariza qabul qilindi`,
-            electricityAccountNumber: pendingAbonent.etkCustomerCode,
-            electricityCoato: pendingAbonent.etkCaoto,
+            electricityAccountNumber: pendingAbonentN.etkCustomerCode,
+            electricityCoato: pendingAbonentN.etkCaoto,
             homePhone: null,
             house: {
-              cadastralNumber: pendingAbonent.cadastr,
+              cadastralNumber: pendingAbonentN.cadastr,
               flatNumber: null,
               homeIndex: null,
               homeNumber: 0,
-              inhabitantCnt: pendingAbonent.inhabitant_cnt,
+              inhabitantCnt: pendingAbonentN.inhabitant_cnt,
               temporaryCadastralNumber: null,
               type: "HOUSE",
             },
             isCreditor: false,
-            mahallaId: pendingAbonent.mahallaId,
+            mahallaId: pendingAbonentN.mahallaId,
             nSaldo: 0,
             residentType: "INDIVIDUAL",
-            streetId: pendingAbonent.streetId,
+            streetId: pendingAbonentN.streetId,
           });
           await Abonent.create({
             createdAt: new Date(),
-            fio: pendingAbonent.abonent_name,
+            fio: pendingAbonentN.abonent_name,
             licshet: generatedAccountNumber,
-            mahallas_id: pendingAbonent.mahallaId,
-            prescribed_cnt: pendingAbonent.inhabitant_cnt,
+            mahallas_id: pendingAbonentN.mahallaId,
+            prescribed_cnt: pendingAbonentN.inhabitant_cnt,
             id: data,
-            kadastr_number: pendingAbonent.cadastr,
-            pinfl: pendingAbonent.citizen?.pnfl,
-            mahalla_name: pendingAbonent.mahallaName,
-            passport_number: pendingAbonent.citizen?.passport,
-            streets_id: pendingAbonent.streetId,
+            kadastr_number: pendingAbonentN.cadastr,
+            pinfl: pendingAbonentN.citizen?.pnfl,
+            mahalla_name: pendingAbonentN.mahallaName,
+            passport_number: pendingAbonentN.citizen?.passport,
+            streets_id: pendingAbonentN.streetId,
             shaxsi_tasdiqlandi: {
               confirm: true,
               inspector: {
@@ -667,10 +677,10 @@ export const new_abonent_request_by_pinfl_scene = new Scenes.WizardScene<Ctx>(
               inspector_name: ctx.wizard.state.inspector?.name,
               updated_at: new Date(),
             },
-            companyId: pendingAbonent.companyId,
+            companyId: pendingAbonentN.companyId,
           });
-          await pendingAbonent.updateOne({
-            status: StatusNewAbonent.APPROVED,
+          await pendingAbonentN.updateOne({
+            status: StatusNewAbonent.COMPLETED,
             accountNumber: generatedAccountNumber,
           });
 
