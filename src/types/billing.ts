@@ -81,29 +81,11 @@ export interface AbonentSearchQuery {
   passport?: string;
   phone?: string;
   pnfl?: string;
-  size?:
-    | 1
-    | 2
-    | 3
-    | 4
-    | 5
-    | 10
-    | 20
-    | 25
-    | 30
-    | 40
-    | 50
-    | 60
-    | 70
-    | 80
-    | 90
-    | 100
-    | 150
-    | 200
-    | 250
-    | 300;
+  size?: number;
   sort?: string;
   streetId?: number;
+  mahallaBindStatus?: boolean;
+  bindStatus?: boolean;
 }
 
 export interface IAbonent {
@@ -297,4 +279,60 @@ export interface IAutomobile {
   trackerSerialNumber: string | null;
   trackerSimcardNumber: string | null;
   wialonId: number;
+}
+
+export interface ISubMahalla {
+  centerLatitude: number;
+  centerLongitude: number;
+  companyId: number;
+  coordinates: [number, number][][];
+  districtId: number;
+  geofenceUniqueId: string;
+  id: number;
+  mahallaId: number;
+  mahallaName: string;
+  maxAvgSpeed: number;
+  minMileage: number;
+  minMovingDuration: number;
+  minStopsCount: number;
+  monthlyTripsNumber: number;
+  name: string;
+  regionId: number;
+}
+
+interface Pageable {
+  pageNumber: number;
+  pageSize: number;
+  sort: Sort[];
+  keysetPage: any | null;
+  offset: number;
+  withCountQuery: boolean;
+  withExtractAllKeysets: boolean;
+  intOffset: number;
+  paged: boolean;
+  unpaged: boolean;
+}
+
+interface Sort {
+  direction: "ASC" | "DESC";
+  property: string;
+  ignoreCase: boolean;
+  nullHandling: "NATIVE" | string;
+  descending: boolean;
+  ascending: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  content: T[];
+  pageable: Pageable;
+  keysetPage: any | null;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+  size: number;
+  number: number;
+  sort: Sort[];
+  numberOfElements: number;
+  empty: boolean;
 }
