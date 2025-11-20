@@ -58,6 +58,7 @@ import NotFoundError from "@errors/NotFoundError.js";
 import { readExcel } from "@helpers/getJsonFromExcel.js";
 import { readFileSync } from "fs";
 import path from "path";
+import { Folder } from "@models/Folder.js";
 
 const jobsService = new JobService(agenda);
 
@@ -183,8 +184,9 @@ export const createResidentAct = async (
   const actInfo = await createAct(tozaMakonApi, aktPayload);
 
   // Agar ariza bo'lsa akt ma'lumotlari yozib qolinadi
+  let folderId = null;
   if (ariza_id) {
-    await Ariza.findByIdAndUpdate(ariza_id, {
+    const ariza = await Ariza.findByIdAndUpdate(ariza_id, {
       $set: {
         status: "akt_kiritilgan",
         akt_pachka_id: actPackId,
@@ -193,9 +195,21 @@ export const createResidentAct = async (
         akt_date: actInfo.createdAt,
       },
     });
+    if (ariza) {
+      const folder = await Folder.addArizaToFolder(companyId, {
+        accountNumber: ariza.licshet,
+        ariza_id: ariza_id,
+        arizaNumber: ariza.document_number,
+      });
+      folderId = folder.id;
+    }
   }
 
-  return res.json({ ok: true, message: "Akt muvaffaqqiyatli qo‘shildi" });
+  return res.json({
+    ok: true,
+    folderId,
+    message: "Akt muvaffaqqiyatli qo‘shildi",
+  });
 };
 
 export const duplicateActFromRequest = async (
