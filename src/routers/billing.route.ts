@@ -19,6 +19,7 @@ import {
   transferMoneyBetweenResidents,
   importActs,
   importActsDownloadTemplate,
+  closeFolder,
 } from "./controllers/billing.controller.js";
 
 import express from "express";
@@ -82,5 +83,7 @@ router.post(
 );
 
 router.get("/import-acts-template", catchAsync(importActsDownloadTemplate));
+
+router.post("/close-folder", catchAsync(closeFolder));
 
 export default router;
