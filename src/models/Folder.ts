@@ -36,7 +36,7 @@ async function generateOrderNumber(companyId: number) {
   return last ? last.id + 1 : 1; // birinchi bo'lsa 1 dan boshlaydi
 }
 
-schema.pre("save", async function (next) {
+schema.pre("validate", async function (next) {
   if (this.isNew) {
     this.id = await generateOrderNumber(this.companyId);
     this.startingAt = new Date();
