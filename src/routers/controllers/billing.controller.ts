@@ -773,3 +773,20 @@ export const closeFolder = async (req: Request, res: Response) => {
   await Folder.closeFolder(folderId);
   res.json({ ok: true });
 };
+
+export const uploadFileTozamakon = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  if (!req.file)
+    return res.json({ ok: false, message: "file not found on body" });
+
+  const fileId = await uploadFileToTozaMakon(
+    createTozaMakonApi(req.user.companyId),
+    req.file?.buffer,
+    req.file?.originalname,
+    "SPECIFIC_ACT"
+  );
+
+  return res.json({ ok: true, fileId });
+};
