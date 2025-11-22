@@ -1,4 +1,5 @@
 import { Model, model, Schema } from "mongoose";
+import { arizaDocumentTypes } from "./Ariza.js";
 
 interface IFolder {
   _id: string;
@@ -7,6 +8,7 @@ interface IFolder {
     accountNumber: string;
     arizaNumber: number;
     ariza_id: string;
+    arizaType: (typeof arizaDocumentTypes)[number];
   }[];
   startingAt: Date;
   endingAt?: Date;
@@ -58,7 +60,12 @@ schema.pre("findOneAndUpdate", function (next) {
 
 schema.statics.addArizaToFolder = async function (
   companyId: number,
-  element: { accountNumber: string; arizaNumber: number; ariza_id: string }
+  element: {
+    accountNumber: string;
+    arizaNumber: number;
+    ariza_id: string;
+    arizaType: (typeof arizaDocumentTypes)[number];
+  }
 ) {
   // 1. Ending bo'lmagan oxirgi folderni topamiz
   let folder = await this.findOne({
@@ -95,6 +102,7 @@ interface IFolderStatics {
       accountNumber: string;
       arizaNumber: number;
       ariza_id: string;
+      arizaType: (typeof arizaDocumentTypes)[number];
     }
   ) => Promise<IFolder>;
   closeFolder: (_id: string) => Promise<any>;

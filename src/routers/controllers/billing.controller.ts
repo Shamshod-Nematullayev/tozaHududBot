@@ -200,6 +200,7 @@ export const createResidentAct = async (
         accountNumber: ariza.licshet,
         ariza_id: ariza_id,
         arizaNumber: ariza.document_number,
+        arizaType: ariza.document_type,
       });
       folderId = folder.id;
     }
@@ -316,7 +317,15 @@ export const duplicateActFromRequest = async (
     },
   });
 
-  res.json({ ok: true, message: "Aktlar muvaffaqiyatli yaratildi" });
+  // 6. Papkaga qo'shish
+  const folderId = await Folder.addArizaToFolder(companyId, {
+    accountNumber: ariza.ikkilamchi_licshet,
+    ariza_id: ariza_id,
+    arizaNumber: ariza.document_number,
+    arizaType: ariza.document_type,
+  });
+
+  res.json({ ok: true, message: "Aktlar muvaffaqiyatli yaratildi", folderId });
 };
 
 export const getActiveMfy = async (req: Request, res: Response) => {
