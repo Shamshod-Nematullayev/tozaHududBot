@@ -118,7 +118,7 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene<Ctx>(
         if (
           abonent.companyId === 1144 &&
           inspektor.id !== 17413 &&
-          !admin?.roles.includes("admin") &&
+          inspektor.id !== 38520 &&
           !admin?.roles.includes("billing")
         ) {
           ctx.scene.leave();

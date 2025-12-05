@@ -118,6 +118,7 @@ export async function sendMFYIncomeReport(
       company.GROUP_ID_NAZORATCHILAR,
       {
         parse_mode: "HTML",
+        disable_notification: true,
       }
     );
     if (deleteLastReport)

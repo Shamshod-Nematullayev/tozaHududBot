@@ -1,4 +1,5 @@
 import { createTozaMakonApi } from "@api/tozaMakon.js";
+import { Company } from "@models/Company.js";
 import { DalolatnomaGPS } from "@models/DalolatnomaGPS.js";
 import {
   createGPSDalolatnomaBodySchema,
@@ -70,4 +71,13 @@ export const getOneGPSDalolatnomaById: Handler = async (req, res) => {
     return;
   }
   res.json({ ok: true, data });
+};
+
+export const getMahallas: Handler = async (req, res): Promise<any> => {
+  const company = await Company.findOne({ id: req.user.companyId });
+  if (!company) return res.json({ ok: false, message: "Company not found" });
+
+  const mahallas = await company.getMahallasFromTozamakon();
+
+  return res.json({ ok: true, data: mahallas });
 };

@@ -126,6 +126,7 @@ export async function mahallaTushumlarNazoratchiKesimida({
       // process.env.ME as string,
       {
         parse_mode: "HTML",
+        disable_notification: true,
       }
     );
 

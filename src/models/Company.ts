@@ -1,3 +1,5 @@
+import { createTozaMakonApi } from "@api/tozaMakon.js";
+import { getMahallasFromTozamakon } from "@services/billing/getMahallasFromTozamakon.js";
 import { model, Schema } from "mongoose";
 
 interface IAktPack {
@@ -62,6 +64,9 @@ export interface ICompany {
   smartGpsLogin: string;
   smartGpsPassword: string;
   smartGpsAccessToken?: string;
+  getMahallasFromTozamakon(): Promise<
+    Awaited<ReturnType<typeof getMahallasFromTozamakon>>["content"]
+  >;
 }
 
 const aktPackSchema = new Schema({
@@ -174,5 +179,15 @@ const schema = new Schema<ICompany>(
     timestamps: true,
   }
 );
+
+schema.methods.getMahallasFromTozamakon = async function (this: ICompany) {
+  const tozaMakonApi = createTozaMakonApi(this.id);
+  return (
+    await getMahallasFromTozamakon(tozaMakonApi, {
+      districtId: this.districtId,
+      size: 1000,
+    })
+  ).content;
+};
 
 export const Company = model<ICompany>("Company", schema);

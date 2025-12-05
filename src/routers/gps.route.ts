@@ -4,6 +4,7 @@ import {
   createGPSDalolatnoma,
   getCars,
   getGPSDalolatnomalar,
+  getMahallas,
   getOneGPSDalolatnomaById,
 } from "./controllers/gps.controller.js";
 
@@ -16,5 +17,7 @@ router.post("/create-dalolatnoma", catchAsync(createGPSDalolatnoma));
 router.get("/dalolatnomalar", catchAsync(getGPSDalolatnomalar));
 
 router.get("/:_id", catchAsync(getOneGPSDalolatnomaById));
+
+router.get("/mahallas", catchAsync(getMahallas));
 
 export default router;
