@@ -777,12 +777,6 @@ export const importActsDownloadTemplate = async (
   );
 };
 
-export const closeFolder = async (req: Request, res: Response) => {
-  const { folderId } = z.object({ folderId: z.string() }).parse(req.body);
-  await Folder.closeFolder(folderId);
-  res.json({ ok: true });
-};
-
 export const uploadFileTozamakon = async (
   req: Request,
   res: Response

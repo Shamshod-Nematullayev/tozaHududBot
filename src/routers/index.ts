@@ -21,6 +21,7 @@ import yashovchiSoniXatlovRouter from "./yashovchiSoniXatlov.js";
 import reportsRouter from "./reportsRouter.js";
 import actsRouter from "./actsRouter.js";
 import gpsRouter from "./gps.route.js";
+import foldersRouter from "./folders.route.js";
 import isAuth from "@middlewares/isAuth.js";
 import allowRoles from "@middlewares/allowRoles.js";
 import { globalErrorHandler } from "./controllers/utils/globalErrorHandler.js";
@@ -63,6 +64,12 @@ mainRouter.use("/yashovchi-soni-xatlov", isAuth, yashovchiSoniXatlovRouter);
 mainRouter.use("/reports", isAuth, reportsRouter);
 mainRouter.use("/acts", isAuth, actsRouter);
 mainRouter.use("/gps", isAuth, allowRoles(["admin", "gps"]), gpsRouter);
+mainRouter.use(
+  "/folders",
+  isAuth,
+  allowRoles(["admin", "billing"]),
+  foldersRouter
+);
 mainRouter.use(globalErrorHandler);
 
 export default mainRouter;

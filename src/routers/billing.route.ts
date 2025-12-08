@@ -19,7 +19,6 @@ import {
   transferMoneyBetweenResidents,
   importActs,
   importActsDownloadTemplate,
-  closeFolder,
   uploadFileTozamakon,
 } from "./controllers/billing.controller.js";
 
@@ -84,8 +83,6 @@ router.post(
 );
 
 router.get("/import-acts-template", catchAsync(importActsDownloadTemplate));
-
-router.post("/close-folder", catchAsync(closeFolder));
 
 router.post(
   "/upload-file-tozamakon",
