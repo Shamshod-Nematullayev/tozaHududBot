@@ -7,7 +7,7 @@ import { agenda } from "./config/agenda.js";
 import { connectDb } from "./config/connectDB.js";
 import { bot } from "./bot/core/bot.js";
 
-const launchBot = true;
+const launchBot = false;
 
 if (!process.env.SECRET_JWT_KEY || !process.env.REFRESH_JWT_KEY) {
   console.error(
