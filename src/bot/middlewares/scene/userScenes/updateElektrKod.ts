@@ -191,18 +191,18 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
           inspector_id: ctx.wizard.state.inspector_id,
           update_at: new Date(),
         });
-        const tozaMakonApi = createTozaMakonApi(abonent.companyId);
-        await tozaMakonApi.patch("/user-service/residents/" + abonent.id, {
-          electricityAccountNumber: ctx.wizard.state.ETK,
-          electricityCoato: etkAbonent.caotoNumber,
-          id: abonent.id,
-        });
-        try {
-          await tozaMakonApi.patch("/user-service/residents/identified", {
-            identified: true,
-            residentIds: [abonent.id],
-          });
-        } catch (error) {}
+        // const tozaMakonApi = createTozaMakonApi(abonent.companyId);
+        // await tozaMakonApi.patch("/user-service/residents/" + abonent.id, {
+        //   electricityAccountNumber: ctx.wizard.state.ETK,
+        //   electricityCoato: etkAbonent.caotoNumber,
+        //   id: abonent.id,
+        // });
+        // try {
+        //   await tozaMakonApi.patch("/user-service/residents/identified", {
+        //     identified: true,
+        //     residentIds: [abonent.id],
+        //   });
+        // } catch (error) {}
         await Abonent.findByIdAndUpdate(abonent._id, {
           $set: {
             ekt_kod_tasdiqlandi: {

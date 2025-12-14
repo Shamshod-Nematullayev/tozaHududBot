@@ -37,12 +37,12 @@ const hearsActions: {
     buttons: ["✉️Ogohlantrish xati"],
     listener: (ctx) => ctx.scene.enter("getWarningLetter"),
   },
-  {
-    buttons: ["🔌 ELEKTR KODI🔌"],
-    listener: async (ctx) => {
-      ctx.scene.enter("updateElektrKod");
-    },
-  },
+  // {
+  //   buttons: ["🔌 ELEKTR KODI🔌"],
+  //   listener: async (ctx) => {
+  //     ctx.scene.enter("updateElektrKod");
+  //   },
+  // },
   {
     buttons: ["👥Mening abonentlarim"],
     listener: async (ctx) => {
