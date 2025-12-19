@@ -81,16 +81,16 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
     }
 
     if (abonent.ekt_kod_tasdiqlandi?.confirm) {
-      const admin = await Admin.findOne({ user_id: ctx.from?.id });
-      if (!admin) {
-        ctx.scene.leave();
-        return await ctx.reply(
-          `Bu abonent ma'lumoti ${
-            abonent.ekt_kod_tasdiqlandi.inspector_name ||
-            abonent.ekt_kod_tasdiqlandi.inspector.name
-          } tomonidan kiritilib bo'lingan.`
-        );
-      }
+      // const admin = await Admin.findOne({ user_id: ctx.from?.id });
+      // if (!admin) {
+      //   ctx.scene.leave();
+      //   return await ctx.reply(
+      //     `Bu abonent ma'lumoti ${
+      //       abonent.ekt_kod_tasdiqlandi.inspector_name ||
+      //       abonent.ekt_kod_tasdiqlandi.inspector.name
+      //     } tomonidan kiritilib bo'lingan.`
+      //   );
+      // }
       await ctx.reply(
         `Bu abonent ma'lumoti ${
           abonent.ekt_kod_tasdiqlandi.inspector_name ||
