@@ -191,32 +191,9 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
           inspector_id: ctx.wizard.state.inspector_id,
           update_at: new Date(),
         });
-        // const tozaMakonApi = createTozaMakonApi(abonent.companyId);
-        // await tozaMakonApi.patch("/user-service/residents/" + abonent.id, {
-        //   electricityAccountNumber: ctx.wizard.state.ETK,
-        //   electricityCoato: etkAbonent.caotoNumber,
-        //   id: abonent.id,
-        // });
-        // try {
-        //   await tozaMakonApi.patch("/user-service/residents/identified", {
-        //     identified: true,
-        //     residentIds: [abonent.id],
-        //   });
-        // } catch (error) {}
-        await Abonent.findByIdAndUpdate(abonent._id, {
-          $set: {
-            ekt_kod_tasdiqlandi: {
-              confirm: true,
-              inspector_id: ctx.wizard.state.inspector_id,
-              inspector_name: ctx.wizard.state.inspector_name,
-              updated_at: new Date(),
-            },
-            energy_licshet: ctx.wizard.state.ETK,
-          },
-        });
         await ctx.deleteMessage();
         await ctx.replyWithHTML(
-          `ETK kod qabul qilindi`,
+          `ETK kod yangilash to'g'risidagi so'rovingiz operatorga yuborildi`,
           keyboards.mainKeyboard.resize()
         );
         return ctx.scene.leave();
