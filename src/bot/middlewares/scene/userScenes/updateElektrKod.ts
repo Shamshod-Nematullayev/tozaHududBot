@@ -101,11 +101,32 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
       ctx.wizard.selectStep(5);
       return;
     }
-    await ctx.reply(
-      `FIO: ${abonent.fio}\nElektr kodini kiriting:`,
-      keyboards.cancelBtn.resize()
-    );
+    // Shu yerda caotolar ro'yxati chiqishi kerak;
+    const caotoNamesCompany = caotoNames.filter(
+      (c) => c.companyId == ctx.wizard.state.companyId);
+
+    if(caotoNamesCompany.length === 0) {
+      return ctx.reply("Bu tashkilot uchun caoto raqamlari berilmagan");
+    }
+    if(caotoNamesCompany.length === 1){
+      ctx.wizard.state.region = caotoNamesCompany[0].region;
+      ctx.wizard.state.caoto = caotoNamesCompany[0].caoto;
+      return await ctx.reply(
+        `FIO: ${abonent.fio}\nElektr kodini kiriting:`,
+        keyboards.cancelBtn.resize()
+      );
+    }
+
+    await ctx.reply("FIO: ${abonent.fio}\nHududni tanlang", Markup.inlineKeyboard([
+      ...caotoNamesCompany.map((c) => ([Markup.button.callback(`${c.title} ${c.caoto}`, c.caoto.toString() )]))
+    ]))
     ctx.wizard.next();
+  },
+  async (ctx) => {
+    if(!isCallbackQueryMessage(ctx)) throw ErrorTypes.BAD_REQUEST;
+
+    ctx.wizard.state.caoto = Number(ctx.callbackQuery.data);
+
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) throw ErrorTypes.BAD_REQUEST;
