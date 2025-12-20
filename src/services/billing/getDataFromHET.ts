@@ -5,7 +5,13 @@ interface Payload {
   personalAccount: string;
 }
 
-interface Response {
+interface HETErrorResponse {
+  code: "ACCOUNT.NOT.FOUND";
+  message: string;
+  time: string;
+}
+
+interface HETSuccessResponse {
   address: string;
   cadastralNumber: string;
   coatoCode: string;
@@ -18,13 +24,17 @@ interface Response {
   pinfl: string;
 }
 
+type HETResponse = HETErrorResponse | HETSuccessResponse;
+
 export async function getDataFromHET(
   tozaMakonApi: Axios,
-  params: Payload
-): Promise<Response> {
-  return (
-    await tozaMakonApi.get("/user-service/het/consumers/by-personal-account", {
-      params,
-    })
-  ).data;
+  payload: Payload
+): Promise<HETResponse> {
+  const response = await tozaMakonApi.get(
+    "/user-service/het/consumers/by-personal-account",
+    {
+      params: payload,
+    }
+  );
+  return response.data;
 }

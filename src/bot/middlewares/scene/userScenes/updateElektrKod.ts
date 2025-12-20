@@ -44,7 +44,7 @@ interface IFindedAbonent {
 export const updateElektrKod = new Scenes.WizardScene<Ctx>(
   "updateElektrKod",
   async (ctx) => {
-    await ctx.reply("Abonent litsavoy kodini kiriting:");
+    await ctx.reply("Abonent chiqindi kodini kiriting:");
     return ctx.wizard.next();
   },
   async (ctx) => {
@@ -74,7 +74,7 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
     ctx.wizard.state.abonent = abonent as IAbonentDoc;
     if (!abonent) {
       ctx.reply(
-        "Siz kiritgan litsavoy kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
+        "Siz kiritgan chiqindi kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
         keyboards.cancelBtn.resize()
       );
       return;
@@ -102,13 +102,16 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
       return;
     }
     await ctx.reply(
-      `FIO: ${abonent.fio}\nElektr kodini bazaga kiriting:`,
+      `FIO: ${abonent.fio}\nElektr kodini kiriting:`,
       keyboards.cancelBtn.resize()
     );
     ctx.wizard.next();
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) throw ErrorTypes.BAD_REQUEST;
+    const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId!);
+
+    // const hetData = await
     const findedETKAbonents: IFindedAbonent[] = await EtkAbonent.find({
       accountNumber: ctx.message.text,
       companyId: ctx.wizard.state.companyId,
