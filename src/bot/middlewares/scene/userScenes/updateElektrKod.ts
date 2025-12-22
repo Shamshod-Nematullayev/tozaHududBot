@@ -20,6 +20,8 @@ import { isCallbackQueryMessage, isTextMessage } from "../utils/validator.js";
 import { ErrorTypes } from "@bot/utils/errorHandler.js";
 import { Admin } from "@models/Admin.js";
 import { getDataFromHET } from "@services/billing/getDataFromHET.js";
+import { searchAbonent } from "@services/billing/searchAbonent.js";
+import { Company } from "@models/Company.js";
 
 interface MyWizardState {
   accountNumber?: string;
@@ -134,7 +136,23 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) throw ErrorTypes.BAD_REQUEST;
+    if (ctx.message.text.length < 7) throw ErrorTypes.BAD_REQUEST;
+
     const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId!);
+    const existingAbonents = await searchAbonent(tozaMakonApi, {
+      companyId: ctx.wizard.state.companyId!,
+      electricityAccountNumber: ctx.message.text,
+    });
+
+    // warning!
+    if (existingAbonents.totalElements > 0)
+      await ctx.replyWithHTML(
+        `‼️<b>DIQQAT</b>‼️ \n\n Bu hisob raqami allaqachon boshqa abonent${
+          existingAbonents.content.length > 1 && "lar"
+        } biriktirilgan\n${existingAbonents.content
+          .map((a) => a.accountNumber)
+          .join(", ")}`
+      );
 
     try {
       const hetData = await getDataFromHET(tozaMakonApi, {
@@ -170,7 +188,7 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
       case "yes":
         const abonent = ctx.wizard.state.abonent as IAbonentDoc;
         const state = ctx.wizard.state;
-        await EtkKodRequest.create({
+        const req = await EtkKodRequest.create({
           licshet: abonent.licshet,
           abonent_id: abonent.id,
           etk_kod: state.ETK!,
@@ -181,13 +199,32 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
           phone: state.PHONE,
           address: state.ADDRESS,
           fio: state.FIO,
+          billingdaFIO: abonent.fio,
         });
         await ctx.deleteMessage();
         await ctx.replyWithHTML(
           `ETK kod yangilash to'g'risidagi so'rovingiz operatorga yuborildi`,
           keyboards.mainKeyboard.resize()
         );
-        return ctx.scene.leave();
+        const company = await Company.findOne({
+          id: ctx.wizard.state.companyId,
+        });
+        ctx.scene.leave();
+        if (!company) return;
+        const message = await ctx.telegram.sendMessage(
+          company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
+          `${ctx.wizard.state.inspector_name} tomonidan\nKOD: ${abonent.licshet}\nFIO: ${abonent.fio} ETK: ${state.ETK} ${state.FIO} \n ${state.ADDRESS}`,
+          {
+            reply_markup: Markup.inlineKeyboard([
+              [
+                Markup.button.callback("🚫", "etk_no_" + req._id),
+                Markup.button.callback("✅", "etk_yes_" + req._id),
+              ],
+            ]).reply_markup,
+          }
+        );
+
+        await req.updateOne({ $set: { channelPostId: message.message_id } });
       case "no":
         await ctx.deleteMessage();
         ctx.reply("Bekor qilindi.", keyboards.mainKeyboard.resize());

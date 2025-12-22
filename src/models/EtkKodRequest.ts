@@ -14,6 +14,9 @@ interface IEtkKodRequest {
   companyId: number;
   address: string;
   fio: string;
+  channelPostId: number;
+  existingAbonents: string[];
+  billingdaFIO: string;
 }
 
 const schema = new Schema<IEtkKodRequest>({
@@ -46,6 +49,16 @@ const schema = new Schema<IEtkKodRequest>({
     required: true,
   },
   fio: {
+    type: String,
+    required: true,
+  },
+  channelPostId: {
+    type: Number,
+  },
+  existingAbonents: {
+    type: Array(String),
+  },
+  billingdaFIO: {
     type: String,
     required: true,
   },
