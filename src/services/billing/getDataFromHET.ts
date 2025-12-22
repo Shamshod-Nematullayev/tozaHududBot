@@ -1,4 +1,4 @@
-import { Axios } from "axios";
+import { Axios, AxiosError } from "axios";
 
 interface Payload {
   coato: string;
@@ -30,11 +30,24 @@ export async function getDataFromHET(
   tozaMakonApi: Axios,
   payload: Payload
 ): Promise<HETResponse> {
-  const response = await tozaMakonApi.get(
-    "/user-service/het/consumers/by-personal-account",
-    {
-      params: payload,
+  try {
+    const response = await tozaMakonApi.get(
+      "/user-service/het/consumers/by-personal-account",
+      {
+        params: payload,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError<HETErrorResponse>;
+
+    if (axiosError.response?.data) {
+      // 400 bo‘lsa ham backend qaytargan datani olish
+      return axiosError.response.data;
     }
-  );
-  return response.data;
+
+    // Agar umuman response bo‘lmasa (network error va h.k.)
+    throw error;
+  }
 }

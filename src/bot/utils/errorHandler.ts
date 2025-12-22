@@ -19,5 +19,5 @@ export function errorHandler(err: any, ctx: Context) {
   }
 
   console.error(err);
-  ctx.reply("Kutilmagan xatolik yuz berdi");
+  ctx.reply("Kutilmagan xatolik yuz berdi", keyboards.cancelBtn.resize());
 }

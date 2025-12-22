@@ -11,6 +11,9 @@ interface IEtkKodRequest {
   update_at: Date;
   inspector_id: string;
   status: EtkKodStatus;
+  companyId: number;
+  address: string;
+  fio: string;
 }
 
 const schema = new Schema<IEtkKodRequest>({
@@ -32,6 +35,19 @@ const schema = new Schema<IEtkKodRequest>({
     type: String,
     enum: ["yangi", "tasdiqlandi", "bekor_qilindi"],
     default: "yangi",
+  },
+  companyId: {
+    type: Number,
+    required: true,
+  },
+  phone: String,
+  address: {
+    type: String,
+    required: true,
+  },
+  fio: {
+    type: String,
+    required: true,
   },
 });
 
