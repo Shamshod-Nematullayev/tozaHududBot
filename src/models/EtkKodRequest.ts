@@ -4,7 +4,7 @@ type EtkKodStatus = "yangi" | "tasdiqlandi" | "bekor_qilindi";
 
 interface IEtkKodRequest {
   licshet: string;
-  abonent_id: string;
+  abonent_id: number;
   etk_kod: string;
   etk_saoto: string;
   phone: string;
@@ -24,7 +24,10 @@ const schema = new Schema<IEtkKodRequest>({
     type: String,
     required: true,
   },
-  abonent_id: String,
+  abonent_id: {
+    type: Number,
+    required: true,
+  },
   etk_kod: {
     type: String,
     required: true,
