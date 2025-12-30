@@ -83,7 +83,7 @@ server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
 
-import "./specialBusinessFunctions/bindFileToActs.js";
+// import "./specialBusinessFunctions/bindFileToActs.js";
 
 // (async () => {
 //   const smartGpsApi = createSmartGpsApi(1144);
