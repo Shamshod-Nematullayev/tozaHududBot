@@ -27,7 +27,7 @@ export async function createActs2(
   //   name: "Canceling contract acts",
   //   packType: packTypes.dvaynik,
   // });
-  const packId = 4454337;
+  const packId = 4456983;
 
   if (packId) {
     console.log(`   🚀 Act pachka yaratildi (o'zi bor edi): ${packId}`);
