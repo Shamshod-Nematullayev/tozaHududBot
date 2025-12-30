@@ -713,7 +713,7 @@ export const importActs = async (req: Request, res: Response): Promise<any> => {
   if (!req.file)
     return res.json({ ok: false, message: "file not found on body" });
   const data = readExcel(req.file?.buffer);
-  console.log(data);
+
   req.body.acts = data.map((a) => ({
     ...a,
     next_inhabitant_count: a.inhabitantCount,
@@ -727,7 +727,7 @@ export const importActs = async (req: Request, res: Response): Promise<any> => {
     req.body
   );
   console.log(actPackId);
-  if (actPackId === undefined) {
+  if (!actPackId || isNaN(actPackId)) {
     const tozaMakonApi = createTozaMakonApi(req.user.companyId);
     actPackId = await createActPack(tozaMakonApi, {
       companyId: req.user.companyId,
