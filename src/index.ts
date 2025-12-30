@@ -7,7 +7,7 @@ import { agenda } from "./config/agenda.js";
 import { connectDb } from "./config/connectDB.js";
 import { bot } from "./bot/core/bot.js";
 
-const launchBot = true;
+const launchBot = false;
 
 if (!process.env.SECRET_JWT_KEY || !process.env.REFRESH_JWT_KEY) {
   console.error(
@@ -57,9 +57,11 @@ connectDb();
 import "test/index.js";
 import { initJobs } from "intervals/index.js";
 import mainRouter from "routers/index.js";
-import { aktlarYaratish } from "test/aktlarYaratish.js";
+// import { aktlarYaratish } from "test/aktlarYaratish.js";
 // import "specialBusinessFunctions/bindAbonentsToGeozone.js";
 
+import abonents from "test/abonents.json";
+// import { createActs2 } from "test/create-acts.seed2.js";
 // createActs2(621, abonents);
 
 app.use("/api", mainRouter);

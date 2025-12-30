@@ -6,31 +6,38 @@ import { searchAbonent } from "@services/billing/searchAbonent.js";
 import { uploadFileToTozaMakon } from "@services/billing/uploadFileToTozaMakon.js";
 import path from "path";
 import fs from "fs";
+import { packTypes } from "types/billing.js";
+import { formatDate } from "@services/utils/formatDate.js";
+import { createActPack } from "@services/billing/createActPack.js";
 
 export async function createActs2(
   companyId: number,
-  abonentLists: { accountNumber: number; mahallaId: number }[]
+  abonentLists: {
+    accountNumber: number;
+    mahallaId: number;
+    id: number | string;
+  }[]
 ) {
   const mahallaIds = fs
     .readdirSync(path.join(process.cwd(), "src", "test", "files"))
     .map((fname) => Number(fname.split(".")[0]));
 
-  const tozaMakonApi = createTozaMakonApi(621);
+  const tozaMakonApi = createTozaMakonApi(337);
   const errors: any[] = [];
 
-  // const packId = await createActPack(tozaMakonApi, {
-  //   companyId: companyId,
-  //   createdDate: formatDate(new Date()),
-  //   description: "created by GreenZone service",
-  //   isActive: true,
-  //   isSpecialPack: false,
-  //   name: "Canceling contract acts",
-  //   packType: packTypes.dvaynik,
-  // });
-  const packId = 4454337;
+  const packId = await createActPack(tozaMakonApi, {
+    companyId: companyId,
+    createdDate: formatDate(new Date()),
+    description: "created by GreenZone service",
+    isActive: true,
+    isSpecialPack: false,
+    name: "Canceling contract acts",
+    packType: packTypes.dvaynik,
+  });
+  // const packId = 4454337;
 
   if (packId) {
-    console.log(`   🚀 Act pachka yaratildi (o'zi bor edi): ${packId}`);
+    console.log(`   🚀 Act pachka yaratildi: ${packId}`);
 
     let list = abonentLists.filter((a) => mahallaIds.includes(a.mahallaId));
     const fileIds: any = {};
@@ -54,15 +61,18 @@ export async function createActs2(
       await Promise.all(
         chunk.map(async (abon) => {
           try {
-            const abonentDetails = (
-              await searchAbonent(tozaMakonApi, {
-                accountNumber: abon.accountNumber.toString(),
-                companyId: companyId,
-              })
-            ).content[0];
+            // const abonentDetails = (
+            //   await searchAbonent(tozaMakonApi, {
+            //     accountNumber: abon.accountNumber.toString(),
+            //     companyId: companyId,
+            //   })
+            // ).content[0];
 
-            if (!abonentDetails) {
-              throw new Error("Abonent ma'lumotlari topilmadi");
+            // if (!abonentDetails) {
+            //   throw new Error("Abonent ma'lumotlari topilmadi");
+            // }
+            if (typeof abon.id === "string") {
+              return;
             }
 
             const amount = (
@@ -70,7 +80,7 @@ export async function createActs2(
                 actPackId: packId,
                 inhabitantCount: 0,
                 kSaldo: 0,
-                residentId: abonentDetails.id,
+                residentId: abon.id,
               })
             ).amount;
 
@@ -82,11 +92,11 @@ export async function createActs2(
               amountWithQQS: amount,
               description: "Shartnoma bekor qilish",
               fileId: fileIds[abon.mahallaId],
-              startPeriod: "10.2025",
-              endPeriod: "10.2025",
+              startPeriod: "12.2025",
+              endPeriod: "12.2025",
               inhabitantCount: 0,
               kSaldo: 0,
-              residentId: abonentDetails.id,
+              residentId: abon.id,
             });
           } catch (err: any) {
             console.error(
