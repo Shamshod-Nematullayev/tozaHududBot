@@ -22,7 +22,7 @@ async function bindFileToActsSeed(
   const tozaMakonApi = createTozaMakonApi(companyId);
 
   // 1. Fayllarni o'qish va yuklash
-  const files = fs.readdirSync("./src/test/files");
+  // const files = fs.readdirSync("./src/test/files");
   const fileIds: any = {};
   // const fileIds: any = {
   // "46532":
@@ -80,25 +80,25 @@ async function bindFileToActsSeed(
 
   // };
 
-  console.log(
-    `📁 "./files" papkasida ${files.length} ta fayl topildi. Yuklash boshlanmoqda...`
-  );
+  // console.log(
+  //   `📁 "./files" papkasida ${files.length} ta fayl topildi. Yuklash boshlanmoqda...`
+  // );
 
-  for (let f of files) {
-    try {
-      const id = await uploadFileToTozaMakon(
-        tozaMakonApi,
-        fs.readFileSync(`./src/test/files/${f}`),
-        f,
-        "STACK_ACT"
-      );
-      fileIds[f.split(".")[0]] = id;
-      console.log(`✅ Fayl yuklandi: ${f} -> ID: ${id}`);
-    } catch (error: any) {
-      console.error(`❌ Fayl yuklashda xatolik (${f}):`, error?.message);
-    }
-  }
-  console.log(fileIds);
+  // for (let f of files) {
+  //   try {
+  //     const id = await uploadFileToTozaMakon(
+  //       tozaMakonApi,
+  //       fs.readFileSync(`./src/test/files/${f}`),
+  //       f,
+  //       "STACK_ACT"
+  //     );
+  //     fileIds[f.split(".")[0]] = id;
+  //     console.log(`✅ Fayl yuklandi: ${f} -> ID: ${id}`);
+  //   } catch (error: any) {
+  //     console.error(`❌ Fayl yuklashda xatolik (${f}):`, error?.message);
+  //   }
+  // }
+  // console.log(fileIds);
 
   // 2. Accountlarni aktlarga bog'lash
   console.log(
@@ -131,6 +131,12 @@ async function bindFileToActsSeed(
 
   console.log(`🗂️ Jami ${acts.length} ta akt topildi packda.`);
 
+  fs.writeFileSync(
+    "./acts-in-pack.json",
+    JSON.stringify(acts, null, 2),
+    "utf-8"
+  );
+  return;
   for (let fileIdKey in fileIds) {
     const accountNumbersForMahalla = accountNumbers.filter(
       (a) => a.mahallaId.toString() == fileIdKey
