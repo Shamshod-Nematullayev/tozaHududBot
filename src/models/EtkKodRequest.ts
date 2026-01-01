@@ -17,6 +17,7 @@ interface IEtkKodRequest {
   channelPostId: number;
   existingAbonents: string[];
   billingdaFIO: string;
+  hetBlockingStatus?: "BLOCK" | "UNBLOCK";
 }
 
 const schema = new Schema<IEtkKodRequest>({
@@ -64,6 +65,10 @@ const schema = new Schema<IEtkKodRequest>({
   billingdaFIO: {
     type: String,
     required: true,
+  },
+  hetBlockingStatus: {
+    type: String,
+    enum: ["BLOCK", "UNBLOCK"],
   },
 });
 

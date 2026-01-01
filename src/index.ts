@@ -7,7 +7,7 @@ import { agenda } from "./config/agenda.js";
 import { connectDb } from "./config/connectDB.js";
 import { bot } from "./bot/core/bot.js";
 
-const launchBot = false;
+const launchBot = true;
 
 if (!process.env.SECRET_JWT_KEY || !process.env.REFRESH_JWT_KEY) {
   console.error(
@@ -82,8 +82,6 @@ const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
-
-import "./specialBusinessFunctions/bindFileToActs.js";
 
 // (async () => {
 //   const smartGpsApi = createSmartGpsApi(1144);

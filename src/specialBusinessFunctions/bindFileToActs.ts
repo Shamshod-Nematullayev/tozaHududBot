@@ -224,4 +224,4 @@ async function bindFileToActsSeed(
   ---`);
 }
 
-bindFileToActsSeed(337, abonnets, actPackId);
+// bindFileToActsSeed(337, abonnets, actPackId);
