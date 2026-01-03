@@ -141,7 +141,7 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) throw ErrorTypes.BAD_REQUEST;
-    if (ctx.message.text.length < 7) throw ErrorTypes.BAD_REQUEST;
+    if (isNaN(Number(ctx.message.text))) throw ErrorTypes.BAD_REQUEST;
 
     const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId!);
     const existingAbonents = await searchAbonent(tozaMakonApi, {
