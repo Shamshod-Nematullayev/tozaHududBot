@@ -225,6 +225,7 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
         );
 
         await req.updateOne({ $set: { channelPostId: message.message_id } });
+        break;
       case "no":
         await ctx.deleteMessage();
         ctx.reply("Bekor qilindi.", keyboards.mainKeyboard.resize());
