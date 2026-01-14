@@ -22,6 +22,7 @@ import { Admin } from "@models/Admin.js";
 import { getDataFromHET } from "@services/billing/getDataFromHET.js";
 import { searchAbonent } from "@services/billing/searchAbonent.js";
 import { Company } from "@models/Company.js";
+import { getHetWarningReportByResident } from "@services/billing/getHetWarningReportByResident.js";
 
 interface MyWizardState {
   accountNumber?: string;
@@ -86,6 +87,10 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
       return;
     }
 
+    await ctx.reply(
+      `Abonent topildi:\nFIO: ${abonent.fio}\nL/H: ${abonent.licshet}`
+    );
+
     if (abonent.ekt_kod_tasdiqlandi?.confirm) {
       await ctx.reply(
         `Bu abonent ma'lumoti ${
@@ -136,7 +141,7 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) throw ErrorTypes.BAD_REQUEST;
-    if (ctx.message.text.length < 7) throw ErrorTypes.BAD_REQUEST;
+    if (isNaN(Number(ctx.message.text))) throw ErrorTypes.BAD_REQUEST;
 
     const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId!);
     const existingAbonents = await searchAbonent(tozaMakonApi, {
@@ -187,6 +192,10 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
     switch (ctx.callbackQuery?.data) {
       case "yes":
         const abonent = ctx.wizard.state.abonent as IAbonentDoc;
+        const abonentHetBlocking = await getHetWarningReportByResident(
+          createTozaMakonApi(ctx.wizard.state.companyId!),
+          abonent.id!
+        );
         const state = ctx.wizard.state;
         const req = await EtkKodRequest.create({
           licshet: abonent.licshet,
@@ -213,8 +222,24 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
         if (!company) return;
         const message = await ctx.telegram.sendMessage(
           company.CHANNEL_ID_SHAXSI_TASDIQLANDI,
-          `${ctx.wizard.state.inspector_name} tomonidan\nKOD: ${abonent.licshet}\nFIO: ${abonent.fio} ETK: ${state.ETK} ${state.FIO} \n ${state.ADDRESS}`,
+          `👤 <b>Inspektor:</b> ${ctx.wizard.state.inspector_name}
+
+🆔 <b>KOD (L/H):</b> <code>${abonent.licshet}</code>
+👤 <b>Abonent:</b> ${abonent.fio}
+
+🏢 <b>ETK:</b> ${state.ETK}
+📝 <b>FIO (State):</b> ${state.FIO}
+📍 <b>Manzil:</b> ${state.ADDRESS}
+⚡️ HET: ${
+            abonentHetBlocking?.blockStatus == "BLOCK"
+              ? "🚫 Cheklangan"
+              : "✅ Cheklov yo`q"
+          } 
+📞 <b>Telefon:</b> ${state.PHONE}
+🗺 <b>SaOTo:</b> ${state.caoto}
+`,
           {
+            parse_mode: "HTML",
             reply_markup: Markup.inlineKeyboard([
               [
                 Markup.button.callback("🚫", "etk_no_" + req._id),
@@ -224,7 +249,13 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
           }
         );
 
-        await req.updateOne({ $set: { channelPostId: message.message_id } });
+        await req.updateOne({
+          $set: {
+            channelPostId: message.message_id,
+            hetBlockingStatus:
+              abonentHetBlocking?.blockStatus == "BLOCK" ? "BLOCK" : "UNBLOCK",
+          },
+        });
         break;
       case "no":
         await ctx.deleteMessage();
