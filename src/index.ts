@@ -7,11 +7,11 @@ import { agenda } from "./config/agenda.js";
 import { connectDb } from "./config/connectDB.js";
 import { bot } from "./bot/core/bot.js";
 
-const launchBot = true;
+const launchBot = process.env.LAUNCH_BOT === "false" ? false : true;
 
 if (!process.env.SECRET_JWT_KEY || !process.env.REFRESH_JWT_KEY) {
   console.error(
-    "SECRET_JWT_KEY or REFRESH_JWT_KEY environment variable is not defined"
+    "SECRET_JWT_KEY or REFRESH_JWT_KEY environment variable is not defined",
   );
   process.exit(1);
 }
@@ -31,7 +31,7 @@ app.use(
   cors({
     origin: true,
     credentials: true,
-  })
+  }),
 );
 
 if (launchBot) {
