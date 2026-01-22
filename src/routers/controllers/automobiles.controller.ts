@@ -4,7 +4,7 @@ import z, { number } from "zod";
 
 export const getAutomobiles = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<any> => {
   const filters: any = z
     .object({
@@ -27,7 +27,7 @@ export const getAutomobiles = async (
 
 export const getAutomobileById = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<any> => {
   const automobile = await Automobile.findOne({
     _id: req.params.id,
@@ -38,7 +38,7 @@ export const getAutomobileById = async (
 
 export const createAutomobile = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<any> => {
   const automobileData = z
     .object({
@@ -47,10 +47,21 @@ export const createAutomobile = async (
       year: z.number(),
       km: z.number().optional(),
       currentDriver: z.string().optional(),
-      status: z.enum(["soz", "nosoz"]),
+      status: z.enum(["soz", "nosoz"]).default("soz"),
       tozamakonId: z.number(),
       phone: z.string().optional(),
-      mahallalar: [],
+      mahallalar: z.array(
+        z.object({
+          mahallaId: z.number(),
+          name: z.string(),
+          service: z.array(
+            z.object({
+              serviceId: z.number(),
+              name: z.string(),
+            })
+          ),
+        })
+      ),
     })
     .parse(req.body);
 
@@ -63,7 +74,7 @@ export const createAutomobile = async (
 
 export const updateAutomobile = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<any> => {
   const automobileData = z
     .object({
@@ -88,7 +99,7 @@ export const updateAutomobile = async (
     },
     {
       new: true,
-    },
+    }
   );
 
   res.json(updatedAutomobile);
@@ -96,7 +107,7 @@ export const updateAutomobile = async (
 
 export const deleteAutomobile = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<any> => {
   await Automobile.findOneAndDelete({
     _id: req.params.id,
@@ -107,7 +118,7 @@ export const deleteAutomobile = async (
 
 export const addMahallaToAutomobile = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<any> => {
   const mahallaData = z
     .object({
@@ -117,7 +128,7 @@ export const addMahallaToAutomobile = async (
         z.object({
           day: z.number().refine((val) => [1, 2, 3, 4, 5, 6, 7].includes(val)),
           time: z.number().refine((val) => [0.5, 1].includes(val)),
-        }),
+        })
       ),
     })
     .parse(req.body);
@@ -132,7 +143,7 @@ export const addMahallaToAutomobile = async (
     },
     {
       new: true,
-    },
+    }
   );
 
   res.json(updatedAutomobile);
@@ -140,7 +151,7 @@ export const addMahallaToAutomobile = async (
 
 export const removeMahallaFromAutomobile = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<any> => {
   const mahallaId = z.number().parse(req.body.mahallaId);
 
@@ -154,7 +165,7 @@ export const removeMahallaFromAutomobile = async (
     },
     {
       new: true,
-    },
+    }
   );
 
   res.json(updatedAutomobile);
