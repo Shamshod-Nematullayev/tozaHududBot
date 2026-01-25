@@ -14,7 +14,7 @@ interface BiriktirilganMahalla {
   mahallaId: number;
   name: string;
   service: {
-    day: number[];
+    day: number;
     time: 0.5 | 1;
   }[];
 }
@@ -70,7 +70,7 @@ const schema = new Schema<IAutomobile>({
   status: {
     type: String,
     required: true,
-    enum: ["active", "inactive"],
+    enum: ["soz", "nosoz"],
   },
   phone: String,
   mahallalar: [BiriktirilganMahallaSchema],
