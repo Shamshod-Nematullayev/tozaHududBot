@@ -8,6 +8,7 @@ import {
   getAutomobiles,
   removeMahallaFromAutomobile,
   updateAutomobile,
+  updateMahallaInAutomobile,
 } from "./controllers/automobiles.controller.js";
 
 const router = Router();
@@ -22,8 +23,13 @@ router.put("/:id", catchAsync(updateAutomobile));
 
 router.delete("/:id", catchAsync(deleteAutomobile));
 
-router.patch("/add-mahalla/:id", catchAsync(addMahallaToAutomobile));
+router.post("/add-mahalla/:id", catchAsync(addMahallaToAutomobile));
 
-router.patch("/remove-mahalla/:id", catchAsync(removeMahallaFromAutomobile));
+router.patch("/update-mahalla/:id", catchAsync(updateMahallaInAutomobile));
+
+router.delete(
+  "/remove-mahalla/:autoId/:mahallaId",
+  catchAsync(removeMahallaFromAutomobile),
+);
 
 export default router;
