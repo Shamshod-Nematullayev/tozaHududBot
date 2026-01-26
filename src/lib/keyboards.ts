@@ -30,7 +30,7 @@ function mahallaKeys() {
  * @returns InlineKeyboardMarkup
  */
 export function createInlineKeyboard(
-  buttonDataArray: Array<Array<[string, string]>>
+  buttonDataArray: Array<Array<[string, string]>>,
 ): Markup.Markup<InlineKeyboardMarkup> {
   const inlineKeyboard = buttonDataArray.map((buttonDataSet) => {
     return buttonDataSet.map(([buttonText, buttonCallback]) => {
@@ -43,7 +43,7 @@ export function createInlineKeyboard(
 
 async function nazoratchigaBiriktirilganMahallalar(
   companyId: number,
-  inspector_id?: number
+  inspector_id?: number,
 ) {
   const filter = inspector_id
     ? {
@@ -57,7 +57,7 @@ async function nazoratchigaBiriktirilganMahallalar(
     return;
   }
   const sortedMahallalar = mahallalar.sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.name.localeCompare(b.name),
   );
   const buttons = sortedMahallalar.map((mfy) => [
     Markup.button.callback(mfy.name, "mahalla_" + mfy.id),
@@ -77,6 +77,10 @@ export const keyboards = {
     ["✅Abonentlar ro'yxati"],
   ]).resize(),
   cancelBtn: Markup.keyboard(["🚫Bekor qilish"]).resize(),
+  iHaventETKAndCancelBtn: Markup.keyboard([
+    "📛Menda ETK🔌 yo'q 😥😥",
+    "🚫Bekor qilish",
+  ]).resize(),
   mahallalar: Markup.inlineKeyboard(mahallaKeys()),
   adminAnswerKeyboard: Markup.keyboard([
     "Kod ochish",
