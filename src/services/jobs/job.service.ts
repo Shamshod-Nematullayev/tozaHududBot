@@ -1,7 +1,7 @@
 import { Agenda } from "agenda";
 import { importActJob } from "./importAct.job.js";
 import { JobName, JobNames, JobPayloads } from "./job.type.js";
-import { excelToImageAndSendTelegram } from "./excelToImageAndSendTelegram.js";
+import { excelToImageAndSendTelegramJob } from "./excelToImageAndSendTelegramJob.js";
 import { agenda } from "config/agenda.js";
 
 export class JobService {
@@ -14,7 +14,7 @@ export class JobService {
     this.agenda.define(JobNames.ImportActs, importActJob);
     this.agenda.define(
       JobNames.ExcelToImageAndSendTelegram,
-      excelToImageAndSendTelegram
+      excelToImageAndSendTelegramJob
     );
   }
 

@@ -8,7 +8,7 @@ import { createImgFromHtml } from "@helpers/createImgFromHtml.js";
 import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
 import { bot } from "@bot/core/bot.js";
 
-export async function excelToImageAndSendTelegram(
+export async function excelToImageAndSendTelegramJob(
   job: Job<JobPayloads[typeof JobNames.ExcelToImageAndSendTelegram]>
 ) {
   const payload = job.attrs.data;
