@@ -9,7 +9,7 @@ import notificationRouter from "./notificationRouter.js";
 import sudRouter from "./sudRouter.js";
 import targetsRouter from "./targetsRouter.js";
 import bildirgilarRouter from "./bildirgilarRouter.js";
-import fetchTelegramRouter from "./fetchTelegramRouter.js";
+import fetchTelegramRouter from "./telegram.route.js";
 import aktPachkaRouter from "./aktPachka.js";
 import kiruvchiXujjatlarRouter from "./kiruvchiXujjatlar.js";
 import inspectorsRouter from "./inspectorsRouter.js";
@@ -34,19 +34,19 @@ mainRouter.use(
   "/court-service",
   isAuth,
   allowRoles(["admin", "yurist"]),
-  sudRouter,
+  sudRouter
 );
 mainRouter.use(
   "/targets",
   allowRoles(["admin", "yurist"]),
   isAuth,
-  targetsRouter,
+  targetsRouter
 );
 mainRouter.use(
   "/bildirgilar",
   allowRoles(["admin", "yurist"]),
   isAuth,
-  bildirgilarRouter,
+  bildirgilarRouter
 );
 mainRouter.use("/fetchTelegram", isAuth, fetchTelegramRouter);
 mainRouter.use("/pachkalar", isAuth, aktPachkaRouter);
@@ -58,7 +58,7 @@ mainRouter.use(
   "/arizalar",
   isAuth,
   allowRoles(["admin", "billing"]),
-  arizalarRouter,
+  arizalarRouter
 );
 mainRouter.use("/pendingNewAbonents", isAuth, newAbonentsRouter);
 mainRouter.use("/yashovchi-soni-xatlov", isAuth, yashovchiSoniXatlovRouter);
@@ -69,7 +69,7 @@ mainRouter.use(
   "/folders",
   isAuth,
   allowRoles(["admin", "billing"]),
-  foldersRouter,
+  foldersRouter
 );
 mainRouter.use("/automobiles", isAuth, automobilesRouter);
 

@@ -18,7 +18,7 @@ export interface JobPayloads {
   };
   [JobNames.ExcelToImageAndSendTelegram]: BaseJobData & {
     excelFilePath: string;
-    telegramChatId: number;
+    telegramChatId: number | string;
     // TODO tasks
   };
 }

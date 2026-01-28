@@ -1,6 +1,8 @@
 import { Agenda } from "agenda";
 import { importActJob } from "./importAct.job.js";
 import { JobName, JobNames, JobPayloads } from "./job.type.js";
+import { excelToImageAndSendTelegram } from "./excelToImageAndSendTelegram.js";
+import { agenda } from "config/agenda.js";
 
 export class JobService {
   constructor(private readonly agenda: Agenda) {
@@ -10,6 +12,10 @@ export class JobService {
 
   private async defineJobs() {
     this.agenda.define(JobNames.ImportActs, importActJob);
+    this.agenda.define(
+      JobNames.ExcelToImageAndSendTelegram,
+      excelToImageAndSendTelegram
+    );
   }
 
   async startJob<T extends JobPayloads[JobName]>(jobName: JobName, data: T) {
@@ -57,3 +63,5 @@ export class JobService {
     });
   }
 }
+
+export const jobService = new JobService(agenda);

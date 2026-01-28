@@ -48,7 +48,7 @@ import { chunkArray } from "helpers/chunkArray.js";
 import { generateMessageForAbonentList } from "./utils/generateMessageForAbonentList.js";
 import { getAbonentsByMfyId } from "./utils/getAbonensByMfyId.js";
 import { createMoneyTransferActs } from "@services/billing/createMoneyTransferActs.js";
-import { JobService } from "@services/jobs/job.service.js";
+import { jobService, JobService } from "@services/jobs/job.service.js";
 import { agenda } from "config/agenda.js";
 import { JobNames } from "@services/jobs/job.type.js";
 import { formatDate } from "@services/utils/formatDate.js";
@@ -59,8 +59,6 @@ import { readExcel } from "@helpers/getJsonFromExcel.js";
 import { readFileSync } from "fs";
 import path from "path";
 import { Folder } from "@models/Folder.js";
-
-const jobsService = new JobService(agenda);
 
 export const downloadPdfFileFromBillingAsBase64 = async (
   req: Request,
@@ -740,7 +738,7 @@ export const importActs = async (req: Request, res: Response): Promise<any> => {
     });
   }
 
-  await jobsService.startJob(JobNames.ImportActs, {
+  await jobService.startJob(JobNames.ImportActs, {
     acts: acts.map((a) => ({
       actPackId: actPackId,
       actType: a.akt_sum > 0 ? "CREDIT" : ("DEBIT" as "DEBIT" | "CREDIT"),
