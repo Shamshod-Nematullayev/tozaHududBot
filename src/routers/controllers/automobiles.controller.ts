@@ -153,11 +153,11 @@ export const removeMahallaFromAutomobile = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  const mahallaId = z.number().parse(req.body.mahallaId);
+  const mahallaId = z.coerce.number().parse(req.params.mahallaId);
 
   const updatedAutomobile = await Automobile.findOneAndUpdate(
     {
-      _id: req.params.id,
+      _id: req.params.autoId,
       companyId: req.user.companyId,
     },
     {
@@ -169,4 +169,41 @@ export const removeMahallaFromAutomobile = async (
   );
 
   res.json(updatedAutomobile);
+};
+
+export const updateMahallaInAutomobile = async (
+  req: Request,
+  res: Response,
+): Promise<any> => {
+  const data = z
+    .object({
+      mahallaId: z.number(),
+      newMahallaId: z.number().optional(),
+      newMahallaName: z.string().optional(),
+      service: z.array(
+        z.object({
+          day: z.number(),
+          time: z.number(),
+        }),
+      ),
+    })
+    .parse(req.body);
+
+  const updated = await Automobile.findOneAndUpdate(
+    {
+      _id: req.params.id,
+      companyId: req.user.companyId,
+      "mahallalar.mahallaId": data.mahallaId,
+    },
+    {
+      $set: {
+        "mahallalar.$.mahallaId": data.newMahallaId,
+        "mahallalar.$.name": data.newMahallaName,
+        "mahallalar.$.service": data.service,
+      },
+    },
+    { new: true },
+  );
+
+  res.json(updated);
 };

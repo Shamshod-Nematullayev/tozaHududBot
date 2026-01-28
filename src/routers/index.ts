@@ -23,6 +23,9 @@ import actsRouter from "./actsRouter.js";
 import gpsRouter from "./gps.route.js";
 import foldersRouter from "./folders.route.js";
 import automobilesRouter from "./automobiles.route.js";
+import mahallaRouter from "./mahallaRouter.js";
+
+// use middlewares
 import isAuth from "@middlewares/isAuth.js";
 import allowRoles from "@middlewares/allowRoles.js";
 import { globalErrorHandler } from "./controllers/utils/globalErrorHandler.js";
@@ -72,6 +75,7 @@ mainRouter.use(
   foldersRouter
 );
 mainRouter.use("/automobiles", isAuth, automobilesRouter);
+mainRouter.use("/mahallas", isAuth, mahallaRouter);
 
 // global error handler
 mainRouter.use(globalErrorHandler);
