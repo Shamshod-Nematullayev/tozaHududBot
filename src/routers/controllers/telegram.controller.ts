@@ -44,14 +44,21 @@ export const sendExcelToTelegram = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  if (
-    !req.file ||
-    !req.file.mimetype.startsWith(
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    ) ||
-    !req.file.mimetype.startsWith("application/vnd.ms-excel")
-  ) {
+  console.log(req.file?.mimetype);
+  if (!req.file) {
     return res.status(400).json({ ok: false, message: "Fayl yuklanmadi!" });
+  }
+
+  if (
+    !req.file.mimetype.includes(
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ) &&
+    !req.file.mimetype.includes("application/vnd.ms-excel")
+  ) {
+    return res.status(400).json({
+      ok: false,
+      message: "Fayl formati xlsx yoki xls bo'lishi kerak!",
+    });
   }
 
   const fileName = path.join(process.cwd(), "tmp", Date.now() + ".xlsx");

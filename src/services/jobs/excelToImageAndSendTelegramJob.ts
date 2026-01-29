@@ -7,6 +7,7 @@ import { groupArray } from "@helpers/groupArray.js";
 import { createImgFromHtml } from "@helpers/createImgFromHtml.js";
 import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
 import { bot } from "@bot/core/bot.js";
+import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto.js";
 
 export async function excelToImageAndSendTelegramJob(
   job: Job<JobPayloads[typeof JobNames.ExcelToImageAndSendTelegram]>
@@ -44,14 +45,16 @@ export async function excelToImageAndSendTelegramJob(
       const html = await renderHtmlByEjs("scaledTable.ejs", {
         data: group,
       });
-      const img = await createImgFromHtml({
-        html,
-      });
-
-      // send images to telegram
-      await bot.telegram.sendPhoto(payload.telegramChatId, img, {
-        caption: groupName,
-      });
+      await sendHtmlAsPhoto(
+        {
+          htmlString: html,
+          selector: "table",
+        },
+        payload.telegramChatId,
+        {
+          caption: groupName,
+        }
+      );
     }
 
     console.log("=== ExcelToImageAndSendTelegram Job Finished ===");
@@ -81,5 +84,8 @@ export async function excelToImageAndSendTelegramJob(
       },
     });
     console.error("🔥 Job crashed:", err);
+  } finally {
+    fs.unlinkSync(payload.excelFilePath);
+    job.remove();
   }
 }

@@ -58,7 +58,7 @@ import "test/index.js";
 import { initJobs } from "intervals/index.js";
 import mainRouter from "routers/index.js";
 // import "specialBusinessFunctions/bindAbonentsToGeozone.js";
-
+// importPhonesFromHET(1144, abonents);
 // createActs2(621, abonents);
 
 app.use("/api", mainRouter);
@@ -78,7 +78,7 @@ agenda.on("error", (error: Error) => {
   console.error("Agenda error:", error);
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
