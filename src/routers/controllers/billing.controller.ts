@@ -760,21 +760,6 @@ export const importActs = async (req: Request, res: Response): Promise<any> => {
   res.json({ ok: true, message: "Import job started" });
 };
 
-export const importActsDownloadTemplate = async (
-  req: Request,
-  res: Response
-) => {
-  res.download(
-    path.join(
-      process.cwd(),
-      "src",
-      "lib",
-      "templates",
-      "importActTemplate.xlsx"
-    )
-  );
-};
-
 export const uploadFileTozamakon = async (
   req: Request,
   res: Response

@@ -24,6 +24,7 @@ import gpsRouter from "./gps.route.js";
 import foldersRouter from "./folders.route.js";
 import automobilesRouter from "./automobiles.route.js";
 import mahallaRouter from "./mahallaRouter.js";
+import downloadTemplatesRouter from "./downloadTemplates.route.js";
 
 // use middlewares
 import isAuth from "@middlewares/isAuth.js";
@@ -76,6 +77,7 @@ mainRouter.use(
 );
 mainRouter.use("/automobiles", isAuth, automobilesRouter);
 mainRouter.use("/mahallas", isAuth, mahallaRouter);
+mainRouter.use("/download-templates", isAuth, downloadTemplatesRouter);
 
 // global error handler
 mainRouter.use(globalErrorHandler);

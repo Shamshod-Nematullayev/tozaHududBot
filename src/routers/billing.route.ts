@@ -18,7 +18,6 @@ import {
   downloadPdfFileFromBillingAsBase64,
   transferMoneyBetweenResidents,
   importActs,
-  importActsDownloadTemplate,
   uploadFileTozamakon,
 } from "./controllers/billing.controller.js";
 
@@ -81,8 +80,6 @@ router.post(
   uploadAsBlob.single("file"),
   catchAsync(importActs)
 );
-
-router.get("/import-acts-template", catchAsync(importActsDownloadTemplate));
 
 router.post(
   "/upload-file-tozamakon",

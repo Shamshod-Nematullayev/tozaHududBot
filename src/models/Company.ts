@@ -64,6 +64,9 @@ export interface ICompany {
   smartGpsLogin: string;
   smartGpsPassword: string;
   smartGpsAccessToken?: string;
+  eskizLogin?: string;
+  eskizPassword?: string;
+  eskizAccessToken?: string;
   getMahallasFromTozamakon(): Promise<
     Awaited<ReturnType<typeof getMahallasFromTozamakon>>["content"]
   >;
@@ -174,6 +177,9 @@ const schema = new Schema<ICompany>(
     smartGpsLogin: String,
     smartGpsPassword: String,
     smartGpsAccessToken: String,
+    eskizLogin: String,
+    eskizPassword: String,
+    eskizAccessToken: String,
   },
   {
     timestamps: true,

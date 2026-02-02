@@ -11,12 +11,30 @@ import { Nazoratchi } from "@models/Nazoratchi.js";
 
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 import { updateAbonentDetails } from "@services/billing/updateAbonentDetails.js";
+import { WizardWithState } from "@bot/helpers/WizardWithState.js";
+import { isCallbackQueryMessage, isTextMessage } from "../utils/validator.js";
 
-export const connectPhoneNumber = new Scenes.WizardScene(
+interface MyWizardState {
+  inspector_id?: string;
+  inspector_name?: string;
+  fio?: string;
+  accountNumber?: string;
+  abonent_id?: number;
+  companyId?: number;
+  mahalla_name?: string;
+}
+type Ctx = WizardWithState<MyWizardState>;
+
+export const connectPhoneNumber = new Scenes.WizardScene<Ctx>(
   "connect_phone_number",
   async (ctx) => {
     try {
-      if (isNaN(ctx.message?.text))
+      if (!isTextMessage(ctx))
+        return ctx.reply(
+          messages.enterOnlyNumber,
+          keyboards.cancelBtn.resize()
+        );
+      if (isNaN(Number(ctx.message?.text)))
         return ctx.reply(
           messages.enterOnlyNumber,
           keyboards.cancelBtn.resize()
@@ -27,7 +45,7 @@ export const connectPhoneNumber = new Scenes.WizardScene(
           keyboards.cancelBtn.resize()
         );
 
-      const inspektor = await Nazoratchi.findOne({ telegram_id: ctx.from.id });
+      const inspektor = await Nazoratchi.findOne({ telegram_id: ctx.from?.id });
       if (!inspektor) {
         ctx.reply(
           "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!"
@@ -80,16 +98,33 @@ export const connectPhoneNumber = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
-      if (ctx.message.text.length != 9 || isNaN(ctx.message.text)) {
+      if (!isTextMessage(ctx))
+        return ctx.reply(
+          "Telefon raqam noto`g`ri formatda yuborildi. misol: 992852536",
+          keyboards.cancelBtn.resize()
+        );
+      if (ctx.message.text.length != 9 || isNaN(Number(ctx.message.text))) {
         return ctx.reply(
           `Telefon raqam noto'g'ri formatda yuborildi. misol: 992852536`
         );
       }
-      const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId);
-      await updateAbonentDetails(tozaMakonApi, ctx.wizard.state.abonent_id, {
-        phone: ctx.message.text,
-        description: `${ctx.wizard.state.inspector_name} ma'lumotiga asosan telefon raqami kiritildi.`,
-      });
+      if (
+        ctx.message.text.startsWith("33") ||
+        ctx.message.text.startsWith("77")
+      ) {
+        return ctx.reply(`(33 va 77) Humans abonentlari qabul qilinmaydi`);
+      }
+      const tozaMakonApi = createTozaMakonApi(
+        ctx.wizard.state.companyId as number
+      );
+      await updateAbonentDetails(
+        tozaMakonApi,
+        ctx.wizard.state.abonent_id as number,
+        {
+          phone: ctx.message.text,
+          description: `${ctx.wizard.state.inspector_name} ma'lumotiga asosan telefon raqami kiritildi.`,
+        }
+      );
 
       await Abonent.updateOne(
         {
@@ -117,6 +152,7 @@ export const connectPhoneNumber = new Scenes.WizardScene(
   },
   async (ctx) => {
     try {
+      if (!isCallbackQueryMessage(ctx)) return;
       if (ctx.callbackQuery.data === "yes") {
         await ctx.deleteMessage();
         ctx.wizard.selectStep(1);

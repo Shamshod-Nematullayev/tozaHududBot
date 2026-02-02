@@ -1,21 +1,16 @@
 import { WizardScene } from "telegraf/scenes";
 
-import os from "os";
-import path from "path";
 import { Abonent } from "@models/Abonent.js";
 import { Nazoratchi } from "@models/Nazoratchi.js";
 import { keyboards } from "@lib/keyboards.js";
-import fs from "fs";
-import ejs from "ejs";
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 
-import puppeter from "puppeteer";
 import isCancel from "../../smallFunctions/isCancel.js";
 import { isTextMessage } from "../utils/validator.js";
 import { MyContext } from "types/botContext.js";
-import { createPdfFromHtml } from "@helpers/createPdfFromHtml.js";
 import axios from "axios";
 import { readQrFromBase64 } from "@helpers/readQrFromBase64.js";
+import { Company } from "@models/Company.js";
 
 export const getAbonentCard = new WizardScene(
   "getAbonentCard",
@@ -39,6 +34,15 @@ export const getAbonentCard = new WizardScene(
       if (!inspector) {
         ctx.reply(
           "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!",
+          keyboards.mainKeyboard
+        );
+        return ctx.scene.leave();
+      }
+      const company = await Company.findOne({ id: inspector.companyId });
+      if (!company) throw "Company not found";
+      if (company.activeExpiresDate < new Date()) {
+        ctx.reply(
+          "Sizning tashkilotingiz faolligi tugagan",
           keyboards.mainKeyboard
         );
         return ctx.scene.leave();
