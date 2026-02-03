@@ -10,6 +10,7 @@ export enum ReportType {
   sendKunlikPhoneReports = "sendKunlikPhoneReports",
   xatlovchilarIshiHisobot = "xatlovchilarIshiHisobot",
   mahallaTushumlarNazoratchiKesimida = "mahallaTushumlarNazoratchiKesimida",
+  specialTaskReportByMFY = "specialTaskReportByMFY",
 }
 
 interface IReportsMessage {

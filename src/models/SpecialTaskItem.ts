@@ -9,6 +9,8 @@ interface SpecialTaskItem {
   type: "phone" | "electricity";
   nazoratchi_id: string;
   nazoratchiName: string;
+  status: "completed" | "in-progress" | "rejected";
+  purpose: string;
 }
 
 const schema = new Schema<SpecialTaskItem>({
@@ -44,6 +46,12 @@ const schema = new Schema<SpecialTaskItem>({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    required: true,
+    enum: ["completed", "in-progress"],
+  },
+  purpose: String,
 });
 
 export const SpecialTaskItem = model("special_task_item", schema);

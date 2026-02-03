@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Special Task Report</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    th {
+      background: #2f80ed;
+      color: #fff;
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    td {
+      border-bottom: 1px solid #ddd;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    tfoot td {
+      font-weight: bold;
+      background: #e3f2fd;
+      border-top: 2px solid #2f80ed;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>
+    <%= type === "phone"
+    ? "Telefon orqali tasdiqlangan topshiriqlar hisoboti"
+    : "Elektr kod orqali tasdiqlangan topshiriqlar hisoboti"
+  %>
+  </h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Mahalla nomi</th>
+        <th>Jami topshiriqlar</th>
+        <th>Bajarilgan</th>
+        <th>Bajarilish (%)</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% 
+      let totalAll = 0;
+      let totalCompleted = 0;
+    %>
+
+      <% result.forEach((row, index) => { 
+        totalAll += row.allTasksCount;
+        totalCompleted += row.complatedTasksCount;
+    %>
+      <tr>
+        <td><%= index + 1 %></td>
+        <td style="text-align:left"><%= row.mahallaName %></td>
+        <td><%= row.allTasksCount %></td>
+        <td><%= row.complatedTasksCount %></td>
+        <td><%= row.complatedPercent.toFixed(1) %> %</td>
+      </tr>
+      <% }) %>
+    </tbody>
+
+    <tfoot>
+      <tr>
+        <td colspan="2">UMUMIY</td>
+        <td><%= totalAll %></td>
+        <td><%= totalCompleted %></td>
+        <td>
+          <%= totalAll === 0
+          ? 0
+          : ((totalCompleted / totalAll) * 100).toFixed(1)
+        %> %
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+</body>
+
+</html>

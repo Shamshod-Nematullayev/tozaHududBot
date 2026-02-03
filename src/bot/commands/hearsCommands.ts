@@ -119,6 +119,17 @@ const hearsActions: {
     buttons: ["🗒Ma'lumotnoma"],
     listener: (ctx) => ctx.scene.enter("certificateNoDebtScene"),
   },
+  {
+    buttons: ["🛡 MAXSUS TOPSHIRIQ"],
+    listener: (ctx) =>
+      ctx.reply(
+        "🛡 MAXSUS TOPSHIRIQ turini tanlang",
+        Markup.inlineKeyboard([
+          Markup.button.callback("Elektr ⚡️", "electricity_special"),
+          Markup.button.callback("Telefon 📞", "phone_special"),
+        ])
+      ),
+  },
 ];
 
 hearsActions.forEach(({ buttons, listener }) => {

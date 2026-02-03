@@ -30,7 +30,7 @@ function mahallaKeys() {
  * @returns InlineKeyboardMarkup
  */
 export function createInlineKeyboard(
-  buttonDataArray: Array<Array<[string, string]>>,
+  buttonDataArray: Array<Array<[string, string]>>
 ): Markup.Markup<InlineKeyboardMarkup> {
   const inlineKeyboard = buttonDataArray.map((buttonDataSet) => {
     return buttonDataSet.map(([buttonText, buttonCallback]) => {
@@ -43,7 +43,7 @@ export function createInlineKeyboard(
 
 async function nazoratchigaBiriktirilganMahallalar(
   companyId: number,
-  inspector_id?: number,
+  inspector_id?: number
 ) {
   const filter = inspector_id
     ? {
@@ -57,7 +57,7 @@ async function nazoratchigaBiriktirilganMahallalar(
     return;
   }
   const sortedMahallalar = mahallalar.sort((a, b) =>
-    a.name.localeCompare(b.name),
+    a.name.localeCompare(b.name)
   );
   const buttons = sortedMahallalar.map((mfy) => [
     Markup.button.callback(mfy.name, "mahalla_" + mfy.id),
@@ -70,6 +70,7 @@ async function nazoratchigaBiriktirilganMahallalar(
 export const keyboards = {
   nazoratchigaBiriktirilganMahallalar,
   mainKeyboard: Markup.keyboard([
+    ["🛡 MAXSUS TOPSHIRIQ"],
     ["👤Yangi abonent ochish", "✏️Ma'lumotlarini o'zgartirish"],
     ["👥Mening abonentlarim", "🔎Izlash", "✉️Ogohlantrish xati"],
     ["🗒Ma'lumotnoma", "⚙Sozlamalar"],

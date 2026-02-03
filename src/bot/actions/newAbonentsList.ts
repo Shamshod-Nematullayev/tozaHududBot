@@ -14,7 +14,7 @@ composer.action(/newAbonentsList_(.+)/, async (ctx) => {
     const skip = (page - 1) * PAGE_SIZE;
 
     const abonents = await NewAbonent.find({
-      mahalla_id,
+      mahallaId: mahalla_id,
     })
       .select(["accountNumber", "abonent_name"])
       .skip(skip)
