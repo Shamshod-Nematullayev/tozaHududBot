@@ -24,7 +24,8 @@ export async function importSpec(
         ?.biriktirilganNazoratchi?.inspactor_id,
       nazoratchiName: mahallas.find((m) => m.id == item.mahallaId)
         ?.biriktirilganNazoratchi?.inspector_name,
-      type: "electricity",
+      type: "phone",
+      status: "in-progress",
     });
     console.log(`Imported spec for ${item.fullName}`);
   }
