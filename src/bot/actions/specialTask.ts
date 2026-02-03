@@ -1,4 +1,5 @@
 import { getInspector } from "@bot/utils/getInspector.js";
+import { Admin } from "@models/Admin.js";
 import { Mahalla } from "@models/Mahalla.js";
 import { SpecialTaskItem } from "@models/SpecialTaskItem.js";
 import { Composer, Context, Markup } from "telegraf";
@@ -15,11 +16,16 @@ async function handleSpecialTask(
   type: string
 ) {
   const inspector = await getInspector(ctx.from?.id);
-  if (!inspector) return ctx.reply("Xatolik!");
 
-  const mahallalar = await Mahalla.find({
-    "biriktirilganNazoratchi.inspactor_id": inspector.id,
-  });
+  const admin = await Admin.findOne({ user_id: ctx.from?.id });
+  let filters: any = {
+    companyId: inspector.companyId,
+  };
+  if (!inspector && !admin) return ctx.reply("Sizda huquq yo'q!");
+  if (!admin) {
+    filters["biriktirilganNazoratchi.inspactor_id"] = inspector.id;
+  }
+  const mahallalar = await Mahalla.find(filters);
 
   if (!mahallalar.length)
     return ctx.reply("Sizga biriktirilgan mahallalar yo'q!");
@@ -60,6 +66,7 @@ async function showList(
   tasks.forEach((task, i) => {
     message += `${i + 1}. ${task.accountNumber} ${task.fullName}\n`;
   });
+  await ctx.deleteMessage();
   await ctx.reply(message);
 }
 
