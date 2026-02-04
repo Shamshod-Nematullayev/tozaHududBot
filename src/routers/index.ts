@@ -25,6 +25,7 @@ import foldersRouter from "./folders.route.js";
 import automobilesRouter from "./automobiles.route.js";
 import mahallaRouter from "./mahallaRouter.js";
 import downloadTemplatesRouter from "./downloadTemplates.route.js";
+import tasksRouter from "./tasks.route.js";
 
 // use middlewares
 import isAuth from "@middlewares/isAuth.js";
@@ -75,9 +76,15 @@ mainRouter.use(
   allowRoles(["admin", "billing"]),
   foldersRouter
 );
-mainRouter.use("/automobiles", isAuth, automobilesRouter);
+mainRouter.use(
+  "/automobiles",
+  allowRoles(["admin", "gps", "billing"]),
+  isAuth,
+  automobilesRouter
+);
 mainRouter.use("/mahallas", isAuth, mahallaRouter);
 mainRouter.use("/download-templates", isAuth, downloadTemplatesRouter);
+mainRouter.use("/tasks", isAuth, allowRoles(["admin", "billing"]), tasksRouter);
 
 // global error handler
 mainRouter.use(globalErrorHandler);

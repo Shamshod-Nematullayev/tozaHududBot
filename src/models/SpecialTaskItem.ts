@@ -49,7 +49,8 @@ const schema = new Schema<SpecialTaskItem>({
   status: {
     type: String,
     required: true,
-    enum: ["completed", "in-progress"],
+    enum: ["completed", "in-progress", "rejected"],
+    default: "in-progress",
   },
   purpose: String,
 });

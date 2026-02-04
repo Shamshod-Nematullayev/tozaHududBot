@@ -11,7 +11,7 @@ export const getMahallas = async (req: Request, res: Response) => {
     ...filterParams
   } = getMahallasQuerySchema.parse(req.query);
   const skip = (Number(page) - 1) * Number(limit);
-  const filters: any = {};
+  const filters: any = { companyId: req.user.companyId };
   if (filterParams.id) filters.id = filterParams.id;
   let sortOptions: any = {};
   if (sortField) sortOptions[sortField] = sortDirection === "asc" ? 1 : -1;
