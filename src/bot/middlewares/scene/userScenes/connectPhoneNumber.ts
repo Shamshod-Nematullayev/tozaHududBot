@@ -108,11 +108,8 @@ export const connectPhoneNumber = new Scenes.WizardScene<Ctx>(
           `Telefon raqam noto'g'ri formatda yuborildi. misol: 992852536`
         );
       }
-      if (
-        ctx.message.text.startsWith("33") ||
-        ctx.message.text.startsWith("77")
-      ) {
-        return ctx.reply(`(33 va 77) Humans abonentlari qabul qilinmaydi`);
+      if (ctx.message.text.startsWith("33")) {
+        return ctx.reply(`(33) Humans abonentlari qabul qilinmaydi`);
       }
       const tozaMakonApi = createTozaMakonApi(
         ctx.wizard.state.companyId as number
