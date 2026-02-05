@@ -2,6 +2,7 @@ import { AxiosError } from "axios";
 import AppError from "errors/AppError.js";
 import { ErrorRequestHandler } from "express";
 import { MulterError } from "multer";
+import { TelegramError } from "telegraf";
 import { ZodError } from "zod";
 
 export const globalErrorHandler: ErrorRequestHandler = (
@@ -29,6 +30,14 @@ export const globalErrorHandler: ErrorRequestHandler = (
       ok: false,
       message: err.response?.data?.message || "Axios error",
       issues: err.response?.data,
+    });
+  }
+
+  if (err instanceof TelegramError) {
+    return res.status(400).json({
+      ok: false,
+      message: err.message,
+      issues: err,
     });
   }
 

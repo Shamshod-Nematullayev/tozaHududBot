@@ -8,6 +8,9 @@ import {
 } from "@schemas/tasks.schema.js";
 import { Request, Response } from "express";
 import z from "zod";
+import { createWorkbook } from "./utils/excel/createWorkbook.js";
+import { abonentsExcelConfig } from "./utils/excel/exporters/abonents.exporter.js";
+import { tasksExcelConfig } from "./utils/excel/exporters/tasks.exporter.js";
 
 export const getAllTasks = async (req: Request, res: Response) => {
   const { limit, page, sortDirection, sortField, filters } =
@@ -24,8 +27,6 @@ export const getAllTasks = async (req: Request, res: Response) => {
   if (filters?.type) filtersObj.type = filters.type;
   if (filters?.nazoratchi_id) filtersObj.nazoratchi_id = filters.nazoratchi_id;
   if (filters?.status) filtersObj.status = filters.status;
-  console.log(filtersObj);
-  console.log(limit, page);
 
   const data = await SpecialTaskItem.find(filtersObj)
     .skip(skip)
@@ -39,6 +40,50 @@ export const getAllTasks = async (req: Request, res: Response) => {
     limit,
   };
   res.json({ ok: true, data, meta });
+};
+
+export const getAllTasksToExcel = async (req: Request, res: Response) => {
+  const { sortDirection, sortField, filters } =
+    getAbonentFiltesQuerySchema.parse(req.query);
+
+  const filtersObj: any = { companyId: req.user.companyId };
+  if (filters?.accountNumber)
+    filtersObj.accountNumber = new RegExp(filters.accountNumber, "i");
+  if (filters?.fullName)
+    filtersObj.fullName = new RegExp(lotinga(filters.fullName), "i");
+  if (filters?.mahallaId) filtersObj.mahallaId = filters.mahallaId;
+  if (filters?.type) filtersObj.type = filters.type;
+  if (filters?.nazoratchi_id) filtersObj.nazoratchi_id = filters.nazoratchi_id;
+  if (filters?.status) filtersObj.status = filters.status;
+
+  const tasks = await SpecialTaskItem.find(filtersObj).sort({
+    [sortField || "createdAt"]: sortDirection,
+  });
+
+  const workbook = createWorkbook(
+    tasks.map((task, index) => ({
+      accountNumber: task.accountNumber,
+      fullName: task.fullName,
+      mahallaId: task.mahallaId,
+      type: task.type,
+      nazoratchi_id: task.nazoratchi_id,
+      companyId: task.companyId,
+      status: task.status,
+      purpose: task.purpose,
+      id: task.id,
+      nazoratchiName: task.nazoratchiName,
+      order_number: index + 1,
+    })),
+    tasksExcelConfig
+  );
+
+  res.setHeader(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  res.setHeader("Content-Disposition", "attachment; filename=tasks.xlsx");
+
+  await workbook.xlsx.write(res);
 };
 
 export const getTaskById = async (

@@ -9,9 +9,9 @@ export const getAbonentFiltesQuerySchema = z.object({
     .object({
       accountNumber: z.string().optional(),
       fullName: z.string().optional(),
-      mahallaId: z.number().optional(),
+      mahallaId: z.coerce.number().optional(),
       type: z.enum(["electricity", "phone"]).optional(),
-      nazoratchi_id: z.number().optional(),
+      nazoratchi_id: z.coerce.number().optional(),
       status: z.enum(["completed", "in-progress", "rejected"]).optional(),
     })
     .optional(),
