@@ -46,7 +46,7 @@ export async function specialTaskReport(
     await updateTasks(companyId, type);
 
     // Get all tasks
-    const tasks = await SpecialTaskItem.find({ companyId });
+    const tasks = await SpecialTaskItem.find({ companyId, type });
     const mahallas = await Mahalla.find({ companyId });
 
     // getResults

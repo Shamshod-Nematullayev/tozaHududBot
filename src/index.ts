@@ -57,6 +57,7 @@ connectDb();
 import "test/index.js";
 import { initJobs } from "intervals/index.js";
 import mainRouter from "routers/index.js";
+import { specialTaskReport } from "intervals/specialTaskReport.js";
 // import "specialBusinessFunctions/bindAbonentsToGeozone.js";
 // importPhonesFromHET(1144, abonents);
 // createActs2(621, abonents);
@@ -82,7 +83,10 @@ const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
-
+(async () => {
+  // await specialTaskReport(1144, "phone");
+  // await specialTaskReport(1144, "electricity");
+})();
 // (async () => {
 //   const smartGpsApi = createSmartGpsApi(1144);
 //   const a = await smartGpsApi.post(
