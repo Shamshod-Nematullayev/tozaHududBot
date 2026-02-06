@@ -96,11 +96,11 @@ export async function specialTaskReport(
       }
     );
 
-    await deletePreviousReport(
-      companyId,
-      ReportType.specialTaskReportByMFY,
-      msg
-    );
+    // await deletePreviousReport(
+    //   companyId,
+    //   ReportType.specialTaskReportByMFY,
+    //   msg
+    // );
   } catch (error) {
     console.error(error);
   }

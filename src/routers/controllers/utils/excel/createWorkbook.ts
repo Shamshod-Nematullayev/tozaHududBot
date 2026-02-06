@@ -1,6 +1,6 @@
 import Excel from "exceljs";
-import { ExcelExportConfig } from "./types";
-import { headerStyle, defaultColumnWidth } from "./styles";
+import { ExcelExportConfig } from "./types.js";
+import { headerStyle, defaultColumnWidth } from "./styles.js";
 
 export function createWorkbook<T>(data: T[], config: ExcelExportConfig<T>) {
   const workbook = new Excel.Workbook();

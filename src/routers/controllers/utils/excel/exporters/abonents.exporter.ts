@@ -1,4 +1,4 @@
-import { ExcelExportConfig } from "../types";
+import { ExcelExportConfig } from "../types.js";
 
 export type AbonentExcelRow = {
   id: string;

@@ -7,11 +7,11 @@ interface TaskRow {
   fullName: string;
   id: number;
   mahallaId: number;
-  companyId: number;
-  type: "phone" | "electricity";
+  mahallaName: string;
+  type: string;
   nazoratchi_id: string;
   nazoratchiName: string;
-  status: "completed" | "in-progress" | "rejected";
+  status: string;
   purpose: string;
 }
 // config object
@@ -22,8 +22,8 @@ export const tasksExcelConfig: ExcelExportConfig<TaskRow> = {
     { header: "ID", key: "id" },
     { header: "Hisob raqami", key: "accountNumber" },
     { header: "F.I.O.", key: "fullName" },
-    { header: "Mahalla", key: "mahallaId" },
-    { header: "Kompaniya", key: "companyId" },
+    { header: "Mahalla ID", key: "mahallaId" },
+    { header: "Mahalla", key: "mahallaName" },
     { header: "Turi", key: "type" },
     { header: "Nazoratchi ID", key: "nazoratchi_id" },
     { header: "Nazoratchi", key: "nazoratchiName" },

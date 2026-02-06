@@ -11,6 +11,7 @@ import z from "zod";
 import { createWorkbook } from "./utils/excel/createWorkbook.js";
 import { abonentsExcelConfig } from "./utils/excel/exporters/abonents.exporter.js";
 import { tasksExcelConfig } from "./utils/excel/exporters/tasks.exporter.js";
+import { Mahalla } from "@models/Mahalla.js";
 
 export const getAllTasks = async (req: Request, res: Response) => {
   const { limit, page, sortDirection, sortField, filters } =
@@ -60,19 +61,33 @@ export const getAllTasksToExcel = async (req: Request, res: Response) => {
     [sortField || "createdAt"]: sortDirection,
   });
 
+  console.log(filtersObj);
+
+  const mahallas = await Mahalla.find({ companyId: req.user.companyId });
+
+  const types = {
+    phone: "Telefon",
+    electricity: "Elektr hisob raqami",
+  };
+  const statuses = {
+    completed: "Bajarilgan",
+    "in-progress": "Jarayonda",
+    rejected: "Muvaffaqqiyatsiz yakunlangan",
+  };
+
   const workbook = createWorkbook(
     tasks.map((task, index) => ({
       accountNumber: task.accountNumber,
       fullName: task.fullName,
       mahallaId: task.mahallaId,
-      type: task.type,
+      type: types[task.type],
       nazoratchi_id: task.nazoratchi_id,
-      companyId: task.companyId,
-      status: task.status,
+      status: statuses[task.status],
       purpose: task.purpose,
       id: task.id,
       nazoratchiName: task.nazoratchiName,
       order_number: index + 1,
+      mahallaName: mahallas.find((m) => m.id === task.mahallaId)?.name || "",
     })),
     tasksExcelConfig
   );
@@ -97,7 +112,7 @@ export const getTaskById = async (
   });
   if (!data)
     return res.status(404).json({ ok: false, message: "Task topilmadi" });
-  res.json({ ok: true, data });
+  res.json(data);
 };
 
 export const createTask = async (req: Request, res: Response) => {
@@ -106,7 +121,7 @@ export const createTask = async (req: Request, res: Response) => {
     ...body,
     companyId: req.user.companyId,
   });
-  res.json({ ok: true, data });
+  res.status(201).json(data);
 };
 
 export const updateTask = async (req: Request, res: Response): Promise<any> => {
@@ -120,7 +135,7 @@ export const updateTask = async (req: Request, res: Response): Promise<any> => {
   );
   if (!data)
     return res.status(404).json({ ok: false, message: "Task topilmadi" });
-  res.json({ ok: true, data });
+  res.json(data);
 };
 
 export const deleteTask = async (req: Request, res: Response): Promise<any> => {
@@ -131,7 +146,7 @@ export const deleteTask = async (req: Request, res: Response): Promise<any> => {
   });
   if (!data)
     return res.status(404).json({ ok: false, message: "Task topilmadi" });
-  res.json({ ok: true, data });
+  res.status(200).send();
 };
 
 export const deleteManyTasks = async (req: Request, res: Response) => {
