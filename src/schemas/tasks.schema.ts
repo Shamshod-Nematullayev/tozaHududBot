@@ -24,7 +24,7 @@ export const createTaskBodySchema = z.object({
   fullName: z.string(),
   mahallaId: z.number(),
   type: z.enum(["electricity", "phone"]),
-  nazoratchi_id: z.number(),
+  nazoratchi_id: z.coerce.number(),
   nazoratchiName: z.string(),
 });
 
@@ -33,6 +33,8 @@ export const updateTaskBodySchema = z.object({
   fullName: z.string().optional(),
   mahallaId: z.number().optional(),
   type: z.enum(["electricity", "phone"]).optional(),
-  nazoratchi_id: z.number().optional(),
+  nazoratchi_id: z.coerce.number().optional(),
   nazoratchiName: z.string().optional(),
+  purpose: z.string().optional(),
+  status: z.enum(["completed", "in-progress", "rejected"]).optional(),
 });
