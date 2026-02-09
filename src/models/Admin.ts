@@ -12,6 +12,7 @@ export interface IAdmin {
   companyId: number;
   roles: Role[];
   pnfl: string;
+  isTestUser: boolean;
 }
 
 export interface IAdminDocument extends IAdmin, Document {
@@ -36,5 +37,6 @@ const schema = new Schema<IAdmin>({
     default: [],
   },
   pnfl: String,
+  isTestUser: { type: Boolean, default: false },
 });
 export const Admin = model("admin", schema, "admin");

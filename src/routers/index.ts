@@ -1,8 +1,7 @@
 import { Router } from "express";
-
 const mainRouter = Router();
 
-// use routers
+// routers
 import authRouter from "./auth.route.js";
 import statisticsRouter from "./statisticsRouter.js";
 import notificationRouter from "./notificationRouter.js";
@@ -27,66 +26,63 @@ import mahallaRouter from "./mahallaRouter.js";
 import downloadTemplatesRouter from "./downloadTemplates.route.js";
 import tasksRouter from "./tasks.route.js";
 
-// use middlewares
+// middlewares
 import isAuth from "@middlewares/isAuth.js";
 import allowRoles from "@middlewares/allowRoles.js";
 import { globalErrorHandler } from "./controllers/utils/globalErrorHandler.js";
+import { readOnlyGlobal } from "@middlewares/readOnlyGlobal.js";
 
+// 🔓 public
 mainRouter.use("/auth", authRouter);
-mainRouter.use("/statistics", isAuth, statisticsRouter);
-mainRouter.use("/notification", isAuth, notificationRouter);
-mainRouter.use(
-  "/court-service",
-  isAuth,
-  allowRoles(["admin", "yurist"]),
-  sudRouter
-);
-mainRouter.use(
-  "/targets",
-  allowRoles(["admin", "yurist"]),
-  isAuth,
-  targetsRouter
-);
+
+// 🔐 protected (GLOBAL)
+mainRouter.use(isAuth);
+mainRouter.use(readOnlyGlobal);
+
+// 📦 routes
+mainRouter.use("/statistics", statisticsRouter);
+mainRouter.use("/notification", notificationRouter);
+
+mainRouter.use("/court-service", allowRoles(["admin", "yurist"]), sudRouter);
+
+mainRouter.use("/targets", allowRoles(["admin", "yurist"]), targetsRouter);
+
 mainRouter.use(
   "/bildirgilar",
   allowRoles(["admin", "yurist"]),
-  isAuth,
   bildirgilarRouter
 );
-mainRouter.use("/fetchTelegram", isAuth, fetchTelegramRouter);
-mainRouter.use("/pachkalar", isAuth, aktPachkaRouter);
-mainRouter.use("/documents", isAuth, kiruvchiXujjatlarRouter);
-mainRouter.use("/inspectors", isAuth, inspectorsRouter);
-mainRouter.use("/abonents", isAuth, abonentsRouter);
-mainRouter.use("/billing", isAuth, billingRouter);
-mainRouter.use(
-  "/arizalar",
-  isAuth,
-  allowRoles(["admin", "billing"]),
-  arizalarRouter
-);
-mainRouter.use("/pendingNewAbonents", isAuth, newAbonentsRouter);
-mainRouter.use("/yashovchi-soni-xatlov", isAuth, yashovchiSoniXatlovRouter);
-mainRouter.use("/reports", isAuth, reportsRouter);
-mainRouter.use("/acts", isAuth, actsRouter);
-mainRouter.use("/gps", isAuth, allowRoles(["admin", "gps"]), gpsRouter);
-mainRouter.use(
-  "/folders",
-  isAuth,
-  allowRoles(["admin", "billing"]),
-  foldersRouter
-);
+
+mainRouter.use("/fetchTelegram", fetchTelegramRouter);
+mainRouter.use("/pachkalar", aktPachkaRouter);
+mainRouter.use("/documents", kiruvchiXujjatlarRouter);
+mainRouter.use("/inspectors", inspectorsRouter);
+mainRouter.use("/abonents", abonentsRouter);
+mainRouter.use("/billing", billingRouter);
+
+mainRouter.use("/arizalar", allowRoles(["admin", "billing"]), arizalarRouter);
+
+mainRouter.use("/pendingNewAbonents", newAbonentsRouter);
+mainRouter.use("/yashovchi-soni-xatlov", yashovchiSoniXatlovRouter);
+mainRouter.use("/reports", reportsRouter);
+mainRouter.use("/acts", actsRouter);
+
+mainRouter.use("/gps", allowRoles(["admin", "gps"]), gpsRouter);
+
+mainRouter.use("/folders", allowRoles(["admin", "billing"]), foldersRouter);
+
 mainRouter.use(
   "/automobiles",
   allowRoles(["admin", "gps", "billing"]),
-  isAuth,
   automobilesRouter
 );
-mainRouter.use("/mahallas", isAuth, mahallaRouter);
-mainRouter.use("/download-templates", isAuth, downloadTemplatesRouter);
-mainRouter.use("/tasks", isAuth, allowRoles(["admin", "billing"]), tasksRouter);
 
-// global error handler
+mainRouter.use("/mahallas", mahallaRouter);
+mainRouter.use("/download-templates", downloadTemplatesRouter);
+
+mainRouter.use("/tasks", allowRoles(["admin", "billing"]), tasksRouter);
+
+// ❗ error handler
 mainRouter.use(globalErrorHandler);
 
 export default mainRouter;

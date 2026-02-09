@@ -9,6 +9,7 @@ declare global {
         companyId: number;
         fullName: string;
         login: string;
+        isTestUser?: boolean;
       };
     }
   }

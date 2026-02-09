@@ -11,6 +11,7 @@ interface SpecialTaskItem {
   nazoratchiName: string;
   status: "completed" | "in-progress" | "rejected";
   purpose: string;
+  complatedDate: Date;
 }
 
 const schema = new Schema<SpecialTaskItem>({
@@ -53,6 +54,7 @@ const schema = new Schema<SpecialTaskItem>({
     default: "in-progress",
   },
   purpose: String,
+  complatedDate: Date,
 });
 
 export const SpecialTaskItem = model("special_task_item", schema);

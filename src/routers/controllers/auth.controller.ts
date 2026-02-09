@@ -30,6 +30,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
         companyId: admin.companyId,
         fullName: admin.fullName,
         roles: admin.roles,
+        isTestUser: admin.isTestUser,
       },
       process.env.SECRET_JWT_KEY as string,
       { expiresIn: "1h" }

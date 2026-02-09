@@ -19,6 +19,7 @@ const isAuth: Handler = (req, res, next): any => {
       roles: string[];
       fullName: string;
       login: string;
+      isTestUser?: boolean;
     }; // Add user data to request
     if (req.user.roles.includes("stm") && req.query.companyId) {
       req.user.companyId = Number(req.query.companyId);
