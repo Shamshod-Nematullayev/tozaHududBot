@@ -84,8 +84,8 @@ server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
 (async () => {
-  // await specialTaskReport(1144, "phone");
-  // await specialTaskReport(1144, "electricity");
+  await specialTaskReport(1144, "phone");
+  await specialTaskReport(1144, "electricity");
 })();
 // (async () => {
 //   const smartGpsApi = createSmartGpsApi(1144);

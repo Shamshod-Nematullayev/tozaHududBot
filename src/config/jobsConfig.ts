@@ -41,7 +41,7 @@ export const jobsConfig: IJobConfig[] = [
   },
   {
     name: "maxsusTopshiriq",
-    schedule: "0 9,13,19, * * *",
+    schedule: "20 9,10,13,19 * * *",
     handler: async () => {
       await specialTaskReport(1144, "phone");
       await specialTaskReport(1144, "electricity");
