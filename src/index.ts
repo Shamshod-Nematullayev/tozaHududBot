@@ -89,7 +89,8 @@ server.listen(PORT, () => {
 (async () => {
   // await specialTaskReport(1144, "phone");
   // await specialTaskReport(1144, "electricity");
-  // specialTaskReportByInspectorsDaily(1144, "phone");
+  specialTaskReportByInspectorsDaily(1144, "phone");
+  specialTaskReportByInspectorsDaily(1144, "electricity");
 })();
 // (async () => {
 //   const smartGpsApi = createSmartGpsApi(1144);

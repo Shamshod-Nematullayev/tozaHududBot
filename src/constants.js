@@ -105,6 +105,12 @@ export const caotoNames = [
     region: 18,
     companyId: 1824,
   },
+  {
+    title: "Nurobod EP",
+    caoto: 18235,
+    region: 18,
+    companyId: 1144,
+  },
 ];
 
 export const queueNames = {

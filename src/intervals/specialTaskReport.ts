@@ -62,7 +62,7 @@ export async function specialTaskReport(
       const mahallaTasks = tasks.filter((t) => t.mahallaId === mahalla.id);
       const allTasksCount = mahallaTasks.length;
       const complatedTasksCount = mahallaTasks.filter(
-        (t) => t.status === "completed"
+        (t) => t.status === "completed" || t.status === "rejected"
       ).length;
       let complatedPercent = (complatedTasksCount / allTasksCount) * 100;
       if (complatedPercent > 100) complatedPercent = 100;
@@ -116,10 +116,12 @@ export async function specialTaskReportByInspectorsDaily(
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const tasks = await SpecialTaskItem.find({ companyId, type });
-    const tasksCompleted = await SpecialTaskItem.find({
+    const tasksCompletedToday = await SpecialTaskItem.find({
       companyId,
       type,
-      complatedDate: today,
+      complatedDate: {
+        $gte: today,
+      },
     });
     const inspectors = await Nazoratchi.find({
       companyId,
@@ -151,12 +153,12 @@ export async function specialTaskReportByInspectorsDaily(
         allTasksCount,
         complatedTasksCount,
         complatedPercent,
-        todayCompleted: tasksCompleted.filter(
+        todayCompleted: tasksCompletedToday.filter(
           (t) => t.nazoratchi_id == inspector.id
         ).length,
       });
     }
-    result.sort((a, b) => b.complatedPercent - a.complatedPercent);
+    result.sort((a, b) => b.todayCompleted - a.todayCompleted);
     const html = await renderHtmlByEjs(
       "specialTaskReportByInspectorsDaily.ejs",
       {
