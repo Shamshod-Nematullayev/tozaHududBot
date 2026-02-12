@@ -1,6 +1,23 @@
 import { Axios } from "axios";
 import { Citizen } from "types/billing";
 
+interface EmptyCitizen {
+  id: null;
+  birthDate: null;
+  firstName: null;
+  lastName: null;
+  patronymic: null;
+  passport: null;
+  photo: "";
+  email: null;
+  inn: null;
+  passportGivenDate: null;
+  passportIssuer: null;
+  passportExpireDate: null;
+  foreignCitizen: boolean;
+  pnfl: null;
+}
+
 /**
  * Fetches a citizen's information from the TozaMakon API.
  *
@@ -19,7 +36,7 @@ export async function getCitizen(
     pinfl?: string;
     photoStatus?: "WITH_PHOTO" | "WITHOUT_PHOTO";
   }
-): Promise<Citizen> {
+): Promise<Citizen | EmptyCitizen> {
   return (
     await tozaMakonApi.get("/user-service/citizens", {
       params,

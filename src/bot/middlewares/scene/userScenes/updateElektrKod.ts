@@ -11,14 +11,10 @@ import { EtkKodRequest } from "@models/EtkKodRequest.js";
 
 import { createTozaMakonApi } from "@api/tozaMakon.js";
 
-import { EtkAbonent } from "@models/EtkAbonent.js";
-
 import { caotoNames } from "../../../../constants.js";
-import { getElectricResidentDetails } from "@services/payme.js";
 import { WizardWithState } from "@bot/helpers/WizardWithState.js";
 import { isCallbackQueryMessage, isTextMessage } from "../utils/validator.js";
 import { ErrorTypes } from "@bot/utils/errorHandler.js";
-import { Admin } from "@models/Admin.js";
 import { getDataFromHET } from "@services/billing/getDataFromHET.js";
 import { searchAbonent } from "@services/billing/searchAbonent.js";
 import { Company } from "@models/Company.js";
@@ -40,13 +36,6 @@ interface MyWizardState {
   etk_abonent?: any;
 }
 type Ctx = WizardWithState<MyWizardState>;
-
-interface IFindedAbonent {
-  caotoNumber: string;
-  accountNumber: string;
-  customerName: string;
-  companyId: number;
-}
 
 export const updateElektrKod = new Scenes.WizardScene<Ctx>(
   "updateElektrKod",
@@ -79,13 +68,6 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
 
     const abonent = abonents[0];
     ctx.wizard.state.abonent = abonent as IAbonentDoc;
-    if (!abonent) {
-      ctx.reply(
-        "Siz kiritgan chiqindi kod bo'yicha abonent ma'lumoti topilmadi. Tekshirib qaytadan kiriting",
-        keyboards.cancelBtn.resize()
-      );
-      return;
-    }
 
     await ctx.reply(
       `Abonent topildi:\nFIO: ${abonent.fio}\nL/H: ${abonent.licshet}`
@@ -113,8 +95,9 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
     if (caotoNamesCompany.length === 1) {
       ctx.wizard.state.region = caotoNamesCompany[0].region;
       ctx.wizard.state.caoto = caotoNamesCompany[0].caoto;
+      ctx.wizard.selectStep(3);
       return await ctx.reply(
-        `FIO: ${abonent.fio}\nElektr kodini kiriting:`,
+        `Elektr kodini kiriting:`,
         keyboards.cancelBtn.resize()
       );
     }
@@ -153,8 +136,8 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
     if (existingAbonents.totalElements > 0)
       await ctx.replyWithHTML(
         `‼️<b>DIQQAT</b>‼️ \n\n Bu hisob raqami allaqachon boshqa abonent${
-          existingAbonents.content.length > 1 && "lar"
-        } biriktirilgan\n${existingAbonents.content
+          existingAbonents.content.length > 1 ? "lar" : ""
+        }ga biriktirilgan\n${existingAbonents.content
           .map((a) => a.accountNumber)
           .join(", ")}`
       );

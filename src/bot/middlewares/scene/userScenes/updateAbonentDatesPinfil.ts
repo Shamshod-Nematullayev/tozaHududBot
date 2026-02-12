@@ -193,6 +193,12 @@ export const updateAbonentDatesByPinfl = new Scenes.WizardScene<Ctx>(
           photoStatus: "WITH_PHOTO",
         });
         if (citizen) {
+          if (citizen.passport === null) {
+            return ctx.reply(
+              "Ushbu PINFL to'g'ri kiritilganmikan tekshirib qaytadan kiriting",
+              keyboards.cancelBtn.resize()
+            );
+          }
           customDates.success = true;
           customDates.last_name = citizen.lastName;
           customDates.first_name = citizen.firstName;
