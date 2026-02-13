@@ -7,23 +7,26 @@ export async function importSpec(
     fullName: string;
     id: number;
     mahallaId: number;
-  }[]
+  }[],
+  companyId: number
 ) {
   console.log("Starting import spec");
-  const mahallas = await Mahalla.find({ companyId: 1144 });
+  const mahallas = await Mahalla.find({ companyId });
   console.log(`Found ${mahallas.length} mahallas`);
   for (let item of data) {
     console.log(`Importing spec for ${item.fullName}`);
     await SpecialTaskItem.create({
       accountNumber: item.accountNumber.toString(),
-      companyId: 1144,
+      companyId,
       fullName: item.fullName,
       id: item.id,
       mahallaId: item.mahallaId,
-      nazoratchi_id: mahallas.find((m) => m.id == item.mahallaId)
-        ?.biriktirilganNazoratchi?.inspactor_id,
-      nazoratchiName: mahallas.find((m) => m.id == item.mahallaId)
-        ?.biriktirilganNazoratchi?.inspector_name,
+      nazoratchi_id:
+        mahallas.find((m) => m.id == item.mahallaId)?.biriktirilganNazoratchi
+          ?.inspactor_id || 38618,
+      nazoratchiName:
+        mahallas.find((m) => m.id == item.mahallaId)?.biriktirilganNazoratchi
+          ?.inspector_name || "DAMINOV ASLIDDIN ERKINJON O‘G‘LI",
       type: "phone",
       status: "in-progress",
     });
@@ -31,4 +34,4 @@ export async function importSpec(
   }
   console.log("Finished importing spec");
 }
-importSpec(data);
+importSpec(data, 1824);

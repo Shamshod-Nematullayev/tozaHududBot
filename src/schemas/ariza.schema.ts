@@ -8,7 +8,10 @@ export const getArizalarQuerySchema = z.object({
   sortField: z.string().optional(),
   sortDirection: z.enum(["asc", "desc"]).optional().default("asc"),
 
-  document_type: z.enum(arizaDocumentTypes).optional().nullable(),
+  document_type: z
+    .enum([...arizaDocumentTypes, ""])
+    .optional()
+    .nullable(),
   document_number: z.coerce.number().optional(),
   account_number: z.string().optional(),
   dublicat_account_number: z.string().optional(),
