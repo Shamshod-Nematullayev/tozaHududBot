@@ -4,9 +4,7 @@ import fs from "fs";
 import { readExcel } from "@helpers/getJsonFromExcel.js";
 import { notificationService } from "@services/notification.js";
 import { groupArray } from "@helpers/groupArray.js";
-import { createImgFromHtml } from "@helpers/createImgFromHtml.js";
 import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
-import { bot } from "@bot/core/bot.js";
 import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto.js";
 
 export async function excelToImageAndSendTelegramJob(

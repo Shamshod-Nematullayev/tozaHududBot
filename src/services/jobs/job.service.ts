@@ -1,8 +1,9 @@
-import { Agenda } from "agenda";
-import { importActJob } from "./importAct.job.js";
-import { JobName, JobNames, JobPayloads } from "./job.type.js";
-import { excelToImageAndSendTelegramJob } from "./excelToImageAndSendTelegramJob.js";
-import { agenda } from "config/agenda.js";
+import { Agenda } from 'agenda';
+import { importActJob } from './importAct.job.js';
+import { JobName, JobNames, JobPayloads } from './job.type.js';
+import { excelToImageAndSendTelegramJob } from './excelToImageAndSendTelegramJob.js';
+import { agenda } from 'config/agenda.js';
+import { updateArizaStatusJob } from './updateArizasStatus.job.js';
 
 export class JobService {
   constructor(private readonly agenda: Agenda) {
@@ -12,10 +13,8 @@ export class JobService {
 
   private async defineJobs() {
     this.agenda.define(JobNames.ImportActs, importActJob);
-    this.agenda.define(
-      JobNames.ExcelToImageAndSendTelegram,
-      excelToImageAndSendTelegramJob
-    );
+    this.agenda.define(JobNames.ExcelToImageAndSendTelegram, excelToImageAndSendTelegramJob);
+    this.agenda.define(JobNames.UpdateArizasStatus, updateArizaStatusJob);
   }
 
   async startJob<T extends JobPayloads[JobName]>(jobName: JobName, data: T) {
@@ -24,41 +23,41 @@ export class JobService {
   }
 
   async getJobStatus(id: string): Promise<{
-    status: "completed" | "in-progress";
+    status: 'completed' | 'in-progress';
     lastFinishedAt: Date | undefined;
   } | null> {
     const [job] = await this.agenda.jobs({ _id: id });
     if (!job) return null;
 
     const { lastFinishedAt } = job.attrs;
-    const status = lastFinishedAt ? "completed" : "in-progress";
+    const status = lastFinishedAt ? 'completed' : 'in-progress';
     return { status, lastFinishedAt };
   }
 
   async getJobsStatusPerUser(userId: string): Promise<
     {
-      status: "completed" | "in-progress";
+      status: 'completed' | 'in-progress';
       lastFinishedAt: Date | undefined;
     }[]
   > {
-    const jobs = await this.agenda.jobs({ "attrs.data.userId": userId });
+    const jobs = await this.agenda.jobs({ 'attrs.data.userId': userId });
     return jobs.map((job) => {
       const { lastFinishedAt } = job.attrs;
-      const status = lastFinishedAt ? "completed" : "in-progress";
+      const status = lastFinishedAt ? 'completed' : 'in-progress';
       return { status, lastFinishedAt };
     });
   }
 
   async getJobsStatusPerCompany(companyId: number): Promise<
     {
-      status: "completed" | "in-progress";
+      status: 'completed' | 'in-progress';
       lastFinishedAt: Date | undefined;
     }[]
   > {
-    const jobs = await this.agenda.jobs({ "attrs.data.companyId": companyId });
+    const jobs = await this.agenda.jobs({ 'attrs.data.companyId': companyId });
     return jobs.map((job) => {
       const { lastFinishedAt } = job.attrs;
-      const status = lastFinishedAt ? "completed" : "in-progress";
+      const status = lastFinishedAt ? 'completed' : 'in-progress';
       return { status, lastFinishedAt };
     });
   }

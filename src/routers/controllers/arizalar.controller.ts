@@ -1,21 +1,21 @@
-import { createTozaMakonApi } from "../../api/tozaMakon.js";
+import { createTozaMakonApi } from '../../api/tozaMakon.js';
 
-import { Ariza } from "../../models/Ariza.js";
+import { Ariza } from '../../models/Ariza.js';
 
-import { Abonent } from "@models/Abonent.js";
-import { Counter } from "@models/Counter.js";
-import FormData from "form-data";
-import { getOrCreateActPackId } from "@services/billing/getOrCreateActPackId.js";
-import { Handler, Request, Response } from "express";
-import { getPagination } from "./utils/pagination.js";
+import { Abonent } from '@models/Abonent.js';
+import { Counter } from '@models/Counter.js';
+import FormData from 'form-data';
+import { getOrCreateActPackId } from '@services/billing/getOrCreateActPackId.js';
+import { Handler, Request, Response } from 'express';
+import { getPagination } from './utils/pagination.js';
 import {
   cancelArizaByIdSchema,
   changeArizaActBodySchema,
   createArizaBodySchema,
   createMonayTransferArizaBodySchema,
   getArizalarQuerySchema,
-} from "@schemas/ariza.schema.js";
-import z, { ZodError } from "zod";
+} from '@schemas/ariza.schema.js';
+import z, { ZodError } from 'zod';
 import {
   calculateKSaldo,
   createAct,
@@ -25,13 +25,12 @@ import {
   getResidentActs,
   updateAct,
   uploadFileToTozaMakon,
-} from "@services/billing/index.js";
-import { mergePhotosWithPdf } from "./utils/mergePhotosWithPdf.js";
+} from '@services/billing/index.js';
+import { mergePhotosWithPdf } from './utils/mergePhotosWithPdf.js';
+import { jobService } from '@services/jobs/job.service.js';
+import { JobNames } from '@services/jobs/job.type.js';
 
-export const getArizalar = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const getArizalar = async (req: Request, res: Response): Promise<any> => {
   try {
     const parsed = getArizalarQuerySchema.parse(req.query);
     const { skip, limit, sort, meta } = getPagination(parsed);
@@ -56,8 +55,7 @@ export const getArizalar = async (
     if (document_type) filters.document_type = document_type;
     if (document_number) filters.document_number = document_number;
     if (account_number) filters.licshet = account_number;
-    if (dublicat_account_number)
-      filters.ikkilamchi_licshet = dublicat_account_number;
+    if (dublicat_account_number) filters.ikkilamchi_licshet = dublicat_account_number;
     if (created_from_date) filters.sana = { $gte: new Date(created_from_date) };
     if (created_to_date)
       filters.sana = {
@@ -65,8 +63,7 @@ export const getArizalar = async (
         $lte: new Date(created_to_date),
       };
     if (act_from_date) filters.akt_date = { $gte: new Date(act_from_date) };
-    if (act_to_date)
-      filters.akt_date = { ...filters.akt_date, $lte: new Date(act_to_date) };
+    if (act_to_date) filters.akt_date = { ...filters.akt_date, $lte: new Date(act_to_date) };
     if (act_amount_from) filters.aktSummasi = { $gte: act_amount_from };
     if (act_amount_to)
       filters.aktSummasi = {
@@ -77,11 +74,7 @@ export const getArizalar = async (
     if (act_status) filters.actStatus = act_status;
 
     // Ma'lumotlarni qidirish
-    const data = await Ariza.find(filters)
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .lean();
+    const data = await Ariza.find(filters).sort(sort).skip(skip).limit(limit).lean();
     const total = await Ariza.countDocuments(filters);
     const accountNumbers = data.map((ariza) => ariza.licshet);
     const abonents = await Abonent.find({
@@ -91,9 +84,7 @@ export const getArizalar = async (
     res.json({
       ok: true,
       data: data.map((item) => {
-        let abonent = abonents.find(
-          (abonent) => abonent.licshet === item.licshet
-        );
+        let abonent = abonents.find((abonent) => abonent.licshet === item.licshet);
         return {
           ...item,
           abonentId: abonent?.id,
@@ -110,21 +101,16 @@ export const getArizalar = async (
     if (error instanceof ZodError) {
       return res.status(400).json({
         ok: false,
-        message: "Invalid query params",
+        message: 'Invalid query params',
         issues: error.issues, // foydalanuvchi ko'rishi uchun
       });
     }
 
-    res
-      .status(500)
-      .json({ ok: false, message: `internal error: ${error?.message}` });
+    res.status(500).json({ ok: false, message: `internal error: ${error?.message}` });
   }
 };
 
-export const getArizaById = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const getArizaById = async (req: Request, res: Response): Promise<any> => {
   try {
     const ariza = await Ariza.findOne({
       _id: req.params.id,
@@ -133,11 +119,10 @@ export const getArizaById = async (
     if (!ariza)
       return res.status(404).json({
         ok: false,
-        message: "Ariza topilmadi",
+        message: 'Ariza topilmadi',
       });
     const abonent = await Abonent.findOne({ licshet: ariza.licshet });
-    if (!abonent)
-      return res.status(404).json({ ok: false, message: "Abonent topilmadi" });
+    if (!abonent) return res.status(404).json({ ok: false, message: 'Abonent topilmadi' });
     ariza.fio = abonent.fio;
     ariza.abonentId = abonent.id;
     res.json({
@@ -146,22 +131,17 @@ export const getArizaById = async (
     });
   } catch (error: any) {
     console.error(error);
-    res
-      .status(500)
-      .json({ ok: false, message: `internal error: ${error.message}` });
+    res.status(500).json({ ok: false, message: `internal error: ${error.message}` });
   }
 };
 
-export const cancelArizaById = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const cancelArizaById = async (req: Request, res: Response): Promise<any> => {
   const { _id, canceling_description } = cancelArizaByIdSchema.parse(req.body);
   const ariza = await Ariza.findOneAndUpdate(
     { _id, companyId: req.user.companyId },
     {
       $set: {
-        status: "bekor qilindi",
+        status: 'bekor qilindi',
         canceling_description,
         is_canceled: true,
       },
@@ -170,15 +150,12 @@ export const cancelArizaById = async (
   if (!ariza)
     return res.status(404).json({
       ok: false,
-      message: "Ariza topilmadi",
+      message: 'Ariza topilmadi',
     });
-  res.json({ ok: true, message: "Ariza bekor qilindi" });
+  res.json({ ok: true, message: 'Ariza bekor qilindi' });
 };
 
-export const createAriza: Handler = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const createAriza: Handler = async (req: Request, res: Response): Promise<any> => {
   const {
     abonentId,
     account_number,
@@ -196,14 +173,14 @@ export const createAriza: Handler = async (
   // validate the request
 
   const counter = await Counter.findOne({
-    name: "ariza_tartib_raqami",
+    name: 'ariza_tartib_raqami',
     companyId: req.user.companyId,
     arizaDocumentType: document_type,
   });
   if (!counter)
     return res.status(404).json({
       ok: false,
-      message: "Ariza tartib raqami topilmadi",
+      message: 'Ariza tartib raqami topilmadi',
     });
   const newAriza = await Ariza.create({
     abonentId,
@@ -237,7 +214,7 @@ export const moveToInboxAriza: Handler = async (req, res) => {
     {
       $set: {
         acceptedDate: new Date(),
-        status: "qabul qilindi",
+        status: 'qabul qilindi',
       },
     }
   );
@@ -264,10 +241,7 @@ export const updateArizaById: Handler = async (req, res) => {
   });
 };
 
-export const updateArizaFromBillingById: Handler = async (
-  req,
-  res
-): Promise<any> => {
+export const updateArizaFromBillingById: Handler = async (req, res): Promise<any> => {
   // validate the request
   const ariza = await Ariza.findOne({
     _id: req.params.id,
@@ -276,23 +250,21 @@ export const updateArizaFromBillingById: Handler = async (
   if (!ariza)
     return res.status(404).json({
       ok: false,
-      message: "Ariza topilmadi",
+      message: 'Ariza topilmadi',
     });
   const abonent = await Abonent.findOne({ licshet: ariza.licshet });
-  if (!abonent)
-    return res.status(404).json({ ok: false, message: "Abonent topilmadi" });
+  if (!abonent) return res.status(404).json({ ok: false, message: 'Abonent topilmadi' });
 
   // update the ariza
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const acts = await getResidentActs(tozaMakonApi, abonent.id);
   const act = acts.find((a) => a.id == ariza.akt_id);
-  if (!act)
-    return res.status(404).json({ ok: false, message: "Act topilmadi" });
+  if (!act) return res.status(404).json({ ok: false, message: 'Act topilmadi' });
   const updates: any = {
     actStatus: act.actStatus,
     aktInfo: act,
   };
-  if (act.actStatus === "CONFIRMED") updates.status = "tasdiqlangan";
+  if (act.actStatus === 'CONFIRMED') updates.status = 'tasdiqlangan';
   const updatedAriza = await Ariza.findByIdAndUpdate(
     ariza._id,
     {
@@ -310,15 +282,9 @@ export const updateArizaFromBillingById: Handler = async (
 export const changeArizaAct: Handler = async (req, res): Promise<any> => {
   // validate
   const { id } = req.params;
-  const {
-    allAmount,
-    inhabitantCount,
-    amountWithQQS,
-    amountWithoutQQS,
-    description,
-    photos,
-    actNumber,
-  } = changeArizaActBodySchema.parse(req.body);
+  const { allAmount, inhabitantCount, amountWithQQS, amountWithoutQQS, description, photos, actNumber } = changeArizaActBodySchema.parse(
+    req.body
+  );
 
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const ariza = await Ariza.findOne({
@@ -326,21 +292,17 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
     companyId: req.user.companyId,
   });
   if (!ariza) {
-    return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
+    return res.status(404).json({ ok: false, message: 'Ariza topilmadi' });
   }
 
   const abonent = await Abonent.findOne({ licshet: ariza.licshet });
   if (!abonent) {
-    return res.status(404).json({ ok: false, message: "Abonent topilmadi" });
+    return res.status(404).json({ ok: false, message: 'Abonent topilmadi' });
   }
 
   // 📁 1. Faylni olish
   let file = req.file?.buffer;
-  if (!file)
-    file = await getFileAsBuffer(
-      tozaMakonApi,
-      ariza.aktInfo.fileId.split("*")[1]
-    );
+  if (!file) file = await getFileAsBuffer(tozaMakonApi, ariza.aktInfo.fileId.split('*')[1]);
 
   // 🖼️ 2. Agar rasm bo‘lsa — PDFga qo‘shamiz
   if (photos?.length) {
@@ -350,16 +312,11 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
   // 📤 3. Faylni TozaMakonga yuklash
   let newFileId = ariza.aktInfo.fileId;
   if (req.file || photos?.length) {
-    newFileId = await uploadFileToTozaMakon(
-      tozaMakonApi,
-      file,
-      req.file?.originalname || "file.pdf",
-      "SPECIFIC_ACT"
-    );
+    newFileId = await uploadFileToTozaMakon(tozaMakonApi, file, req.file?.originalname || 'file.pdf', 'SPECIFIC_ACT');
   }
 
   // 4. K-Saldo hisoblash
-  const actType = Number(allAmount) > 0 ? "CREDIT" : "DEBIT";
+  const actType = Number(allAmount) > 0 ? 'CREDIT' : 'DEBIT';
   const kSaldo = await calculateKSaldo(tozaMakonApi, {
     amount: allAmount,
     residentId: abonent.id,
@@ -369,7 +326,7 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
 
   // 5. Aktni yangilash yoki yaratish
   const date = new Date();
-  if (ariza.actStatus === "WARNED" || ariza.actStatus === "NEW") {
+  if (ariza.actStatus === 'WARNED' || ariza.actStatus === 'NEW') {
     const act = await updateAct(tozaMakonApi, ariza.aktInfo.id, {
       kSaldo,
       amountWithQQS,
@@ -391,11 +348,7 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
     ariza.aktInfo = act;
   } else {
     // Yangi akt uchun pachkani olish
-    ariza.akt_pachka_id = await getOrCreateActPackId(
-      ariza.document_type,
-      tozaMakonApi,
-      req.user.companyId
-    );
+    ariza.akt_pachka_id = await getOrCreateActPackId(ariza.document_type, tozaMakonApi, req.user.companyId);
     // Yangi akt yaratish
     const act = await createAct(tozaMakonApi, {
       kSaldo,
@@ -414,10 +367,10 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
     ariza.akt_id = act.id;
     ariza.actHistory.push(ariza.aktInfo);
     ariza.aktInfo = await getActInfo(tozaMakonApi, ariza.akt_id);
-    ariza.actStatus = "NEW";
+    ariza.actStatus = 'NEW';
   }
 
-  ariza.status = "qayta_akt_kiritilgan";
+  ariza.status = 'qayta_akt_kiritilgan';
   ariza.akt_date = date;
 
   // Arizani yangilash
@@ -428,10 +381,7 @@ export const changeArizaAct: Handler = async (req, res): Promise<any> => {
   res.json({ ok: true, ariza });
 };
 
-export const addImageToAriza = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const addImageToAriza = async (req: Request, res: Response): Promise<any> => {
   const { id } = z.parse(z.object({ id: z.string() }), req.params);
   const { file_id } = z.parse(z.object({ file_id: z.string() }), req.body);
   const ariza = await Ariza.findOne({
@@ -439,41 +389,32 @@ export const addImageToAriza = async (
     companyId: req.user.companyId,
   });
   if (!ariza) {
-    return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
+    return res.status(404).json({ ok: false, message: 'Ariza topilmadi' });
   }
   ariza.tempPhotos.push(file_id);
   await ariza.save();
-  res.json({ ok: true, message: "Biriktirildi", ariza });
+  res.json({ ok: true, message: 'Biriktirildi', ariza });
 };
 
-export const createMonayTransferAriza = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
-  let { debitorAct, creditorActs } = createMonayTransferArizaBodySchema.parse(
-    req.body
-  );
+export const createMonayTransferAriza = async (req: Request, res: Response): Promise<any> => {
+  let { debitorAct, creditorActs } = createMonayTransferArizaBodySchema.parse(req.body);
 
   // 0. Find Abonent
   const abonent = await Abonent.findOne({ licshet: debitorAct.accountNumber });
-  if (!abonent)
-    return res.status(404).json({ ok: false, message: "Abonent topilmadi" });
+  if (!abonent) return res.status(404).json({ ok: false, message: 'Abonent topilmadi' });
 
   // 1. Ariza uchun tartiq raqami olish
   const counter = await Counter.findOne({
     companyId: req.user.companyId,
-    arizaDocumentType: "pul_kuchirish",
-    name: "ariza_tartib_raqami",
+    arizaDocumentType: 'pul_kuchirish',
+    name: 'ariza_tartib_raqami',
   });
-  if (!counter)
-    return res
-      .status(404)
-      .json({ ok: false, message: "Ariza tartib raqami topilmadi" });
+  if (!counter) return res.status(404).json({ ok: false, message: 'Ariza tartib raqami topilmadi' });
 
   // 2. Ariza yaratish
   const ariza = await Ariza.create({
     licshet: debitorAct.accountNumber,
-    document_type: "pul_kuchirish",
+    document_type: 'pul_kuchirish',
     companyId: req.user.companyId,
     document_number: counter.value + 1,
     needMonayTransferActs: creditorActs,
@@ -486,10 +427,7 @@ export const createMonayTransferAriza = async (
   res.json({ ok: true, ariza });
 };
 
-export const createMonayTransferActByAriza = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const createMonayTransferActByAriza = async (req: Request, res: Response): Promise<any> => {
   // rollback qilish
   const actIds: number[] = [];
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
@@ -499,26 +437,17 @@ export const createMonayTransferActByAriza = async (
       companyId: req.user.companyId,
     });
     if (!ariza) {
-      return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
+      return res.status(404).json({ ok: false, message: 'Ariza topilmadi' });
     }
     if (!req.file) {
-      return res.status(404).json({ ok: false, message: "Fayl topilmadi" });
+      return res.status(404).json({ ok: false, message: 'Fayl topilmadi' });
     }
 
     const formData = new FormData();
-    formData.append("file", req.file.buffer, req.file.originalname);
-    const fileId = await uploadFileToTozaMakon(
-      tozaMakonApi,
-      req.file.buffer,
-      req.file.originalname,
-      "SPECIFIC_ACT"
-    );
+    formData.append('file', req.file.buffer, req.file.originalname);
+    const fileId = await uploadFileToTozaMakon(tozaMakonApi, req.file.buffer, req.file.originalname, 'SPECIFIC_ACT');
 
-    const actPackId = await getOrCreateActPackId(
-      "pul_kuchirish",
-      tozaMakonApi,
-      req.user.companyId
-    );
+    const actPackId = await getOrCreateActPackId('pul_kuchirish', tozaMakonApi, req.user.companyId);
     const date = new Date();
     // debitor abonentdan pul olish
     const needMonayTransferActs: any = [
@@ -530,8 +459,8 @@ export const createMonayTransferActByAriza = async (
         fileId,
         startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
         endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        actType: "DEBIT",
-        description: "Pul kuchirish",
+        actType: 'DEBIT',
+        description: 'Pul kuchirish',
       },
       ...ariza.needMonayTransferActs.map((a) => ({
         amount: a.amount,
@@ -541,8 +470,8 @@ export const createMonayTransferActByAriza = async (
         fileId,
         startPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
         endPeriod: `${date.getMonth() + 1}.${date.getFullYear()}`,
-        actType: "CREDIT",
-        description: "Pul kuchirish " + ariza.licshet + "dan",
+        actType: 'CREDIT',
+        description: 'Pul kuchirish ' + ariza.licshet + 'dan',
       })),
     ];
 
@@ -562,15 +491,23 @@ export const createMonayTransferActByAriza = async (
     }
 
     ariza.akt_id = actIds[0];
-    ariza.actStatus = "NEW";
-    ariza.status = "akt_kiritilgan";
+    ariza.actStatus = 'NEW';
+    ariza.status = 'akt_kiritilgan';
     await ariza.save();
-    res.json({ ok: true, ariza, message: "Muvaffaqiyatli akt kiritildi" });
+    res.json({ ok: true, ariza, message: 'Muvaffaqiyatli akt kiritildi' });
   } catch (error) {
     for (let actId of actIds) {
       await deleteActById(tozaMakonApi, actId);
     }
     console.error(error);
-    res.status(500).json({ ok: false, message: "Internal server error" });
+    res.status(500).json({ ok: false, message: 'Internal server error' });
   }
+};
+
+export const updateArizaStatus = async (req: Request, res: Response): Promise<any> => {
+  const { arizaIds } = z.object({ arizaIds: z.array(z.string()).max(1000) }).parse(req.body);
+
+  jobService.startJob(JobNames.UpdateArizasStatus, { userId: req.user.id, companyId: req.user.companyId, arizaIds });
+
+  res.json({ ok: true });
 };

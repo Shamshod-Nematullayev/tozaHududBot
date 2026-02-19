@@ -67,6 +67,7 @@ export interface ICompany {
   eskizLogin?: string;
   eskizPassword?: string;
   eskizAccessToken?: string;
+  premium: boolean;
   getMahallasFromTozamakon(): Promise<
     Awaited<ReturnType<typeof getMahallasFromTozamakon>>["content"]
   >;
@@ -180,6 +181,7 @@ const schema = new Schema<ICompany>(
     eskizLogin: String,
     eskizPassword: String,
     eskizAccessToken: String,
+    premium: Boolean,
   },
   {
     timestamps: true,
