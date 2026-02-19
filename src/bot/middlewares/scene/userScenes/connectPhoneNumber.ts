@@ -1,6 +1,6 @@
 import { Scenes } from "telegraf";
 
-import { keyboards } from "@lib/keyboards.js";
+import { createInlineKeyboard, keyboards } from "@lib/keyboards.js";
 
 import { messages } from "@lib/messages.js";
 
@@ -22,6 +22,7 @@ interface MyWizardState {
   abonent_id?: number;
   companyId?: number;
   mahalla_name?: string;
+  phone?: string;
 }
 type Ctx = WizardWithState<MyWizardState>;
 
@@ -39,9 +40,9 @@ export const connectPhoneNumber = new Scenes.WizardScene<Ctx>(
           messages.enterOnlyNumber,
           keyboards.cancelBtn.resize()
         );
-      if (ctx.message.text.length != 12)
+      if (ctx.message.text.length < 6)
         return ctx.reply(
-          messages.enterFullNamber,
+          "Chiqindi kodi kamida 6 ta raqam bo'lishi kerak",
           keyboards.cancelBtn.resize()
         );
 
@@ -57,7 +58,7 @@ export const connectPhoneNumber = new Scenes.WizardScene<Ctx>(
       ctx.wizard.state.companyId = inspektor.companyId;
 
       const abonent = await Abonent.findOne({
-        licshet: ctx.message.text,
+        licshet: new RegExp(ctx.message.text),
         companyId: inspektor.companyId,
       });
       if (!abonent) {
@@ -76,15 +77,24 @@ export const connectPhoneNumber = new Scenes.WizardScene<Ctx>(
         return ctx.scene.leave();
       }
 
+      ctx.wizard.state.accountNumber = abonent.licshet;
+      ctx.wizard.state.abonent_id = abonent.id;
       if (abonent.phone_tasdiqlandi?.confirm) {
         ctx.wizard.selectStep(2);
-        return ctx.reply(
+        ctx.reply(
           `🛑 Ushbu hisob raqamiga ${abonent.phone_tasdiqlandi.inspector_name} tomonidan allaqachon telefon raqami biriktirilgan <b>${abonent.phone}</b>. Baribir o'zgartirmoqchimisiz?`,
-          keyboards.yesOrNo
+          {
+            reply_markup: createInlineKeyboard([
+              [["Xa", "yes"]],
+              [["Yo'q", "no"]],
+              [["Mazkur raqamni qayta biriktirish", "new"]],
+            ]).reply_markup,
+            parse_mode: "HTML",
+          }
         );
+        ctx.wizard.state.phone = abonent.phone;
+        return;
       }
-      ctx.wizard.state.accountNumber = ctx.message.text;
-      ctx.wizard.state.abonent_id = abonent.id;
       await ctx.replyWithHTML(
         `<b>${abonent.fio}</b> ${abonent.mahalla_name} MFY\n` +
           `Telefon raqamini kiriting misol: 992852536`,
@@ -163,6 +173,38 @@ export const connectPhoneNumber = new Scenes.WizardScene<Ctx>(
         );
       } else if (ctx.callbackQuery.data === "no") {
         await ctx.deleteMessage();
+      } else if (ctx.callbackQuery.data === "new") {
+        await ctx.deleteMessage();
+        const tozaMakonApi = createTozaMakonApi(
+          ctx.wizard.state.companyId as number
+        );
+        await updateAbonentDetails(
+          tozaMakonApi,
+          ctx.wizard.state.abonent_id as number,
+          {
+            phone: ctx.wizard.state.phone,
+            description: `${ctx.wizard.state.inspector_name} ma'lumotiga asosan telefon raqami kiritildi.`,
+          }
+        );
+
+        await Abonent.updateOne(
+          {
+            licshet: ctx.wizard.state.accountNumber,
+            companyId: ctx.wizard.state.companyId,
+          },
+          {
+            $set: {
+              phone: ctx.wizard.state.phone,
+              phone_tasdiqlandi: {
+                confirm: true,
+                inspector_id: ctx.wizard.state.inspector_id,
+                inspector_name: ctx.wizard.state.inspector_name,
+                updated_at: new Date(),
+              },
+            },
+          }
+        );
+        await ctx.reply(`Muvaffaqqiyatli bajarildi ✅`);
       }
       ctx.scene.leave();
     } catch (error) {
