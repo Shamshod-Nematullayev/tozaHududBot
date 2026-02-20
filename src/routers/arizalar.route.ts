@@ -12,6 +12,7 @@ import {
   createMonayTransferAriza,
   createMonayTransferActByAriza,
   updateArizaStatus,
+  getArizaIds,
 } from './controllers/arizalar.controller.js';
 import { uploadAsBlob } from '../middlewares/multer.js';
 import { catchAsync } from './controllers/utils/catchAsync.js';
@@ -20,6 +21,7 @@ const router = express.Router();
 
 // --- GET routes ---
 router.get('/', catchAsync(getArizalar)); // GET all arizas
+router.get('/ids', catchAsync(getArizaIds));
 router.get('/:id', catchAsync(getArizaById)); // GET specific ariza
 
 // --- POST routes ---
@@ -29,11 +31,11 @@ router.post('/money-transfer', catchAsync(createMonayTransferAriza)); // Create 
 router.post('/money-transfer-act/:ariza_id', uploadAsBlob.single('file'), catchAsync(createMonayTransferActByAriza));
 
 // --- PUT routes ---
+router.put('/update-ariza-status', catchAsync(updateArizaStatus));
 router.put('/:id', catchAsync(updateArizaById)); // Full update
 router.put('/update-from-billing/:id', catchAsync(updateArizaFromBillingById)); // Billing update
 router.put('/move-to-inbox/:id', catchAsync(moveToInboxAriza)); // Move ariza
 router.put('/change-act/:id', uploadAsBlob.single('file'), catchAsync(changeArizaAct));
 router.put('/add-image/:id', catchAsync(addImageToAriza));
-router.put('/update-ariza-status', catchAsync(updateArizaStatus));
 
 export default router;

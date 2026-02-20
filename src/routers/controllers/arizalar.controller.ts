@@ -13,6 +13,7 @@ import {
   changeArizaActBodySchema,
   createArizaBodySchema,
   createMonayTransferArizaBodySchema,
+  getArizaIdsSchema,
   getArizalarQuerySchema,
 } from '@schemas/ariza.schema.js';
 import z, { ZodError } from 'zod';
@@ -31,83 +32,120 @@ import { jobService } from '@services/jobs/job.service.js';
 import { JobNames } from '@services/jobs/job.type.js';
 
 export const getArizalar = async (req: Request, res: Response): Promise<any> => {
-  try {
-    const parsed = getArizalarQuerySchema.parse(req.query);
-    const { skip, limit, sort, meta } = getPagination(parsed);
+  const parsed = getArizalarQuerySchema.parse(req.query);
+  const { skip, limit, sort, meta } = getPagination(parsed);
 
-    const {
-      document_type,
-      document_number,
-      account_number,
-      dublicat_account_number,
-      created_from_date,
-      created_to_date,
-      act_from_date,
-      act_to_date,
-      act_amount_from,
-      act_amount_to,
-      ariza_status,
-      act_status,
-    } = parsed;
+  const {
+    document_type,
+    document_number,
+    account_number,
+    dublicat_account_number,
+    created_from_date,
+    created_to_date,
+    act_from_date,
+    act_to_date,
+    act_amount_from,
+    act_amount_to,
+    ariza_status,
+    act_status,
+  } = parsed;
 
-    // Filtrni dinamik shakllantirish
-    const filters: any = { companyId: req.user.companyId };
-    if (document_type) filters.document_type = document_type;
-    if (document_number) filters.document_number = document_number;
-    if (account_number) filters.licshet = account_number;
-    if (dublicat_account_number) filters.ikkilamchi_licshet = dublicat_account_number;
-    if (created_from_date) filters.sana = { $gte: new Date(created_from_date) };
-    if (created_to_date)
-      filters.sana = {
-        ...filters.sana,
-        $lte: new Date(created_to_date),
+  // Filtrni dinamik shakllantirish
+  const filters: any = { companyId: req.user.companyId };
+  if (document_type) filters.document_type = document_type;
+  if (document_number) filters.document_number = document_number;
+  if (account_number) filters.licshet = account_number;
+  if (dublicat_account_number) filters.ikkilamchi_licshet = dublicat_account_number;
+  if (created_from_date) filters.sana = { $gte: new Date(created_from_date) };
+  if (created_to_date)
+    filters.sana = {
+      ...filters.sana,
+      $lte: new Date(created_to_date),
+    };
+  if (act_from_date) filters.akt_date = { $gte: new Date(act_from_date) };
+  if (act_to_date) filters.akt_date = { ...filters.akt_date, $lte: new Date(act_to_date) };
+  if (act_amount_from) filters.aktSummasi = { $gte: act_amount_from };
+  if (act_amount_to)
+    filters.aktSummasi = {
+      ...filters.aktSummasi,
+      $lte: act_amount_to,
+    };
+  if (ariza_status) filters.status = ariza_status;
+  if (act_status) filters.actStatus = act_status;
+
+  // Ma'lumotlarni qidirish
+  const data = await Ariza.find(filters).sort(sort).skip(skip).limit(limit).lean();
+  const total = await Ariza.countDocuments(filters);
+  const accountNumbers = data.map((ariza) => ariza.licshet);
+  const abonents = await Abonent.find({
+    licshet: { $in: accountNumbers },
+  });
+
+  res.json({
+    ok: true,
+    data: data.map((item) => {
+      let abonent = abonents.find((abonent) => abonent.licshet === item.licshet);
+      return {
+        ...item,
+        abonentId: abonent?.id,
+        fullName: abonent?.fio,
       };
-    if (act_from_date) filters.akt_date = { $gte: new Date(act_from_date) };
-    if (act_to_date) filters.akt_date = { ...filters.akt_date, $lte: new Date(act_to_date) };
-    if (act_amount_from) filters.aktSummasi = { $gte: act_amount_from };
-    if (act_amount_to)
-      filters.aktSummasi = {
-        ...filters.aktSummasi,
-        $lte: act_amount_to,
-      };
-    if (ariza_status) filters.status = ariza_status;
-    if (act_status) filters.actStatus = act_status;
+    }),
+    meta: {
+      ...meta,
+      total,
+      totalPages: Math.ceil(total / meta.limit),
+    },
+  });
+};
 
-    // Ma'lumotlarni qidirish
-    const data = await Ariza.find(filters).sort(sort).skip(skip).limit(limit).lean();
-    const total = await Ariza.countDocuments(filters);
-    const accountNumbers = data.map((ariza) => ariza.licshet);
-    const abonents = await Abonent.find({
-      licshet: { $in: accountNumbers },
-    });
+export const getArizaIds = async (req: Request, res: Response): Promise<any> => {
+  const parsed = getArizaIdsSchema.parse(req.query);
+  const {
+    document_type,
+    document_number,
+    account_number,
+    dublicat_account_number,
+    created_from_date,
+    created_to_date,
+    act_from_date,
+    act_to_date,
+    act_amount_from,
+    act_amount_to,
+    ariza_status,
+    act_status,
+  } = parsed;
 
-    res.json({
-      ok: true,
-      data: data.map((item) => {
-        let abonent = abonents.find((abonent) => abonent.licshet === item.licshet);
-        return {
-          ...item,
-          abonentId: abonent?.id,
-          fullName: abonent?.fio,
-        };
-      }),
-      meta: {
-        ...meta,
-        total,
-        totalPages: Math.ceil(total / meta.limit),
-      },
-    });
-  } catch (error: any) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({
-        ok: false,
-        message: 'Invalid query params',
-        issues: error.issues, // foydalanuvchi ko'rishi uchun
-      });
-    }
+  // Filtrni dinamik shakllantirish
+  const filters: any = { companyId: req.user.companyId };
+  if (document_type) filters.document_type = document_type;
+  if (document_number) filters.document_number = document_number;
+  if (account_number) filters.licshet = account_number;
+  if (dublicat_account_number) filters.ikkilamchi_licshet = dublicat_account_number;
+  if (created_from_date) filters.sana = { $gte: new Date(created_from_date) };
+  if (created_to_date)
+    filters.sana = {
+      ...filters.sana,
+      $lte: new Date(created_to_date),
+    };
+  if (act_from_date) filters.akt_date = { $gte: new Date(act_from_date) };
+  if (act_to_date) filters.akt_date = { ...filters.akt_date, $lte: new Date(act_to_date) };
+  if (act_amount_from) filters.aktSummasi = { $gte: act_amount_from };
+  if (act_amount_to)
+    filters.aktSummasi = {
+      ...filters.aktSummasi,
+      $lte: act_amount_to,
+    };
+  if (ariza_status) filters.status = ariza_status;
+  if (act_status) filters.actStatus = act_status;
 
-    res.status(500).json({ ok: false, message: `internal error: ${error?.message}` });
-  }
+  // Ma'lumotlarni qidirish
+  const data = await Ariza.find(filters).select('_id').lean();
+
+  res.json({
+    ok: true,
+    data: data.map((item) => item._id),
+  });
 };
 
 export const getArizaById = async (req: Request, res: Response): Promise<any> => {
@@ -223,8 +261,8 @@ export const moveToInboxAriza: Handler = async (req, res) => {
   });
 };
 
-export const updateArizaById: Handler = async (req, res) => {
-  await Ariza.findOneAndUpdate(
+export const updateArizaById: Handler = async (req, res): Promise<any> => {
+  const ariza = await Ariza.findOneAndUpdate(
     {
       _id: req.params.ariza_id,
       companyId: req.user.companyId,
@@ -236,6 +274,11 @@ export const updateArizaById: Handler = async (req, res) => {
     },
     { new: true }
   );
+  if (!ariza)
+    return res.status(404).json({
+      ok: false,
+      message: 'Ariza topilmadi',
+    });
   res.status(200).json({
     ok: true,
   });
@@ -282,9 +325,8 @@ export const updateArizaFromBillingById: Handler = async (req, res): Promise<any
 export const changeArizaAct: Handler = async (req, res): Promise<any> => {
   // validate
   const { id } = req.params;
-  const { allAmount, inhabitantCount, amountWithQQS, amountWithoutQQS, description, photos, actNumber } = changeArizaActBodySchema.parse(
-    req.body
-  );
+  const { allAmount, inhabitantCount, amountWithQQS, amountWithoutQQS, description, photos, actNumber } =
+    changeArizaActBodySchema.parse(req.body);
 
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const ariza = await Ariza.findOne({
@@ -507,7 +549,11 @@ export const createMonayTransferActByAriza = async (req: Request, res: Response)
 export const updateArizaStatus = async (req: Request, res: Response): Promise<any> => {
   const { arizaIds } = z.object({ arizaIds: z.array(z.string()).max(1000) }).parse(req.body);
 
-  jobService.startJob(JobNames.UpdateArizasStatus, { userId: req.user.id, companyId: req.user.companyId, arizaIds });
+  await jobService.startJob(JobNames.UpdateArizasStatus, {
+    userId: req.user.id,
+    companyId: req.user.companyId,
+    arizaIds,
+  });
 
   res.json({ ok: true });
 };

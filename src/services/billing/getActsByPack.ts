@@ -9,7 +9,7 @@ interface Payload {
   id?: number;
 }
 
-interface Act {
+export interface Act {
   id: number;
   actNumber: string;
   actPackId: number;

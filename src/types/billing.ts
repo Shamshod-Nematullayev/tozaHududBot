@@ -25,7 +25,7 @@ export interface House {
   longitude?: number;
   miaInhabitantCnt?: null;
   temporaryCadastralNumber?: string;
-  type: "HOUSE" | "APARTMENT";
+  type: 'HOUSE' | 'APARTMENT';
 }
 
 export interface Balance {
@@ -43,7 +43,7 @@ export interface Balance {
 export interface AbonentDetails {
   id: number;
   accountNumber: string;
-  residentType: "INDIVIDUAL";
+  residentType: 'INDIVIDUAL';
   electricityAccountNumber: string;
   electricityCoato: string;
   companyId: number;
@@ -155,8 +155,8 @@ export interface IAct {
   actNumber: string;
   actPackId: number;
   actPackName: string;
-  actStatus: "NEW" | "CONFIRMED" | "WARNED" | "REJECTED";
-  actType: "DEBIT" | "CREDIT";
+  actStatus: 'NEW' | 'CONFIRMED' | 'WARNED' | 'REJECTED';
+  actType: 'DEBIT' | 'CREDIT';
   amount: number;
   amountWithQQS: number | null;
   amountWithoutQQS: number | null;
@@ -188,7 +188,7 @@ export interface IAct {
 export interface DHJRow {
   accountNumber: string;
   accrual: number;
-  accrualType: "DEFAULT";
+  accrualType: 'DEFAULT';
   actAmount: number;
   additionalAccrual: number;
   cashAmount: number;
@@ -246,20 +246,20 @@ export interface IActPack {
 }
 
 export const packNames = {
-  viza: "PASSPORT VIZA",
-  odam_soni: "ODAM SONI",
-  dvaynik: "IKKILAMCHI KODLAR",
+  viza: 'PASSPORT VIZA',
+  odam_soni: 'ODAM SONI',
+  dvaynik: 'IKKILAMCHI KODLAR',
   pul_kuchirish: "PUL KO'CHIRISH",
   death: "O'LIM GUVOHNOMA",
-  gps: "GPS XULOSA",
+  gps: 'GPS XULOSA',
 };
 export enum packTypes {
-  viza = "SERVICE_NOT_PROVIDED",
-  odam_soni = "INVENTORY",
-  dvaynik = "CANCEL_CONTRACT",
-  pul_kuchirish = "SIMPLE",
-  death = "INVENTORY",
-  gps = "INVENTORY",
+  viza = 'INVENTORY',
+  odam_soni = 'INVENTORY',
+  dvaynik = 'CANCEL_CONTRACT',
+  pul_kuchirish = 'SIMPLE',
+  death = 'INVENTORY',
+  gps = 'INVENTORY',
 }
 
 export interface IAutomobile {
@@ -314,10 +314,10 @@ interface Pageable {
 }
 
 interface Sort {
-  direction: "ASC" | "DESC";
+  direction: 'ASC' | 'DESC';
   property: string;
   ignoreCase: boolean;
-  nullHandling: "NATIVE" | string;
+  nullHandling: 'NATIVE' | string;
   descending: boolean;
   ascending: boolean;
 }
