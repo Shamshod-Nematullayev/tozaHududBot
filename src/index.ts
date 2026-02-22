@@ -11,7 +11,7 @@ const launchBot = process.env.LAUNCH_BOT === "false" ? false : true;
 
 if (!process.env.SECRET_JWT_KEY || !process.env.REFRESH_JWT_KEY) {
   console.error(
-    "SECRET_JWT_KEY or REFRESH_JWT_KEY environment variable is not defined"
+    "SECRET_JWT_KEY or REFRESH_JWT_KEY environment variable is not defined",
   );
   process.exit(1);
 }
@@ -31,7 +31,7 @@ app.use(
   cors({
     origin: true,
     credentials: true,
-  })
+  }),
 );
 
 if (launchBot) {
@@ -89,8 +89,8 @@ server.listen(PORT, () => {
 (async () => {
   // await specialTaskReport(1144, "phone");
   // await specialTaskReport(1144, "electricity");
-  // specialTaskReportByInspectorsDaily(1144, "phone");
-  // specialTaskReportByInspectorsDaily(1144, "electricity");
+  specialTaskReportByInspectorsDaily(1144, "phone");
+  specialTaskReportByInspectorsDaily(1144, "electricity");
 })();
 // (async () => {
 //   const smartGpsApi = createSmartGpsApi(1144);
