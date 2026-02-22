@@ -1,14 +1,7 @@
-import mongoose, { Schema } from "mongoose";
-import { IAct } from "types/billing";
+import mongoose, { Schema } from 'mongoose';
+import { IAct } from 'types/billing';
 
-export const arizaDocumentTypes = [
-  "dvaynik",
-  "odam_soni",
-  "viza",
-  "death",
-  "gps",
-  "pul_kuchirish",
-] as const;
+export const arizaDocumentTypes = ['dvaynik', 'odam_soni', 'viza', 'death', 'gps', 'pul_kuchirish'] as const;
 
 export interface INeedMoneyTransfer {
   accountNumber: string;
@@ -34,13 +27,7 @@ interface IAriza {
   };
   current_prescribed_cnt: number;
   next_prescribed_cnt: number;
-  status:
-    | "yangi"
-    | "qabul qilindi"
-    | "tasdiqlangan"
-    | "bekor qilindi"
-    | "akt_kiritilgan"
-    | "qayta_akt_kiritilgan";
+  status: 'yangi' | 'qabul qilindi' | 'tasdiqlangan' | 'bekor qilindi' | 'akt_kiritilgan' | 'qayta_akt_kiritilgan';
   photos: string[];
   recalculationPeriods: any[];
   muzlatiladi: boolean;
@@ -50,7 +37,7 @@ interface IAriza {
   canceling_description: string;
   akt_pachka_id: number;
   akt_id: number;
-  actStatus: "NEW" | "CONFIRMED" | "WARNED" | "REJECTED";
+  actStatus: 'NEW' | 'CONFIRMED' | 'WARNED' | 'REJECTED' | 'MISSING' | 'CANCELED';
   aktInfo: IAct;
   tempPhotos: string[];
   actHistory: any[];
@@ -91,7 +78,7 @@ const schema = new Schema<IAriza>({
   },
   comment: {
     type: String,
-    default: "",
+    default: '',
   },
   aktSummasi: {
     type: Number,
@@ -111,15 +98,8 @@ const schema = new Schema<IAriza>({
   },
   status: {
     type: String,
-    enum: [
-      "yangi",
-      "qabul qilindi",
-      "tasdiqlangan",
-      "bekor qilindi",
-      "akt_kiritilgan",
-      "qayta_akt_kiritilgan",
-    ],
-    default: "yangi",
+    enum: ['yangi', 'qabul qilindi', 'tasdiqlangan', 'bekor qilindi', 'akt_kiritilgan', 'qayta_akt_kiritilgan'],
+    default: 'yangi',
   },
   is_canceled: {
     type: Boolean,
@@ -133,14 +113,14 @@ const schema = new Schema<IAriza>({
   actStatus: {
     type: String,
     enum: [
-      "NEW",
-      "WARNED",
-      "CONFIRMED",
-      "CANCELLED",
-      "CONFIRMED_CANCELLED",
-      "WARNED_CANCELLED",
-      "APPROVED",
-      "CORRECTED",
+      'NEW',
+      'WARNED',
+      'CONFIRMED',
+      'CANCELLED',
+      'CONFIRMED_CANCELLED',
+      'WARNED_CANCELLED',
+      'APPROVED',
+      'CORRECTED',
     ],
   },
   aktInfo: Object,
@@ -168,8 +148,5 @@ const schema = new Schema<IAriza>({
     default: 1,
   },
 });
-schema.index(
-  { companyId: 1, document_number: 1, version: 1, document_type: 1 },
-  { unique: true }
-);
-export const Ariza = mongoose.model("ariza", schema, "arizalar");
+schema.index({ companyId: 1, document_number: 1, version: 1, document_type: 1 }, { unique: true });
+export const Ariza = mongoose.model('ariza', schema, 'arizalar');

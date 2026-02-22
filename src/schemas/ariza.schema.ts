@@ -28,6 +28,27 @@ export const getArizalarQuerySchema = z.object({
   act_status: z.string().optional(),
 });
 
+export const getArizaIdsSchema = z.object({
+  document_type: z
+    .enum([...arizaDocumentTypes, ""])
+    .optional()
+    .nullable(),
+  document_number: z.coerce.number().optional(),
+  account_number: z.string().optional(),
+  dublicat_account_number: z.string().optional(),
+
+  created_from_date: z.coerce.date().optional(),
+  created_to_date: z.coerce.date().optional(),
+  act_from_date: z.coerce.date().optional(),
+  act_to_date: z.coerce.date().optional(),
+
+  act_amount_from: z.coerce.number().optional(),
+  act_amount_to: z.coerce.number().optional(),
+
+  ariza_status: z.string().optional(),
+  act_status: z.string().optional(),
+})
+
 const accountNumberRegex = [
   /^\d{12}$/,
   "uzunligi 12 ta raqamdan iborat matn bo'lishi kerak",

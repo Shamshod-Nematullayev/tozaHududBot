@@ -1,16 +1,16 @@
-import PDFMerger from "pdf-merger-js";
-import { createTozaMakonApi } from "../../api/tozaMakon.js";
+import PDFMerger from 'pdf-merger-js';
+import { createTozaMakonApi } from '../../api/tozaMakon.js';
 
-import { Abonent } from "@models/Abonent.js";
+import { Abonent } from '@models/Abonent.js';
 
-import { Ariza } from "@models/Ariza.js";
+import { Ariza } from '@models/Ariza.js';
 
-import { bot } from "@bot/core/bot.js";
-import { Company } from "@models/Company.js";
+import { bot } from '@bot/core/bot.js';
+import { Company } from '@models/Company.js';
 
-import { Mahalla } from "@models/Mahalla.js";
+import { Mahalla } from '@models/Mahalla.js';
 
-import Excel from "exceljs";
+import Excel from 'exceljs';
 
 import {
   uploadFileToTozaMakon,
@@ -27,9 +27,9 @@ import {
   getAbonentDetails,
   getActPacks,
   searchAbonent,
-} from "@services/billing/index.js";
-import { Request, response, Response } from "express";
-import z from "zod";
+} from '@services/billing/index.js';
+import { Request, response, Response } from 'express';
+import z from 'zod';
 import {
   createDublicateActBodySchema,
   createResidentActBodySchema,
@@ -37,48 +37,43 @@ import {
   getAbonentsByMfyIdQuerySchema,
   importActsBodySchema,
   sendAbonentsListToTelegramQuerySchema,
-} from "@schemas/billing.schema.js";
-import { mergePhotosWithPdf } from "./utils/mergePhotosWithPdf.js";
-import { transferAmountBetweenAccounts } from "@services/billing/transferAmountBetweenAccounts.js";
-import {
-  InputMediaDocument,
-  InputMediaPhoto,
-} from "telegraf/typings/core/types/typegram";
-import { chunkArray } from "helpers/chunkArray.js";
-import { generateMessageForAbonentList } from "./utils/generateMessageForAbonentList.js";
-import { getAbonentsByMfyId } from "./utils/getAbonensByMfyId.js";
-import { createMoneyTransferActs } from "@services/billing/createMoneyTransferActs.js";
-import { jobService, JobService } from "@services/jobs/job.service.js";
-import { agenda } from "config/agenda.js";
-import { JobNames } from "@services/jobs/job.type.js";
-import { formatDate } from "@services/utils/formatDate.js";
-import { createActPack } from "@services/billing/createActPack.js";
-import { packTypes } from "types/billing.js";
-import NotFoundError from "@errors/NotFoundError.js";
-import { readExcel } from "@helpers/getJsonFromExcel.js";
-import { readFileSync } from "fs";
-import path from "path";
-import { Folder } from "@models/Folder.js";
+} from '@schemas/billing.schema.js';
+import { mergePhotosWithPdf } from './utils/mergePhotosWithPdf.js';
+import { transferAmountBetweenAccounts } from '@services/billing/transferAmountBetweenAccounts.js';
+import { InputMediaDocument, InputMediaPhoto } from 'telegraf/typings/core/types/typegram';
+import { chunkArray } from 'helpers/chunkArray.js';
+import { generateMessageForAbonentList } from './utils/generateMessageForAbonentList.js';
+import { getAbonentsByMfyId } from './utils/getAbonensByMfyId.js';
+import { createMoneyTransferActs } from '@services/billing/createMoneyTransferActs.js';
+import { jobService, JobService } from '@services/jobs/job.service.js';
+import { agenda } from 'config/agenda.js';
+import { JobNames } from '@services/jobs/job.type.js';
+import { formatDate } from '@services/utils/formatDate.js';
+import { createActPack } from '@services/billing/createActPack.js';
+import { packTypes } from 'types/billing.js';
+import NotFoundError from '@errors/NotFoundError.js';
+import { readExcel } from '@helpers/getJsonFromExcel.js';
+import { readFileSync } from 'fs';
+import path from 'path';
+import { Folder } from '@models/Folder.js';
+import { confirmActTozamakon } from '@services/billing/confirmActTozamakon.js';
 
-export const downloadPdfFileFromBillingAsBase64 = async (
-  req: Request,
-  res: Response
-) => {
+export const downloadPdfFileFromBillingAsBase64 = async (req: Request, res: Response) => {
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   // 1. inputlarni olish
   const { file_id } = z.parse(
     z.object({
-      file_id: z.string().regex(/.*\*.*/, "Invalid file_id format"),
+      file_id: z.string().regex(/.*\*.*/, 'Invalid file_id format'),
     }),
     req.query
   );
-  const cleanFileId = file_id.split("*").pop() as string; // "filaname*fileId" => "fileId"
+  const cleanFileId = file_id.split('*').pop() as string; // "filaname*fileId" => "fileId"
 
   // 2. faylni yuklab olish
   const buffer = await getFileAsBuffer(tozaMakonApi, cleanFileId);
 
   // 3. Faylni Base64 ga o'tkazish
-  const base64Data = buffer.toString("base64");
+  const base64Data = buffer.toString('base64');
 
   // 4. javob qaytarish
   res.json({
@@ -112,61 +107,45 @@ export const getAbonentActs = async (req: Request, res: Response) => {
   });
 };
 
-export const createResidentAct = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
-  const {
-    next_inhabitant_count,
-    akt_sum,
-    amountWithoutQQS,
-    document_type,
-    description,
-    ariza_id,
-    photos,
-    residentId,
-  } = createResidentActBodySchema.parse(req.body);
+export const createResidentAct = async (req: Request, res: Response): Promise<any> => {
+  let { next_inhabitant_count, akt_sum, amountWithoutQQS, document_type, description, ariza_id, photos, residentId } =
+    createResidentActBodySchema.parse(req.body);
 
   const companyId = req.user.companyId;
   const date = new Date();
+  const tozaMakonApi = createTozaMakonApi(companyId);
 
-  if (!req.file?.buffer) throw new NotFoundError("Faylni yuklang");
+  if (!req.file?.buffer) throw new NotFoundError('Faylni yuklang');
   // 🖼️ 1. Agar rasm bo‘lsa — PDFga qo‘shamiz
   if (photos?.length) {
     req.file.buffer = await mergePhotosWithPdf(photos, req.file.buffer);
   }
 
   // 📎 2. Faylni Telegramga yuklaymiz bu qism ishlatilmayotganligi sababli olib tashlandi
-  // 📄 3. Incoming Document yaratish bu qism ishlatilmayotganligi sababli olib tashlandi
+  // 👥 3. Agar pasport viza yoki sifatsiz xizmat (muzlatishdan tashqari) akti bo'lsa yashovchi sonini joriyni qo'yish
+  if (document_type === 'viza' || (document_type === 'gps' && next_inhabitant_count)) {
+    const abonent = await getAbonentDetails(tozaMakonApi, residentId);
+    next_inhabitant_count = abonent.house.inhabitantCnt;
+  }
 
   // 📤 4. Faylni TozaMakon APIga yuklash
-  const tozaMakonApi = createTozaMakonApi(companyId);
-  const fileId = await uploadFileToTozaMakon(
-    tozaMakonApi,
-    req.file.buffer,
-    req.file.originalname,
-    "SPECIFIC_ACT"
-  );
+  const fileId = await uploadFileToTozaMakon(tozaMakonApi, req.file.buffer, req.file.originalname, 'SPECIFIC_ACT');
 
   // 📦 5. Akt Pachkasini olish
-  const actPackId = await getOrCreateActPackId(
-    document_type,
-    tozaMakonApi,
-    companyId
-  );
+  const actPackId = await getOrCreateActPackId(document_type, tozaMakonApi, companyId);
 
   // 📊 6. kSaldo hisoblash
   const kSaldo = await calculateKSaldo(tozaMakonApi, {
     amount: Math.abs(akt_sum),
     residentId: residentId,
     actPackId,
-    actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
+    actType: akt_sum < 0 ? 'DEBIT' : 'CREDIT',
   });
 
   // 📌 7. Aktni yaratish
   const aktPayload: ICreateActPayload = {
     actPackId,
-    actType: akt_sum < 0 ? "DEBIT" : "CREDIT",
+    actType: akt_sum < 0 ? 'DEBIT' : 'CREDIT',
     amount: Number(akt_sum),
     amountWithQQS: Number(akt_sum) - (Number(amountWithoutQQS) || 0),
     amountWithoutQQS: Number(amountWithoutQQS) || 0,
@@ -178,15 +157,14 @@ export const createResidentAct = async (
     residentId: residentId,
     inhabitantCount: next_inhabitant_count,
   };
-
   const actInfo = await createAct(tozaMakonApi, aktPayload);
 
-  // Agar ariza bo'lsa akt ma'lumotlari yozib qolinadi
+  // 📄 8. Agar ariza bo'lsa akt ma'lumotlari yozib qolinadi
   let folderId = null;
   if (ariza_id) {
     const ariza = await Ariza.findByIdAndUpdate(ariza_id, {
       $set: {
-        status: "akt_kiritilgan",
+        status: 'akt_kiritilgan',
         akt_pachka_id: actPackId,
         akt_id: actInfo.id,
         aktInfo: actInfo,
@@ -204,29 +182,30 @@ export const createResidentAct = async (
     }
   }
 
+  // ✅ 9. Akt tasdiqlash
+  await confirmActTozamakon(tozaMakonApi, [actInfo.id]);
+
+  // 🥇 10. Natija
   return res.json({
     ok: true,
     folderId,
-    message: "Akt muvaffaqqiyatli qo‘shildi",
+    message: 'Akt muvaffaqqiyatli qo‘shildi',
   });
 };
 
-export const duplicateActFromRequest = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const duplicateActFromRequest = async (req: Request, res: Response): Promise<any> => {
   const { ariza_id, akt_sum } = req.body;
 
   const ariza = await Ariza.findById(ariza_id);
 
   if (!ariza) {
-    return res.status(404).json({ ok: false, message: "Ariza topilmadi" });
+    return res.status(404).json({ ok: false, message: 'Ariza topilmadi' });
   }
 
   if (!req.file?.buffer) {
     return res.status(400).json({
       ok: false,
-      message: "Faylni yuklang",
+      message: 'Faylni yuklang',
     });
   }
 
@@ -244,31 +223,18 @@ export const duplicateActFromRequest = async (
   if (!abonentReal || !abonentFake) {
     return res.status(404).json({
       ok: false,
-      message: "Abonentlar topilmadi",
+      message: 'Abonentlar topilmadi',
     });
   }
 
   const tozaMakonApi = createTozaMakonApi(companyId);
 
   // 1. Faylni TozaMakon APIga yuklash
-  const fileId = await uploadFileToTozaMakon(
-    tozaMakonApi,
-    req.file.buffer,
-    req.file.originalname,
-    "SPECIFIC_ACT"
-  );
+  const fileId = await uploadFileToTozaMakon(tozaMakonApi, req.file.buffer, req.file.originalname, 'SPECIFIC_ACT');
 
   // 2. Akt pachkalarini olish
-  const pulKuchirishPackId = await getOrCreateActPackId(
-    "pul_kuchirish",
-    tozaMakonApi,
-    companyId
-  );
-  const dvaynikPackId = await getOrCreateActPackId(
-    "dvaynik",
-    tozaMakonApi,
-    companyId
-  );
+  const pulKuchirishPackId = await getOrCreateActPackId('pul_kuchirish', tozaMakonApi, companyId);
+  const dvaynikPackId = await getOrCreateActPackId('dvaynik', tozaMakonApi, companyId);
 
   // 3. Pul ko‘chirish aktlarini yaratish
   if (Number(akt_sum))
@@ -291,7 +257,7 @@ export const duplicateActFromRequest = async (
 
   const dvaynikAct = await createAct(tozaMakonApi, {
     actPackId: dvaynikPackId,
-    actType: "CREDIT",
+    actType: 'CREDIT',
     amount: Number(amountObj.amount) + Number(akt_sum),
     amountWithQQS: 0,
     amountWithoutQQS: Number(amountObj.amount) + Number(akt_sum),
@@ -307,7 +273,7 @@ export const duplicateActFromRequest = async (
   // 5. Arizani yangilash
   await ariza.updateOne({
     $set: {
-      status: "akt_kiritilgan",
+      status: 'akt_kiritilgan',
       akt_pachka_id: dvaynikPackId,
       akt_id: dvaynikAct.id,
       aktInfo: dvaynikAct,
@@ -323,7 +289,7 @@ export const duplicateActFromRequest = async (
     arizaType: ariza.document_type,
   });
 
-  res.json({ ok: true, message: "Aktlar muvaffaqiyatli yaratildi", folderId });
+  res.json({ ok: true, message: 'Aktlar muvaffaqiyatli yaratildi', folderId });
 };
 
 export const getActiveMfy = async (req: Request, res: Response) => {
@@ -338,13 +304,11 @@ export const getActiveMfy = async (req: Request, res: Response) => {
   res.json({ ok: true, data: mahallalar });
 };
 
-export const createDublicateAct = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const createDublicateAct = async (req: Request, res: Response): Promise<any> => {
   // inputlarni olish
-  const { realAccountNumber, fakeAccountNumber, fakeAccountIncomeAmount } =
-    createDublicateActBodySchema.parse(req.body);
+  const { realAccountNumber, fakeAccountNumber, fakeAccountIncomeAmount } = createDublicateActBodySchema.parse(
+    req.body
+  );
 
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const date = new Date();
@@ -354,35 +318,22 @@ export const createDublicateAct = async (
   if (!abonentReal || !abonentFake) {
     return res.status(404).json({
       ok: false,
-      message: "Abonentlar topilmadi",
+      message: 'Abonentlar topilmadi',
     });
   }
   if (!req.file) {
     return res.status(404).json({
       ok: false,
-      message: "Fayl kiriting",
+      message: 'Fayl kiriting',
     });
   }
 
   // 1. 📎 Faylni TozaMakonga yuklash
-  const fileId = await uploadFileToTozaMakon(
-    tozaMakonApi,
-    req.file.buffer,
-    req.file.originalname,
-    "SPECIFIC_ACT"
-  );
+  const fileId = await uploadFileToTozaMakon(tozaMakonApi, req.file.buffer, req.file.originalname, 'SPECIFIC_ACT');
 
   // 2. 📁 Akt pachkalarini olish
-  const pulKochirishPackId = await getOrCreateActPackId(
-    "pul_kuchirish",
-    tozaMakonApi,
-    req.user.companyId
-  );
-  const dvaynikPackId = await getOrCreateActPackId(
-    "dvaynik",
-    tozaMakonApi,
-    req.user.companyId
-  );
+  const pulKochirishPackId = await getOrCreateActPackId('pul_kuchirish', tozaMakonApi, req.user.companyId);
+  const dvaynikPackId = await getOrCreateActPackId('dvaynik', tozaMakonApi, req.user.companyId);
 
   // 3. 💸 Agar to'lovlar bo'lsa pul ko'chirish
   if (fakeAccountIncomeAmount > 0) {
@@ -418,35 +369,27 @@ export const createDublicateAct = async (
 
   return res.json({
     ok: true,
-    message: "muvaffaqqiyatli akt qilindi",
+    message: 'muvaffaqqiyatli akt qilindi',
   });
 };
 
-export const sendAbonentsListToTelegram = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
-  let {
-    minSaldo,
-    maxSaldo,
-    identified,
-    elektrAccountNumberConfirmed,
-    mahalla_name,
-  } = sendAbonentsListToTelegramQuerySchema.parse(req.query);
+export const sendAbonentsListToTelegram = async (req: Request, res: Response): Promise<any> => {
+  let { minSaldo, maxSaldo, identified, elektrAccountNumberConfirmed, mahalla_name } =
+    sendAbonentsListToTelegramQuerySchema.parse(req.query);
   const files = req.files;
 
   const company = await Company.findOne({ id: req.user.companyId });
   if (!company) {
-    return res.status(404).send("Company topilmadi!");
+    return res.status(404).send('Company topilmadi!');
   }
 
   if (!files || files.length === 0 || !Array.isArray(files)) {
-    return res.status(400).send("Hech qanday fayl yuklanmadi!");
+    return res.status(400).send('Hech qanday fayl yuklanmadi!');
   }
 
   // Yuklangan fayllarni Telegram media group formatiga o‘tkazish
   const mediaGroup: InputMediaPhoto[] = files.map((file) => ({
-    type: "photo",
+    type: 'photo',
     media: { source: file.buffer },
   }));
 
@@ -468,7 +411,7 @@ export const sendAbonentsListToTelegram = async (
     })
   );
 
-  res.status(200).send("Rasmlar muvaffaqiyatli yuborildi!");
+  res.status(200).send('Rasmlar muvaffaqiyatli yuborildi!');
 };
 
 export const getMfyById = async (req: Request, res: Response): Promise<any> => {
@@ -476,10 +419,10 @@ export const getMfyById = async (req: Request, res: Response): Promise<any> => {
     id: req.params.mfy_id,
     companyId: req.user.companyId,
   });
-  if (!mahalla) return res.json({ ok: false, message: "MFY not found" });
+  if (!mahalla) return res.json({ ok: false, message: 'MFY not found' });
 
   const company = await Company.findOne({ id: req.user.companyId }).lean();
-  if (!company) return res.json({ ok: false, message: "Company not found" });
+  if (!company) return res.json({ ok: false, message: 'Company not found' });
 
   const companyForReturn = {
     id: company.id,
@@ -497,18 +440,15 @@ export const getMfyById = async (req: Request, res: Response): Promise<any> => {
   res.json({ ok: true, data: mahalla, company: companyForReturn });
 };
 
-export const getAbonentDataByLicshet = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const getAbonentDataByLicshet = async (req: Request, res: Response): Promise<any> => {
   const abonentData = await Abonent.findOne({
     licshet: req.params.licshet,
     companyId: req.user.companyId,
-  }).select("id");
+  }).select('id');
   if (!abonentData) {
     return res.status(404).json({
       ok: false,
-      message: "Abonent mongodbda topilmadi",
+      message: 'Abonent mongodbda topilmadi',
     });
   }
 
@@ -532,29 +472,23 @@ export const getTariffs = async (req: Request, res: Response) => {
   if (companyId == 1824) companyId = 1144;
   const tozaMakonApi = createTozaMakonApi(companyId);
   const company = await Company.findOne({ id: companyId });
-  const { data } = await tozaMakonApi.get(
-    "/billing-service/tariffs/population-tariffs",
-    {
-      params: {
-        page: 0,
-        size: 100,
-        regionId: company?.regionId,
-        companyId: company?.id,
-      },
-    }
-  );
+  const { data } = await tozaMakonApi.get('/billing-service/tariffs/population-tariffs', {
+    params: {
+      page: 0,
+      size: 100,
+      regionId: company?.regionId,
+      companyId: company?.id,
+    },
+  });
   res.json({ tariffs: data.content });
 };
 
-export const getAbonentsByMfyIdController = async (
-  req: Request,
-  res: Response
-) => {
+export const getAbonentsByMfyIdController = async (req: Request, res: Response) => {
   try {
     const data = await getAbonentsByMfyId(req as any);
     res.json({ ok: true, data });
   } catch (error) {
-    res.json({ ok: false, message: "Internal server error 500" });
+    res.json({ ok: false, message: 'Internal server error 500' });
     console.error(error);
   }
 };
@@ -562,49 +496,45 @@ export const getAbonentsByMfyIdController = async (
 export const getAbonentsByMfyIdExcel = async (req: Request, res: Response) => {
   const filteredData = await getAbonentsByMfyId(req as any);
   const workbook = new Excel.Workbook();
-  const worksheet = workbook.addWorksheet("Abonents");
+  const worksheet = workbook.addWorksheet('Abonents');
   worksheet.columns = [
-    { header: "ID", key: "id", width: 10 },
-    { header: "Hisob raqam", key: "accountNumber", width: 20 },
-    { header: "FIO", key: "fullName", width: 30 },
-    { header: "Ko'cha", key: "streetName", width: 15 },
-    { header: "Yashovchilar soni", key: "inhabitantCnt", width: 15 },
-    { header: "Saldo", key: "ksaldo", width: 15 },
-    { header: "Oxirgi to'lov", key: "lastPaymentAmount", width: 15 },
-    { header: "", key: "lastPayDate", width: 15 },
-    { header: "Shaxsi tasdiqlangan", key: "isIdentified", width: 15 },
+    { header: 'ID', key: 'id', width: 10 },
+    { header: 'Hisob raqam', key: 'accountNumber', width: 20 },
+    { header: 'FIO', key: 'fullName', width: 30 },
+    { header: "Ko'cha", key: 'streetName', width: 15 },
+    { header: 'Yashovchilar soni', key: 'inhabitantCnt', width: 15 },
+    { header: 'Saldo', key: 'ksaldo', width: 15 },
+    { header: "Oxirgi to'lov", key: 'lastPaymentAmount', width: 15 },
+    { header: '', key: 'lastPayDate', width: 15 },
+    { header: 'Shaxsi tasdiqlangan', key: 'isIdentified', width: 15 },
     {
-      header: "Elektr Kod tasdiqlangan",
-      key: "isElektrKodConfirmForExcel",
+      header: 'Elektr Kod tasdiqlangan',
+      key: 'isElektrKodConfirmForExcel',
       width: 15,
     },
   ];
-  worksheet.mergeCells("G1:H1");
+  worksheet.mergeCells('G1:H1');
   worksheet.getRow(1).eachCell((cell) => {
-    cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
     cell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FF0070C0" },
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF0070C0' },
     };
   });
   worksheet.addRows(filteredData);
   const buffer = await workbook.xlsx.writeBuffer();
-  res.setHeader(
-    "Content-Type",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-  );
-  res.setHeader("Content-Disposition", "attachment; filename=abonents.xlsx");
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', 'attachment; filename=abonents.xlsx');
   res.send(buffer);
   res.json({ ok: true, data: filteredData });
 };
 
 export const getHouses = async (req: Request, res: Response): Promise<any> => {
   const { cadNum } = req.query;
-  if (!cadNum)
-    return res.json({ ok: false, message: "cadNum not found on query" });
+  if (!cadNum) return res.json({ ok: false, message: 'cadNum not found on query' });
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
-  const { data } = await tozaMakonApi.get("/billing-service/houses", {
+  const { data } = await tozaMakonApi.get('/billing-service/houses', {
     params: {
       cadNum,
     },
@@ -612,15 +542,12 @@ export const getHouses = async (req: Request, res: Response): Promise<any> => {
   res.json(data);
 };
 
-export const getResidents = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const getResidents = async (req: Request, res: Response): Promise<any> => {
   const { cadastralNumber, pnfl } = req.query;
   if (!cadastralNumber && !pnfl)
     return res.json({
       ok: false,
-      message: "cadastralNumber or pnfl not found on query",
+      message: 'cadastralNumber or pnfl not found on query',
     });
 
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
@@ -650,10 +577,7 @@ export const getResidents = async (
   res.json(result);
 };
 
-export const transferMoneyBetweenResidents = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const transferMoneyBetweenResidents = async (req: Request, res: Response): Promise<any> => {
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const createdActs = [];
 
@@ -665,25 +589,15 @@ export const transferMoneyBetweenResidents = async (
     if (!debitorAct || !creditorActs)
       return res.json({
         ok: false,
-        message: "debitorAct or creditorActs not found on body",
+        message: 'debitorAct or creditorActs not found on body',
       });
-    if (!req.file)
-      return res.json({ ok: false, message: "file not found on body" });
+    if (!req.file) return res.json({ ok: false, message: 'file not found on body' });
 
     // 2. Faylni yuklab, fileId ni olamiz
-    const fileId = await uploadFileToTozaMakon(
-      tozaMakonApi,
-      req.file.buffer,
-      req.file.originalname,
-      "SPECIFIC_ACT"
-    );
+    const fileId = await uploadFileToTozaMakon(tozaMakonApi, req.file.buffer, req.file.originalname, 'SPECIFIC_ACT');
 
     // 3. Akt pachkasini tayyorlaymiz
-    const actPackId = await getOrCreateActPackId(
-      "pul_kuchirish",
-      tozaMakonApi,
-      req.user.companyId
-    );
+    const actPackId = await getOrCreateActPackId('pul_kuchirish', tozaMakonApi, req.user.companyId);
 
     // 4. Barcha aktlarni yaratamiz
     const acts = await createMoneyTransferActs({
@@ -700,7 +614,7 @@ export const transferMoneyBetweenResidents = async (
     for (let act of createdActs) {
       await deleteActById(tozaMakonApi, act.id);
     }
-    res.json({ ok: false, message: "Internal server error 500" });
+    res.json({ ok: false, message: 'Internal server error 500' });
     console.error(error);
   }
 };
@@ -708,8 +622,7 @@ export const transferMoneyBetweenResidents = async (
 export const importActs = async (req: Request, res: Response): Promise<any> => {
   // 1. Kiruvchi ma’lumotlarni ajratib olamiz
   // avvalo excel fayldan ma'lumotlarni olib acts arrayiga yuklaymiz
-  if (!req.file)
-    return res.json({ ok: false, message: "file not found on body" });
+  if (!req.file) return res.json({ ok: false, message: 'file not found on body' });
   const data = readExcel(req.file?.buffer);
 
   req.body.acts = data.map((a) => ({
@@ -721,17 +634,15 @@ export const importActs = async (req: Request, res: Response): Promise<any> => {
     description: a.comment,
   }));
 
-  let { acts, actPackId, fileId, packType } = importActsBodySchema.parse(
-    req.body
-  );
+  let { acts, actPackId, fileId, packType } = importActsBodySchema.parse(req.body);
   console.log(actPackId);
   if (!actPackId || isNaN(actPackId)) {
     const tozaMakonApi = createTozaMakonApi(req.user.companyId);
     actPackId = await createActPack(tozaMakonApi, {
       companyId: req.user.companyId,
-      name: "Imported acts",
+      name: 'Imported acts',
       createdDate: formatDate(new Date()),
-      description: "Imported acts",
+      description: 'Imported acts',
       isActive: true,
       isSpecialPack: false,
       packType: packType as packTypes,
@@ -741,13 +652,13 @@ export const importActs = async (req: Request, res: Response): Promise<any> => {
   await jobService.startJob(JobNames.ImportActs, {
     acts: acts.map((a) => ({
       actPackId: actPackId,
-      actType: a.akt_sum > 0 ? "CREDIT" : ("DEBIT" as "DEBIT" | "CREDIT"),
+      actType: a.akt_sum > 0 ? 'CREDIT' : ('DEBIT' as 'DEBIT' | 'CREDIT'),
       amount: a.akt_sum,
       amountWithQQS: a.akt_sum,
       amountWithoutQQS: 0,
       description: a.description,
-      endPeriod: formatDate(new Date(), "M.YYYY"),
-      startPeriod: formatDate(new Date(), "M.YYYY"),
+      endPeriod: formatDate(new Date(), 'M.YYYY'),
+      startPeriod: formatDate(new Date(), 'M.YYYY'),
       fileId,
       kSaldo: 0,
       residentId: a.residentId,
@@ -757,21 +668,17 @@ export const importActs = async (req: Request, res: Response): Promise<any> => {
     userId: req.user.id,
   });
 
-  res.json({ ok: true, message: "Import job started" });
+  res.json({ ok: true, message: 'Import job started' });
 };
 
-export const uploadFileTozamakon = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
-  if (!req.file)
-    return res.json({ ok: false, message: "file not found on body" });
+export const uploadFileTozamakon = async (req: Request, res: Response): Promise<any> => {
+  if (!req.file) return res.json({ ok: false, message: 'file not found on body' });
 
   const fileId = await uploadFileToTozaMakon(
     createTozaMakonApi(req.user.companyId),
     req.file?.buffer,
     req.file?.originalname,
-    "SPECIFIC_ACT"
+    'SPECIFIC_ACT'
   );
 
   return res.json({ ok: true, fileId });
