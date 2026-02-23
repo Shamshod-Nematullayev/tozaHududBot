@@ -13,6 +13,7 @@ import { createTozaMakonApi } from '@api/tozaMakon.js';
 import { updateAbonentDetails } from '@services/billing/updateAbonentDetails.js';
 import { WizardWithState } from '@bot/helpers/WizardWithState.js';
 import { isCallbackQueryMessage, isTextMessage } from '../utils/validator.js';
+import { changePhone } from '@services/billing/changePhone.js';
 
 interface MyWizardState {
   inspector_id?: string;
@@ -101,9 +102,9 @@ export const connectPhoneNumber = new Scenes.WizardScene<Ctx>(
         return ctx.reply(`(33 va 70) Humans abonentlari qabul qilinmaydi`);
       }
       const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId as number);
-      await updateAbonentDetails(tozaMakonApi, ctx.wizard.state.abonent_id as number, {
-        phone: ctx.message.text,
-        description: `${ctx.wizard.state.inspector_name} ma'lumotiga asosan telefon raqami kiritildi.`,
+      await changePhone(tozaMakonApi, {
+        phoneNumber: ctx.message.text,
+        residentId: ctx.wizard.state.abonent_id as number,
       });
 
       await Abonent.updateOne(
