@@ -147,9 +147,9 @@ export const connectPhoneNumber = new Scenes.WizardScene<Ctx>(
       } else if (ctx.callbackQuery.data === 'new') {
         await ctx.deleteMessage();
         const tozaMakonApi = createTozaMakonApi(ctx.wizard.state.companyId as number);
-        await updateAbonentDetails(tozaMakonApi, ctx.wizard.state.abonent_id as number, {
-          phone: ctx.wizard.state.phone,
-          description: `${ctx.wizard.state.inspector_name} ma'lumotiga asosan telefon raqami kiritildi.`,
+        await changePhone(tozaMakonApi, {
+          phoneNumber: ctx.wizard.state.phone as string,
+          residentId: ctx.wizard.state.abonent_id as number,
         });
 
         await Abonent.updateOne(
