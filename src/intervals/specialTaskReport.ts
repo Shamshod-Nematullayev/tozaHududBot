@@ -1,17 +1,16 @@
-import { deletePreviousReport } from "@bot/helpers/deletePreviousReport.js";
-import { createImgFromHtml } from "@helpers/createImgFromHtml.js";
-import { renderHtmlByEjs } from "@helpers/renderHtmlByEjs.js";
-import { sendHtmlAsPhoto } from "@helpers/sendHtmlAsPhoto.js";
-import { Abonent } from "@models/Abonent.js";
-import { Company } from "@models/Company.js";
-import { Mahalla } from "@models/Mahalla.js";
-import { Nazoratchi } from "@models/Nazoratchi.js";
-import { ReportType } from "@models/ReportsMessage.js";
-import { SpecialTaskItem } from "@models/SpecialTaskItem.js";
+import { deletePreviousReport } from '@bot/helpers/deletePreviousReport.js';
+import { createImgFromHtml } from '@helpers/createImgFromHtml.js';
+import { renderHtmlByEjs } from '@helpers/renderHtmlByEjs.js';
+import { sendHtmlAsPhoto } from '@helpers/sendHtmlAsPhoto.js';
+import { Abonent } from '@models/Abonent.js';
+import { Company } from '@models/Company.js';
+import { Mahalla } from '@models/Mahalla.js';
+import { Nazoratchi } from '@models/Nazoratchi.js';
+import { ReportType } from '@models/ReportsMessage.js';
+import { SpecialTaskItem } from '@models/SpecialTaskItem.js';
 
-async function updateTasks(companyId: number, type: "phone" | "electricity") {
-  const confirmType =
-    type === "phone" ? "phone_tasdiqlandi" : "ekt_kod_tasdiqlandi";
+async function updateTasks(companyId: number, type: 'phone' | 'electricity') {
+  const confirmType = type === 'phone' ? 'phone_tasdiqlandi' : 'ekt_kod_tasdiqlandi';
 
   // 1. Barcha tasklarni olish
   const tasks = await SpecialTaskItem.find({ companyId });
@@ -33,15 +32,12 @@ async function updateTasks(companyId: number, type: "phone" | "electricity") {
 
   // 4. Shu id larga mos tasklarni DONE qilish
   await SpecialTaskItem.updateMany(
-    { id: { $in: abonentIds }, status: "in-progress" },
-    { $set: { status: "completed", complatedDate: new Date() } }
+    { id: { $in: abonentIds }, status: 'in-progress' },
+    { $set: { status: 'completed', complatedDate: new Date() } }
   );
 }
 
-export async function specialTaskReport(
-  companyId = 1144,
-  type: "phone" | "electricity"
-) {
+export async function specialTaskReport(companyId = 1144, type: 'phone' | 'electricity') {
   try {
     // Update all tasks
     await updateTasks(companyId, type);
@@ -62,7 +58,7 @@ export async function specialTaskReport(
       const mahallaTasks = tasks.filter((t) => t.mahallaId === mahalla.id);
       const allTasksCount = mahallaTasks.length;
       const complatedTasksCount = mahallaTasks.filter(
-        (t) => t.status === "completed" || t.status === "rejected"
+        (t) => t.status === 'completed' || t.status === 'rejected'
       ).length;
       let complatedPercent = (complatedTasksCount / allTasksCount) * 100;
       if (complatedPercent > 100) complatedPercent = 100;
@@ -79,21 +75,19 @@ export async function specialTaskReport(
     result.sort((a, b) => b.complatedPercent - a.complatedPercent);
     // draw and send telegram
     const company = await Company.findOne({ id: companyId });
-    const html = await renderHtmlByEjs("specialTaskReport.ejs", {
+    const html = await renderHtmlByEjs('specialTaskReport.ejs', {
       result,
       type,
     });
     const msg = await sendHtmlAsPhoto(
       {
         htmlString: html,
-        selector: "body",
+        selector: 'body',
       },
       company?.GROUP_ID_NAZORATCHILAR as string,
       {
-        parse_mode: "HTML",
-        caption:
-          "Maxsus topshiriq bo'yicha ma'lumot, " +
-          new Date().toLocaleDateString(),
+        parse_mode: 'HTML',
+        caption: "Maxsus topshiriq bo'yicha ma'lumot, " + new Date().toLocaleDateString(),
       }
     );
 
@@ -107,10 +101,7 @@ export async function specialTaskReport(
   }
 }
 
-export async function specialTaskReportByInspectorsDaily(
-  companyId = 1144,
-  type: "phone" | "electricity"
-) {
+export async function specialTaskReportByInspectorsDaily(companyId = 1144, type: 'phone' | 'electricity') {
   try {
     await updateTasks(companyId, type);
     const now = new Date();
@@ -138,12 +129,10 @@ export async function specialTaskReportByInspectorsDaily(
     }[] = [];
 
     for (const inspector of inspectors) {
-      const inspectorTasks = tasks.filter(
-        (t) => t.nazoratchi_id == inspector.id
-      );
+      const inspectorTasks = tasks.filter((t) => t.nazoratchi_id == inspector.id);
       const allTasksCount = inspectorTasks.length;
       const complatedTasksCount = inspectorTasks.filter(
-        (t) => t.status == "completed" || t.status == "rejected"
+        (t) => t.status == 'completed' || t.status == 'rejected'
       ).length;
       let complatedPercent = (complatedTasksCount / allTasksCount) * 100;
       if (complatedPercent > 100) complatedPercent = 100;
@@ -153,31 +142,24 @@ export async function specialTaskReportByInspectorsDaily(
         allTasksCount,
         complatedTasksCount,
         complatedPercent,
-        todayCompleted: tasksCompletedToday.filter(
-          (t) => t.nazoratchi_id == inspector.id
-        ).length,
+        todayCompleted: tasksCompletedToday.filter((t) => t.nazoratchi_id == inspector.id).length,
       });
     }
-    result.sort((a, b) => b.todayCompleted - a.todayCompleted);
-    const html = await renderHtmlByEjs(
-      "specialTaskReportByInspectorsDaily.ejs",
-      {
-        result,
-        type,
-      }
-    );
+    result.sort((a, b) => b.complatedPercent - a.complatedPercent);
+    const html = await renderHtmlByEjs('specialTaskReportByInspectorsDaily.ejs', {
+      result,
+      type,
+    });
     console.log(result);
     const msg = await sendHtmlAsPhoto(
       {
         htmlString: html,
-        selector: "body",
+        selector: 'body',
       },
       process.env.ME as string,
       {
-        parse_mode: "HTML",
-        caption:
-          "Maxsus topshiriq bo'yicha tezkor ma'lumot, " +
-          new Date().toLocaleDateString(),
+        parse_mode: 'HTML',
+        caption: "Maxsus topshiriq bo'yicha tezkor ma'lumot, " + new Date().toLocaleDateString(),
       }
     );
   } catch (error) {

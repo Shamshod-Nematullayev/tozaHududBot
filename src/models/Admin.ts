@@ -1,7 +1,7 @@
-import { Document } from "mongoose";
-import { model, Schema } from "mongoose";
+import { Document } from 'mongoose';
+import { model, Schema } from 'mongoose';
 
-export type Role = "admin" | "stm" | "billing" | "yurist" | "gps";
+export type Role = 'admin' | 'stm' | 'billing' | 'yurist' | 'gps';
 export interface IAdmin {
   user_id: number;
   login: string;
@@ -13,6 +13,7 @@ export interface IAdmin {
   roles: Role[];
   pnfl: string;
   isTestUser: boolean;
+  email: string;
 }
 
 export interface IAdminDocument extends IAdmin, Document {
@@ -33,10 +34,11 @@ const schema = new Schema<IAdmin>({
   companyId: Number,
   roles: {
     type: [String],
-    enum: ["billing", "yurist", "admin", "stm", "gps"],
+    enum: ['billing', 'yurist', 'admin', 'stm', 'gps'],
     default: [],
   },
   pnfl: String,
   isTestUser: { type: Boolean, default: false },
+  email: String,
 });
-export const Admin = model("admin", schema, "admin");
+export const Admin = model('admin', schema, 'admin');

@@ -1,10 +1,16 @@
-import { Admin } from "@models/Admin.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { bot } from "@bot/core/bot.js";
-import axios from "axios";
-import { Company } from "@models/Company.js";
-import { Request, Response } from "express";
+import { Admin } from '@models/Admin.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { bot } from '@bot/core/bot.js';
+import axios from 'axios';
+import { Company } from '@models/Company.js';
+import { Request, Response } from 'express';
+import { OAuth2Client } from 'google-auth-library';
+import qs from 'querystring';
+import crypto from 'crypto';
+import z from 'zod';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const login = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -12,14 +18,14 @@ export const login = async (req: Request, res: Response): Promise<any> => {
     const admin: any = await Admin.findOne({ login });
 
     if (!admin) {
-      return res.json({ ok: false, message: "Login yoki parol mos kelmadi" });
+      return res.json({ ok: false, message: 'Login yoki parol mos kelmadi' });
     }
 
-    const validPassword = await bcrypt.compare(password, admin.password || "");
+    const validPassword = await bcrypt.compare(password, admin.password || '');
     if (!validPassword) {
       return res.json({
         ok: false,
-        message: "Login yoki parol mos kelmadi",
+        message: 'Login yoki parol mos kelmadi',
       });
     }
 
@@ -33,7 +39,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
         isTestUser: admin.isTestUser,
       },
       process.env.SECRET_JWT_KEY as string,
-      { expiresIn: "1h" }
+      { expiresIn: '1h' }
     );
 
     const refreshToken = jwt.sign(
@@ -45,7 +51,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
         roles: admin.roles,
       },
       process.env.REFRESH_JWT_KEY as string,
-      { expiresIn: "12h" }
+      { expiresIn: '12h' }
     );
 
     await admin.updateOne({ $set: { refreshToken } });
@@ -59,7 +65,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       return res.status(400).json({
         ok: false,
         message:
-          "Dastur faoliyati vaqtincha cheklangan. \nIltimos, xizmatlardan foydalanishni davom ettirish uchun to‘lovni amalga oshiring.",
+          'Dastur faoliyati vaqtincha cheklangan. \nIltimos, xizmatlardan foydalanishni davom ettirish uchun to‘lovni amalga oshiring.',
       });
     }
 
@@ -93,78 +99,62 @@ export const login = async (req: Request, res: Response): Promise<any> => {
     });
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({ ok: false, message: "Internal server error" });
+    return res.status(500).json({ ok: false, message: 'Internal server error' });
   }
 };
 
-export const refreshToken = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const refreshToken = async (req: Request, res: Response): Promise<any> => {
   const { refreshToken } = req.body;
 
-  if (!refreshToken) return res.status(401).json({ message: "Unauthorized" });
+  if (!refreshToken) return res.status(401).json({ message: 'Unauthorized' });
 
   const admin = await Admin.findOne({ refreshToken });
-  if (!admin) return res.status(401).json({ message: "Invalid refresh token" });
+  if (!admin) return res.status(401).json({ message: 'Invalid refresh token' });
 
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_JWT_KEY as string,
-    (err: any, decoded: any) => {
-      if (err)
-        return res.status(401).json({ message: "Invalid refresh token" });
+  jwt.verify(refreshToken, process.env.REFRESH_JWT_KEY as string, (err: any, decoded: any) => {
+    if (err) return res.status(401).json({ message: 'Invalid refresh token' });
 
-      const accessToken = jwt.sign(
-        {
-          id: decoded.id,
-          login: decoded.login,
-          companyId: admin.companyId,
-          fullName: admin.fullName,
-          roles: admin.roles,
-        },
-        process.env.SECRET_JWT_KEY as string,
-        { expiresIn: "1h" }
-      );
+    const accessToken = jwt.sign(
+      {
+        id: decoded.id,
+        login: decoded.login,
+        companyId: admin.companyId,
+        fullName: admin.fullName,
+        roles: admin.roles,
+      },
+      process.env.SECRET_JWT_KEY as string,
+      { expiresIn: '1h' }
+    );
 
-      return res.json({ accessToken });
-    }
-  );
+    return res.json({ accessToken });
+  });
 };
 
 export const logout = async (req: Request, res: Response): Promise<any> => {
   const { refreshToken } = req.body;
   await Admin.updateOne({ refreshToken }, { refreshToken: null });
-  return res.status(200).json({ message: "Logged out successfully" });
+  return res.status(200).json({ message: 'Logged out successfully' });
 };
 
-export const changePassword = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const changePassword = async (req: Request, res: Response): Promise<any> => {
   try {
     if (!req.body.newPassword || !req.body.login || !req.body.password) {
       return res.status(400).json({
-        message: "All fields are required. newPassword, login, password",
+        message: 'All fields are required. newPassword, login, password',
       });
     }
     const admin = await Admin.findOne({ login: req.body.login });
     if (!admin) {
       return res.status(400).json({
         ok: false,
-        message: "Admin topilmadi",
+        message: 'Admin topilmadi',
       });
     }
-    const validPassword = await bcrypt.compare(
-      req.body.password,
-      admin.password
-    );
+    const validPassword = await bcrypt.compare(req.body.password, admin.password);
     if (!validPassword) {
       return res.status(400).json({
         ok: false,
-        message: "Parol mos kelmadi",
+        message: 'Parol mos kelmadi',
       });
     }
     await Admin.findByIdAndUpdate(admin._id, {
@@ -180,7 +170,7 @@ export const changePassword = async (
     console.error(error);
     return res.status(500).json({
       ok: false,
-      message: "Internal server error",
+      message: 'Internal server error',
     });
   }
 };
@@ -188,25 +178,126 @@ export const changePassword = async (
 export const getPhoto = async (req: Request, res: Response): Promise<any> => {
   try {
     const user = await Admin.findById(req.user?.id);
-    if (!user)
-      return res.status(404).json({ ok: false, message: "Admin topilmadi" });
+    if (!user) return res.status(404).json({ ok: false, message: 'Admin topilmadi' });
 
     const ctx = await bot.telegram.getChat(user.user_id);
     let photo = { data: null };
 
     if (ctx.photo) {
       const file = await bot.telegram.getFile(ctx.photo.small_file_id);
-      photo = await axios.get(
-        `https://api.telegram.org/file/bot${process.env.TOKEN}/${file.file_path}`,
-        { responseType: "arraybuffer" }
-      );
+      photo = await axios.get(`https://api.telegram.org/file/bot${process.env.TOKEN}/${file.file_path}`, {
+        responseType: 'arraybuffer',
+      });
     }
 
     return res.status(200).json({ ok: true, photo: photo.data });
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({ ok: false, message: "Internal server error" });
+    return res.status(500).json({ ok: false, message: 'Internal server error' });
   }
+};
+
+export const loginByGoogle = async (req: Request, res: Response): Promise<any> => {
+  const { code, state } = z.object({ code: z.string(), state: z.string() }).parse(req.query);
+
+  const savedState = req.cookies.oauth_state;
+  if (savedState !== state) return res.status(400).json({ message: 'Invalid state' });
+  res.clearCookie('oauth_state');
+
+  const { id_token } = (
+    await axios.post(
+      'https://oauth2.googleapis.com/token',
+      qs.stringify({
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        grant_type: 'authorization_code',
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
+    )
+  ).data;
+
+  const googleUser = (
+    await client.verifyIdToken({
+      idToken: id_token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    })
+  ).getPayload();
+
+  if (!googleUser) {
+    return res.status(400).json({ message: 'Google user not found' });
+  }
+
+  const user = await Admin.findOne({ email: googleUser?.email });
+
+  if (!user) {
+    return res.status(400).json({ message: 'User not found' });
+  }
+
+  const accessToken = jwt.sign(
+    {
+      id: user.id,
+      login: user.login,
+      companyId: user.companyId,
+      fullName: user.fullName,
+      roles: user.roles,
+    },
+    process.env.SECRET_JWT_KEY as string,
+    { expiresIn: '1h' }
+  );
+
+  const refreshToken = jwt.sign(
+    {
+      id: user.id,
+      login: user.login,
+      companyId: user.companyId,
+      fullName: user.fullName,
+      roles: user.roles,
+    },
+    process.env.REFRESH_JWT_KEY as string,
+    { expiresIn: '1d' }
+  );
+
+  await Admin.findByIdAndUpdate(user.id, {
+    $set: {
+      refreshToken,
+    },
+  });
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
+  return res.json({ accessToken });
+};
+
+export const redirectToGoogle = async (req: Request, res: Response) => {
+  const state = crypto.randomBytes(32).toString('hex');
+
+  res.cookie('oauth_state', state, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 5 * 60 * 1000, // 5 minut
+  });
+
+  const googleAuthUrl =
+    'https://accounts.google.com/o/oauth2/v2/auth?' +
+    new URLSearchParams({
+      client_id: process.env.GOOGLE_CLIENT_ID!,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+      response_type: 'code',
+      scope: 'openid email profile',
+      state,
+    }).toString();
+
+  return res.redirect(googleAuthUrl);
 };
