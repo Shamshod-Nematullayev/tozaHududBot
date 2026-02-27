@@ -6,6 +6,7 @@ import { app, server } from './config/socketConfig.js';
 import { agenda } from './config/agenda.js';
 import { connectDb } from './config/connectDB.js';
 import { bot } from './bot/core/bot.js';
+import cookieParser from 'cookie-parser';
 
 const launchBot = process.env.LAUNCH_BOT === 'false' ? false : true;
 
@@ -25,6 +26,7 @@ process.on('uncaughtException', (err) => {
 // App middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
     origin: true,

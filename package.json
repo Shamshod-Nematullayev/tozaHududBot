@@ -20,6 +20,7 @@
     "bull": "^4.16.5",
     "compressing": "^1.9.0",
     "convert-excel-to-json": "^1.7.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "decompress": "^4.2.1",
     "docx": "^8.5.0",
@@ -56,6 +57,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.10",
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",

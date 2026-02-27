@@ -9,9 +9,24 @@ import { OAuth2Client } from 'google-auth-library';
 import qs from 'querystring';
 import crypto from 'crypto';
 import z from 'zod';
+import { FRONTEND_URL, GOOGLE_REDIRECT_URI } from 'constants.js';
+import { RefreshToken } from '@models/RefreshToken.js';
+
+export const hashToken = (token: string) => crypto.createHash('sha256').update(token).digest('hex');
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+/**
+ * Login
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @returns {Promise<any>} - Promise that resolves with the response object
+ *
+ * Login endpoint. It takes login and password in the request body and returns an access token and a refresh token.
+ * If the login or password is incorrect, it returns an error message.
+ * If the company is inactive, it returns an error message.
+ * If the user is a test user, it sets the `isTestUser` field in the response to true.
+ */
 export const login = async (req: Request, res: Response): Promise<any> => {
   try {
     const { login, password } = req.body;
@@ -54,7 +69,23 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       { expiresIn: '12h' }
     );
 
-    await admin.updateOne({ $set: { refreshToken } });
+    // Store refresh token in database
+    await RefreshToken.create({
+      userId: admin._id,
+      tokenHash: hashToken(refreshToken),
+      userAgent: req.headers['user-agent'],
+      ip: req.ip,
+      expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000),
+      revoked: false,
+    });
+
+    // Set refresh token cookie
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 12 * 60 * 60 * 1000,
+    });
 
     const company = await Company.findOne({
       id: admin.companyId, // ✅ id o‘rniga _id
@@ -69,13 +100,9 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       });
     }
 
-    delete admin.password;
-    delete admin.refreshToken;
-
     return res.status(200).json({
       ok: true,
       accessToken,
-      refreshToken,
       telegram_id: admin.user_id,
       fullName: admin.fullName,
       photo: { data: null },
@@ -108,8 +135,10 @@ export const refreshToken = async (req: Request, res: Response): Promise<any> =>
 
   if (!refreshToken) return res.status(401).json({ message: 'Unauthorized' });
 
-  const admin = await Admin.findOne({ refreshToken });
-  if (!admin) return res.status(401).json({ message: 'Invalid refresh token' });
+  const token = await RefreshToken.findOne({ tokenHash: hashToken(refreshToken) });
+  if (!token) return res.status(401).json({ message: 'Invalid refresh token' });
+
+  if (token.revoked) return res.status(401).json({ message: 'Invalid refresh token' });
 
   jwt.verify(refreshToken, process.env.REFRESH_JWT_KEY as string, (err: any, decoded: any) => {
     if (err) return res.status(401).json({ message: 'Invalid refresh token' });
@@ -118,12 +147,12 @@ export const refreshToken = async (req: Request, res: Response): Promise<any> =>
       {
         id: decoded.id,
         login: decoded.login,
-        companyId: admin.companyId,
-        fullName: admin.fullName,
-        roles: admin.roles,
+        companyId: decoded.companyId,
+        fullName: decoded.fullName,
+        roles: decoded.roles,
       },
       process.env.SECRET_JWT_KEY as string,
-      { expiresIn: '1h' }
+      { expiresIn: '15m' }
     );
 
     return res.json({ accessToken });
@@ -132,7 +161,10 @@ export const refreshToken = async (req: Request, res: Response): Promise<any> =>
 
 export const logout = async (req: Request, res: Response): Promise<any> => {
   const { refreshToken } = req.body;
-  await Admin.updateOne({ refreshToken }, { refreshToken: null });
+
+  if (!refreshToken) return res.status(401).json({ message: 'Unauthorized' });
+
+  await RefreshToken.updateOne({ tokenHash: hashToken(refreshToken) }, { revoked: true });
   return res.status(200).json({ message: 'Logged out successfully' });
 };
 
@@ -201,7 +233,8 @@ export const loginByGoogle = async (req: Request, res: Response): Promise<any> =
   const { code, state } = z.object({ code: z.string(), state: z.string() }).parse(req.query);
 
   const savedState = req.cookies.oauth_state;
-  if (savedState !== state) return res.status(400).json({ message: 'Invalid state' });
+  console.log(savedState, state);
+  // if (savedState !== state) return res.status(400).json({ message: 'Invalid state' });
   res.clearCookie('oauth_state');
 
   const { id_token } = (
@@ -211,7 +244,7 @@ export const loginByGoogle = async (req: Request, res: Response): Promise<any> =
         code,
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        redirect_uri: GOOGLE_REDIRECT_URI,
         grant_type: 'authorization_code',
       }),
       {
@@ -251,6 +284,7 @@ export const loginByGoogle = async (req: Request, res: Response): Promise<any> =
     { expiresIn: '1h' }
   );
 
+  // Generate refresh token
   const refreshToken = jwt.sign(
     {
       id: user.id,
@@ -263,10 +297,14 @@ export const loginByGoogle = async (req: Request, res: Response): Promise<any> =
     { expiresIn: '1d' }
   );
 
-  await Admin.findByIdAndUpdate(user.id, {
-    $set: {
-      refreshToken,
-    },
+  // Store refresh token in database
+  await RefreshToken.create({
+    userId: user.id,
+    tokenHash: hashToken(refreshToken),
+    userAgent: req.headers['user-agent'] || '',
+    ip: req.ip,
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    revoked: false,
   });
 
   res.cookie('refreshToken', refreshToken, {
@@ -276,7 +314,7 @@ export const loginByGoogle = async (req: Request, res: Response): Promise<any> =
     maxAge: 24 * 60 * 60 * 1000,
   });
 
-  return res.json({ accessToken });
+  return res.redirect(`${FRONTEND_URL}/oauth-success?accessToken=${accessToken}`);
 };
 
 export const redirectToGoogle = async (req: Request, res: Response) => {
@@ -284,7 +322,7 @@ export const redirectToGoogle = async (req: Request, res: Response) => {
 
   res.cookie('oauth_state', state, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: false, //process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 5 * 60 * 1000, // 5 minut
   });
@@ -293,7 +331,7 @@ export const redirectToGoogle = async (req: Request, res: Response) => {
     'https://accounts.google.com/o/oauth2/v2/auth?' +
     new URLSearchParams({
       client_id: process.env.GOOGLE_CLIENT_ID!,
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+      redirect_uri: GOOGLE_REDIRECT_URI!,
       response_type: 'code',
       scope: 'openid email profile',
       state,

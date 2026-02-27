@@ -15,7 +15,7 @@ const router = Router();
 
 router.post('/login', catchAsync(login));
 router.get('/google', catchAsync(redirectToGoogle));
-router.post('/google/callback', catchAsync(loginByGoogle));
+router.get('/google/callback', catchAsync(loginByGoogle));
 router.post('/refresh-token', catchAsync(refreshToken));
 router.post('/logout', catchAsync(logout));
 router.put('/change-password', isAuth, catchAsync(changePassword));
