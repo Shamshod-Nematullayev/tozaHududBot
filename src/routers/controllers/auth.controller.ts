@@ -131,7 +131,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
 };
 
 export const refreshToken = async (req: Request, res: Response): Promise<any> => {
-  const { refreshToken } = req.body;
+  const { refreshToken } = req.cookies;
 
   if (!refreshToken) return res.status(401).json({ message: 'Unauthorized' });
 
