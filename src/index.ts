@@ -54,7 +54,6 @@ if (launchBot) {
 
 connectDb();
 
-import 'test/index.js';
 import { initJobs } from 'intervals/index.js';
 import mainRouter from 'routers/index.js';
 import { specialTaskReport, specialTaskReportByInspectorsDaily } from 'intervals/specialTaskReport.js';

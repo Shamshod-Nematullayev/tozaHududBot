@@ -16,13 +16,13 @@ export const NOTIFICATIONS_CHANNEL_ID = -1002429873864;
 export const TEST_BASE_CHANNEL_ID = -1001567163110;
 export const caotoNames = [
   {
-    title: "Qoradaryo TETK",
+    title: 'Qoradaryo TETK',
     caoto: 18214,
     region: 18,
     companyId: 1144,
   },
   {
-    title: "Xatirchi TETK",
+    title: 'Xatirchi TETK',
     caoto: 12251,
     region: 12,
     companyId: 1144,
@@ -34,25 +34,25 @@ export const caotoNames = [
     companyId: 1144,
   },
   {
-    title: "Paxtachi TETK",
+    title: 'Paxtachi TETK',
     caoto: 18230,
     region: 18,
     companyId: 1265,
   },
   {
-    title: "Nurobod ETK",
+    title: 'Nurobod ETK',
     caoto: 18235,
     region: 18,
     companyId: 1263,
   },
   {
-    title: "Payariq TETK",
+    title: 'Payariq TETK',
     caoto: 18224,
     region: 18,
     companyId: 1266,
   },
   {
-    title: "Chelak TETK",
+    title: 'Chelak TETK',
     caoto: 18226,
     region: 18,
     companyId: 1266,
@@ -64,7 +64,7 @@ export const caotoNames = [
     companyId: 621,
   },
   {
-    title: "Siyob TETK",
+    title: 'Siyob TETK',
     caoto: 18407,
     region: 18,
     companyId: 621,
@@ -76,7 +76,7 @@ export const caotoNames = [
     companyId: 621,
   },
   {
-    title: "Zarafshon TETK",
+    title: 'Zarafshon TETK',
     caoto: 18234,
     region: 18,
     companyId: 621,
@@ -88,7 +88,7 @@ export const caotoNames = [
     companyId: 621,
   },
   {
-    title: "Zarafshon TETK",
+    title: 'Zarafshon TETK',
     caoto: 18234,
     region: 18,
     companyId: 337,
@@ -106,7 +106,7 @@ export const caotoNames = [
     companyId: 1824,
   },
   {
-    title: "Nurobod EP",
+    title: 'Nurobod EP',
     caoto: 18235,
     region: 18,
     companyId: 1144,
@@ -114,5 +114,9 @@ export const caotoNames = [
 ];
 
 export const queueNames = {
-  updateAbonents: "updateAbonents",
+  updateAbonents: 'updateAbonents',
 };
+
+const DOMEN = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : 'https://api.greenzone.uz';
+export const GOOGLE_REDIRECT_URI = DOMEN + '/api/auth/google/callback';
+export const FRONTEND_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : 'https://greenzone.uz';
