@@ -28,7 +28,6 @@ interface IAriza {
   current_prescribed_cnt: number;
   next_prescribed_cnt: number;
   status: 'yangi' | 'qabul qilindi' | 'tasdiqlangan' | 'bekor qilindi' | 'akt_kiritilgan' | 'qayta_akt_kiritilgan';
-  photos: string[];
   recalculationPeriods: any[];
   muzlatiladi: boolean;
   is_canceled: boolean;
@@ -124,10 +123,6 @@ const schema = new Schema<IAriza>({
     ],
   },
   aktInfo: Object,
-  photos: {
-    type: [String],
-    default: [],
-  },
   tempPhotos: {
     type: [String],
     default: [],
