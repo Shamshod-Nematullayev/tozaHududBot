@@ -235,8 +235,34 @@ export const duplicateActFromRequest = async (req: Request, res: Response): Prom
   // 2. Akt pachkalarini olish
   const pulKuchirishPackId = await getOrCreateActPackId('pul_kuchirish', tozaMakonApi, companyId);
   const dvaynikPackId = await getOrCreateActPackId('dvaynik', tozaMakonApi, companyId);
+  const odamSoniPackId = await getOrCreateActPackId('odam_soni', tozaMakonApi, companyId);
 
-  // 3. Pul ko‘chirish aktlarini yaratish
+  // 3. Odam soni aktlarini yaratish
+  const abonentData = await getAbonentDetails(tozaMakonApi, abonentReal.id);
+  if (abonentData.house.inhabitantCnt !== ariza.next_prescribed_cnt) {
+    const odamSoniAct = await createAct(tozaMakonApi, {
+      actPackId: odamSoniPackId,
+      actType: 'DEBIT',
+      amount: 0,
+      amountWithoutQQS: 0,
+      amountWithQQS: 0,
+      description: 'Ikkilamchi dalolatnomasi',
+      endPeriod: `${new Date().getMonth() + 1}.${new Date().getFullYear()}`,
+      startPeriod: `${new Date().getMonth() + 1}.${new Date().getFullYear()}`,
+      fileId,
+      inhabitantCount: ariza.next_prescribed_cnt,
+      kSaldo: await calculateKSaldo(tozaMakonApi, {
+        actPackId: odamSoniPackId,
+        amount: 0,
+        actType: 'DEBIT',
+        residentId: abonentReal.id,
+      }),
+      residentId: abonentReal.id,
+    });
+    confirmActTozamakon(tozaMakonApi, [odamSoniAct.id]);
+  }
+
+  // 4. Pul ko‘chirish aktlarini yaratish
   if (Number(akt_sum))
     await transferAmountBetweenAccounts(tozaMakonApi, {
       amount: Number(akt_sum),
@@ -247,7 +273,7 @@ export const duplicateActFromRequest = async (req: Request, res: Response): Prom
       descriptionPrefix: `${abonentFake.licshet} → ${abonentReal.licshet}`,
     });
 
-  // 4. Dvaynikni yopish
+  // 5. Dvaynikni yopish
   const amountObj = await calculateAmount(tozaMakonApi, {
     residentId: abonentFake.id,
     inhabitantCount: 0,
@@ -270,7 +296,7 @@ export const duplicateActFromRequest = async (req: Request, res: Response): Prom
     inhabitantCount: 0,
   });
 
-  // 5. Arizani yangilash
+  // 6. Arizani yangilash
   await ariza.updateOne({
     $set: {
       status: 'akt_kiritilgan',
@@ -281,7 +307,7 @@ export const duplicateActFromRequest = async (req: Request, res: Response): Prom
     },
   });
 
-  // 6. Papkaga qo'shish
+  // 7. Papkaga qo'shish
   const folderId = await Folder.addArizaToFolder(companyId, {
     accountNumber: ariza.ikkilamchi_licshet,
     ariza_id: ariza_id,

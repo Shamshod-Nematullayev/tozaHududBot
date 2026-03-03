@@ -1,13 +1,11 @@
-import { Handler } from "express";
-import jwt from "jsonwebtoken";
+import { Handler } from 'express';
+import jwt from 'jsonwebtoken';
 
 const isAuth: Handler = (req, res, next): any => {
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Access Denied: No Token Provided" });
+    return res.status(401).json({ message: 'Access Denied: No Token Provided' });
   }
 
   try {
@@ -21,12 +19,12 @@ const isAuth: Handler = (req, res, next): any => {
       login: string;
       isTestUser?: boolean;
     }; // Add user data to request
-    if (req.user.roles.includes("stm") && req.query.companyId) {
+    if (req.user.roles.includes('stm') && req.query.companyId) {
       req.user.companyId = Number(req.query.companyId);
     }
     next();
   } catch (error) {
-    res.status(401).json({ message: "Invalid Token" });
+    res.status(401).json({ message: 'Invalid Token' });
   }
 };
 
