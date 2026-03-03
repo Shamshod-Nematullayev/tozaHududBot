@@ -66,7 +66,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
         roles: admin.roles,
       },
       process.env.REFRESH_JWT_KEY as string,
-      { expiresIn: '12h' }
+      { expiresIn: '24h' }
     );
 
     // Store refresh token in database
@@ -75,7 +75,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       tokenHash: hashToken(refreshToken),
       userAgent: req.headers['user-agent'],
       ip: req.ip,
-      expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
       revoked: false,
     });
 
@@ -84,7 +84,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 12 * 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     const company = await Company.findOne({
