@@ -57,6 +57,7 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import { Folder } from '@models/Folder.js';
 import { confirmActTozamakon } from '@services/billing/confirmActTozamakon.js';
+import { getAbonentDetailsHistory } from '@services/billing/getAbonentDetailsHistory.js';
 
 export const downloadPdfFileFromBillingAsBase64 = async (req: Request, res: Response) => {
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
@@ -95,6 +96,13 @@ export const getAbonentDHJByAbonentId = async (req: Request, res: Response) => {
     ok: true,
     rows: data,
   });
+};
+
+export const getAbonentDetailsHistoryById = async (req: Request, res: Response) => {
+  const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+  const { abonentId } = z.object({ abonentId: z.coerce.number() }).parse(req.params);
+  const data = await getAbonentDetailsHistory(tozaMakonApi, abonentId);
+  res.json(data);
 };
 
 export const getAbonentActs = async (req: Request, res: Response) => {
@@ -708,4 +716,11 @@ export const uploadFileTozamakon = async (req: Request, res: Response): Promise<
   );
 
   return res.json({ ok: true, fileId });
+};
+
+export const getAbonentDetailsById = async (req: Request, res: Response): Promise<any> => {
+  const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+  const { abonentId } = z.object({ abonentId: z.coerce.number() }).parse(req.params);
+  const data = await getAbonentDetails(tozaMakonApi, abonentId);
+  res.json(data);
 };
