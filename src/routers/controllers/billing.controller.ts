@@ -84,17 +84,25 @@ export const downloadPdfFileFromBillingAsBase64 = async (req: Request, res: Resp
 };
 
 export const getAbonentDHJByAbonentId = async (req: Request, res: Response) => {
+  const { page, size } = z
+    .object({ page: z.coerce.number().default(1), size: z.coerce.number().default(500) })
+    .parse(req.query);
   // 1. inputlarni olish
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const { residentId } = getAbonentDataRowIdQuerySchema.parse(req.query);
 
   // 2. ma'lumotlarni olish
-  const data = await getResidentDHJByAbonentId(tozaMakonApi, residentId);
+  const data = await getResidentDHJByAbonentId(tozaMakonApi, residentId, { page, size });
 
   // 2. javob qaytarish
   res.json({
     ok: true,
-    rows: data,
+    rows: data.content,
+    meta: {
+      page: data.number,
+      size: data.size,
+      total: data.totalElements,
+    },
   });
 };
 
