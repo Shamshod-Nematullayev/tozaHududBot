@@ -5,6 +5,8 @@ import { getAbonentDetailsHistory } from '@services/billing/getAbonentDetailsHis
 import { getResidentHousesByPnfl } from '@services/billing/getResidentHousesByPnfl.js';
 import z from 'zod';
 import { getDataFromHET } from '@services/billing/getDataFromHET.js';
+import { getIncomeStatistics } from '@services/billing/getIncomeStatistics.js';
+import { getBalanceRecalcPredict } from '@services/billing/getBalanceRecalcPredict.js';
 
 export const getAbonentById = async (req: Request, res: Response): Promise<any> => {
   const abonent = await getResidentById(createTozaMakonApi(req.user.companyId), Number(req.params.id));
@@ -13,14 +15,14 @@ export const getAbonentById = async (req: Request, res: Response): Promise<any> 
   res.json(abonent);
 };
 
-export const getAbonentHistoryById = async (req: Request, res: Response) => {
+export const getAbonentHistoryById = async (req: Request, res: Response): Promise<any> => {
   const history = await getAbonentDetailsHistory(createTozaMakonApi(req.user.companyId), Number(req.params.id));
 
   if (!history) return res.status(404).json({ ok: false, message: 'Abonent topilmadi' });
   res.json(history);
 };
 
-export const getCadastrs = async (req: Request, res: Response) => {
+export const getCadastrs = async (req: Request, res: Response): Promise<any> => {
   const { pnfl } = z.object({ pnfl: z.string() }).parse(req.params);
   const cadastrs = await getResidentHousesByPnfl(createTozaMakonApi(req.user.companyId), pnfl);
 
@@ -35,6 +37,18 @@ export const getHetAbonent = async (req: Request, res: Response) => {
 
 export const getIibInhabitants = async (req: Request, res: Response) => {
   //TODO
+};
+
+export const getIncomeStatisticsController = async (req: Request, res: Response) => {
+  const { id } = z.object({ id: z.coerce.number() }).parse(req.params); //residentId
+  const data = await getIncomeStatistics(createTozaMakonApi(req.user.companyId), id);
+  res.json(data);
+};
+
+export const getBalanceRecalcPredictController = async (req: Request, res: Response) => {
+  const params = z.object({ residentId: z.coerce.number(), period: z.string() }).parse(req.query);
+  const data = await getBalanceRecalcPredict(createTozaMakonApi(req.user.companyId), params);
+  res.json(data);
 };
 
 export const getAbonentByIdFromDB = async (req: Request, res: Response) => {

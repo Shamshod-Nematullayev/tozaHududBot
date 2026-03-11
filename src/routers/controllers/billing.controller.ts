@@ -83,16 +83,35 @@ export const downloadPdfFileFromBillingAsBase64 = async (req: Request, res: Resp
   });
 };
 
+export const downloadPdfFileFromBilling = async (req: Request, res: Response) => {
+  const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+  // 1. inputlarni olish
+  const { file_id } = z.parse(
+    z.object({
+      file_id: z.string().regex(/.*\*.*/, 'Invalid file_id format'),
+    }),
+    req.query
+  );
+  const cleanFileId = file_id.split('*').pop() as string; // "filaname*fileId" => "fileId"
+
+  // 2. faylni yuklab olish
+  const buffer = await getFileAsBuffer(tozaMakonApi, cleanFileId);
+
+  // 3. Faylni yuklab olish
+  res.set('Content-Type', 'application/pdf');
+  res.send(buffer);
+};
+
 export const getAbonentDHJByAbonentId = async (req: Request, res: Response) => {
   const { page, size } = z
-    .object({ page: z.coerce.number().default(1), size: z.coerce.number().default(500) })
+    .object({ page: z.coerce.number().default(1), size: z.coerce.number().default(100) })
     .parse(req.query);
   // 1. inputlarni olish
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const { residentId } = getAbonentDataRowIdQuerySchema.parse(req.query);
 
   // 2. ma'lumotlarni olish
-  const data = await getResidentDHJByAbonentId(tozaMakonApi, residentId, { page, size });
+  const data = await getResidentDHJByAbonentId(tozaMakonApi, residentId, { page: page - 1, size });
 
   // 2. javob qaytarish
   res.json({

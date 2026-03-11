@@ -4,9 +4,11 @@ import {
   getAbonentById,
   getAbonentByIdFromDB,
   getAbonentHistoryById,
+  getBalanceRecalcPredictController,
   getCadastrs,
   getHetAbonent,
   getIibInhabitants,
+  getIncomeStatisticsController,
   updateAbonentById,
   updateAbonentElectricityById,
   updateAbonentPhoneById,
@@ -23,6 +25,10 @@ router.get('/cadastrs', catchAsync(getCadastrs));
 router.get('/het-abonent', catchAsync(getHetAbonent));
 
 router.get('/iib-inhabitants', catchAsync(getIibInhabitants));
+
+router.get('/income-statistics/:id', catchAsync(getIncomeStatisticsController));
+
+router.get('/balance-recalc-predict', catchAsync(getBalanceRecalcPredictController));
 
 router.get('/details-db/:id', catchAsync(getAbonentByIdFromDB));
 

@@ -48,10 +48,12 @@ export const getArizalar = async (req: Request, res: Response): Promise<any> => 
     act_amount_to,
     ariza_status,
     act_status,
+    resident_id,
   } = parsed;
 
   // Filtrni dinamik shakllantirish
   const filters: any = { companyId: req.user.companyId };
+  if (resident_id) filters.abonentId = resident_id;
   if (document_type) filters.document_type = document_type;
   if (document_number) filters.document_number = document_number;
   if (account_number) filters.licshet = account_number;

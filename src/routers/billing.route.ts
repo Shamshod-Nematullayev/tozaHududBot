@@ -21,6 +21,7 @@ import {
   uploadFileTozamakon,
   getAbonentDetailsById,
   getAbonentDetailsHistoryById,
+  downloadPdfFileFromBilling,
 } from './controllers/billing.controller.js';
 
 import express from 'express';
@@ -29,7 +30,8 @@ import { getActPacks } from './controllers/acts.controller.js';
 const router = express.Router();
 
 // --- GET routes ---
-router.get('/get-file/', catchAsync(downloadPdfFileFromBillingAsBase64));
+router.get('/get-file', catchAsync(downloadPdfFileFromBillingAsBase64));
+router.get('/download-file-from-billing', catchAsync(downloadPdfFileFromBilling));
 router.get(`/get-abonent-dxj-by-id`, catchAsync(getAbonentDHJByAbonentId));
 router.get('/get-abonent-data-by-licshet/:licshet', catchAsync(getAbonentDataByLicshet));
 router.get('/get-abonent-details/:abonentId', catchAsync(getAbonentDetailsById));
