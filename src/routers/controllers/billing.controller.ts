@@ -229,7 +229,7 @@ export const createResidentAct = async (req: Request, res: Response): Promise<an
 };
 
 export const duplicateActFromRequest = async (req: Request, res: Response): Promise<any> => {
-  const { ariza_id, akt_sum } = req.body;
+  const { ariza_id } = req.body;
 
   const ariza = await Ariza.findById(ariza_id);
 
@@ -298,6 +298,9 @@ export const duplicateActFromRequest = async (req: Request, res: Response): Prom
   }
 
   // 4. Pul ko‘chirish aktlarini yaratish
+  let akt_sum = 0;
+  const dhj = await getResidentDHJByAbonentId(tozaMakonApi, abonentFake.id, { page: 0, size: 1 });
+  dhj.content.forEach((i) => (akt_sum += i.allPaymentsSum));
   if (Number(akt_sum))
     await transferAmountBetweenAccounts(tozaMakonApi, {
       amount: Number(akt_sum),
