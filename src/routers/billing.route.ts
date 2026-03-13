@@ -22,6 +22,7 @@ import {
   getAbonentDetailsById,
   getAbonentDetailsHistoryById,
   downloadPdfFileFromBilling,
+  getStreetByMfyId,
 } from './controllers/billing.controller.js';
 
 import express from 'express';
@@ -45,6 +46,7 @@ router.get('/act-packs', catchAsync(getActPacks));
 router.get('/get-tariffs', catchAsync(getTariffs));
 router.get('/get-houses', catchAsync(getHouses));
 router.get('/residents', catchAsync(getResidents));
+router.get('/streets', catchAsync(getStreetByMfyId));
 // --- POST routes ---
 router.post('/create-full-akt', uploadAsBlob.single('file'), catchAsync(createResidentAct));
 router.post('/create-dvaynik-akt-by-ariza', uploadAsBlob.single('file'), catchAsync(duplicateActFromRequest));

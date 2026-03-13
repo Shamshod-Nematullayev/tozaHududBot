@@ -7,6 +7,10 @@ import z from 'zod';
 import { getDataFromHET } from '@services/billing/getDataFromHET.js';
 import { getIncomeStatistics } from '@services/billing/getIncomeStatistics.js';
 import { getBalanceRecalcPredict } from '@services/billing/getBalanceRecalcPredict.js';
+import { searchAbonent } from '@services/billing/searchAbonent.js';
+import { AbonentSearchQuery } from 'types/billing.js';
+import { changePhone } from '@services/billing/changePhone.js';
+import { Abonent } from '@models/Abonent.js';
 
 export const getAbonentById = async (req: Request, res: Response): Promise<any> => {
   const abonent = await getResidentById(createTozaMakonApi(req.user.companyId), Number(req.params.id));
@@ -56,7 +60,11 @@ export const getAbonentByIdFromDB = async (req: Request, res: Response) => {
 };
 
 export const updateAbonentPhoneById = async (req: Request, res: Response) => {
-  //TODO
+  const { id } = z.object({ id: z.coerce.number() }).parse(req.params);
+  const { phone } = z.object({ phone: z.string() }).parse(req.body);
+
+  await changePhone(createTozaMakonApi(req.user.companyId), { phoneNumber: phone, residentId: id });
+  res.status(200).send();
 };
 
 export const updateAbonentElectricityById = async (req: Request, res: Response) => {
@@ -65,4 +73,15 @@ export const updateAbonentElectricityById = async (req: Request, res: Response) 
 
 export const updateAbonentById = async (req: Request, res: Response) => {
   //TODO
+};
+
+export const searchAbonentFromTozamakon = async (req: Request, res: Response) => {
+  let query: any = { companyId: req.user.companyId };
+  for (let key in req.query) {
+    if (req.query[key]) {
+      query[key] = req.query[key];
+    }
+  }
+  const data = await searchAbonent(createTozaMakonApi(req.user.companyId), query);
+  res.json(data);
 };

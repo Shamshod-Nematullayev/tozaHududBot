@@ -9,12 +9,15 @@ import {
   getHetAbonent,
   getIibInhabitants,
   getIncomeStatisticsController,
+  searchAbonentFromTozamakon,
   updateAbonentById,
   updateAbonentElectricityById,
   updateAbonentPhoneById,
 } from './controllers/abonents.controller.js';
 
 const router = Router();
+
+router.get('/tozamakon', catchAsync(searchAbonentFromTozamakon));
 
 router.get('/details-tozamakon/:id', catchAsync(getAbonentById));
 
@@ -32,7 +35,7 @@ router.get('/balance-recalc-predict', catchAsync(getBalanceRecalcPredictControll
 
 router.get('/details-db/:id', catchAsync(getAbonentByIdFromDB));
 
-router.patch('/phone/:id', catchAsync(updateAbonentPhoneById));
+router.patch('/update-phone/:id', catchAsync(updateAbonentPhoneById));
 
 router.patch('/electricity/:id', catchAsync(updateAbonentElectricityById));
 

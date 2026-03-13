@@ -1,13 +1,13 @@
-import { Axios } from "axios";
-import { AbonentSearchQuery, IAbonent } from "types/billing";
+import { Axios } from 'axios';
+import { AbonentSearchQuery, IAbonent } from 'types/billing';
 
 export async function searchAbonent(
   tozaMakonApi: Axios,
-  query: AbonentSearchQuery,
-  withMetaData?: boolean
+  query: AbonentSearchQuery
 ): Promise<{ content: IAbonent[]; totalPages: number; totalElements: number }> {
+  console.log(query);
   const data = (
-    await tozaMakonApi.get("/user-service/residents", {
+    await tozaMakonApi.get('/user-service/residents', {
       params: query,
     })
   ).data;

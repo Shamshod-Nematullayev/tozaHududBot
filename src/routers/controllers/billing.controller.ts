@@ -58,6 +58,7 @@ import path from 'path';
 import { Folder } from '@models/Folder.js';
 import { confirmActTozamakon } from '@services/billing/confirmActTozamakon.js';
 import { getAbonentDetailsHistory } from '@services/billing/getAbonentDetailsHistory.js';
+import { getStreetsByMahallaId } from '@services/billing/getStreetsByMahallaId.js';
 
 export const downloadPdfFileFromBillingAsBase64 = async (req: Request, res: Response) => {
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
@@ -752,5 +753,12 @@ export const getAbonentDetailsById = async (req: Request, res: Response): Promis
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);
   const { abonentId } = z.object({ abonentId: z.coerce.number() }).parse(req.params);
   const data = await getAbonentDetails(tozaMakonApi, abonentId);
+  res.json(data);
+};
+
+export const getStreetByMfyId = async (req: Request, res: Response): Promise<any> => {
+  const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+  const { mahallaId } = z.object({ mahallaId: z.coerce.number() }).parse(req.query);
+  const data = await getStreetsByMahallaId(tozaMakonApi, mahallaId);
   res.json(data);
 };
