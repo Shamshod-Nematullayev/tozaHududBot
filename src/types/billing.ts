@@ -16,8 +16,8 @@ export interface Citizen {
 
 export interface House {
   cadastralNumber: string;
-  flatNumber?: number;
-  homeIndex?: number;
+  flatNumber?: string;
+  homeIndex?: string;
   homeNumber?: string;
   id: number;
   inhabitantCnt: number;

@@ -6,6 +6,7 @@ import {
   getAbonentHistoryById,
   getBalanceRecalcPredictController,
   getCadastrs,
+  getCitizenController,
   getHetAbonent,
   getIibInhabitants,
   getIncomeStatisticsController,
@@ -34,6 +35,8 @@ router.get('/income-statistics/:id', catchAsync(getIncomeStatisticsController));
 router.get('/balance-recalc-predict', catchAsync(getBalanceRecalcPredictController));
 
 router.get('/details-db/:id', catchAsync(getAbonentByIdFromDB));
+
+router.get('/citizens', catchAsync(getCitizenController));
 
 router.patch('/update-phone/:id', catchAsync(updateAbonentPhoneById));
 

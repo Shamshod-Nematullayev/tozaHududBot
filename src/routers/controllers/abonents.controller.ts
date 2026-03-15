@@ -11,6 +11,65 @@ import { searchAbonent } from '@services/billing/searchAbonent.js';
 import { AbonentSearchQuery } from 'types/billing.js';
 import { changePhone } from '@services/billing/changePhone.js';
 import { Abonent } from '@models/Abonent.js';
+import { updateAbonentDetails } from '@services/billing/updateAbonentDetails.js';
+import { getCitizen } from '@services/billing/getCitizen.js';
+
+const stringOrEmpty = z
+  .string()
+  .nullable()
+  .transform((v) => v ?? '');
+
+export const abonentSchema = z.object({
+  id: z.number(),
+  accountNumber: z.string(),
+  residentType: z.enum(['INDIVIDUAL']),
+  electricityAccountNumber: z.string(),
+  electricityCoato: z.string(),
+  companyId: z.number(),
+  streetId: z.number(),
+  mahallaId: z.number(),
+
+  contractNumber: stringOrEmpty,
+  contractDate: z.string(),
+
+  homePhone: stringOrEmpty,
+  phone: stringOrEmpty,
+
+  active: z.boolean(),
+  description: stringOrEmpty,
+
+  citizen: z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    patronymic: z.string(),
+    foreignCitizen: z.boolean(),
+
+    inn: stringOrEmpty,
+    pnfl: z.string(),
+    passport: z.string(),
+
+    birthDate: z.string(),
+    passportGivenDate: z.string(),
+    passportIssuer: z.string(),
+    passportExpireDate: z.string(),
+
+    email: stringOrEmpty,
+    photo: stringOrEmpty,
+  }),
+
+  house: z.object({
+    cadastralNumber: z.string(),
+    temporaryCadastralNumber: stringOrEmpty,
+
+    type: z.enum(['HOUSE', 'APARTMENT']),
+    flatNumber: stringOrEmpty,
+
+    homeNumber: z.string(),
+    homeIndex: stringOrEmpty,
+
+    inhabitantCnt: z.number(),
+  }),
+});
 
 export const getAbonentById = async (req: Request, res: Response): Promise<any> => {
   const abonent = await getResidentById(createTozaMakonApi(req.user.companyId), Number(req.params.id));
@@ -72,7 +131,31 @@ export const updateAbonentElectricityById = async (req: Request, res: Response) 
 };
 
 export const updateAbonentById = async (req: Request, res: Response) => {
-  //TODO
+  const data = abonentSchema.parse(req.body);
+
+  await updateAbonentDetails(createTozaMakonApi(req.user.companyId), data.id, data);
+
+  res.status(200).send();
+
+  await Abonent.findOneAndUpdate(
+    { id: data.id, companyId: req.user.companyId },
+    {
+      $set: {
+        energy_licshet: data.electricityAccountNumber,
+        caotoNumber: data.electricityCoato,
+        streets_id: data.streetId,
+        mahallas_id: data.mahallaId,
+
+        fio: `${data.citizen.lastName} ${data.citizen.firstName} ${data.citizen.patronymic}`,
+        last_name: data.citizen.lastName,
+        first_name: data.citizen.firstName,
+        middle_name: data.citizen.patronymic,
+        licshet: data.accountNumber,
+        phone: data.phone,
+        pinfl: data.citizen.pnfl,
+      },
+    },
+  );
 };
 
 export const searchAbonentFromTozamakon = async (req: Request, res: Response) => {
@@ -83,5 +166,16 @@ export const searchAbonentFromTozamakon = async (req: Request, res: Response) =>
     }
   }
   const data = await searchAbonent(createTozaMakonApi(req.user.companyId), query);
+  res.json(data);
+};
+
+export const getCitizenController = async (req: Request, res: Response) => {
+  const query = z.object({ pnfl: z.string(), passport: z.string(), birthDate: z.string().optional() }).parse(req.query);
+  const data = await getCitizen(createTozaMakonApi(req.user.companyId), {
+    photoStatus: 'WITHOUT_PHOTO',
+    birthdate: query.birthDate,
+    pinfl: query.pnfl,
+    passport: query.passport,
+  });
   res.json(data);
 };
