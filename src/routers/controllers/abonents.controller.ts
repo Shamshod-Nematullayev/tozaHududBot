@@ -13,6 +13,11 @@ import { changePhone } from '@services/billing/changePhone.js';
 import { Abonent } from '@models/Abonent.js';
 import { updateAbonentDetails } from '@services/billing/updateAbonentDetails.js';
 import { getCitizen } from '@services/billing/getCitizen.js';
+import { getAbonentCardById } from '@services/billing/getAbonentCard.js';
+import { getCertificateNoDebt } from '@services/billing/getCertificateNoDebt.js';
+import { identificationAbonent } from '@services/billing/identificationAbonent.js';
+import { AxiosError } from 'axios';
+import { getIIBInhabitants } from '@services/billing/getIIBInhabitants.js';
 
 const stringOrEmpty = z
   .string()
@@ -99,7 +104,10 @@ export const getHetAbonent = async (req: Request, res: Response) => {
 };
 
 export const getIibInhabitants = async (req: Request, res: Response) => {
-  //TODO
+  const { cadastralNumber } = z.object({ cadastralNumber: z.string() }).parse(req.query);
+
+  const data = await getIIBInhabitants(createTozaMakonApi(req.user.companyId), cadastralNumber);
+  res.json(data);
 };
 
 export const getIncomeStatisticsController = async (req: Request, res: Response) => {
@@ -154,7 +162,7 @@ export const updateAbonentById = async (req: Request, res: Response) => {
         phone: data.phone,
         pinfl: data.citizen.pnfl,
       },
-    },
+    }
   );
 };
 
@@ -178,4 +186,37 @@ export const getCitizenController = async (req: Request, res: Response) => {
     passport: query.passport,
   });
   res.json(data);
+};
+
+export const getAbonentCard = async (req: Request, res: Response) => {
+  const { id } = z.object({ id: z.coerce.number() }).parse(req.params);
+  const { periodFrom, periodTo, lang } = z
+    .object({ periodFrom: z.string(), periodTo: z.string(), lang: z.string().optional() })
+    .parse(req.query);
+
+  const data = await getAbonentCardById(createTozaMakonApi(req.user.companyId), {
+    residentId: id,
+    periodFrom,
+    periodTo,
+    lang,
+  });
+  res.json(data);
+};
+
+export const getNodebtCertificate = async (req: Request, res: Response) => {
+  const { id } = z.object({ id: z.coerce.number() }).parse(req.params);
+  const data = await getCertificateNoDebt(createTozaMakonApi(req.user.companyId), id);
+  res.json(data);
+};
+
+export const verifyIdentity = async (req: Request, res: Response) => {
+  const { id } = z.object({ id: z.coerce.number() }).parse(req.params);
+  const { identified } = z.object({ identified: z.coerce.boolean() }).parse(req.body);
+  try {
+    await identificationAbonent(createTozaMakonApi(req.user.companyId), id, identified);
+  } catch (error) {
+    if (error instanceof AxiosError) res.status(400).json(error.response?.data);
+
+    throw error;
+  }
 };

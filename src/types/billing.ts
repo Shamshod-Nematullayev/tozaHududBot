@@ -260,6 +260,7 @@ export enum packTypes {
   pul_kuchirish = 'SIMPLE',
   death = 'INVENTORY',
   gps = 'INVENTORY',
+  serviceNotProvided = 'SERVICE_NOT_PROVIDED',
 }
 
 export interface IAutomobile {

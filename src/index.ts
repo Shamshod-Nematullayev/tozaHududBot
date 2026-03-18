@@ -57,6 +57,7 @@ connectDb();
 import { initJobs } from 'intervals/index.js';
 import mainRouter from 'routers/index.js';
 import { specialTaskReport, specialTaskReportByInspectorsDaily } from 'intervals/specialTaskReport.js';
+import { createTozaMakonApi } from '@api/tozaMakon.js';
 // import "specialBusinessFunctions/bindAbonentsToGeozone.js";
 // importPhonesFromHET(1144, abonents);
 // createActs2(621, abonents);
@@ -82,22 +83,3 @@ const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
-// (async () => {
-//   await specialTaskReport(1144, 'phone');
-//   await specialTaskReport(1144, 'electricity');
-//   specialTaskReportByInspectorsDaily(1144, 'phone');
-//   specialTaskReportByInspectorsDaily(1144, 'electricity');
-// })();
-// (async () => {
-//   const smartGpsApi = createSmartGpsApi(1144);
-//   const a = await smartGpsApi.post(
-//     "/wialon/ajax.html?svc=resource/get_zone_data",
-//     {
-//       params: JSON.stringify({
-//         itemId: 37,
-//         flags: 28,
-//       }),
-//     }
-//   );
-//   console.log(a.data);
-// })();
