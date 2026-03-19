@@ -214,6 +214,7 @@ export const verifyIdentity = async (req: Request, res: Response) => {
   const { identified } = z.object({ identified: z.coerce.boolean() }).parse(req.body);
   try {
     await identificationAbonent(createTozaMakonApi(req.user.companyId), id, identified);
+    res.status(200).send();
   } catch (error) {
     if (error instanceof AxiosError) res.status(400).json(error.response?.data);
 
