@@ -18,6 +18,8 @@ import { getCertificateNoDebt } from '@services/billing/getCertificateNoDebt.js'
 import { identificationAbonent } from '@services/billing/identificationAbonent.js';
 import { AxiosError } from 'axios';
 import { getIIBInhabitants } from '@services/billing/getIIBInhabitants.js';
+import { uploadFileToTozaMakon } from '@services/billing/uploadFileToTozaMakon.js';
+import { addInhabitantsToAbonent } from '@services/billing/addAbonentInhabitantsCount.js';
 
 const stringOrEmpty = z
   .string()
@@ -220,4 +222,15 @@ export const verifyIdentity = async (req: Request, res: Response) => {
 
     throw error;
   }
+};
+
+export const addInhabitants = async (req: Request, res: Response) => {
+  const { id } = z.object({ id: z.coerce.number() }).parse(req.params);
+  const { inhabitantCount } = z.object({ inhabitantCount: z.coerce.number() }).parse(req.body);
+  const tozaMakonApi = createTozaMakonApi(req.user.companyId);
+  if (!req.file) return res.status(400).json({ ok: false, message: 'File not found' });
+  const fileId = await uploadFileToTozaMakon(tozaMakonApi, req.file?.buffer, req.file?.originalname, 'ACT');
+
+  await addInhabitantsToAbonent(tozaMakonApi, { fileId, residentId: id, inhabitantCount });
+  res.status(200).send();
 };

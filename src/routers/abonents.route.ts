@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { catchAsync } from './controllers/utils/catchAsync.js';
 import {
+  addInhabitants,
   getAbonentById,
   getAbonentByIdFromDB,
   getAbonentCard,
@@ -18,6 +19,7 @@ import {
   updateAbonentPhoneById,
   verifyIdentity,
 } from './controllers/abonents.controller.js';
+import { uploadAsBlob } from '@middlewares/multer.js';
 
 const router = Router();
 
@@ -50,6 +52,8 @@ router.patch('/update-phone/:id', catchAsync(updateAbonentPhoneById));
 router.patch('/electricity/:id', catchAsync(updateAbonentElectricityById));
 
 router.patch('/verify-identity/:id', catchAsync(verifyIdentity));
+
+router.post('/add-inhabitants/:id', uploadAsBlob.single('file'), catchAsync(addInhabitants));
 
 router.put('/details/:id', catchAsync(updateAbonentById));
 
