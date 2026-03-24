@@ -224,7 +224,7 @@ export const verifyIdentity = async (req: Request, res: Response) => {
   }
 };
 
-export const addInhabitants = async (req: Request, res: Response) => {
+export const addInhabitants = async (req: Request, res: Response): Promise<any> => {
   const { id } = z.object({ id: z.coerce.number() }).parse(req.params);
   const { inhabitantCount } = z.object({ inhabitantCount: z.coerce.number() }).parse(req.body);
   const tozaMakonApi = createTozaMakonApi(req.user.companyId);

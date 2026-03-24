@@ -1,21 +1,23 @@
-import { Composer } from "telegraf";
-import { kirillga } from "./smallFunctions/lotinKiril.js";
+import { Composer, Context } from 'telegraf';
+import { kirillga } from './smallFunctions/lotinKiril.js';
+import { MyContext } from 'types/botContext.js';
+import { InlineKeyboardButton, ReplyKeyboardMarkup } from 'telegraf/typings/core/types/typegram.js';
 const composer = new Composer();
 
 // Faqat matnlarni tarjima qilish
-function translateText(text) {
-  return typeof text === "string" ? kirillga(text) : text;
+function translateText(text: any) {
+  return typeof text === 'string' ? kirillga(text) : text;
 }
 
 // reply_markup dagi matnlarni tarjima qilish (har xil formatlarni hisobga olib)
-function translateReplyMarkup(replyMarkup) {
+function translateReplyMarkup(replyMarkup: any) {
   if (!replyMarkup) return replyMarkup;
 
   // Inline keyboard (obyekt ichidagi `text` maydonini tarjima qilish)
   if (Array.isArray(replyMarkup.inline_keyboard)) {
-    replyMarkup.inline_keyboard = replyMarkup.inline_keyboard.map((row) =>
-      row.map((button) =>
-        button && typeof button === "object" && "text" in button
+    replyMarkup.inline_keyboard = replyMarkup.inline_keyboard.map((row: any) =>
+      row.map((button: InlineKeyboardButton) =>
+        button && typeof button === 'object' && 'text' in button
           ? { ...button, text: translateText(button.text) }
           : button
       )
@@ -24,11 +26,11 @@ function translateReplyMarkup(replyMarkup) {
 
   // Oddiy keyboard (stringlarni tarjima qilish)
   if (Array.isArray(replyMarkup.keyboard)) {
-    replyMarkup.keyboard = replyMarkup.keyboard.map((row) =>
-      row.map((button) =>
-        typeof button === "string"
+    replyMarkup.keyboard = replyMarkup.keyboard.map((row: any) =>
+      row.map((button: InlineKeyboardButton) =>
+        typeof button === 'string'
           ? translateText(button) // Oddiy string tugmalarni tarjima qilish
-          : button && typeof button === "object" && "text" in button
+          : button && typeof button === 'object' && 'text' in button
           ? { ...button, text: translateText(button.text) } // Agar object bo'lsa, textni tarjima qilish
           : button
       )
@@ -38,67 +40,44 @@ function translateReplyMarkup(replyMarkup) {
   return replyMarkup;
 }
 
-// ctx.reply ni modifikatsiya qilish
-function modifyReply(ctx) {
-  const originalReply = ctx.reply.bind(ctx);
-
-  ctx.reply = async function (message, extra = {}) {
-    try {
-      if (ctx.session?.til === "kiril") {
-        // HTML teglarini buzmay tarjima qilish
-        message = message.replace(/(<[^>]+>)|([^<>]+)/g, (match, tag, text) =>
-          tag ? tag : translateText(text)
-        );
-
-        // reply_markup ichidagi matnlarni tarjima qilish
-        extra.reply_markup = translateReplyMarkup(extra.reply_markup);
-      }
-
-      return originalReply(message, extra);
-    } catch (error) {
-      console.error("lotin-kiril reply xatosi:", error);
-    }
-  };
-}
-
-function modifyReplyFunctions(ctx) {
+function modifyReplyFunctions(ctx: MyContext) {
   const methods = [
-    "reply",
-    "replyWithPhoto",
-    "replyWithVideo",
-    "replyWithAudio",
-    "replyWithDocument",
-    "replyWithAnimation",
-    "replyWithSticker",
-    "replyWithVideoNote",
-    "replyWithVoice",
-    "replyWithMediaGroup",
-  ];
+    'reply',
+    'replyWithPhoto',
+    'replyWithVideo',
+    'replyWithAudio',
+    'replyWithDocument',
+    'replyWithAnimation',
+    'replyWithSticker',
+    'replyWithVideoNote',
+    'replyWithVoice',
+    'replyWithMediaGroup',
+  ] as const;
 
   methods.forEach((method) => {
     const originalMethod = ctx[method]?.bind(ctx);
 
     if (originalMethod) {
-      ctx[method] = async function (...args) {
+      ctx[method] = async function (...args): Promise<any> {
         try {
-          let [message, extra = {}] = args;
+          let [message, extra = {} as any] = args;
 
-          if (ctx.session?.til === "kiril") {
+          if (ctx.scene.session.til === 'kiril') {
             // Tarjima qilinmaydigan qismlarni ajratib olish (HTML, @username, URL)
             const regex = /(<[^>]+>)|(@\w+)|(https?:\/\/\S+)|([^<>@\s]+)/g;
 
-            const translateSafe = (text) =>
+            const translateSafe = (text: string) =>
               text.replace(regex, (match, tag, username, url, normalText) =>
                 tag || username || url ? match : translateText(normalText)
               );
 
             // Oddiy matnli xabarlar uchun
-            if (typeof message === "string") {
+            if (typeof message === 'string') {
               message = translateSafe(message);
             }
 
             // Media xabarlar (caption) uchun
-            if (extra.caption) {
+            if (extra?.caption) {
               extra.caption = translateSafe(extra.caption);
             }
 
@@ -108,7 +87,9 @@ function modifyReplyFunctions(ctx) {
             }
           }
 
-          originalMethod(message, extra);
+          if (message !== undefined) {
+            originalMethod(message as any, extra);
+          }
         } catch (error) {
           console.error(`${method} uchun tarjima xatosi:`, error);
         }
@@ -119,7 +100,7 @@ function modifyReplyFunctions(ctx) {
 
 // Bot uchun middleware
 composer.use((ctx, next) => {
-  modifyReplyFunctions(ctx);
+  modifyReplyFunctions(ctx as MyContext);
   next();
 });
 
