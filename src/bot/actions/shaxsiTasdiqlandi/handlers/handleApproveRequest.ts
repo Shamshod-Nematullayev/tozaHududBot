@@ -1,45 +1,31 @@
-import { createTozaMakonApi } from "@api/tozaMakon.js";
-import { Abonent } from "@models/Abonent.js";
-import { Company } from "@models/Company.js";
-import { ICustomDataRequestDoc } from "@models/CustomDataRequest.js";
-import { Nazoratchi } from "@models/Nazoratchi.js";
-import {
-  getCitizen,
-  updateAbonentDetails,
-  searchAbonent,
-} from "@services/billing/index.js";
-import { Context } from "telegraf";
-import { tryDeleteOrEditMessage } from "./tryDeleteOrEditMessage.js";
-import { tryToIdentify } from "@services/billing/tryToIdentify.js";
-import { formatDate } from "@services/utils/formatDate.js";
+import { createTozaMakonApi } from '@api/tozaMakon.js';
+import { Abonent } from '@models/Abonent.js';
+import { Company } from '@models/Company.js';
+import { ICustomDataRequestDoc } from '@models/CustomDataRequest.js';
+import { Nazoratchi } from '@models/Nazoratchi.js';
+import { getCitizen, updateAbonentDetails, searchAbonent } from '@services/billing/index.js';
+import { Context } from 'telegraf';
+import { tryDeleteOrEditMessage } from './tryDeleteOrEditMessage.js';
+import { tryToIdentify } from '@services/billing/tryToIdentify.js';
+import { formatDate } from '@services/utils/formatDate.js';
 
 function getPassportGivenDate(docEndDate: string | undefined): Date {
   if (!docEndDate) return new Date();
-  const [yil, oy, kun] = docEndDate.split("-").map(Number);
+  const [yil, oy, kun] = docEndDate.split('-').map(Number);
   return new Date(yil - 10, oy - 1, kun);
 }
 
-export default async function handleApproveRequest(
-  ctx: Context,
-  req: ICustomDataRequestDoc
-) {
+export default async function handleApproveRequest(ctx: Context, req: ICustomDataRequestDoc) {
   // validation and get varibles
   const abonent = await Abonent.findOne({ licshet: req.licshet });
-  if (!abonent) return await ctx.answerCbQuery("Abonent topilmadi");
-  if (
-    abonent.shaxsi_tasdiqlandi &&
-    abonent.shaxsi_tasdiqlandi.confirm &&
-    !req.reUpdating
-  ) {
+  if (!abonent) return await ctx.answerCbQuery('Abonent topilmadi');
+  if (abonent.shaxsi_tasdiqlandi && abonent.shaxsi_tasdiqlandi.confirm && !req.reUpdating) {
     return await ctx.answerCbQuery("Bu abonent ma'lumoti kiritilib bo'lingan");
   }
   const inspector = await Nazoratchi.findById(req.inspector_id);
-  if (!inspector) return await ctx.answerCbQuery("Nazoratchi topilmadi");
+  if (!inspector) return await ctx.answerCbQuery('Nazoratchi topilmadi');
   const company = await Company.findOne({ id: req.companyId });
-  if (!company)
-    return await ctx.answerCbQuery(
-      "Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!"
-    );
+  if (!company) return await ctx.answerCbQuery('Siz ushbu amaliyotni bajarish uchun yetarli huquqga ega emassiz!');
   const tozaMakonApi = createTozaMakonApi(req.companyId);
 
   //   ma'lumotlarni tayyorlash
@@ -51,9 +37,7 @@ export default async function handleApproveRequest(
   });
 
   //   billingga yangilov so'rovini yuborish
-  const passportGivenDate = getPassportGivenDate(
-    req.data.details?.doc_end_date
-  );
+  const passportGivenDate = getPassportGivenDate(req.data.details?.doc_end_date);
   await updateAbonentDetails(tozaMakonApi, abonent.id, {
     citizen: {
       birthDate: req.data.birth_date,
@@ -66,9 +50,8 @@ export default async function handleApproveRequest(
       patronymic: req.data.middle_name,
       passport: req.data.passport_serial + req.data.passport_number,
       passportGivenDate: formatDate(passportGivenDate),
-      passportIssuer: req.data.details?.division || "IIB",
-      passportExpireDate:
-        req.data.details?.doc_end_date || formatDate(new Date()),
+      passportIssuer: req.data.details?.division || 'IIB',
+      passportExpireDate: req.data.details?.doc_end_date || formatDate(new Date()),
       photo: citizen.photo || null,
     },
     description: `${inspector.id} ${inspector.name} ma'lumotiga asosan o'zgartirildi.`,
@@ -107,8 +90,8 @@ export default async function handleApproveRequest(
         fullName: abonent.fio,
         pinfl: abonent.pinfl,
         inspector: {
-          _id: abonent.shaxsi_tasdiqlandi?.inspector?._id,
-          name: abonent.shaxsi_tasdiqlandi?.inspector?.name,
+          _id: abonent.shaxsi_tasdiqlandi?.inspector_id,
+          name: abonent.shaxsi_tasdiqlandi?.inspector_name,
         },
       },
     },
@@ -134,16 +117,14 @@ export default async function handleApproveRequest(
   //   tizimga kiritgan nazoratchiga javob yo'llash
   await ctx.telegram.sendMessage(
     req.user.id,
-    `Tabriklaymiz 🥳🥳 Siz yuborgan pasport ma'lumot qabul qilindi. <b>${
-      req.licshet
-    }</b> \nPasport: ${req.data.last_name} ${req.data.first_name} ${
-      req.data.middle_name
-    } ${
+    `Tabriklaymiz 🥳🥳 Siz yuborgan pasport ma'lumot qabul qilindi. <b>${req.licshet}</b> \nPasport: ${
+      req.data.last_name
+    } ${req.data.first_name} ${req.data.middle_name} ${
       req.data.birth_date
     }\n 1 ballni qo'lga kiritdingiz. \n Jami to'plagan ballaringiz: <b>${
       Number(inspector.shaxs_tasdiqlash_ball) + 1
     }</b>`,
-    { parse_mode: "HTML" }
+    { parse_mode: 'HTML' }
   );
   //   adminga amaliyot tugagani haqida xabar yuborish status: 200
   await ctx.answerCbQuery("✅ Ma'lumot qabul qilindi.");
