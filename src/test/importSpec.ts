@@ -1,5 +1,4 @@
 import { SpecialTaskItem } from '@models/SpecialTaskItem.js';
-import data from './files/abonents.json';
 import { Mahalla } from '@models/Mahalla.js';
 export async function importSpec(
   data: {
