@@ -1,24 +1,24 @@
-import { Scenes, Markup } from "telegraf";
+import { Scenes, Markup } from 'telegraf';
 
-import { keyboards, createInlineKeyboard } from "@lib/keyboards.js";
+import { keyboards, createInlineKeyboard } from '@lib/keyboards.js';
 
-import { Abonent, IAbonent, IAbonentDoc } from "@models/Abonent.js";
+import { Abonent, IAbonent, IAbonentDoc } from '@models/Abonent.js';
 
-import { Nazoratchi } from "@models/Nazoratchi.js";
+import { Nazoratchi } from '@models/Nazoratchi.js';
 
-import isCancel from "../../smallFunctions/isCancel.js";
-import { EtkKodRequest } from "@models/EtkKodRequest.js";
+import isCancel from '../../smallFunctions/isCancel.js';
+import { EtkKodRequest } from '@models/EtkKodRequest.js';
 
-import { createTozaMakonApi } from "@api/tozaMakon.js";
+import { createTozaMakonApi } from '@api/tozaMakon.js';
 
-import { caotoNames } from "../../../../constants.js";
-import { WizardWithState } from "@bot/helpers/WizardWithState.js";
-import { isCallbackQueryMessage, isTextMessage } from "../utils/validator.js";
-import { ErrorTypes } from "@bot/utils/errorHandler.js";
-import { getDataFromHET } from "@services/billing/getDataFromHET.js";
-import { searchAbonent } from "@services/billing/searchAbonent.js";
-import { Company } from "@models/Company.js";
-import { getHetWarningReportByResident } from "@services/billing/getHetWarningReportByResident.js";
+import { caotoNames } from '../../../../constants.js';
+import { WizardWithState } from '@bot/helpers/WizardWithState.js';
+import { isCallbackQueryMessage, isTextMessage } from '../utils/validator.js';
+import { ErrorTypes } from '@bot/utils/errorHandler.js';
+import { getDataFromHET } from '@services/billing/getDataFromHET.js';
+import { searchAbonent } from '@services/billing/searchAbonent.js';
+import { Company } from '@models/Company.js';
+import { getHetWarningReportByResident } from '@services/billing/getHetWarningReportByResident.js';
 
 interface MyWizardState {
   accountNumber?: string;
@@ -38,9 +38,9 @@ interface MyWizardState {
 type Ctx = WizardWithState<MyWizardState>;
 
 export const updateElektrKod = new Scenes.WizardScene<Ctx>(
-  "updateElektrKod",
+  'updateElektrKod',
   async (ctx) => {
-    await ctx.reply("Abonent chiqindi kodini kiriting:");
+    await ctx.reply('Abonent chiqindi kodini kiriting:');
     return ctx.wizard.next();
   },
   async (ctx) => {
@@ -69,45 +69,33 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
     const abonent = abonents[0];
     ctx.wizard.state.abonent = abonent as IAbonentDoc;
 
-    await ctx.reply(
-      `Abonent topildi:\nFIO: ${abonent.fio}\nL/H: ${abonent.licshet}`
-    );
+    await ctx.reply(`Abonent topildi:\nFIO: ${abonent.fio}\nL/H: ${abonent.licshet}`);
 
     if (abonent.ekt_kod_tasdiqlandi?.confirm) {
       await ctx.reply(
-        `Bu abonent ma'lumoti ${
-          abonent.ekt_kod_tasdiqlandi.inspector_name ||
-          abonent.ekt_kod_tasdiqlandi.inspector?.name
-        } tomonidan kiritilib bo'lingan. Baribir kiritmoqchimisiz?`,
+        `Bu abonent ma'lumoti ${abonent.ekt_kod_tasdiqlandi.inspector_name} tomonidan kiritilib bo'lingan. Baribir kiritmoqchimisiz?`,
         keyboards.yesOrNo
       );
       ctx.wizard.selectStep(5);
       return;
     }
     // Shu yerda caotolar ro'yxati chiqishi kerak;
-    const caotoNamesCompany = caotoNames.filter(
-      (c) => c.companyId == ctx.wizard.state.companyId
-    );
+    const caotoNamesCompany = caotoNames.filter((c) => c.companyId == ctx.wizard.state.companyId);
 
     if (caotoNamesCompany.length === 0) {
-      return ctx.reply("Bu tashkilot uchun caoto raqamlari berilmagan");
+      return ctx.reply('Bu tashkilot uchun caoto raqamlari berilmagan');
     }
     if (caotoNamesCompany.length === 1) {
       ctx.wizard.state.region = caotoNamesCompany[0].region;
       ctx.wizard.state.caoto = caotoNamesCompany[0].caoto;
       ctx.wizard.selectStep(3);
-      return await ctx.reply(
-        `Elektr kodini kiriting:`,
-        keyboards.cancelBtn.resize()
-      );
+      return await ctx.reply(`Elektr kodini kiriting:`, keyboards.cancelBtn.resize());
     }
 
     await ctx.reply(
-      "FIO: ${abonent.fio}\nHududni tanlang",
+      'FIO: ${abonent.fio}\nHududni tanlang',
       Markup.inlineKeyboard([
-        ...caotoNamesCompany.map((c) => [
-          Markup.button.callback(`${c.title} ${c.caoto}`, c.caoto.toString()),
-        ]),
+        ...caotoNamesCompany.map((c) => [Markup.button.callback(`${c.title} ${c.caoto}`, c.caoto.toString())]),
       ])
     );
     ctx.wizard.next();
@@ -117,10 +105,7 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
     ctx.deleteMessage();
     ctx.wizard.state.caoto = Number(ctx.callbackQuery.data);
     ctx.wizard.next();
-    return await ctx.reply(
-      `Abonent elektr kodini kiriting`,
-      keyboards.cancelBtn.resize()
-    );
+    return await ctx.reply(`Abonent elektr kodini kiriting`, keyboards.cancelBtn.resize());
   },
   async (ctx) => {
     if (!isTextMessage(ctx)) throw ErrorTypes.BAD_REQUEST;
@@ -136,10 +121,8 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
     if (existingAbonents.totalElements > 0)
       await ctx.replyWithHTML(
         `‼️<b>DIQQAT</b>‼️ \n\n Bu hisob raqami allaqachon boshqa abonent${
-          existingAbonents.content.length > 1 ? "lar" : ""
-        }ga biriktirilgan\n${existingAbonents.content
-          .map((a) => a.accountNumber)
-          .join(", ")}`
+          existingAbonents.content.length > 1 ? 'lar' : ''
+        }ga biriktirilgan\n${existingAbonents.content.map((a) => a.accountNumber).join(', ')}`
       );
 
     try {
@@ -148,15 +131,15 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
         personalAccount: ctx.message.text,
       });
 
-      console.log("hetData", hetData);
-      if ("code" in hetData) return ctx.reply("Xatolik: " + hetData.message);
+      console.log('hetData', hetData);
+      if ('code' in hetData) return ctx.reply('Xatolik: ' + hetData.message);
 
       await ctx.replyWithHTML(
         `<code>${hetData.fullName}</code> \nManzil: ${hetData.address}\nTelefon: ${hetData.phone}\nUshbu abonentga shu hisob raqamni rostdan ham kiritaymi?`,
         createInlineKeyboard([
           [
-            ["Xa 👌", "yes"],
-            ["Yo'q 🙅‍♂️", "no"],
+            ['Xa 👌', 'yes'],
+            ["Yo'q 🙅‍♂️", 'no'],
           ],
         ])
       );
@@ -169,11 +152,11 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
   },
   async (ctx) => {
     if (!isCallbackQueryMessage(ctx)) {
-      ctx.reply("OK");
+      ctx.reply('OK');
       return ctx.scene.leave();
     }
     switch (ctx.callbackQuery?.data) {
-      case "yes":
+      case 'yes':
         const abonent = ctx.wizard.state.abonent as IAbonentDoc;
         const abonentHetBlocking = await getHetWarningReportByResident(
           createTozaMakonApi(ctx.wizard.state.companyId!),
@@ -213,21 +196,14 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
 🏢 <b>ETK:</b> ${state.ETK}
 📝 <b>FIO (State):</b> ${state.FIO}
 📍 <b>Manzil:</b> ${state.ADDRESS}
-⚡️ HET: ${
-            abonentHetBlocking?.blockStatus == "BLOCK"
-              ? "🚫 Cheklangan"
-              : "✅ Cheklov yo`q"
-          } 
+⚡️ HET: ${abonentHetBlocking?.blockStatus == 'BLOCK' ? '🚫 Cheklangan' : '✅ Cheklov yo`q'} 
 📞 <b>Telefon:</b> ${state.PHONE}
 🗺 <b>SaOTo:</b> ${state.caoto}
 `,
           {
-            parse_mode: "HTML",
+            parse_mode: 'HTML',
             reply_markup: Markup.inlineKeyboard([
-              [
-                Markup.button.callback("🚫", "etk_no_" + req._id),
-                Markup.button.callback("✅", "etk_yes_" + req._id),
-              ],
+              [Markup.button.callback('🚫', 'etk_no_' + req._id), Markup.button.callback('✅', 'etk_yes_' + req._id)],
             ]).reply_markup,
           }
         );
@@ -235,29 +211,26 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
         await req.updateOne({
           $set: {
             channelPostId: message.message_id,
-            hetBlockingStatus:
-              abonentHetBlocking?.blockStatus == "BLOCK" ? "BLOCK" : "UNBLOCK",
+            hetBlockingStatus: abonentHetBlocking?.blockStatus == 'BLOCK' ? 'BLOCK' : 'UNBLOCK',
           },
         });
         break;
-      case "no":
+      case 'no':
         await ctx.deleteMessage();
-        ctx.reply("Bekor qilindi.", keyboards.mainKeyboard.resize());
+        ctx.reply('Bekor qilindi.', keyboards.mainKeyboard.resize());
         ctx.scene.leave();
         break;
     }
   },
   async (ctx) => {
     if (!isCallbackQueryMessage(ctx)) throw ErrorTypes.BAD_REQUEST;
-    if (ctx.callbackQuery.data === "yes") {
+    if (ctx.callbackQuery.data === 'yes') {
       await ctx.deleteMessage();
       // Shu yerda caotolar ro'yxati chiqishi kerak;
-      const caotoNamesCompany = caotoNames.filter(
-        (c) => c.companyId == ctx.wizard.state.companyId
-      );
+      const caotoNamesCompany = caotoNames.filter((c) => c.companyId == ctx.wizard.state.companyId);
 
       if (caotoNamesCompany.length === 0) {
-        return ctx.reply("Bu tashkilot uchun caoto raqamlari berilmagan");
+        return ctx.reply('Bu tashkilot uchun caoto raqamlari berilmagan');
       }
       if (caotoNamesCompany.length === 1) {
         ctx.wizard.state.region = caotoNamesCompany[0].region;
@@ -271,24 +244,22 @@ export const updateElektrKod = new Scenes.WizardScene<Ctx>(
       await ctx.reply(
         `FIO: ${ctx.wizard.state.abonent?.fio}\nHududni tanlang`,
         Markup.inlineKeyboard([
-          ...caotoNamesCompany.map((c) => [
-            Markup.button.callback(`${c.title} ${c.caoto}`, c.caoto.toString()),
-          ]),
+          ...caotoNamesCompany.map((c) => [Markup.button.callback(`${c.title} ${c.caoto}`, c.caoto.toString())]),
         ])
       );
       ctx.wizard.selectStep(2);
       return;
-    } else if (ctx.callbackQuery.data === "no") {
+    } else if (ctx.callbackQuery.data === 'no') {
       await ctx.deleteMessage();
     }
-    await ctx.reply("Asosiy menyu", keyboards.mainKeyboard);
+    await ctx.reply('Asosiy menyu', keyboards.mainKeyboard);
     ctx.scene.leave();
   }
 );
 
-updateElektrKod.on("text", (ctx, next) => {
+updateElektrKod.on('text', (ctx, next) => {
   if (isCancel(ctx.message.text)) {
-    ctx.reply("Bekor qilindi", keyboards.mainKeyboard.resize());
+    ctx.reply('Bekor qilindi', keyboards.mainKeyboard.resize());
     return ctx.scene.leave();
   }
   return next();

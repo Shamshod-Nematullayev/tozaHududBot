@@ -73,10 +73,7 @@ composer.action(/etk_yes/, async (ctx) => {
           confirm: true,
           inspector_id: request.inspector_id,
           inspector_name: nazoratchi.name,
-          inspector: {
-            name: nazoratchi.name,
-            _id: nazoratchi._id,
-          },
+          value: `${request.etk_saoto}-${request.etk_kod}`,
           updated_at: new Date(),
         },
       },

@@ -1,13 +1,10 @@
-import { model, Schema } from "mongoose";
+import { model, Schema } from 'mongoose';
 
 interface IConfirmSchema {
   confirm: boolean;
   inspector_id: number;
   inspector_name: string;
-  inspector: {
-    name: string;
-    _id: number;
-  };
+  value: string;
   updated_at: Date;
 }
 
@@ -59,8 +56,8 @@ const isConfirmSchema = new Schema({
   },
   inspector_id: Number,
   inspector_name: String,
-  inspector: inspectorSchema,
   updated_at: Date,
+  value: String,
 });
 const courtProcessSchema = new Schema(
   {
@@ -168,4 +165,4 @@ export interface AbonentDoc {
   _id: string;
 }
 
-export const Abonent = model("billing_abonent", schema);
+export const Abonent = model('billing_abonent', schema);

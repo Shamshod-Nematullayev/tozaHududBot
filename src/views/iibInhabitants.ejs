@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    .page {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .styled-table {
+      text-align: center;
+      border-collapse: collapse;
+      margin: 10px auto;
+      border: 1px solid blue;
+      width: 100%;
+    }
+
+    th,
+    td {
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page">
+    <div class="title">
+      Migratsiya va fuqarolikni rasmiylashtirish bosh boshqarmasi (Passport-Viza tizimi) elektron manzil boʻyicha doimiy va vaqtincha roʻyxatga olinganlar
+    </div>
+
+    <% if (details && details.house && details.house.owners && details.house.owners.length > 0) { %>
+    <table class="styled-table">
+      <tr>
+        <td>F.I.Sh</td>
+        <td style="width: 400px;"><%= details.house.owners[0].name %></td>
+      </tr>
+      <tr>
+        <td>Manzil</td>
+        <td><%= details.house.fullAddress %></td>
+      </tr>
+      <tr>
+        <td>Kadastr raqami</td>
+        <td><%= details.house.cadastralNumber %></td>
+      </tr>
+      <tr>
+        <td>Passport raqami</td>
+        <td><%= details.house.owners[0].passport %></td>
+      </tr>
+      <tr>
+        <td>PNFL</td>
+        <td><%= details.house.owners[0].pinfl %></td>
+      </tr>
+    </table>
+    <% } %>
+
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>F.I.Sh</th>
+          <th>Holat</th>
+          <th>PNFL</th>
+          <th>Ro`yxatdan o`tgandan vaqti</th>
+          <th>Ro`yxatdan chiqarilgan vaqti</th>
+          <th>Tug‘ilgan sanasi</th>
+          <th>Jinsi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (details && details.Data && details.Data.PermanentPersons) { %>
+        <% details.Data.PermanentPersons.forEach((person, i) => { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= person.Person %></td>
+          <td><%= person.Status === 1 ? "Doimiy ro'yxatdan o'tgan" : "Doimiy ro'yxatdan o'tmagan" %></td>
+          <td><%= person.Pinpp %></td>
+          <td><%= person.RegistrationDate %></td>
+          <td></td>
+          <td><%= person.DateBirth %></td>
+          <td><%= person.Sex === '1' ? 'Erkak' : 'Ayol' %></td>
+        </tr>
+        <% }); %>
+        <% } else { %>
+        <tr>
+          <td colspan="8">Ma'lumot topilmadi</td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+
+</html>

@@ -20,6 +20,13 @@ import { AxiosError } from 'axios';
 import { getIIBInhabitants } from '@services/billing/getIIBInhabitants.js';
 import { uploadFileToTozaMakon } from '@services/billing/uploadFileToTozaMakon.js';
 import { addInhabitantsToAbonent } from '@services/billing/addAbonentInhabitantsCount.js';
+import { PermamentsSchema } from '@schemas/abonents.schema.js';
+import { renderHtmlByEjs } from '@helpers/renderHtmlByEjs.js';
+import { createPdfFromHtml } from '@helpers/createPdfFromHtml.js';
+import { getHetWarningReportByResident } from '@services/billing/getHetWarningReportByResident.js';
+import { getCadastrDetailsService } from '@services/billing/getCadastrDetails.js';
+import NotFoundError from '@errors/NotFoundError.js';
+import { updateHetAccountNumber } from '@services/billing/updateHetAccountNumber.js';
 
 const stringOrEmpty = z
   .string()
@@ -81,14 +88,14 @@ export const abonentSchema = z.object({
 export const getAbonentById = async (req: Request, res: Response): Promise<any> => {
   const abonent = await getResidentById(createTozaMakonApi(req.user.companyId), Number(req.params.id));
 
-  if (!abonent) return res.status(404).json({ ok: false, message: 'Abonent topilmadi' });
+  if (!abonent) throw new NotFoundError('Abonent');
   res.json(abonent);
 };
 
 export const getAbonentHistoryById = async (req: Request, res: Response): Promise<any> => {
   const history = await getAbonentDetailsHistory(createTozaMakonApi(req.user.companyId), Number(req.params.id));
 
-  if (!history) return res.status(404).json({ ok: false, message: 'Abonent topilmadi' });
+  if (!history) throw new NotFoundError('Abonent');
   res.json(history);
 };
 
@@ -96,13 +103,21 @@ export const getCadastrs = async (req: Request, res: Response): Promise<any> => 
   const { pnfl } = z.object({ pnfl: z.string() }).parse(req.params);
   const cadastrs = await getResidentHousesByPnfl(createTozaMakonApi(req.user.companyId), pnfl);
 
-  if (!cadastrs) return res.status(404).json({ ok: false, message: 'Abonent topilmadi' });
+  if (!cadastrs) throw new NotFoundError('Abonent');
   res.json(cadastrs);
 };
 
+export const getCadastrDetails = async (req: Request, res: Response): Promise<any> => {
+  const { cadastralNumber } = z.object({ cadastralNumber: z.string() }).parse(req.params);
+  const cadastr = await getCadastrDetailsService(createTozaMakonApi(req.user.companyId), cadastralNumber);
+
+  res.json(cadastr);
+};
+
 export const getHetAbonent = async (req: Request, res: Response) => {
-  const params = z.object({ coato: z.string(), personalAccount: z.string() }).parse(req.params);
-  const data = await getDataFromHET(createTozaMakonApi(req.user.companyId), params);
+  const query = z.object({ coato: z.string(), personalAccount: z.string() }).parse(req.query);
+  const data = await getDataFromHET(createTozaMakonApi(req.user.companyId), query);
+  res.json(data);
 };
 
 export const getIibInhabitants = async (req: Request, res: Response) => {
@@ -125,7 +140,9 @@ export const getBalanceRecalcPredictController = async (req: Request, res: Respo
 };
 
 export const getAbonentByIdFromDB = async (req: Request, res: Response) => {
-  //TODO
+  const abonent = await Abonent.findOne({ id: req.params.id, companyId: req.user.companyId }).lean();
+  if (!abonent) throw new NotFoundError('Abonent');
+  res.json(abonent);
 };
 
 export const updateAbonentPhoneById = async (req: Request, res: Response) => {
@@ -137,7 +154,54 @@ export const updateAbonentPhoneById = async (req: Request, res: Response) => {
 };
 
 export const updateAbonentElectricityById = async (req: Request, res: Response) => {
-  //TODO
+  const { id } = z.object({ id: z.coerce.number() }).parse(req.params);
+  const { electricityAccountNumber, electricityCoato } = z
+    .object({ electricityAccountNumber: z.string(), electricityCoato: z.string() })
+    .parse(req.body);
+
+  await updateHetAccountNumber(createTozaMakonApi(req.user.companyId), {
+    electricityAccountNumber,
+    electricityCoato,
+    residentId: id,
+  });
+  res.status(200).send();
+  const abonent = await Abonent.findOne({ id: id, companyId: req.user.companyId }).lean();
+  if (
+    abonent &&
+    abonent.ekt_kod_tasdiqlandi?.value !== `${electricityCoato} ${electricityAccountNumber}` &&
+    electricityAccountNumber !== '' &&
+    electricityCoato !== ''
+  ) {
+    await Abonent.findOneAndUpdate(
+      { id: id, companyId: req.user.companyId },
+      {
+        $set: {
+          ekt_kod_tasdiqlandi: {
+            value: `${electricityCoato}-${electricityAccountNumber}`,
+            updated_at: new Date(),
+            inspector_id: req.user.id,
+            inspector_name: req.user.fullName,
+            confirm: true,
+          },
+        },
+      }
+    );
+  } else {
+    await Abonent.findOneAndUpdate(
+      { id: id, companyId: req.user.companyId },
+      {
+        $set: {
+          ekt_kod_tasdiqlandi: {
+            value: '',
+            updated_at: new Date(),
+            inspector_id: req.user.id,
+            inspector_name: req.user.fullName,
+            confirm: false,
+          },
+        },
+      }
+    );
+  }
 };
 
 export const updateAbonentById = async (req: Request, res: Response) => {
@@ -180,9 +244,16 @@ export const searchAbonentFromTozamakon = async (req: Request, res: Response) =>
 };
 
 export const getCitizenController = async (req: Request, res: Response) => {
-  const query = z.object({ pnfl: z.string(), passport: z.string(), birthDate: z.string().optional() }).parse(req.query);
+  const query = z
+    .object({
+      pnfl: z.string(),
+      passport: z.string(),
+      birthDate: z.string().optional(),
+      photoStatus: z.enum(['WITH_PHOTO', 'WITHOUT_PHOTO']).optional(),
+    })
+    .parse(req.query);
   const data = await getCitizen(createTozaMakonApi(req.user.companyId), {
-    photoStatus: 'WITHOUT_PHOTO',
+    photoStatus: query.photoStatus,
     birthdate: query.birthDate,
     pinfl: query.pnfl,
     passport: query.passport,
@@ -233,4 +304,21 @@ export const addInhabitants = async (req: Request, res: Response): Promise<any> 
 
   await addInhabitantsToAbonent(tozaMakonApi, { fileId, residentId: id, inhabitantCount });
   res.status(200).send();
+};
+
+export const createPdfByIib = async (req: Request, res: Response) => {
+  const data = PermamentsSchema.parse(req.body);
+
+  const html = await renderHtmlByEjs('iibInhabitants.ejs', data);
+  const pdf = await createPdfFromHtml(html);
+  res.setHeader('Content-Type', 'application/pdf');
+  res.send(pdf);
+};
+
+export const getHetWarningReport = async (req: Request, res: Response): Promise<any> => {
+  const { id } = z.object({ id: z.coerce.number() }).parse(req.params);
+  const data = await getHetWarningReportByResident(createTozaMakonApi(req.user.companyId), id);
+
+  if (!data) res.status(200).send();
+  res.json(data);
 };
