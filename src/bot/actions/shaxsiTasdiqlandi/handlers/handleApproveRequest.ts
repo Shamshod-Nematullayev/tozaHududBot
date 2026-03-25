@@ -81,6 +81,8 @@ export default async function handleApproveRequest(ctx: Context, req: ICustomDat
       shaxsi_tasdiqlandi: {
         confirm: true,
         inspector: { name: inspector.name, _id: inspector._id },
+        inspector_id: inspector.id,
+        inspector_name: inspector.name,
         updated_at: new Date(),
       },
     },
