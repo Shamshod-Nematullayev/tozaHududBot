@@ -184,7 +184,7 @@ export const updateAbonentElectricityById = async (req: Request, res: Response) 
             confirm: true,
           },
         },
-      }
+      },
     );
   } else {
     await Abonent.findOneAndUpdate(
@@ -199,7 +199,7 @@ export const updateAbonentElectricityById = async (req: Request, res: Response) 
             confirm: false,
           },
         },
-      }
+      },
     );
   }
 };
@@ -228,7 +228,7 @@ export const updateAbonentById = async (req: Request, res: Response) => {
         phone: data.phone,
         pinfl: data.citizen.pnfl,
       },
-    }
+    },
   );
 };
 
@@ -309,7 +309,7 @@ export const addInhabitants = async (req: Request, res: Response): Promise<any> 
 export const createPdfByIib = async (req: Request, res: Response) => {
   const data = PermamentsSchema.parse(req.body);
 
-  const html = await renderHtmlByEjs('iibInhabitants.ejs', data);
+  const html = await renderHtmlByEjs('iibInhabitants.ejs', { details: data });
   const pdf = await createPdfFromHtml(html);
   res.setHeader('Content-Type', 'application/pdf');
   res.send(pdf);
