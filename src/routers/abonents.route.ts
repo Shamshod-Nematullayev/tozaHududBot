@@ -36,7 +36,7 @@ router.get('/cadastrs', catchAsync(getCadastrs));
 
 router.get('/het-abonent', catchAsync(getHetAbonent));
 
-router.get('/cadastr-details/:cadastrNumber', catchAsync(getCadastrDetails));
+router.get('/cadastr-details', catchAsync(getCadastrDetails));
 
 router.get('/iib-inhabitants', catchAsync(getIibInhabitants));
 

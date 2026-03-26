@@ -108,7 +108,7 @@ export const getCadastrs = async (req: Request, res: Response): Promise<any> => 
 };
 
 export const getCadastrDetails = async (req: Request, res: Response): Promise<any> => {
-  const { cadastralNumber } = z.object({ cadastralNumber: z.string() }).parse(req.params);
+  const { cadastralNumber } = z.object({ cadastralNumber: z.string() }).parse(req.query);
   const cadastr = await getCadastrDetailsService(createTozaMakonApi(req.user.companyId), cadastralNumber);
 
   res.json(cadastr);
