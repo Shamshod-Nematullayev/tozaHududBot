@@ -31,7 +31,7 @@ app.use(
   cors({
     origin: true,
     credentials: true,
-  })
+  }),
 );
 
 if (launchBot) {
@@ -64,20 +64,20 @@ import { createTozaMakonApi } from '@api/tozaMakon.js';
 
 app.use('/api', mainRouter);
 
-process.on('warning', (warning) => {
-  console.warn(warning.stack);
-});
+// process.on('warning', (warning) => {
+//   console.warn(warning.stack);
+// });
 
-// Schedule jobs
+// // Schedule jobs
 
-agenda.on('ready', async () => {
-  console.log('Agenda is ready to use!');
-  initJobs();
-});
+// agenda.on('ready', async () => {
+//   console.log('Agenda is ready to use!');
+//   initJobs();
+// });
 
-agenda.on('error', (error: Error) => {
-  console.error('Agenda error:', error);
-});
+// agenda.on('error', (error: Error) => {
+//   console.error('Agenda error:', error);
+// });
 
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {

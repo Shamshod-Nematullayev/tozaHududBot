@@ -1,8 +1,6 @@
 import { Composer, Scenes } from 'telegraf';
 import { addNotification } from './scene/adminActions/addNotification.js';
 import { multiplyLivingsScene } from './scene/userScenes/multiplyLivings.js';
-import cancelGuvohnoma from './scene/adminActions/cancelGuvohnoma.js';
-import { confirmGuvohnomaScene } from './scene/adminActions/completeGuvohnoma.js';
 import { importPlanForInspectors } from './scene/adminActions/importPlanForInspectors.js';
 import { connectPhoneNumber } from './scene/userScenes/connectPhoneNumber.js';
 import { generateSBuyruq } from './scene/adminActions/generateSudBuyruq.js';
@@ -32,8 +30,6 @@ import { certificateNoDebtScene } from './scene/userScenes/certificateNoDebt.js'
 const stage = new Scenes.Stage<any>([
   addNotification,
   multiplyLivingsScene,
-  cancelGuvohnoma,
-  confirmGuvohnomaScene,
   importPlanForInspectors,
   connectPhoneNumber,
   generateSBuyruq,
