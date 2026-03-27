@@ -31,7 +31,7 @@ app.use(
   cors({
     origin: true,
     credentials: true,
-  })
+  }),
 );
 
 if (launchBot) {
