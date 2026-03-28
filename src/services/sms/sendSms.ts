@@ -44,7 +44,7 @@ export async function sendSmsWarning(
     mobile_phone: phone,
     message,
     from: 4546,
-    callback_url: `https://greenzone.uz/api/sms-service/callback-eskiz?secret=${process.env.ESKIZ_LONG_TOKEN}`,
+    callback_url: `https://api.greenzone.uz/api/sms-service/callback-eskiz?secret=${process.env.ESKIZ_LONG_TOKEN}`,
   };
   const sms = await sendSms(eskiz, payload);
   const smsWarning = await SmsWarning.create({

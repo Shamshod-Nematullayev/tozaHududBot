@@ -1,9 +1,9 @@
-import https from "https";
-import fs from "fs";
-import xlsx from "xlsx";
-import { messages } from "@lib/messages.js";
+import https from 'https';
+import fs from 'fs';
+import xlsx from 'xlsx';
+import { messages } from '@lib/messages.js';
 
-import { keyboards } from "@lib/keyboards.js";
+import { keyboards } from '@lib/keyboards.js';
 
 // Helper function to download file using HTTPS
 function downloadFile(url, dest) {
@@ -12,11 +12,11 @@ function downloadFile(url, dest) {
     https
       .get(url, (response) => {
         response.pipe(file);
-        file.on("finish", () => {
+        file.on('finish', () => {
           file.close(resolve);
         });
       })
-      .on("error", (error) => {
+      .on('error', (error) => {
         fs.unlink(dest, () => reject(error));
       });
   });
@@ -29,16 +29,13 @@ export async function handleTelegramExcel(ctx) {
     }
     if (
       ctx.message.document &&
-      (ctx.message.document.mime_type ===
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-        ctx.message.document.mime_type === "application/vnd.ms-excel")
+      (ctx.message.document.mime_type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+        ctx.message.document.mime_type === 'application/vnd.ms-excel')
     ) {
-      const xlsxLink = await ctx.telegram.getFileLink(
-        ctx.message.document.file_id
-      );
+      const xlsxLink = await ctx.telegram.getFileLink(ctx.message.document.file_id);
       ctx.reply(messages.pleaseWait);
 
-      const filePath = "./alert_letter.xls"; // Path where the Excel file will be saved
+      const filePath = './alert_letter.xls'; // Path where the Excel file will be saved
 
       await downloadFile(xlsxLink.href, filePath); // Download the Excel file
 
@@ -46,20 +43,20 @@ export async function handleTelegramExcel(ctx) {
       const jsonData = xlsx.utils.sheet_to_json(xls.Sheets[xls.SheetNames[0]]); // Convert sheet to JSON
 
       // Further processing with jsonData
-      console.log("Excel data:", jsonData);
+      console.log('Excel data:', jsonData);
 
       // Optionally, reply or perform actions with the processed data
-      await ctx.reply("Excel file processed successfully!");
+      await ctx.reply('Excel file processed successfully!');
 
       // Clean up: Remove the downloaded file
       await fs.unlinkSync(filePath);
 
       return jsonData; // Return JSON data if needed
     } else {
-      ctx.reply("Invalid or unsupported document type.", keyboards.cancelBtn);
+      ctx.reply('Invalid or unsupported document type.', keyboards.cancelBtn);
     }
   } catch (error) {
-    console.error("Error handling Excel file:", error);
+    console.error('Error handling Excel file:', error);
     throw error;
   }
 }
