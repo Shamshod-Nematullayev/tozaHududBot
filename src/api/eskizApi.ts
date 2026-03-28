@@ -1,13 +1,13 @@
-import { Company } from "@models/Company.js";
-import axios, { AxiosInstance } from "axios";
+import { Company } from '@models/Company.js';
+import axios, { AxiosInstance } from 'axios';
 
-function createEskizApi(companyId: number): AxiosInstance {
+export function createEskizApi(companyId: number): AxiosInstance {
   const instance = axios.create({
-    baseURL: "https://notify.eskiz.uz/api",
+    baseURL: 'https://notify.eskiz.uz/api',
     headers: {
-      Accept: "application/json, text/plain, */*",
-      "accept-language": "UZ",
-      "x-channel": "WEB",
+      Accept: 'application/json, text/plain, */*',
+      'accept-language': 'UZ',
+      'x-channel': 'WEB',
     },
   });
 
@@ -15,7 +15,7 @@ function createEskizApi(companyId: number): AxiosInstance {
     async (config) => {
       const company = await Company.findOne({ id: companyId });
       if (company?.eskizAccessToken) {
-        config.headers["Authorization"] = `Bearer ${company.eskizAccessToken}`;
+        config.headers['Authorization'] = `Bearer ${company.eskizAccessToken}`;
       }
       return config;
     },
@@ -39,7 +39,7 @@ function createEskizApi(companyId: number): AxiosInstance {
       if (status === 401) {
         try {
           const { data } = (
-            await axios.post("https://notify.eskiz.uz/api/auth/login", {
+            await axios.post('https://notify.eskiz.uz/api/auth/login', {
               email: company.eskizLogin,
               password: company.eskizPassword,
             })
@@ -51,7 +51,7 @@ function createEskizApi(companyId: number): AxiosInstance {
             },
           });
 
-          error.config.headers["Authorization"] = `Bearer ${data.token}`;
+          error.config.headers['Authorization'] = `Bearer ${data.token}`;
           return instance.request(error.config);
         } catch (loginError) {
           return Promise.reject(loginError); // login noto‘g‘ri bo‘lsa, to‘xtatish

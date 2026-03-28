@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 type EskizSmsStatus = 'NEW' | 'STORED' | 'ACCEPTED' | 'PARTDELIVERED' | 'DELIVERED' | 'REJECTED';
 
-interface ISmsWarning {
+export interface ISmsWarning {
   residentId: number;
   accountNumber: string;
   debtAmount: number;

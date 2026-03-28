@@ -25,6 +25,7 @@ import automobilesRouter from './automobiles.route.js';
 import mahallaRouter from './mahallaRouter.js';
 import downloadTemplatesRouter from './downloadTemplates.route.js';
 import tasksRouter from './tasks.route.js';
+import smsRouter from './sms.route.js';
 
 // middlewares
 import isAuth from '@middlewares/isAuth.js';
@@ -34,6 +35,8 @@ import { readOnlyGlobal } from '@middlewares/readOnlyGlobal.js';
 
 // 🔓 public
 mainRouter.use('/auth', authRouter);
+
+mainRouter.use('/sms-service', smsRouter);
 
 // 🔐 protected (GLOBAL)
 mainRouter.use(isAuth);

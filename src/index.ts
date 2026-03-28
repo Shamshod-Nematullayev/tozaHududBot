@@ -31,7 +31,7 @@ app.use(
   cors({
     origin: true,
     credentials: true,
-  }),
+  })
 );
 
 if (launchBot) {
@@ -58,6 +58,8 @@ import { initJobs } from 'intervals/index.js';
 import mainRouter from 'routers/index.js';
 import { specialTaskReport, specialTaskReportByInspectorsDaily } from 'intervals/specialTaskReport.js';
 import { createTozaMakonApi } from '@api/tozaMakon.js';
+import { sendSmsWarning } from '@services/sms/sendSms.js';
+import { createEskizApi } from '@api/eskizApi.js';
 // import "specialBusinessFunctions/bindAbonentsToGeozone.js";
 // importPhonesFromHET(1144, abonents);
 // createActs2(621, abonents);
@@ -83,3 +85,16 @@ const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log(`Server listening port: ${PORT}`);
 });
+
+// (async () => {
+//   const sms = await sendSmsWarning(createEskizApi(1144), {
+//     accountNumber: '105120450661',
+//     phone: 998992833227,
+//     companyId: 1144,
+//     companyPhone: '557052555',
+//     debtAmount: 78954,
+//     debtDate: '28.03.2026',
+//     residentId: 13236117,
+//   });
+//   console.log(sms);
+// })();
