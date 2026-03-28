@@ -89,7 +89,7 @@ server.listen(PORT, () => {
 // (async () => {
 //   const sms = await sendSmsWarning(createEskizApi(1144), {
 //     accountNumber: '105120450661',
-//     phone: 998992833227,
+//     phone: 998951872536,
 //     companyId: 1144,
 //     companyPhone: '557052555',
 //     debtAmount: 78954,

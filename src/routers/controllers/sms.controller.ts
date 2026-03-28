@@ -23,6 +23,7 @@ export const EskizQuerySchema = z.object({
 });
 
 export const receiveCallbackFromEskiz = async (req: Request, res: Response) => {
+  console.log(req.body, req.query);
   const { secret } = EskizQuerySchema.parse(req.query);
   const { message_id, status, status_date } = EskizCallbackSchema.parse(req.body);
 
